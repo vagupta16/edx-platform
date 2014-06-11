@@ -24,12 +24,12 @@ window.InlineAnalytics = (function() {
         var arrayLength = partsToGet.length;
         for (index = 0; index < arrayLength; index++) {
             partId = partsToGet[index];
-            
+
             if (messageByPart[partId]) {
-            	// An error was encountered processing the API data so set the appropriate
-            	// error message and continue.
-            	setErrorMessageOnPart(partId, messageByPart[partId]);
-            	continue;
+                // An error was encountered processing the API data so set the appropriate
+                // error message and continue.
+                setErrorMessageOnPart(partId, messageByPart[partId]);
+                continue;
             }
 
             if (countByPart[partId]) {
@@ -110,29 +110,29 @@ window.InlineAnalytics = (function() {
 
         // Build the array of choice texts
         var choiceText = getChoiceTexts(partId);
-        
+
         // Generate choice name array
         var choiceNameArray = JSON.parse(choiceNameString);
 
         if (result) {
             // Build the array of value_id's
             valueIdArray = constructValueIdArray(result);
-        	
+
             // Loop through choiceNameArray and construct row array.
             // We can determine if any rows are "missing" from the api data
             // since the choiceNameArray is a list of all possible rows.
             arrayLength = choiceNameArray.length;
             for (index = 0; index < arrayLength; index++) {
-            
+
                 // If value is not in array then add row
                 if (valueIdArray.indexOf(choiceNameArray[index]) === -1) {
-                	insertMissingRows(partId,
-                	    index,
-                	    index + 1,
-                	    correctResponse,
-                	    choiceText,
-                	    choiceNameArray,
-                	    trs);
+                    insertMissingRows(partId,
+                        index,
+                        index + 1,
+                        correctResponse,
+                        choiceText,
+                        choiceNameArray,
+                        trs);
                 } else {
                     currentResult = result[valueIdArray.indexOf(choiceNameArray[index])]
                     correct = currentResult['correct'];
@@ -144,19 +144,19 @@ window.InlineAnalytics = (function() {
                     } else {
                         answerClass = 'inline-analytics-incorrect';
                     }
-                    
+
                     tr = $('<tr>');
-                    tdChoice = $('<td class="answer_box">');
+                    tdChoice = $('<td class="answer-box">');
                     tdChoice.attr('title', choiceText[index]);
                     tdChoice.text(parseInt(index, 10) + 1);
-                    tdDot = $('<td class="answer_box">');
+                    tdDot = $('<td class="answer-box">');
                     tdDot.addClass(answerClass);
                     tdDot.append($('<span class="dot">'));
-                    tdCount = $('<td class="answer_box">');
+                    tdCount = $('<td class="answer-box">');
                     tdCount.text(count);
-                    tdPercent = $('<td class="answer_box">');
+                    tdPercent = $('<td class="answer-box">');
                     tdPercent.text(percent + '%');
-                    
+
                     tr.append(tdChoice);
                     tr.append(tdDot);
                     tr.append(tdCount);
@@ -200,7 +200,7 @@ window.InlineAnalytics = (function() {
         var tdDot;
         var tdCount;
         var tdPercent;
-        
+
         correctResponse = correctResponse.substring(2, correctResponse.length - 2);
 
         // Insert rows between currentIndex and finalIndex
@@ -210,19 +210,19 @@ window.InlineAnalytics = (function() {
             } else {
                 answerClass = 'inline-analytics-incorrect';
             }
-            
+
             tr = $('<tr>');
-            tdChoice = $('<td class="answer_box">');
+            tdChoice = $('<td class="answer-box">');
             tdChoice.attr('title', choiceText[currentIndex]);
             tdChoice.text(parseInt(currentIndex, 10) + 1);
-            tdDot = $('<td class="answer_box">');
+            tdDot = $('<td class="answer-box">');
             tdDot.addClass(answerClass);
             tdDot.append($('<span class="dot">'));
-            tdCount = $('<td class="answer_box">');
+            tdCount = $('<td class="answer-box">');
             tdCount.text(0);
-            tdPercent = $('<td class="answer_box">');
+            tdPercent = $('<td class="answer-box">');
             tdPercent.text('0%');
-            
+
             tr.append(tdChoice);
             tr.append(tdDot);
             tr.append(tdCount);
@@ -262,11 +262,11 @@ window.InlineAnalytics = (function() {
         var choiceText = getChoiceTexts(partId);
 
         // Add "Last Attempt" to the choice number column
-        $('#' + partId + '_table .checkbox_header_row').after('<tr><td id="last_attempt" class="answer_box checkbox_last_attempt">Last Attempt</td></tr>');
+        $('#' + partId + '_table .checkbox_header_row').after('<tr><td id="last_attempt" class="answer-box checkbox-last-attempt">' + gettext('Last Attempt') + '</td></tr>');
 
         // Contruct the choice number column array
         while (choiceCounter <= choiceText.length) {
-            tr = $('<tr><td id="column0:row' + choiceCounter + '" class="answer_box" title="' +
+            tr = $('<tr><td id="column0:row' + choiceCounter + '" class="answer-box" title="' +
                 choiceText[choiceCounter - 1] + '">' + choiceCounter + '</td></tr>');
             choiceTrs.push(tr[0]);
             choiceCounter += 1;
@@ -290,7 +290,7 @@ window.InlineAnalytics = (function() {
                 // Append message and break if number of distinct choices >= max_columns
                 if (index >= maxColumns) {
                     var notDisplayed = result.length - maxColumns;
-                    tr = $('<th class="not_displayed"> ' + notDisplayed + ' columns not displayed.</th>');
+                    tr = $('<th class="not-displayed"> ' + notDisplayed + ' columns not displayed.</th>');
                     headerTrs.push(tr[0]);
                     break;
                 }
@@ -302,7 +302,7 @@ window.InlineAnalytics = (function() {
                 while (choiceCounter <= choiceText.length) {
                     imaginedResponse = 'choice_' + (choiceCounter - 1);
 
-                    // Can't rely in contains method in all browsers so use indexOf
+                    // Can't rely on contains method in all browsers so use indexOf
                     if ((correctResponse.indexOf(imaginedResponse) === -1) &&
                         (actualResponse.indexOf(imaginedResponse) === -1) ||
                         (correctResponse.indexOf("'" + imaginedResponse + "'") > -1 &&
@@ -317,7 +317,8 @@ window.InlineAnalytics = (function() {
                     } else {
                         checkboxChecked = '';
                     }
-                    tr = $('<td id="column' + index + ':row' + choiceCounter + '" class="answer_box ' +
+
+                    tr = $('<td id="column' + index + ':row' + choiceCounter + '" class="answer-box ' +
                         answerClass + '">' + checkboxChecked + '</td>');
                     dataTrs.push([choiceCounter, tr[0]]);
 
@@ -327,7 +328,7 @@ window.InlineAnalytics = (function() {
                 // Construct the Last Attempt row
                 count = result[index]['count'];
                 percent = Math.round(count * 1000 / (totalAttemptCount * 10));
-                countRow += '<td class="answer_box">' + count + '<br/>' + percent + '%</td>'
+                countRow += '<td class="answer-box">' + count + '<br/>' + percent + '%</td>'
             }
 
             // Append the header row array to the header row
@@ -363,7 +364,7 @@ window.InlineAnalytics = (function() {
     function getChoiceTexts(partId) {
         var choiceText = [];
         $('#inputtype_' + partId).find("fieldset label").each(function(index) {
-        	// Filter out the tick or cross text indicating correctness if present
+            // Filter out the tick or cross text indicating correctness if present
             choiceText[index] = $(this).contents().filter(function() {
                 return this.nodeType === 3; //Node.TEXT_NODE
             }).text();
@@ -398,8 +399,8 @@ window.InlineAnalytics = (function() {
         part = $(part);
         var correctPercent = Math.round(totalCorrectCount * 1000 / (totalAttemptCount * 10));
         var incorrectPercent = Math.round(totalIncorrectCount * 1000 / (totalAttemptCount * 10));
-        part.find('.num-students-extra').text(totalCorrectCount + ' (' + correctPercent + '%) correct and ' +
-            totalIncorrectCount + ' (' + incorrectPercent + '%) incorrect.');
+        part.find('.num-students-extra').text(totalCorrectCount + ' (' + correctPercent + '%) ' + gettext('correct and') +
+            ' ' + totalIncorrectCount + ' (' + incorrectPercent + '%) ' + gettext('incorrect.'));
     }
 
 
@@ -418,7 +419,7 @@ window.InlineAnalytics = (function() {
         elementId,
         message) {
         // Set the error message on the element
-    	$('#' + elementId + '_analytics').html(message);
+        $('#' + elementId + '_analytics').html(message);
     }
 
 
@@ -427,12 +428,11 @@ window.InlineAnalytics = (function() {
         valueIdArray = result.map(function(element) {
             return element['value_id'];
         });
-    	return valueIdArray;
+        return valueIdArray;
     }
 
 
     function runDocReady(elementId) {
-
 
         // Variable for storing if a problem's analytics data has previously been retrieved.
         var elementsRetrieved = [];
@@ -481,16 +481,16 @@ window.InlineAnalytics = (function() {
 
                 // Build dict of number of options (choices)
                 numOptionsByPart[partId] = getChoiceTexts(partId).length;
-                
+
                 // Build dict of choice name lists
                 choiceNameListByPart[partId] = divs[index].dataset.choiceNameList;
             }
 
             var data = {
-            		module_id: location,
-            		question_types_by_part: questionTypesByPart,
-            		num_options_by_part: numOptionsByPart,
-            		course_id: courseId,
+                module_id: location,
+                question_types_by_part: questionTypesByPart,
+                num_options_by_part: numOptionsByPart,
+                course_id: courseId,
             };
 
             if (partsToGet.length > 0) {
@@ -498,7 +498,9 @@ window.InlineAnalytics = (function() {
                     context: this,
                     url: answerDistUrl,
                     type: 'POST',
-                    data: {data: JSON.stringify(data)},
+                    data: {
+                        data: JSON.stringify(data)
+                    },
                     dataType: 'json',
                     contentType: "application/json",
 
@@ -518,8 +520,8 @@ window.InlineAnalytics = (function() {
                 });
 
             } else {
-            	// API was not called, (no parts to get) so display the existing messages
-            	$('#' + elementId + '_analytics_close').show();
+                // API was not called, (no parts to get) so display the existing messages
+                $('#' + elementId + '_analytics_close').show();
             }
         });
 
@@ -530,8 +532,8 @@ window.InlineAnalytics = (function() {
     }
 
     return {
-        processResponse: processResponse,
         runDocReady: runDocReady,
+        processResponse: processResponse,
     };
 
 })();

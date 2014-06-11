@@ -1,7 +1,7 @@
 """Inline Analytics integration tests"""
 
 import json
-from mock import patch, MagicMock
+from mock import patch
 
 from django.test import RequestFactory
 from django.test.utils import override_settings
@@ -10,6 +10,7 @@ from courseware.views import get_analytics_answer_dist, process_analytics_answer
 from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from analyticsclient.exceptions import NotFoundError, InvalidRequestError, TimeoutError
 
 
 class InlineAnalyticsTest(ModuleStoreTestCase):
@@ -22,7 +23,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             org="A",
             number="B",
-            run="C",
+            display_name="C",
         )
         self.staff = StaffFactory(course_key=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -36,32 +37,40 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         json_analytics_data = json.dumps(analytics_data)
         self.data = {"data": json_analytics_data}
 
-    @override_settings(ANALYTICS_ANSWER_DIST_URL='dummy_url')
+    @override_settings(ANALYTICS_DATA_URL='dummy_url',
+                       ZENDESK_URL='https://zendesk.com')
     def test_regular_user(self):
 
         request = self.factory.post('', self.data)
         request.user = self.user
 
         response = get_analytics_answer_dist(request)
-        self.assertEquals(response.content, 'A problem has occurred retrieving the data, please report the problem.')
+        self.assertEquals(response.content, 'A problem has occurred retrieving the data, to report the problem click <a href="https://zendesk.com/hc/en-us/requests/new">here</a>')
 
+    @override_settings(ZENDESK_URL='https://zendesk.com')
     def test_no_url(self):
 
         request = self.factory.post('', self.data)
         request.user = self.instructor
 
         response = get_analytics_answer_dist(request)
-        self.assertEquals(response.content, 'A problem has occurred retrieving the data, please report the problem.')
+        self.assertEquals(response.content, 'A problem has occurred retrieving the data, to report the problem click <a href="https://zendesk.com/hc/en-us/requests/new">here</a>')
 
-    @override_settings(ANALYTICS_ANSWER_DIST_URL='dummy_url')
-    @patch('urllib2.urlopen')
+    def test_no_url_no_zendesk(self):
+
+        request = self.factory.post('', self.data)
+        request.user = self.instructor
+
+        response = get_analytics_answer_dist(request)
+        self.assertEquals(response.content, 'A problem has occurred retrieving the data.')
+
+    @override_settings(ANALYTICS_DATA_URL='dummy_url',
+                       ZENDESK_URL='https://zendesk.com')
     @patch('courseware.views.process_analytics_answer_dist')
-    def test_staff_and_url(self, mock_process_analytics, mock_requests):
+    @patch('courseware.views.Client')
+    def test_staff_and_url(self, mock_client, mock_process_analytics):
 
-        mock_resp = MagicMock()
-        mock_read = MagicMock(return_value="{}")
-        mock_resp.read = mock_read
-        mock_requests.return_value = mock_resp
+        mock_client.return_value.modules.return_value.answer_distribution.return_value = [{}]
 
         factory = self.factory
         request = factory.post('', self.data)
@@ -71,15 +80,13 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         response = get_analytics_answer_dist(request)
         self.assertEquals(response, [{'dummy': 'dummy'}])
 
-    @override_settings(ANALYTICS_ANSWER_DIST_URL='dummy_url')
-    @patch('urllib2.urlopen')
+    @override_settings(ANALYTICS_DATA_URL='dummy_url',
+                       ZENDESK_URL='https://zendesk.com')
     @patch('courseware.views.process_analytics_answer_dist')
-    def test_instructor_and_url(self, mock_process_analytics, mock_requests):
+    @patch('courseware.views.Client')
+    def test_instructor_and_url(self, mock_client, mock_process_analytics):
 
-        mock_resp = MagicMock()
-        mock_read = MagicMock(return_value="{}")
-        mock_resp.read = mock_read
-        mock_requests.return_value = mock_resp
+        mock_client.return_value.modules.return_value.answer_distribution.return_value = [{}]
 
         factory = self.factory
         request = factory.post('', self.data)
@@ -88,6 +95,51 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         mock_process_analytics.return_value = [{'dummy': 'dummy'}]
         response = get_analytics_answer_dist(request)
         self.assertEquals(response, [{'dummy': 'dummy'}])
+
+    @override_settings(ANALYTICS_DATA_URL='dummy_url',
+                       ZENDESK_URL='https://zendesk.com')
+    @patch('courseware.views.Client')
+    def test_not_found_error(self, mock_client):
+
+        mock_client.return_value.modules.return_value.answer_distribution.side_effect = NotFoundError
+
+        factory = self.factory
+        request = factory.post('', self.data)
+        request.user = self.instructor
+
+        response = get_analytics_answer_dist(request)
+        self.assertEquals(response.status_code, 404)
+        self.assertEquals(response.content, 'There are no student answers for this problem yet; please try again later.')
+
+    @override_settings(ANALYTICS_DATA_URL='dummy_url',
+                       ZENDESK_URL='https://zendesk.com')
+    @patch('courseware.views.Client')
+    def test_invalid_request_error(self, mock_client):
+
+        mock_client.return_value.modules.return_value.answer_distribution.side_effect = InvalidRequestError
+
+        factory = self.factory
+        request = factory.post('', self.data)
+        request.user = self.instructor
+
+        response = get_analytics_answer_dist(request)
+        self.assertEquals(response.status_code, 500)
+        self.assertEquals(response.content, 'A problem has occurred retrieving the data, to report the problem click <a href="https://zendesk.com/hc/en-us/requests/new">here</a>')
+
+    @override_settings(ANALYTICS_DATA_URL='dummy_url',
+                       ZENDESK_URL='https://zendesk.com')
+    @patch('courseware.views.Client')
+    def test_timeout_error(self, mock_client):
+
+        mock_client.return_value.modules.return_value.answer_distribution.side_effect = TimeoutError
+
+        factory = self.factory
+        request = factory.post('', self.data)
+        request.user = self.instructor
+
+        response = get_analytics_answer_dist(request)
+        self.assertEquals(response.status_code, 500)
+        self.assertEquals(response.content, 'A problem has occurred retrieving the data, to report the problem click <a href="https://zendesk.com/hc/en-us/requests/new">here</a>')
 
     def test_process_analytics_answer_dist(self):
 

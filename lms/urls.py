@@ -439,6 +439,10 @@ if settings.COURSEWARE_ENABLED:
         # Student Notes
         url(r'^courses/{}/edxnotes'.format(settings.COURSE_ID_PATTERN),
             include('edxnotes.urls'), name="edxnotes_endpoints"),
+
+        # Analytics api endpoints for in-line analytics
+        url(r'^get_analytics_answer_dist/',
+            'courseware.views.get_analytics_answer_dist', name='get_analytics_answer_dist'),
     )
 
     # allow course staff to change to student view of courseware
