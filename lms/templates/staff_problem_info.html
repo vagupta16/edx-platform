@@ -17,13 +17,163 @@ ${block_content}
       % endif
   </div>
 %  endif
+
+
+<style>
+body {
+  font-family:'helvetica neue', 'helvetica';
+  font-size:16px;
+  background-color: #fbfbf9;
+}
+.grid-wrapper{
+  position: relative;
+  float: left;
+  clear: both;
+  margin:30px 100px 100px 30px;
+}
+
+.grid-block{
+  position: relative;
+  float: left;
+  margin: 0 25px 0 0;
+}
+.grid-block .graph{
+  float: left;
+  width: 300px;
+  margin-left: 50px;
+  border-left: 2px solid #444;
+  border-bottom: 2px solid #444;
+}
+.grid-wrapper.radio .graph{
+  height: 150px;
+}
+.grid-wrapper.checkbox .graph{
+  height: 250px;
+}
+.grid-block .graph .y-label{
+  position: absolute;
+  width: 45px;
+  top: -8px;
+  left: 0;
+  text-align: right;
+}
+.grid-block .graph .column{
+  position: relative;
+  height: 100%;
+  width: 45px;
+  margin: 0 15px;
+  float: left;
+}
+.grid-block .graph .column .block {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+.grid-block .legend{
+  float: left;
+  clear: both;
+  height: 28px;
+  width: 300px;
+  margin-left: 50px;
+}
+.grid-block .legend .label{
+  float: left;
+  width: 75px;
+  padding: 5px 0;
+  text-align: center;
+}
+.grid .view {
+}
+.answer_box{
+  padding:5px 0px;
+  background-color:#efefef;
+  text-align: center;
+}
+.wrong{
+  background-color:#ffa4a2;
+}
+.right{
+  background-color:#96ec9c;
+}
+.correct_answer {
+  color:#96ec9c;
+  background-color: #444;
+}
+.correct_answer .dot {
+  background-color:#efefef;
+}
+
+.check{
+  content:url('https://class.stanford.edu/static/images/correct-icon.ea93859cc9ff.png');
+}
+.dot{
+  display: inline-block;
+  height:20px;
+  width: 20px;
+  border-radius: 10px;
+  background-color: #444;
+  margin: 0;
+}
+.plus{
+  font-size:36px;
+  font-weight:bold;
+  padding-bottom: 5px;
+}
+</style>
+
+
+
 <div aria-hidden="true" class="wrap-instructor-info">
   <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
-
+  
+  % if problem_type:
+      <a class="instructor-info-action instructor-analytics-action" id="${element_id}_analytics" data-correct_response="${correct_response}" data-num_choices="${num_choices}" data-problem_type="${problem_type}" data-div_id="${div_id}" href="#${element_id}">${_("Staff Analytics Info")}</a>
+  % endif
+  
   %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
     location.category == 'problem':
     <a class="instructor-info-action" href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a>
   %  endif
+</div>
+
+<div id="${element_id}_radio" style="display: none;">
+  <div id="${element_id}_radio_close" href="#">X
+    <section aria-hidden="true" >
+      <div class="grid-wrapper radio">
+        <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question.</p>
+        <p>Last updated: <strong class="last-update"></strong></p>
+        <div class="grid-block table">
+          <table cellspacing="2px" id="${element_id}_radio_table">
+            <tr>
+              <td width="65px">Choice</td>
+              <td width="50px"></td>
+              <td width="125px" colspan="2">Last Attempt</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<div id="${element_id}_checkbox" style="display: none;">
+  <div id="${element_id}_checkbox_close" href="#">X
+    <section aria-hidden="true" >
+      <div class="grid-wrapper checkbox">
+        <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question:</p>
+        <p>Last updated: <strong class="last-update"></strong></p>
+        <div class="grid-block table">
+          <table cellspacing="2px" id="${element_id}_checkbox_table">
+            <tr class="checkbox_header_row">
+              <td width="65px">Choice</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<div id="error_message" style="display: none;">
+  <p><strong></strong></p>
 </div>
 
 <section aria-hidden="true" id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
@@ -135,7 +285,255 @@ $(function () {
             'user': '${user}'
         }
     );
+    
 });
+
+// Variable for storing if a problem's analytics data has previously been retrieved.
+elements_retrieved = [];
+
+$('#${element_id}_analytics').click(function(event) {
+	
+  var element_id = this.id.replace("_analytics", '_'+this.dataset.problem_type);
+	
+  // If data already retrieved for this problem, show the div
+  if (elements_retrieved.indexOf(this.id) != -1) {
+    $('#'+element_id).show();
+	return;
+  }
+  elements_retrieved.push(this.id);
+	
+  $.ajax({
+    context: this,
+    url: "${get_analytics_answer_dist}",
+    type: "GET",
+    data: {module_id: "${location.to_deprecated_string()}"},
+    dataType: "json",
+        
+    success: function(response) {
+
+      var correct_response = this.dataset.correct_response;
+      var num_choices = this.dataset.num_choices;
+      var div_id = "problem_"+this.dataset.div_id
+
+      if (response != '{}') {
+        var result = JSON.parse(response.data);
+
+        if (!result[0]['variant']) {
+          if (this.dataset.problem_type == 'radio') {
+            process_radio_response(result, response.last_update_date, element_id, correct_response, num_choices, div_id);
+          }else if (this.dataset.problem_type == 'checkbox') {
+    	    process_checkbox_response(result, response.last_update_date, element_id, correct_response, num_choices, div_id);
+          }
+          // If randomize was used, show error message
+        }else {        	  
+          $('#error_message').text("The analytics cannot be displayed as the problem uses randomize.").show();
+          return;
+        }
+      // If api returned no data show error message
+      } else {
+        $('#error_message').text("There was a problem retrieving data for this problem.").show();
+        return;
+      }
+    }
+  });
+});
+
+
+function process_radio_response(result, last_update_date, element_id, correct_response, num_choices, div_id) {
+	
+  var total_count = 0;
+  var correct;
+  var count;
+  var percent;
+  var last_update;
+  var value_id;
+  var value_index;
+  var current_index;
+  var last_index;
+  var choice_text = [];
+  var answer_class;
+
+  // Build the array of choice texts
+  $('#'+div_id).find("fieldset label").each(function(index) {
+	choice_text[index] = $(this).text();
+  });
+  
+  // Calculate the total number of responses
+  for (var index in result) {
+	total_count += result[index]['count'];
+  }
+  
+  // Loop through results creating rows
+  for (var index in result) {
+	
+	value_id = result[index]['value_id'];
+		
+	current_index = index;
+	value_index = value_id.replace("choice_", "");
+		
+	// Display rows for gaps in answers in the results
+	if (current_index < value_index) {
+	 insert_missing_rows(element_id, current_index, value_index, correct_response, choice_text);
+	}
+	    
+	correct = result[index]['correct'];
+	count = result[index]['count'];
+	percent = Math.round(count*1000/(total_count*10));
+	
+	// Display row for the result
+	if (correct) {
+	  answer_class = 'right';
+	} else {
+	  answer_class = 'wrong';
+	}
+	$('#'+element_id+'_table tr:last').after('<tr><td class="answer_box" title=\"'+choice_text[index]+'\">'+(parseInt(index)+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">'+count+'</td><td class="answer_box">'+percent+'%</td></tr>');
+  }
+	
+  // Display rows for missing answers at the end of results
+  last_index = parseInt(result[result.length -1]['value_id'].replace("choice_", ""));
+  if (last_index < num_choices -1) {
+    insert_missing_rows(element_id, last_index + 1, num_choices, correct_response, choice_text);  
+  }
+		
+  // Set the student count
+  $('#'+element_id+' .num-students').text(total_count);
+    
+  //Set last updated
+  $('#'+element_id+' .last-update').text(last_update_date);
+          
+  // Show the div
+  $('#'+element_id).show();
+	
+}   
+
+function insert_missing_rows(element_id, current_index, final_index, correct_response, choice_text) {
+
+  var answer_class;
+
+  while (current_index < final_index) {
+    if ("choice_"+current_index == correct_response) {
+      answer_class = 'right';
+	} else {
+	  answer_class = 'wrong';
+	}
+    $('#'+element_id+'_table tr:last').after('<tr><td class="answer_box" title=\"'+choice_text[current_index]+'\">'+(current_index+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">0</td><td class="answer_box">0%</td></tr>');
+	current_index += 1;
+  }
+}
+
+
+function process_checkbox_response(result, last_update_date, element_id, correct_response, num_choices, div_id) {
+	
+  var choice_text = [];
+  var total_count = 0;
+  var choice_counter = num_choices;
+  var count;
+  var percent;
+  var answer_class;
+  var actual_response;
+  var imagined_response;
+  var checkbox_checked;
+  var count_row;
+  var max_columns = 10;
+	
+  // Sort the results in decending response count order
+  result.sort(compare);
+	
+  // Build the array of choice texts
+  $('#'+div_id).find("fieldset label").each(function(index) {
+	choice_text[index] = $(this).text();
+  });
+	  
+  // Calculate the total number of responses
+  for (var index in result) {
+	total_count += result[index]['count'];
+  }
+	
+  // Add "Last Attempt" to the choice number column
+  $('#'+element_id+'_table .checkbox_header_row').after('<tr><td id="last_attempt" class="answer_box checkbox_last_attempt">Last Attempt</td></tr>');
+	
+  // Contruct the choice number column
+  while (choice_counter > 0) {
+	$('#'+element_id+'_table .checkbox_header_row').after('<tr><td id="column0:row'+choice_counter+'" class="answer_box" title=\"'+choice_text[choice_counter-1]+'\">'+choice_counter+'</td></tr>');
+	choice_counter -= 1;
+  }
+	
+  // Loop through results creating columns
+  for (var index in result) {
+		
+    // Append to the header row
+    $( '<th width="65px"></th>' ).appendTo( $('#'+element_id+'_table tr:eq(0)') );
+	  
+    // Append message and break if number of distinct choices >= max_columns
+    if (index >= max_columns) {
+      $( '<th width="400px">+ '+result.length+' columns not displayed.</th>' ).appendTo( $('#'+element_id+'_table tr:eq(0)') );
+	  break;
+    }
+		
+    actual_response = result[index]['value_id'];
+	
+    choice_counter = 1; 
+    while (choice_counter <= num_choices) {
+
+      imagined_response = 'choice_'+(choice_counter -1);
+    	
+      // Can't rely in contains method in all browsers so use indexOf
+      if ((correct_response.indexOf(imagined_response) == -1) &&
+          (actual_response.indexOf(imagined_response) == -1) ||
+          (correct_response.indexOf(imagined_response) > -1  &&
+           actual_response.indexOf(imagined_response) > -1)) {
+        answer_class = 'right';
+      }else {
+        answer_class = 'wrong';
+      }
+
+      if (actual_response.indexOf(imagined_response) != -1) {
+        checkbox_checked = '<span class="dot"></span>';
+      }else {
+        checkbox_checked = '';
+      }
+	  $( '<td id="column'+index+':row'+choice_counter+'" class="answer_box '+answer_class+'">'+checkbox_checked+'</td>' ).appendTo( $('#'+element_id+'_table tr:eq('+choice_counter+')') );  
+	  choice_counter += 1;
+    }
+      
+    // Construct the Last Attempt row
+    count = result[index]['count'];
+    percent = Math.round(count*1000/(total_count*10));
+    count_row += '<td class="answer_box">'+count+'<br/>'+percent+'%</td>'
+  }
+
+  // Append count row to the last attempt row
+  $('#'+element_id+'_table #last_attempt' ).after( count_row );
+	
+  // Set the student count
+  $('#'+element_id+' .num-students').text(total_count);
+    
+  //Set last updated
+  $('#'+element_id+' .last-update').text(last_update_date);
+          
+  // Show the div
+  $('#'+element_id).show();
+	
+}
+
+function compare(a,b) {
+  if (a.count > b.count) {
+	return -1;
+  }
+  if (a.count < b.count) {
+	return 1;
+  }
+  return 0;
+}
+
+$('#${element_id}_radio_close').click(function(event) {
+	this.parentNode.style.display = 'none';
+});
+
+$('#${element_id}_checkbox_close').click(function(event) {
+	this.parentNode.style.display = 'none';
+});
+
 </script>
 %endif
 

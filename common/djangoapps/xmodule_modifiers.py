@@ -7,6 +7,7 @@ import json
 import logging
 import static_replace
 import uuid
+from lxml import etree
 
 from django.conf import settings
 from django.utils.timezone import UTC
@@ -19,6 +20,9 @@ from xmodule.vertical_module import VerticalModule
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from django.core.urlresolvers import reverse
+from xmodule.capa_module import CapaModule
+from capa.responsetypes import ChoiceResponse, MultipleChoiceResponse
 
 log = logging.getLogger(__name__)
 
@@ -250,6 +254,9 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
             log.warning("Unable to read field in Staff Debug information", exc_info=True)
             field_contents.append((name, "WARNING: Unable to read field"))
 
+    # Determine type of problem for in-line analytics.
+    correct_response, num_choices, problem_type, choice_text = get_problem_type(block)
+
     staff_context = {'fields': field_contents,
                      'xml_attributes': getattr(block, 'xml_attributes', {}),
                      'location': block.location,
@@ -267,5 +274,51 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
                      'block_content': frag.content,
                      'is_released': is_released,
                      'has_instructor_access': has_instructor_access,
+                     'get_analytics_answer_dist': reverse('get_analytics_answer_dist'),
+                     'correct_response': correct_response,
+                     'num_choices': num_choices,
+                     'problem_type': problem_type,
+                     'div_id': block.location.html_id(),
                      }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
+
+
+def get_problem_type(block):
+    """
+    Determines the problem type; used by the in-line analytics display.
+    Currently supported problem types, for in-line analytics are:
+       checkboxgroup, radiogroup
+    All other problem types return None
+    If settings.ANALYTICS_DATA_URL not set then returns None
+    """
+
+    correct_response = None
+    num_choices = 0
+    problem_type = None
+    choice_text = []
+
+    if settings.ANALYTICS_DATA_URL and isinstance(block, CapaModule):
+
+        # Determine type of response
+        response = block.lcp.responders.values()[0]
+        if isinstance(response, MultipleChoiceResponse):
+            problem_type = 'radio'
+        elif isinstance(response, ChoiceResponse):
+            problem_type = 'checkbox'
+
+        if problem_type:
+            # Determine the correct response; should only be 1 answer id
+            answer_id = block.lcp.get_answer_ids()[0][0]
+            question_answers = block.lcp.get_question_answers()
+            correct_response = question_answers[answer_id]
+
+            for node in block.lcp.tree.iter(tag=etree.Element):
+                if node.tag == 'choice':
+                    # Determine number of choices
+                    num_choices += 1
+
+                    # Build list of choice text
+                    choice_text.append(node.text)
+
+    return correct_response, num_choices, problem_type, choice_text
+

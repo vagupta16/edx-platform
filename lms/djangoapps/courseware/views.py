@@ -4,7 +4,11 @@ Courseware views functions
 
 import logging
 import urllib
+import urllib2
 import json
+from util.json_request import JsonResponse
+from datetime import datetime
+from pytz import timezone
 
 from collections import defaultdict
 from django.utils import translation
@@ -52,6 +56,7 @@ from opaque_keys import InvalidKeyError
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor.enrollment import uses_shib
+from util.date_utils import get_time_display
 
 log = logging.getLogger("edx.courseware")
 
@@ -1026,3 +1031,41 @@ def get_course_lti_endpoints(request, course_id):
     ]
 
     return HttpResponse(json.dumps(endpoints), content_type='application/json')
+
+@require_GET
+def get_analytics_answer_dist(request):
+    """
+    Makes a call the the analytics api to retrieve answer distribution data for the in-line analytics display.
+    Returns an empty json string if there was an error.
+    From the result, gets the date/time the data was last updated and reformats to the client TZ.
+    Returns a json payload of the api data and last updated string.
+    """
+
+    # Construct api request
+    module_id = request.GET['module_id']
+    url = settings.ANALYTICS_DATA_URL + '/problems/' +module_id + '/answer_distribution'
+    api_secret = settings.ANALYTICS_API_SECRET
+    token = 'Token %s' % api_secret
+
+    analytics_req = urllib2.Request(url)
+    analytics_req.add_header('Authorization', token)
+
+    try:
+        response = urllib2.urlopen(analytics_req)
+        data = response.read()
+        
+    except urllib2.URLError as e:
+        return JsonResponse('{}')
+
+    # Determine the last updated date, convert to client TZ and format
+    created_date = json.loads(data)[0]['created']
+    obj_date = datetime.strptime(created_date, '%Y-%m-%dT%H:%M:%S')
+    obj_date = timezone('UTC').localize(obj_date)
+    formatted_date_string = get_time_display(obj_date, None, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+
+    response_payload = {
+        'data': data,
+        'last_update_date': formatted_date_string,
+    }
+    
+    return JsonResponse(response_payload)
