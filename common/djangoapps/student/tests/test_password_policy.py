@@ -7,6 +7,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from mock import patch
 from django.test.utils import override_settings
+from django.utils.translation import ugettext as _, get_language
 
 
 @patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
@@ -34,7 +35,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Invalid Length (must be 6 characters or more)",
+            _("Password: Invalid Length (must be 6 characters or more)"),
         )
 
     @override_settings(PASSWORD_MIN_LENGTH=6)
@@ -53,7 +54,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Invalid Length (must be 12 characters or less)",
+            _("Password: Invalid Length (must be 12 characters or less)"),
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
@@ -64,7 +65,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more uppercase characters)",
+            _("Password: Must be more complex (must contain 3 or more uppercase characters)"),
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
@@ -83,7 +84,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more lowercase characters)",
+            _("Password: Must be more complex (must contain 3 or more lowercase characters)"),
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'LOWER': 3})
@@ -102,7 +103,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more digits)",
+            _("Password: Must be more complex (must contain 3 or more digits)"),
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'DIGITS': 3})
@@ -121,7 +122,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more punctuation characters)",
+            _("Password: Must be more complex (must contain 3 or more punctuation characters)"),
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'PUNCTUATION': 3})
@@ -140,7 +141,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Must be more complex (must contain 3 or more unique words)",
+            _("Password: Must be more complex (must contain 3 or more unique words)"),
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'WORDS': 3})
@@ -163,7 +164,7 @@ class TestPasswordPolicy(TestCase):
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content)
-        errstring = ("Password: Must be more complex ("
+        errstring = _("Password: Must be more complex ("
             "must contain 3 or more uppercase characters, "
             "must contain 3 or more digits, "
             "must contain 3 or more punctuation characters, "
@@ -194,7 +195,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Too similar to a restricted dictionary word.",
+            _("Password: Too similar to a restricted dictionary word."),
         )
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
@@ -206,7 +207,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Too similar to a restricted dictionary word.",
+            _("Password: Too similar to a restricted dictionary word."),
         )
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
@@ -218,7 +219,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Too similar to a restricted dictionary word.",
+            _("Password: Too similar to a restricted dictionary word."),
         )
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
@@ -234,5 +235,41 @@ class TestPasswordPolicy(TestCase):
         self.url_params['password'] = u'四節比分和七年前'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
+
+
+class TestUsernamePasswordNonmatch(TestCase):
+    """
+    Test that registration username and password fields differ
+    """
+    def setUp(self):
+        super(TestUsernamePasswordNonmatch, self).setUp()
+        self.url = reverse('create_account')
+
+        self.url_params = {
+            'username': 'username',
+            'email': 'foo_bar@bar.com',
+            'name': 'username',
+            'terms_of_service': 'true',
+            'honor_code': 'true',
+        }
+
+    def test_with_username_password_match(self):
+        self.url_params['username'] = "foobar"
+        self.url_params['password'] = "foobar"
+        response = self.client.post(self.url, self.url_params)
+        self.assertEquals(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            _("Username and password fields must not match")
+        )
+
+    def test_with_username_password_nonmatch(self):
+        self.url_params['username'] = "foobar"
+        self.url_params['password'] = "nonmatch"
+        response = self.client.post(self.url, self.url_params)
+        self.assertEquals(response.status_code, 200)
         obj = json.loads(response.content)
         self.assertTrue(obj['success'])
