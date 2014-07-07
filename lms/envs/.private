@@ -1,0 +1,4 @@
+from .common import FEATURES
+
+
+FEATURES['CLASS_DASHBOARD'] = True
