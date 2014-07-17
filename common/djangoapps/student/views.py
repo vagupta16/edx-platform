@@ -1721,7 +1721,8 @@ def confirm_email_change(request, key):
         user = pec.user
         address_context = {
             'old_email': user.email,
-            'new_email': pec.new_email
+            'new_email': pec.new_email,
+            'account_activated': False
         }
 
         if len(User.objects.filter(email=pec.new_email)) != 0:
@@ -1760,11 +1761,35 @@ def confirm_email_change(request, key):
             transaction.rollback()
             return response
 
+        import pdb; pdb.set_trace()
+        # Activate user who is not yet active
         if not user.is_active:
             # Want to activiate account here now..
             r = Registration.objects.filter(user=user)
-            # Copy process of activating an account from above.
-            # Maybe make helper function?
+
+            if len(r) == 1:
+                r[0].activate()
+                # user_logged_in = request.user.is_authenticated()
+                # already_active = True
+                # if not r[0].user.is_active:
+                #     r[0].activate()
+                #     already_active = False
+
+                # Enroll in pending courses if auto_enroll enabled
+                student = User.objects.filter(id=r[0].user_id)
+                if student:
+                    ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
+                    for cea in ceas:
+                        if cea.auto_enroll:
+                            CourseEnrollment.enroll(student[0], cea.course_id)
+                address_context['account_activated'] = True
+
+            # Will this case below ever happen? How do I handle it?
+            if len(r) == 0:
+                log.warning('No matching Registration object for non-activated user', exc_info=True)
+                respone = render_to_response("email_change_failed.html", {'email': pec.new_email})
+                transaction.rollback()
+                return response
 
         response = render_to_response("email_change_successful.html", address_context)
         transaction.commit()
