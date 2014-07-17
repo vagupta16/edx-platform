@@ -394,6 +394,34 @@ class MongoModuleStore(ModuleStoreWriteBase):
             self.ignore_write_events_on_courses.remove(course_id)
             self.refresh_cached_metadata_inheritance_tree(course_id)
 
+    def _is_bulk_write_in_progress(self, course_id):
+        """
+        Returns whether a bulk write operation is in progress for the given course.
+        """
+        # check with branch set to None
+        return course_id in self.ignore_write_events_on_courses
+
+    def _fill_in_run(self, course_key):
+        if course_key.run is not None:
+            return course_key
+
+        cache_key = (course_key.org, course_key.course)
+        if cache_key not in self._course_run_cache:
+
+            matching_courses = list(self.collection.find(SON([
+                ('_id.tag', 'i4x'),
+                ('_id.org', course_key.org),
+                ('_id.course', course_key.course),
+                ('_id.category', 'course'),
+            ])).limit(1))
+
+            if not matching_courses:
+                return course_key
+
+            self._course_run_cache[cache_key] = matching_courses[0]['_id']['name']
+
+        return course_key.replace(run=self._course_run_cache[cache_key])
+
     def _compute_metadata_inheritance_tree(self, course_id):
         '''
         TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
@@ -518,7 +546,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         If given a runtime, it replaces the cached_metadata in that runtime. NOTE: failure to provide
         a runtime may mean that some objects report old values for inherited data.
         """
-        if course_id not in self.ignore_write_events_on_courses:
+        if not self._is_bulk_write_in_progress(course_id):
             # below is done for side effects when runtime is None
             cached_metadata = self._get_cached_metadata_inheritance_tree(course_id, force_refresh=True)
             if runtime:
@@ -977,6 +1005,18 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 children = self._convert_reference_fields_to_strings(xblock, {'children': xblock.children})
                 payload.update({'definition.children': children['children']})
             self._update_single_item(xblock.scope_ids.usage_id, payload)
+
+            # update subtree edited info for ancestors
+            # don't update the subtree info for descendants of the publish root for efficiency
+            if (
+                (not isPublish or (isPublish and is_publish_root)) and
+                not self._is_bulk_write_in_progress(xblock.location.course_key)
+            ):
+                ancestor_payload = {
+                    'edit_info.subtree_edited_on': now,
+                    'edit_info.subtree_edited_by': user_id
+                }
+                self._update_ancestors(xblock.scope_ids.usage_id, ancestor_payload)
 
             # recompute (and update) the metadata inheritance tree which is cached
             self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)
