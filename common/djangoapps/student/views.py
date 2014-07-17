@@ -1681,7 +1681,6 @@ def change_email_request(request):
         'new_email': pec.new_email,
         'needs_activation': False if user.is_active else True,
     }
-    import pdb; pdb.set_trace()
 
     subject = render_to_string('emails/email_change_subject.txt', context)
     subject = ''.join(subject.splitlines())
@@ -1761,7 +1760,6 @@ def confirm_email_change(request, key):
             transaction.rollback()
             return response
 
-        import pdb; pdb.set_trace()
         # Activate user who is not yet active
         if not user.is_active:
             # Want to activiate account here now..
