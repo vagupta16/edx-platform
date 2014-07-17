@@ -1678,8 +1678,10 @@ def change_email_request(request):
     context = {
         'key': pec.activation_key,
         'old_email': user.email,
-        'new_email': pec.new_email
+        'new_email': pec.new_email,
+        'needs_activation': False if user.is_active else True,
     }
+    import pdb; pdb.set_trace()
 
     subject = render_to_string('emails/email_change_subject.txt', context)
     subject = ''.join(subject.splitlines())
@@ -1757,6 +1759,12 @@ def confirm_email_change(request, key):
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})
             transaction.rollback()
             return response
+
+        if not user.is_active:
+            # Want to activiate account here now..
+            r = Registration.objects.filter(user=user)
+            # Copy process of activating an account from above.
+            # Maybe make helper function?
 
         response = render_to_response("email_change_successful.html", address_context)
         transaction.commit()
