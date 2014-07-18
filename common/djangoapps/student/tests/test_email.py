@@ -8,7 +8,7 @@ from student.models import UserProfile, PendingEmailChange
 from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
-from mock import Mock, patch
+from mock import Mock, patch, PropertyMock
 from django.http import Http404, HttpResponse
 from django.conf import settings
 from edxmako.shortcuts import render_to_string
@@ -251,12 +251,10 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         request.META['HTTP_HOST'] = "aGenericValidHostName"
         self.append_allowed_hosts("aGenericValidHostName")
 
-        # What the fuck is happening here??!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!?!
-        print context
         body = render_to_string('emails/confirm_email_change.txt', context)
-#        url = safe_get_host(request)
+        url = safe_get_host(request)
 
-#        self.assertIn(url, body)
+        self.assertIn(url, body)
 
     def test_not_pending(self, email_user):
         self.key = 'not_a_key'
@@ -316,3 +314,109 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
             confirm_email_change(self.request, self.key)
 
         rollback.assert_called_with()
+
+# @patch('django.contrib.auth.models.User.email_user')
+# @patch('student.models.Registration.activate')
+# @patch('student.views.PendingEmailChange.objects.get')
+# @patch('student.views.User.objects.filter')
+# @patch('student.views.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
+# @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+# class EmailChangeAccountActivationTests(EmailTestMixin, TransactionTestCase):
+#     """ """
+#     def setUp(self):
+#         self.user = UserFactory.create()
+#         self.req_factory = RequestFactory()
+#         self.request = self.req_factory.post('unused_url')
+#         self.request.user = self.user
+#         self.user.email_user = Mock()
+#         self.registration = RegistrationFactory.create(user=self.user)
+#         self.pending_change_request = PendingEmailChangeFactory.create(user=self.user)
+#         self.key = self.pending_change_request.activation_key
+#
+#     def run_request(self, request=None):
+#         """Execute request and return result parsed as json
+#
+#         If request isn't passed in, use self.request instead
+#         """
+#         if request is None:
+#             request = self.request
+#
+#         response = confirm_email_change(request, self.key)
+#         return json.loads(response.content)
+#
+#     def mock_pending_email_change(self):
+#         return self.pending_change_request
+#
+#     def mock_user_profile(self, *args, **kwargs):
+#         return self.user
+#
+#     def mock_registration_obj(self, *args, **kwargs):
+#         return [self.registration]
+#
+#     def mock_activate_user(self, *args, **kwargs):
+#         self.user.is_active = True
+#
+#     def mock_user_obj(self, *args, **kwargs):
+#         return []
+#
+# #     #@patch('student.views.PendingEmailChange.objects.get', Mock(side_effect=mock_pending_email_change))
+# #     @patch('student.views.UserProfile.objects.get', Mock(side_effect=mock_user_profile))
+# #     @patch('student.views.Registration.objects.filter', Mock(side_effect=mock_registration_obj))
+# #     #@patch('student.views.User.objects.filter', Mock(side_effect=mock_user_obj))
+# #     def test_nonactive_user_gets_activated(self, email_user, activate, pec_get, user_filter):
+# #         activate.side_effect = self.mock_activate_user
+# #         pec_get.side_effect = self.pending_change_request
+# #         user_filter.side_effect = []
+# #         response_data = self.run_request()
+# #         self.assertTrue(response_data['success'])
+# # #        self.assertEquals(1,2)
+#
+#     def test_nonactive_user_gets_deactivated(self, email_user, activate):
+
+@patch('django.contrib.auth.models.User.email_user')
+@patch('student.models.Registration.activate')
+@patch('student.views.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
+@patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+class EmailChangeAccountActivationTests(EmailTestMixin, TransactionTestCase):
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.user.is_active = False
+        self.req_factory = RequestFactory()
+        self.request = self.req_factory.post('unused_url')
+        self.request.user = self.user
+    #    self.user.email_user = Mock()
+        self.registration = RegistrationFactory.create(user=self.user)
+        self.pending_change_request = PendingEmailChangeFactory.create(user=self.user)
+        self.key = self.pending_change_request.activation_key
+
+    def mock_is_active_check(self):
+        return self.user.is_active
+
+    def mock_activate_user(self):
+        self.user.is_active = True
+
+    def run_request(self, request=None):
+        """Execute request and return result parsed as json
+
+        If request isn't passed in, use self.request instead
+        """
+        if request is None:
+            request = self.request
+
+        return confirm_email_change(request, self.key)
+
+    @patch('student.views.PendingEmailChange.objects.get')
+    @patch('student.views.User.objects.filter')
+    @patch('student.views.UserProfile.objects.get')
+    @patch('student.views.Registration.objects.filter')
+    def test_nonactive_user_gets_activated(self, activate, email_user, registration_get, userprof_get, user_filter, pec_get):
+        print self.pending_change_request.user.is_active
+        activate.side_effect = self.mock_activate_user
+        pec_get.return_value= self.pending_change_request
+        user_filter.side_effect = []
+        with patch('student.views.PendingEmailChange.objects.get.user') as mock_user:
+            type(mock_user.return_value).is_active = PropertyMock(return_value=False)
+            response_data = self.run_request()
+        print response_data.content
+        self.assertIn('account_activateddd', response_data.content)

@@ -1717,7 +1717,7 @@ def confirm_email_change(request, key):
             response = render_to_response("invalid_email_key.html", {})
             transaction.rollback()
             return response
-
+        print pec.user
         user = pec.user
         address_context = {
             'old_email': user.email,
@@ -1763,7 +1763,12 @@ def confirm_email_change(request, key):
 
         # Activate user who is not yet active
         address_context['account_activated'] = False
+        print "About to check if we should activate..."
+        print "User is active? "
+        huh = user.is_active
+        print huh
         if not user.is_active:
+            print "Activating"
             r = Registration.objects.filter(user=user)
 
             if len(r) == 1:
