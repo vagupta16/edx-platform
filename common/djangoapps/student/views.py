@@ -1722,7 +1722,6 @@ def confirm_email_change(request, key):
         address_context = {
             'old_email': user.email,
             'new_email': pec.new_email,
-            'account_activated': False
         }
 
         if len(User.objects.filter(email=pec.new_email)) != 0:
@@ -1733,6 +1732,7 @@ def confirm_email_change(request, key):
         subject = render_to_string('emails/email_change_subject.txt', address_context)
         subject = ''.join(subject.splitlines())
         message = render_to_string('emails/confirm_email_change.txt', address_context)
+
         up = UserProfile.objects.get(user=user)
         meta = up.get_meta()
         if 'old_emails' not in meta:
@@ -1762,6 +1762,7 @@ def confirm_email_change(request, key):
             return response
 
         # Activate user who is not yet active
+        address_context['account_activated'] = False
         if not user.is_active:
             r = Registration.objects.filter(user=user)
 
