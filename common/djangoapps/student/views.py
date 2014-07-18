@@ -1707,7 +1707,8 @@ def change_email_request(request):
 @transaction.commit_manually
 def confirm_email_change(request, key):
     """ User requested a new e-mail. This is called when the activation
-    link is clicked. We confirm with the old e-mail, and update
+    link is clicked. We confirm with the old e-mail, and update. The user account
+    is also activated if it hasn't been already
     """
     try:
         try:
@@ -1762,16 +1763,11 @@ def confirm_email_change(request, key):
 
         # Activate user who is not yet active
         if not user.is_active:
-            # Want to activiate account here now..
             r = Registration.objects.filter(user=user)
 
             if len(r) == 1:
                 r[0].activate()
-                # user_logged_in = request.user.is_authenticated()
-                # already_active = True
-                # if not r[0].user.is_active:
-                #     r[0].activate()
-                #     already_active = False
+                address_context['account_activated'] = True
 
                 # Enroll in pending courses if auto_enroll enabled
                 student = User.objects.filter(id=r[0].user_id)
@@ -1780,7 +1776,6 @@ def confirm_email_change(request, key):
                     for cea in ceas:
                         if cea.auto_enroll:
                             CourseEnrollment.enroll(student[0], cea.course_id)
-                address_context['account_activated'] = True
 
             # Will this case below ever happen? How do I handle it?
             if len(r) == 0:

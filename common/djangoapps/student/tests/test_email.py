@@ -237,6 +237,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         context = {
             'old_email': self.user.email,
             'new_email': self.pending_change_request.new_email,
+            #'account_activated': False,
         }
         self.assertEmailUser(
             email_user,
@@ -283,7 +284,8 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
     def test_new_email_fails(self, email_user):
         email_user.side_effect = [None, Exception]
         self.check_confirm_email_change('email_change_failed.html', {
-            'email': self.pending_change_request.new_email
+            'email': self.pending_change_request.new_email,
+            'account_activated': False
         })
         self.assertRolledBack()
         self.assertChangeEmailSent(email_user)
@@ -294,7 +296,8 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
     def test_successful_email_change(self, email_user):
         self.check_confirm_email_change('email_change_successful.html', {
             'old_email': self.user.email,
-            'new_email': self.pending_change_request.new_email
+            'new_email': self.pending_change_request.new_email,
+            'account_activated': False
         })
         self.assertChangeEmailSent(email_user)
         meta = json.loads(UserProfile.objects.get(user=self.user).meta)
