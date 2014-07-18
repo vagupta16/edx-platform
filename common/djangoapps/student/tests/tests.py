@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
@@ -250,6 +252,7 @@ class DashboardTest(TestCase):
         )
 
         self.assertFalse(enrollment.refundable())
+
 
 class EnrollInCourseTest(TestCase):
     """Tests enrolling and unenrolling in courses."""
@@ -621,3 +624,22 @@ class AnonymousLookupTable(TestCase):
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, self.course.id, save=False))
+
+    def test_non_ascii_anon_id(self):
+        """
+        Test that anonymous_id_for_user doesn't fail with course ids that contain
+        non-ascii characters
+        """
+        non_ascii_course = CourseFactory.create(
+            org=self.COURSE_ORG,
+            display_name=u"세원",
+            number=self.COURSE_SLUG
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        did_raise = False
+        try:
+            anon_id = anonymous_id_for_user(self.user, self.course.id)
+        except UnicodeDecodeError:
+            did_raise = True
+
+        self.assertFalse(did_raise, 'Computing anonymous_user_id with non-ascii string failed')
