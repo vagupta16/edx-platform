@@ -1765,7 +1765,7 @@ def confirm_email_change(request, key):
         address_context['account_activated'] = False
         if not user.is_active:
             r = Registration.objects.filter(user=user)
-
+            r = []
             if len(r) == 1:
                 r[0].activate()
                 address_context['account_activated'] = True
@@ -1779,9 +1779,10 @@ def confirm_email_change(request, key):
                             CourseEnrollment.enroll(student[0], cea.course_id)
 
             # Will this case below ever happen? How do I handle it?
+            # Is giving the activation invalid page acceptable?
             if len(r) == 0:
                 log.warning('No matching Registration object for non-activated user', exc_info=True)
-                response = render_to_response("email_change_failed.html", {'email': pec.new_email})
+                response = render_to_response("registration/activation_invalid.html", {'csrf': csrf(request)['csrf_token']})
                 transaction.rollback()
                 return response
 

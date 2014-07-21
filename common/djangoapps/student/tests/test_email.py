@@ -315,7 +315,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
 
         rollback.assert_called_with()
 
-        
+
 @patch('student.views.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 class EmailChangeAccountActivationTests(EmailTestMixin, TransactionTestCase):
@@ -334,8 +334,8 @@ class EmailChangeAccountActivationTests(EmailTestMixin, TransactionTestCase):
         self.user.is_active = True
 
     def run_request(self, request=None):
-        """Execute request and return result parsed as json
-
+        """
+        Execute request and return result parsed as json
         If request isn't passed in, use self.request instead
         """
         if request is None:
