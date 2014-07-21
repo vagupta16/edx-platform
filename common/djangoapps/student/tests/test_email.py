@@ -319,7 +319,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
 @patch('student.views.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 class EmailChangeAccountActivationTests(EmailTestMixin, TransactionTestCase):
-
+    """ Test that non-active account gets activated with email change """
     def setUp(self):
         self.user = UserFactory.create()
         self.user.is_active = False
@@ -351,6 +351,7 @@ class EmailChangeAccountActivationTests(EmailTestMixin, TransactionTestCase):
     def test_nonactive_user_gets_activated(self, registration_get, userprof_get, pec_get, activate):
         """ Ensure that nonactive user gets activated """
         # User should initially be non-active
+        self.user.is_active = False
         self.assertFalse(self.user.is_active)
 
         activate.side_effect = self.mock_activate_user
@@ -367,6 +368,7 @@ class EmailChangeAccountActivationTests(EmailTestMixin, TransactionTestCase):
     @patch('student.views.UserProfile.objects.get')
     @patch('student.views.Registration.objects.filter')
     def test_already_active_user(self, registration_get, userprof_get, pec_get, activate):
+        """ Test that active user isn't activated """
         self.user.is_active = True
         self.assertTrue(self.user.is_active)
 
@@ -377,3 +379,21 @@ class EmailChangeAccountActivationTests(EmailTestMixin, TransactionTestCase):
 
         self.assertIn("('account_activated', False)", response_data.content)
         self.assertTrue(self.user.is_active)
+
+    @patch('student.models.Registration.activate')
+    @patch('student.views.PendingEmailChange.objects.get')
+    @patch('student.views.User.objects.filter', Mock(return_value=[]))
+    @patch('student.views.UserProfile.objects.get')
+    @patch('student.views.Registration.objects.filter')
+    def test_activation_failure_handled(self, registration_get, userprof_get, pec_get, activate):
+        """ Test that an error activating user is properly handled """
+        self.user.is_active = False
+        self.assertFalse(self.user.is_active)
+
+        activate.side_effect = self.mock_activate_user
+        pec_get.return_value = self.pending_change_request
+        registration_get.return_value = []
+        response_data = self.run_request()
+
+        self.assertIn("registration/activation_invalid.html", response_data.content)
+        self.assertFalse(self.user.is_active)

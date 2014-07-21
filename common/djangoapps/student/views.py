@@ -1765,7 +1765,6 @@ def confirm_email_change(request, key):
         address_context['account_activated'] = False
         if not user.is_active:
             r = Registration.objects.filter(user=user)
-            r = []
             if len(r) == 1:
                 r[0].activate()
                 address_context['account_activated'] = True
