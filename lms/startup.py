@@ -11,7 +11,7 @@ from django_startup import autostartup
 import edxmako
 import logging
 
-# Imports for Monkeypatching keyword substitution module
+# Imports required for Monkeypatching keyword substitution module
 from util import keyword_substitution
 from student.models import anonymous_id_for_user
 from django.contrib.auth.models import User
