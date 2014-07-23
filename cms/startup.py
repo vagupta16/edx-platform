@@ -16,7 +16,7 @@ def run():
     autostartup()
 
     add_mimetypes()
-   
+
     # Supply keyword-substitution mapping for CMS
     # Currently no substitution for CMS
     keyword_substitution.KEYWORD_FUNCTION_MAP = {}

@@ -36,7 +36,7 @@ def run():
 
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
-    
+
     # Monkey patch the keyword function map
     keyword_substitution.KEYWORD_FUNCTION_MAP = get_keyword_function_map()
 
@@ -154,7 +154,7 @@ def get_keyword_function_map():
 
     def user_fullname_sub(user, course=None):
         return user.profile.name
-    
+
     def course_display_name_sub(user, course):
         return course.display_name
 

@@ -44,7 +44,7 @@ def substitute_keywords_with_data(string, user_id=None, course_id=None):
 
     # Memoize user objects
     user = User.objects.get(id=user_id)
-    course = modulestore().get_course(course_id, depth=0) 
+    course = modulestore().get_course(course_id, depth=0)
 
     for key, func in KEYWORD_FUNCTION_MAP.iteritems():
         if key in string:

@@ -636,10 +636,6 @@ class AnonymousLookupTable(TestCase):
             number=self.COURSE_SLUG
         )
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
-        did_raise = False
-        try:
-            anon_id = anonymous_id_for_user(self.user, self.course.id)
-        except UnicodeDecodeError:
-            did_raise = True
+        # This shouldn't throw error
+        anon_id = anonymous_id_for_user(self.user, self.course.id)
 
-        self.assertFalse(did_raise, 'Computing anonymous_user_id with non-ascii string failed')
