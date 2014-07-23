@@ -8,8 +8,11 @@ Contains utility functions to help substitute keywords in a text body with
 the appropriate user / course data.
 
 Supported:
-    %%USER_ID%% => anonymous user id
-    %%USER_FULLNAME%% => User's full name
+    LMS:
+        - %%USER_ID%% => anonymous user id
+        - %%USER_FULLNAME%% => User's full name
+        - %%COURSE_DISPLAY_NAME%% => display name of the course
+        - %%COURSE_END_DATE%% => end date of the course
 
 Usage:
     KEYWORD_FUNCTION_MAP must be supplied in startup.py, so that it lives

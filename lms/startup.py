@@ -11,10 +11,11 @@ from django_startup import autostartup
 import edxmako
 import logging
 
-# Monkeypatch keyword substitution module
+# Imports for Monkeypatching keyword substitution module
 from util import keyword_substitution
 from student.models import anonymous_id_for_user
 from django.contrib.auth.models import User
+from util.date_utils import get_default_time_display
 
 log = logging.getLogger(__name__)
 kf_map = {}
@@ -157,11 +158,15 @@ def get_keyword_function_map():
     def course_display_name_sub(user, course):
         return course.display_name
 
+    def course_end_date_sub(user, course):
+        return get_default_time_display(course.end)
+
     # Define keyword - function map
     kf_map = {
         '%%USER_ID%%': user_id_sub,
         '%%USER_FULLNAME%%': user_fullname_sub,
-        '%%COURSE_DISPLAY_NAME%%': course_display_name_sub
+        '%%COURSE_DISPLAY_NAME%%': course_display_name_sub,
+        '%%COURSE_END_DATE%%': course_end_date_sub
     }
 
     return kf_map
