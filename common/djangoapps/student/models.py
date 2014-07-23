@@ -92,7 +92,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     hasher.update(settings.SECRET_KEY)
     hasher.update(unicode(user.id))
 
-    # Since course_id consists of course name strings, convert to utf before hashing
+    # Since course_id consists of course name strings, convert to utf-8 before hashing
     if course_id:
         hasher.update(course_id.to_deprecated_string().encode('utf-8'))
 
