@@ -11,8 +11,13 @@ from django_startup import autostartup
 import edxmako
 import logging
 
-log = logging.getLogger(__name__)
+# Monkeypatch keyword substitution module
+from util import keyword_substitution
+from student.models import anonymous_id_for_user
+from django.contrib.auth.models import User
 
+log = logging.getLogger(__name__)
+kf_map = {}
 
 def run():
     """
@@ -30,6 +35,9 @@ def run():
 
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
+    
+    # Monkey patch the keyword function map
+    keyword_substitution.KEYWORD_FUNCTION_MAP = get_keyword_function_map()
 
 
 def add_mimetypes():
@@ -127,3 +135,18 @@ def enable_third_party_auth():
 
     from third_party_auth import settings as auth_settings
     auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
+
+
+def get_keyword_function_map():
+
+    def user_id_sub(user, course_id):
+        print "subbing user_anon_id"
+        return anonymous_id_for_user(user, course_id)
+
+    def user_fullname_sub(user, course_id=None):
+        return user.profile.name
+
+    kf_map['%%USER_ID%%'] = user_id_sub
+    kf_map['%%USER_FULLNAME%%'] = user_fullname_sub
+
+    return kf_map

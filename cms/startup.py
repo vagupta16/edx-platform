@@ -7,7 +7,7 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
-
+from util import keyword_substitution
 
 def run():
     """
@@ -16,7 +16,8 @@ def run():
     autostartup()
 
     add_mimetypes()
-
+    
+    keyword_substitution.KEYWORD_FUNCTION_MAP = {}
 
 def add_mimetypes():
     """

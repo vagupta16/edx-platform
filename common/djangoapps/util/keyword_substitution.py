@@ -1,8 +1,4 @@
-from itertools import ifilter
-
 from django.contrib.auth.models import User
-
-from student.models import anonymous_id_for_user
 
 """
 keyword_substitution.py
@@ -15,25 +11,16 @@ Supported:
     %%USER_FULLNAME%% => User's full name
 """
 
+KEYWORD_FUNCTION_MAP = {}
 
-def get_anonymous_id_for_user(user, course_id):
-    # Wrapper for anonymous_id_for_user
-    return anonymous_id_for_user(user, course_id)
-
-
-def get_user_name(user, course_id=None):
-    # Wrapper for user.profile.name
-    return user.profile.name
-
-"""
-Add any keywords that you wish to substitute here:
-"""
-KEYWORD_FUNCTION_MAP = {
-    '%%USER_ID%%': get_anonymous_id_for_user,
-    '%%USER_FULLNAME%%': get_user_name,
-}
-
-
+def setup_module(keyword_map):
+    """
+    Setup the keyword function map with the right class
+    """
+    KEYWORD_FUNCTION_MAP = keyword_map
+    print "printing keyword_map"
+    print keyword_map
+    
 def substitute_keywords_with_data(string, user_id=None, course_id=None):
     """
     Iterates through all keywords that must be substituted and replaces
@@ -45,7 +32,8 @@ def substitute_keywords_with_data(string, user_id=None, course_id=None):
     the forloop below, and eliminate the possibility of unnecessarily piling up
     if elif else statements when keyword pool grows.
     """
-
+    
+    print "subbing"
     # Do not proceed without parameters: Compatibility check with existing tests
     # That do not supply these parameters
     if user_id is None or course_id is None:
