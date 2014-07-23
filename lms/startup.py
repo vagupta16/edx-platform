@@ -138,15 +138,30 @@ def enable_third_party_auth():
 
 
 def get_keyword_function_map():
+    """
+    Define the mapping of keywords and functions that will be used to filter
+    html, text and email strings before rendering them.
 
-    def user_id_sub(user, course_id):
-        print "subbing user_anon_id"
-        return anonymous_id_for_user(user, course_id)
+    The generated map will be monkey-patched onto the keyword_substitution
+    module so that it persists along with the running server.
 
-    def user_fullname_sub(user, course_id=None):
+    Each function must take: user & course as parameters
+    """
+
+    def user_id_sub(user, course):
+        return anonymous_id_for_user(user, course.id)
+
+    def user_fullname_sub(user, course=None):
         return user.profile.name
+    
+    def course_display_name_sub(user, course):
+        return course.display_name
 
-    kf_map['%%USER_ID%%'] = user_id_sub
-    kf_map['%%USER_FULLNAME%%'] = user_fullname_sub
+    # Define keyword - function map
+    kf_map = {
+        '%%USER_ID%%': user_id_sub,
+        '%%USER_FULLNAME%%': user_fullname_sub,
+        '%%COURSE_DISPLAY_NAME%%': course_display_name_sub
+    }
 
     return kf_map

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from xmodule.modulestore.django import modulestore
 
 """
 keyword_substitution.py
@@ -9,18 +10,18 @@ the appropriate user / course data.
 Supported:
     %%USER_ID%% => anonymous user id
     %%USER_FULLNAME%% => User's full name
+
+Usage:
+    KEYWORD_FUNCTION_MAP must be supplied in startup.py, so that it lives
+    above other modules in the dependency tree and acts like a global var.
+    Then we can call substitute_keywords_with_data where substitution is
+    needed. Currently called in:
+        - LMS: Announcements + Bulk emails
+        - CMS: Not called
 """
 
 KEYWORD_FUNCTION_MAP = {}
 
-def setup_module(keyword_map):
-    """
-    Setup the keyword function map with the right class
-    """
-    KEYWORD_FUNCTION_MAP = keyword_map
-    print "printing keyword_map"
-    print keyword_map
-    
 def substitute_keywords_with_data(string, user_id=None, course_id=None):
     """
     Iterates through all keywords that must be substituted and replaces
@@ -30,10 +31,9 @@ def substitute_keywords_with_data(string, user_id=None, course_id=None):
     Also, functions imported from other modules must be wrapped around in a
     new function if they don't take in user_id and course_id. This is to simplify
     the forloop below, and eliminate the possibility of unnecessarily piling up
-    if elif else statements when keyword pool grows.
+    if elif else statements when the keyword pool grows.
     """
-    
-    print "subbing"
+
     # Do not proceed without parameters: Compatibility check with existing tests
     # That do not supply these parameters
     if user_id is None or course_id is None:
@@ -41,10 +41,11 @@ def substitute_keywords_with_data(string, user_id=None, course_id=None):
 
     # Memoize user objects
     user = User.objects.get(id=user_id)
+    course = modulestore().get_course(course_id, depth=0) 
 
     for key, func in KEYWORD_FUNCTION_MAP.iteritems():
         if key in string:
-            substitutor = func(user, course_id)
+            substitutor = func(user, course)
             string = string.replace(key, substitutor)
 
     return string
