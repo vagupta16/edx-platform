@@ -25,6 +25,18 @@ Usage:
 
 KEYWORD_FUNCTION_MAP = {}
 
+def add_keyword_function_map(mapping):
+    """
+    Attaches the given keyword-function map to the existing one
+    """
+    KEYWORD_FUNCTION_MAP.update(mapping)
+
+def add_keyword_function_pair(keyword, func):
+    """
+    Attach one keyword, func pair to the map
+    """
+    KEYWORD_FUNCTION_MAP[keyword] = func
+
 def substitute_keywords_with_data(string, user_id=None, course_id=None):
     """
     Iterates through all keywords that must be substituted and replaces

@@ -37,8 +37,7 @@ def run():
         enable_third_party_auth()
 
     # Monkey patch the keyword function map
-    keyword_substitution.KEYWORD_FUNCTION_MAP = get_keyword_function_map()
-
+    keyword_substitution.add_keyword_function_map(get_keyword_function_map())
 
 def add_mimetypes():
     """
