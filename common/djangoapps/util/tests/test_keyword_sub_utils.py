@@ -77,7 +77,7 @@ class KeywordSubTest(TestCase):
         Test that sub-ing works in html tags as well
         """
         test_string = "<some tag>%%USER_ID%%</some tag>"
-        anon_id = anonymous_id_for_user(self.user, self.course.id)
+        anon_id = anonymous_id_for_user(self.user, None)
         result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
 
         self.assertEquals(result, "<some tag>" + anon_id + "</some tag>")
