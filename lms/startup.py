@@ -13,7 +13,6 @@ import logging
 
 # Imports required for Monkeypatching keyword substitution module
 from util import keyword_substitution
-from student.models import anonymous_id_for_user
 from django.contrib.auth.models import User
 from util.date_utils import get_default_time_display
 
@@ -149,6 +148,7 @@ def get_keyword_function_map():
     Each function must take: user & course as parameters
     """
 
+    from student.models import anonymous_id_for_user
     def user_id_sub(user, course):
         return anonymous_id_for_user(user, course.id)
 
