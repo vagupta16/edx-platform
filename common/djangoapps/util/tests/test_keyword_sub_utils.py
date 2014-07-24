@@ -29,7 +29,8 @@ class KeywordSubTest(TestCase):
 
     def get_keyword_function_map(self):
         def user_id_sub(user, course):
-            return anonymous_id_for_user(user, course.id)
+            # Don't include course_id for compatibility 
+            return anonymous_id_for_user(user, None)
 
         def user_fullname_sub(user, course=None):
             return user.profile.name
@@ -57,7 +58,7 @@ class KeywordSubTest(TestCase):
 
     def test_anonymous_id_sub(self):
         test_string = "This is the test string. sub this: %%USER_ID%% into anon_id"
-        anon_id = anonymous_id_for_user(self.user, self.course.id)
+        anon_id = anonymous_id_for_user(self.user, None)
         result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
 
         self.assertIn("this: " + anon_id + " into", result)
