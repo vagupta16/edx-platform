@@ -67,6 +67,9 @@ class HtmlModule(HtmlFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     def get_html(self):
+        print self.runtime._services
+        user_service= self.runtime.service(self, 'user')
+        print getattr(user_service, 'email')
         if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         return self.data

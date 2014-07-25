@@ -106,6 +106,15 @@ def clear_existing_modulestores():
     _MIXED_MODULESTORE = None
 
 
+class ModuleUserService(object):
+    
+    def __init__(self, user):
+        self.user = user
+
+    def __getattr__(self ,name):
+        return getattr(self.user, name)
+
+
 class ModuleI18nService(object):
     """
     Implement the XBlock runtime "i18n" service.
