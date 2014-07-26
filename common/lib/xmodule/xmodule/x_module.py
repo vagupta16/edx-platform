@@ -475,6 +475,7 @@ module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disa
 
 @XBlock.needs("i18n")
 @XBlock.needs("user")
+@XBlock.needs("keyword_sub")
 class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-method
     """ Implements a generic learning module.
 

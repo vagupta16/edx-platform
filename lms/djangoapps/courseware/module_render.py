@@ -44,6 +44,7 @@ from xmodule.x_module import XModuleDescriptor
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 
+from util.keyword_substitution import substitute_keywords_with_data
 
 log = logging.getLogger(__name__)
 
@@ -498,7 +499,8 @@ def get_module_system_for_user(user, field_data_cache,
         get_real_user=user_by_anonymous_id,
         services={
             'i18n': ModuleI18nService(),
-            'user': ModuleUserService(user),
+            'user': ModuleUserService(user, course_id=course_id),
+            'keyword_sub': substitute_keywords_with_data,
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,

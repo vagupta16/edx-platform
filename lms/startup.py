@@ -150,7 +150,7 @@ def get_keyword_function_map():
     from student.models import anonymous_id_for_user
     def user_id_sub(user, course):
         # For compatibility with the existing anon_ids, return anon_id without course_id
-        return anonymous_id_for_user(user, None)
+        return anonymous_id_for_user(user, course.id)
 
     def user_fullname_sub(user, course=None):
         return user.profile.name

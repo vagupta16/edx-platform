@@ -18,6 +18,8 @@ from xmodule.util.django import get_current_request_hostname
 import xmodule.modulestore  # pylint: disable=unused-import
 from xmodule.contentstore.django import contentstore
 
+from xblock.models import XBlockUser
+
 # We may not always have the request_cache module available
 try:
     from request_cache.middleware import RequestCache
@@ -108,11 +110,20 @@ def clear_existing_modulestores():
 
 class ModuleUserService(object):
     
-    def __init__(self, user):
+    def __init__(self, user, course_id=None):
         self.user = user
+        self.xblock_user = XBlockUser(self)
+        self.xblock_user.add_attr('email', self.user.email)
+        self.xblock_user.add_attr('id', self.user.id)
 
+        if course_id is not None:
+           self.xblock_user.add_attr('course_id', course_id)
+        
     def __getattr__(self ,name):
         return getattr(self.user, name)
+
+    def get_user(self):
+        return self.xblock_user
 
 
 class ModuleI18nService(object):

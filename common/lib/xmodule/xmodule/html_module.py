@@ -15,7 +15,9 @@ from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
+
 from xblock.core import XBlock
+#from ..djangoapps.util.keyword_substitution import substitute_keywords_with_data
 
 log = logging.getLogger("edx.courseware")
 
@@ -67,11 +69,20 @@ class HtmlModule(HtmlFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     def get_html(self):
-        print self.runtime._services
         user_service= self.runtime.service(self, 'user')
-        print getattr(user_service, 'email')
+        keyword_sub = self.runtime.service(self, 'keyword_sub')
+        xblock_user = user_service.get_user()
+        """
+        print xblock_user.course_id
         if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
+        """
+        print "got here"
+
+        self.data = keyword_sub(self.data, xblock_user.id, xblock_user.course_id)
+
+        print "got here 2"
+        print self.data
         return self.data
 
 
