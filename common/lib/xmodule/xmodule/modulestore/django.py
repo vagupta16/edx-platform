@@ -118,9 +118,10 @@ class ModuleUserService(object):
     """
     def __init__(self, user, course_id=None):
         self.xblock_user = XBlockUser(self)
-        self.xblock_user.add_attr('email', user.email)
-        self.xblock_user.add_attr('id', user.id)
-
+        self.xblock_user.id = user.id
+        self.xblock_user.email = user.email
+        self.xblock_user.is_istructor = False
+        self.xblock_user.full_name = user.profile.name
         if course_id is not None:
            self.xblock_user.add_attr('course_id', course_id)
 

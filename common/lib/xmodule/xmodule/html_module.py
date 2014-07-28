@@ -76,6 +76,9 @@ class HtmlModule(HtmlFields, XModule):
         if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         """
+        print xblock_user.id
+        print xblock_user.course_id
+        print xblock_user.full_name
         #self.data = keyword_sub(self.data, xblock_user.id, xblock_user.course_id)
         return self.data
 
