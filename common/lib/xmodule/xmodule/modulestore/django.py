@@ -109,18 +109,20 @@ def clear_existing_modulestores():
 
 
 class ModuleUserService(object):
-    
+    """
+    Implement the XBlock runtime 'user' service.
+
+    Each instance of this runtime service takes a user and a course_id
+    and stores a XBlockUser object. It's possible to only wrap desired
+    attributes into the XBlockUser object.
+    """
     def __init__(self, user, course_id=None):
-        self.user = user
         self.xblock_user = XBlockUser(self)
-        self.xblock_user.add_attr('email', self.user.email)
-        self.xblock_user.add_attr('id', self.user.id)
+        self.xblock_user.add_attr('email', user.email)
+        self.xblock_user.add_attr('id', user.id)
 
         if course_id is not None:
            self.xblock_user.add_attr('course_id', course_id)
-        
-    def __getattr__(self ,name):
-        return getattr(self.user, name)
 
     def get_user(self):
         return self.xblock_user
