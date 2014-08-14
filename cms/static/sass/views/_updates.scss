@@ -25,6 +25,11 @@
     background: #fff;
     color: #3c3c3c;
   }
+
+  .wrapper-modal-window .modal-window {
+    position: fixed;
+    top: 50px !important;
+  }
 }
 
 .course-updates {
@@ -77,6 +82,10 @@
   }
 
   .update-contents {
+    em, i {
+      font-style: italic;
+    }
+
     p {
       @extend %t-copy-base;
       line-height: 25px;
@@ -189,7 +198,35 @@
   }
 
   .handouts-content {
-    @extend %t-copy-sub1;
+    @extend %t-copy-base;
+    em, i {
+      font-style: italic;
+    }
+
+    ol, ul {
+      margin: 1em 0;
+      padding: 0 0 0 1em;
+      color: $baseFontColor;
+
+      li {
+        margin-bottom: 0.708em;
+      }
+    }
+
+    ol {
+      list-style: decimal outside none;
+    }
+
+    ul {
+      list-style: disc outside none;
+    }
+
+    code {
+      color: $baseFontColor;
+      font-family: monospace, serif;
+      background: none;
+      padding: 0;
+    }
   }
 
   .treeview-handoutsnav li {
@@ -198,15 +235,12 @@
 }
 
 .edit-handouts-form {
-  @include edit-box;
-  position: absolute;
   right: 0;
   top: 0;
   z-index: 10001;
-  width: 800px;
-  padding: 30px;
 
   textarea {
     height: 300px;
   }
 }
+

@@ -1,12 +1,10 @@
-define(["js/views/baseview", "codemirror", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
-    function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils) {
+define(["js/views/baseview", "js/views/course_info_helper", "js/views/modals/edit_handouts"],
+    function(BaseView, CourseInfoHelper, EditHandoutsModal) {
 
     // the handouts view is dumb right now; it needs tied to a model and all that jazz
     var CourseInfoHandoutsView = BaseView.extend({
         // collection is CourseUpdateCollection
         events: {
-            "click .save-button" : "onSave",
-            "click .cancel-button" : "onCancel",
             "click .edit-button" : "onEdit"
         },
 
@@ -31,67 +29,15 @@ define(["js/views/baseview", "codemirror", "js/views/feedback_notification", "js
                 }))
             );
             $('.handouts-content').html(this.model.get('data'));
-            this.$preview = this.$el.find('.handouts-content');
-            this.$form = this.$el.find(".edit-handouts-form");
-            this.$editor = this.$form.find('.handouts-content-editor');
-            this.$form.hide();
 
             return this;
         },
 
         onEdit: function(event) {
             var self = this;
-            this.$editor.val(this.$preview.html());
-            this.$form.show();
 
-            this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
-                self.model, 'data', self.options['base_asset_url'], this.$editor.get(0));
-
-            ModalUtils.showModalCover(false, function() { self.closeEditor() });
-        },
-
-        onSave: function(event) {
-            $('#handout_error').removeClass('is-shown');
-            $('.save-button').removeClass('is-disabled');
-            if ($('.CodeMirror-lines').find('.cm-error').length == 0){
-                this.model.set('data', this.$codeMirror.getValue());
-                var saving = new NotificationView.Mini({
-                    title: gettext('Saving&hellip;')
-                });
-                saving.show();
-                this.model.save({}, {
-                    success: function() {
-                        saving.hide();
-                    }
-                });
-                this.render();
-                this.$form.hide();
-                this.closeEditor();
-
-                analytics.track('Saved Course Handouts', {
-                    'course': course_location_analytics
-                });
-            }else{
-                $('#handout_error').addClass('is-shown');
-                $('.save-button').addClass('is-disabled');
-                event.preventDefault();
-            }
-        },
-
-        onCancel: function(event) {
-            $('#handout_error').removeClass('is-shown');
-            $('.save-button').removeClass('is-disabled');
-            this.$form.hide();
-            this.closeEditor();
-        },
-
-        closeEditor: function() {
-            $('#handout_error').removeClass('is-shown');
-            $('.save-button').removeClass('is-disabled');
-            this.$form.hide();
-            ModalUtils.hideModalCover();
-            this.$form.find('.CodeMirror').remove();
-            this.$codeMirror = null;
+            var modal = new EditHandoutsModal();
+            return modal.edit(self.model, self.options['base_asset_url'], _.bind(this.render, this));
         }
     });
 
