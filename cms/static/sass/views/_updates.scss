@@ -77,6 +77,10 @@
 	}
 
 	.update-contents {
+                em, i {
+                  font-style: italic;
+                }
+
 		p {
 			font-size: 16px;
 			line-height: 25px;
@@ -196,17 +200,43 @@
 	}
 
 	.handouts-content {
-		font-size: 14px;
+		font-size: 16px;
+
+                em, i {
+                  font-style: italic;
+                }
+
+                ol, ul {
+                  margin: 1em 0;
+                  padding: 0 0 0 1em;
+                  color: $baseFontColor;
+
+                  li {
+                    margin-bottom: 0.708em;
+                  }
+                }
+
+                ol {
+                  list-style: decimal outside none;
+                }
+
+                ul {
+                  list-style: disc outside none;
+                }
+
+                code {
+                  color: $baseFontColor;
+                  font-family: monospace, serif;
+                  background: none;
+                  padding: 0;
+                }
 	}
 
-	.treeview-handoutsnav li {
-		margin-bottom: 12px;
-	}
 }
 
 .edit-handouts-form {
 	@include edit-box;
-	position: absolute;
+	//position: absolute;
 	right: 0;
 	top: 0;
 	z-index: 10001;
@@ -216,4 +246,8 @@
 	textarea {
 		height: 300px;
 	}
+}
+
+.wrapper-modal-window .modal-window {
+    position: fixed;
 }

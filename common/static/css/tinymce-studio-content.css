@@ -97,6 +97,7 @@
 
 .mce-content-body a, .mce-content-body a:link, .mce-content-body a:visited, .mce-content-body a:hover, .mce-content-body a:active {
     color: #1d9dd9;
+    text-decoration: none;
 }
 
 .mce-content-body img {

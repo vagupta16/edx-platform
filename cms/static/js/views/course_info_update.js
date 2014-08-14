@@ -1,6 +1,6 @@
-define(["js/views/baseview", "codemirror", "js/models/course_update",
+define(["js/views/baseview", "tinymce", "js/models/course_update",
     "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
-    function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
+    function(BaseView, TinyMCE, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
 
     var CourseInfoUpdateView = BaseView.extend({
         // collection is CourseUpdateCollection
@@ -53,11 +53,8 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
             $(updateEle).prepend($newForm);
 
             var $textArea = $newForm.find(".new-update-content").first();
-            this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
-                mode: "text/html",
-                lineNumbers: true,
-                lineWrapping: true
-            });
+            CourseInfoHelper.editWithTinyMCE(
+                self.options['base_asset_url'], $textArea.get(0).id);
 
             $newForm.addClass('editing');
             this.$currentPost = $newForm.closest('li');
@@ -74,7 +71,10 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
         onSave: function(event) {
             event.preventDefault();
             var targetModel = this.eventModel(event);
-            targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
+            targetModel.set({
+                date : this.dateEntry(event).val(),
+                content : tinyMCE.activeEditor.getContent({format:"raw", no_events: 1})
+            });
             // push change to display, hide the editor, submit the change
             var saving = new NotificationView.Mini({
                 title: gettext('Saving&hellip;')
@@ -116,8 +116,8 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
             $(this.editor(event)).show();
             var $textArea = this.$currentPost.find(".new-update-content").first();
             var targetModel = this.eventModel(event);
-            this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
-                targetModel, 'content', self.options['base_asset_url'], $textArea.get(0));
+            CourseInfoHelper.editWithTinyMCE(
+                self.options['base_asset_url'], $textArea.get(0).id);
 
             // Variable stored for unit test.
             this.$modalCover = ModalUtils.showModalCover(false,
@@ -195,11 +195,10 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                     // ignore but handle rest of page
                 }
                 this.$currentPost.find('form').hide();
-                this.$currentPost.find('.CodeMirror').remove();
+                tinymce.remove(tinymce.activeEditor);
             }
 
             ModalUtils.hideModalCover(this.$modalCover);
-            this.$codeMirror = null;
         },
 
         // Dereferencing from events to screen elements

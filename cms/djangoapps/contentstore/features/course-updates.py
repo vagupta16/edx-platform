@@ -3,7 +3,6 @@
 
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
-from common import type_in_codemirror, get_codemirror_value
 from nose.tools import assert_in  # pylint: disable=E0611
 
 
@@ -90,43 +89,23 @@ def check_handout(_step, handout):
     assert_in(handout, world.css_html(handout_css))
 
 
-@step(u'I see the handout error text')
-def check_handout_error(_step):
-    handout_error_css = 'div#handout_error'
-    assert world.css_has_class(handout_error_css, 'is-shown')
-
-
-@step(u'I see handout save button disabled')
-def check_handout_error(_step):
-    handout_save_button = 'form.edit-handouts-form a.save-button'
-    assert world.css_has_class(handout_save_button, 'is-disabled')
-
-
-@step(u'I edit the handout to "([^"]*)"$')
-def edit_handouts(_step, text):
-    type_in_codemirror(0, text)
-
-
-@step(u'I see handout save button re-enabled')
-def check_handout_error(_step):
-    handout_save_button = 'form.edit-handouts-form a.save-button'
-    assert not world.css_has_class(handout_save_button, 'is-disabled')
-
-
-@step(u'I save handout edit')
-def check_handout_error(_step):
-    save_css = 'a.save-button'
-    world.css_click(save_css)
-
-
 def change_text(text):
-    type_in_codemirror(0, text)
+    script = """
+    var editor = tinyMCE.activeEditor;
+    editor.setContent(arguments[0]);"""
+    world.browser.driver.execute_script(script, str(text))
+    world.wait_for_ajax_complete()
     save_css = 'a.save-button'
     world.css_click(save_css)
 
 
 def verify_text_in_editor_and_update(button_css, before, after):
     world.css_click(button_css)
-    text = get_codemirror_value()
+    text = world.browser.driver.execute_script(
+        """
+        var editor = tinyMCE.activeEditor;
+        return editor.getContent({format: 'raw', no_events: 1});
+        """
+    )
     assert_in(before, text)
     change_text(after)

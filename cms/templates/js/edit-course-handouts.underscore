@@ -1,0 +1,5 @@
+<form class="edit-handouts-form" id="edit-handouts">
+  <div class="row">
+    <textarea id="handouts" class="handouts-content-editor text-editor"></textarea>
+  </div>
+</form>
