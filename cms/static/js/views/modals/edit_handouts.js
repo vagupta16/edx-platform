@@ -1,5 +1,7 @@
 define(["js/views/modals/base_modal", "js/views/course_info_helper"],
     function(BaseModal, CourseInfoHelper) {
+        var htmlHeight = $('html').height();
+        
         var EditHandoutsModal = BaseModal.extend({
             events: {
                 "click .action-save": "save",
@@ -16,10 +18,11 @@ define(["js/views/modals/base_modal", "js/views/course_info_helper"],
             },
 
             edit: function(content, base_asset_url) {
+                $('html').css({'height': '100%', 'overflow': 'hidden'});
                 this.show();
                 this.$('.handouts-content-editor').html(content);
                 CourseInfoHelper.editWithTinyMCE(
-                    base_asset_url, this.$('.handouts-content-editor').get(0).id); 
+                    base_asset_url, this.$('.handouts-content-editor').get(0).id);
                 this.$('.modal-window-title').text('STUPID');
                 this.resize();
             },
@@ -30,6 +33,12 @@ define(["js/views/modals/base_modal", "js/views/course_info_helper"],
 
             save: function() {
                 //move code from course_info_handouts.js
+                $('html').css({'height': htmlHeight, 'overflow': 'auto'});
+            },
+            
+            cancel: function() {
+                BaseModal.prototype.cancel.call(this);
+                $('html').css({'height': htmlHeight, 'overflow': 'auto'});
             }
         });
 
