@@ -53,7 +53,7 @@ def utility_bulksettings_handler(request, course_key_string):
             course = _get_course_module(course_key, request.user, depth=3)
 
             # traverse into the course tree and extract problem settings information
-            settings_data = BulkSettingsUtil.get_bulksettings_metadata(course)
+            settings_data = BulkSettingsUtil.get_bulksettings_metadata(course, 'problems')
             return render_to_response('bulksettings.html',
                 {
                     'context_course':course,

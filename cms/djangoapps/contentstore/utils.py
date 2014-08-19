@@ -33,7 +33,7 @@ def delete_course_and_groups(course_id, user_id):
     """
     module_store = modulestore()
 
-    with module_store.bulk_write_operations(course_id):
+    with module_store.ulk_write_operations(course_id):
         module_store.delete_course(course_id, user_id)
 
         print 'removing User permissions from course....'
@@ -270,7 +270,7 @@ class BulkSettingsUtil():
             - Chapters: Course url
             - Problems: Unit url
         """
-    
+
         if category == "chapter":
             return reverse('contentstore.views.course_handler',
                             kwargs={'course_key_string': unicode(parent.id)})
@@ -288,7 +288,7 @@ class BulkSettingsUtil():
                             kwargs={'usage_key_string': unicode(parent.location)})
 
     @classmethod
-    def get_bulksettings_metadata(cls, course):
+    def get_bulksettings_metadata(cls, course, setting_type):
         """
         Returns a list of settings metadata for all sections, subsections, units, and problems.
         Each block (section, subsection, unit or problem) settings metadata is saved as a dictionary:
@@ -313,8 +313,11 @@ class BulkSettingsUtil():
 
                     for component in unit.get_children():
 
-                        if component.location.category == 'problem':
-                            curr_problem_settings = cls.get_settings_dict_for_category('problem', component, unit)
+                        # Replace this with just code that collects all components
+                        # I can just pass in component.location.category into settings_dict_for_category
+                        # To get the relevant settings for the component type
+                        if component.location.category == setting_type:
+                            curr_problem_settings = cls.get_settings_dict_for_category(setting_type, component, unit)
                             unit_setting['children'].append(curr_problem_settings)
 
                     if unit_setting['children']:

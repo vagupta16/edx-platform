@@ -1,0 +1,48 @@
+<% _.each(settings_data, function(section_settings) { %>
+    <section class="course-utility" id="course-utility0">
+
+        <header class="section-header">
+            <h4 class="section-header-title" title="Collapase/Expand this utility">
+                <a href="<%= section_settings['url'] %>"><%= section_settings['name'] %></a>
+            <h4>
+            <p class="section-header-date">
+            <% _.each(setting_type_list_map['section_setting_type'], function(setting_type) { %>
+                <strong><%= section_setting_map[setting_type]%>:</strong> <%= section_settings[setting_type]%>
+            <% }); %>
+            </p>
+        </header>
+        <table class = "settings-table">
+        <% _.each(section_settings['children'], function(subsection_settings) { %>
+            <tr class = "subsection-header">
+                <td class = "subsection-header-cell" colspan = "7">
+                     <strong><a href="<%= subsection_settings['url'] %>"><%= subsection_settings['name'] %></a></strong> -
+                    <% _.each(setting_type_list_map['subsection_setting_types'], function(setting_type) { %>
+                        <span title=<%= setting_type %> class="subsection-settings">
+                            <strong><%= subsection_setting_map[setting_type] %>:</strong> <%= subsection_settings[setting_type] %>
+                        </span>
+                    <% }); %>
+                </td>
+            </tr>
+
+            <% _.each(subsection_settings['children'], function(unit_settings) { %>
+                <tr class = "unit-header">
+                    <!-- TODO: dynamically allocate space ?-->
+                    <td width = "92%" colspan="6"><strong><a href="<%= unit_settings['url'] %>"><%= unit_settings['name'] %></a></strong></td>
+                    <td width = "8%"><%= unit_settings['ispublic'] %></td> <!--hard coded right now-->
+                </tr>
+
+                <% _.each(unit_settings['children'], function(problem_settings) { %>
+                    <tr class="problem-header">
+                        <td width="52%"><strong><a href="<%= problem_settings['url'] %>"><%= problem_settings['name'] %></a></strong></td>
+                        <% _.each(setting_type_list_map['problem_setting_types'], function(setting_type) { %>
+                            <td width="8%"><%= problem_settings[setting_type] %></td>
+                        <% }); %>
+                        <td width="8%"></td> <!-- Padding-->
+                    </tr>
+                <% }); %>
+            <% }); %>
+        <% }); %>
+        </table>
+    </section>
+<% }); %>
+

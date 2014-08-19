@@ -23,8 +23,22 @@
   <section class="content">
     <article class="content-primary" role="main">
 
+            <!-- Maybe encase this section in a div (id = problem settings) and then 
+                generate another section like this one in its own div for videos with the
+                video settings. Initially they'd all be hidden.
+                Then when instructor selects which setting they want to see, that section is
+                shown.
+                Or, populate the div with settings data through javascript? AJAX call to get 
+                relevant settings data...? 
+                Or, get all data in one go and store in JS object on the frontend...?
+                -->
+
             <!-- Static Bulk Settings Header Table -->
             <section class="course-utility" id="settings-header">
+                <select name="select-displayed-settings" id="select-displayed-settings">
+                    <option value="problems">Problem settings</option>
+                    <option value="videos">Video settings</option>
+                </select>
                 <table width="100%" style="margin: 10px">
                     <tr>
                         <td width="52%"><strong>Problem Settings:</strong></td>
@@ -142,6 +156,20 @@
         } else {
             $('.key-box').removeClass('fixed-sidebar').css({'width': 'auto'});
         }
+    });
+    $('document').ready(function() {
+        $('#select-displayed-settings').change(function() {
+            var selected_setting = this.value;
+            if(selected_setting != 'Choose setting'){
+                $.ajax({
+                    url: 'lol what is the url????',
+                    type: 'get',
+                    dataType: 'json',
+                    data: {},
+                    success: function(){}, //Make handler here
+                });
+            }
+        });
     });
 </script>
 
