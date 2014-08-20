@@ -36,8 +36,9 @@
             <!-- Static Bulk Settings Header Table -->
             <section class="course-utility" id="settings-header">
                 <select name="select-displayed-settings" id="select-displayed-settings">
-                    <option value="problems">Problem settings</option>
-                    <option value="videos">Video settings</option>
+                    <option value="choose">Choose settings</option>
+                    <option value="problem">Problem settings</option>
+                    <option value="video">Video settings</option>
                 </select>
                 <table width="100%" style="margin: 10px">
                     <tr>
@@ -160,13 +161,18 @@
     $('document').ready(function() {
         $('#select-displayed-settings').change(function() {
             var selected_setting = this.value;
-            if(selected_setting != 'Choose setting'){
+            if(selected_setting != 'choose'){
                 $.ajax({
-                    url: 'lol what is the url????',
+                    url: '${ bulk_settings_path }',
                     type: 'get',
                     dataType: 'json',
-                    data: {},
-                    success: function(){}, //Make handler here
+                    data: {
+                        setting_type: selected_setting,
+                    },
+                    success: function(data){
+                        console.log("Nice job!");
+                        console.log(data['data']);
+                    }, //Make handler here
                 });
             }
         });

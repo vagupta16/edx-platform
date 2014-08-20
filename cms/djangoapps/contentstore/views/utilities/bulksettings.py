@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 
 from edxmako.shortcuts import render_to_response
+from util.json_request import JsonResponse
 
 from contentstore.utils import BulkSettingsUtil
 
@@ -46,6 +47,12 @@ def utility_bulksettings_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     response_format = request.REQUEST.get('format', 'html')
 
+    if request.is_ajax():
+        course = _get_course_module(course_key, request.user, depth=3)
+        desired_settings = request.GET.get('setting_type')
+        settings_data = BulkSettingsUtil.get_bulksettings_metadata(course, desired_settings)
+        return JsonResponse({ 'success': True, 'data': settings_data })
+
     if response_format == 'html':
         if request.method == 'GET':
 
@@ -57,6 +64,7 @@ def utility_bulksettings_handler(request, course_key_string):
             return render_to_response('bulksettings.html',
                 {
                     'context_course':course,
+                    'bulk_settings_path': request.path,
                     'settings_data':settings_data,
                     'setting_type_list_map': SETTING_TYPE_LIST_MAP,
                     'section_setting_map': SECTION_SETTING_MAP,
