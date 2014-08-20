@@ -3,7 +3,7 @@
 import copy
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import UTC
 
 from django.conf import settings
@@ -227,6 +227,10 @@ class BulkSettingsUtil():
     SUBSECTION_SETTING_TYPES = ['start', 'due', 'format']
     UNIT_SETTING_TYPES = []
     PROBLEM_SETTING_TYPES = ['max_attempts', 'weight', 'rerandomize', 'showanswer', 'submission_wait_seconds']
+    VIDEO_SETTING_TYPES = [
+        'start_time', 'end_time', 'handout', 'download_video', 'html5_sources', 'track',
+        'download_track', 'show_captions', 'sub', 'transcripts',
+    ]
     SECTION_SETTING_MAP = {'start': 'Release Date'}
     SUBSECTION_SETTING_MAP = {'start': 'Release', 'due': 'Due', 'format': 'Type'}
     CATEGORY_SETTING_MAP = {
@@ -234,6 +238,7 @@ class BulkSettingsUtil():
         "sequential": SUBSECTION_SETTING_TYPES,
         "vertical": UNIT_SETTING_TYPES,
         "problem": PROBLEM_SETTING_TYPES,
+        "video": VIDEO_SETTING_TYPES,
     }
 
     @classmethod
@@ -243,7 +248,6 @@ class BulkSettingsUtil():
 
         Parent is required since .parent nor .get_parent() work.
         """
-
         settings_dict = {}
         settings_dict['name'] = child.display_name
         settings_dict['children'] = []
@@ -253,6 +257,8 @@ class BulkSettingsUtil():
             value = getattr(child, setting_type)
             if isinstance(value, datetime):
                 value = value.strftime('%m/%d/%Y')
+            if isinstance(value, timedelta):
+                value = str(value)
 
             settings_dict[setting_type] = value
 
