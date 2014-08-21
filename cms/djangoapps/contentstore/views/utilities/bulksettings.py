@@ -30,7 +30,8 @@ SETTING_TYPE_LIST_MAP = {
     "section_setting_types": BulkSettingsUtil.SECTION_SETTING_TYPES,
     "subsection_setting_types": BulkSettingsUtil.SUBSECTION_SETTING_TYPES,
     "unit_setting_types": BulkSettingsUtil.UNIT_SETTING_TYPES,
-    "problem_setting_types": BulkSettingsUtil.PROBLEM_SETTING_TYPES
+    "problem": BulkSettingsUtil.PROBLEM_SETTING_TYPES,
+    "video": BulkSettingsUtil.VIDEO_SETTING_TYPES,
 }
 
 
@@ -52,7 +53,13 @@ def utility_bulksettings_handler(request, course_key_string):
         course = _get_course_module(course_key, request.user, depth=3)
         desired_settings = request.GET.get('setting_type')
         settings_data = BulkSettingsUtil.get_bulksettings_metadata(course, desired_settings)
-        return JsonResponse({ 'success': True, 'settings_data': settings_data })
+        return JsonResponse({
+            'success': True,
+            'settings_data': settings_data,
+            'setting_type_list_map': SETTING_TYPE_LIST_MAP,
+            'section_setting_map': SECTION_SETTING_MAP,
+            'subsection_setting_map': SUBSECTION_SETTING_MAP,
+        })
 
     if response_format == 'html':
         if request.method == 'GET':

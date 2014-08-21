@@ -54,7 +54,14 @@
                 </table>
             </section>
 
+                <script type="text/template" id="bulk-settings-template">
+                    <%static:include path="js/bulk-settings-view.underscore" />
+                </script>
+
+            <div class="bulk-settings-wrapper" id="bulk-settings-wrapper"></div>
+
             <!-- Dynamic Bulk Settings Tables -->
+            <!--
             % for section_settings in settings_data:
             <section class="course-utility" id="course-utility0">
 
@@ -100,6 +107,7 @@
                     </table>
                 </section>
                 % endfor
+                -->
         </article>
 
     <aside class="content-supplementary" role="complimentary">
@@ -172,6 +180,15 @@
                     success: function(data){
                         console.log("Nice job!");
                         console.log(data['settings_data']);
+                        var template = $('#bulk-settings-template').html();
+                        var rendered = _.template(template, {
+                            'settings_data': data['settings_data'],
+                            'setting_type_list_map': data['setting_type_list_map'],
+                            'section_setting_map': data['section_setting_map'],
+                            'subsection_setting_map': data['subsection_setting_map'],
+                            'setting_type': selected_setting,
+                        });
+                        $('#bulk-settings-wrapper').html(rendered);
                     }, //Make handler here
                 });
             }

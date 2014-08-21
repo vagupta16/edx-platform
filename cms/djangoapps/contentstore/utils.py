@@ -228,8 +228,8 @@ class BulkSettingsUtil():
     UNIT_SETTING_TYPES = []
     PROBLEM_SETTING_TYPES = ['max_attempts', 'weight', 'rerandomize', 'showanswer', 'submission_wait_seconds']
     VIDEO_SETTING_TYPES = [
-        'start_time', 'end_time', 'handout', 'download_video', 'html5_sources', 'track',
-        'download_track', 'show_captions', 'sub', 'transcripts',
+        'sub', 'download_track', 'track', 'show_captions', 'transcripts',
+        'handout', 'download_video', 'html5_sources', 'start_time', 'end_time',
     ]
     SECTION_SETTING_MAP = {'start': 'Release Date'}
     SUBSECTION_SETTING_MAP = {'start': 'Release', 'due': 'Due', 'format': 'Type'}
@@ -259,6 +259,8 @@ class BulkSettingsUtil():
                 value = value.strftime('%m/%d/%Y')
             if isinstance(value, timedelta):
                 value = str(value)
+            if isinstance(value, dict):
+                value = [key + ' : ' + key_value for key, key_value in value.iteritems()]
 
             settings_dict[setting_type] = value
 

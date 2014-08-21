@@ -4,7 +4,7 @@
         <header class="section-header">
             <h4 class="section-header-title" title="Collapase/Expand this utility">
                 <a href="<%= section_settings['url'] %>"><%= section_settings['name'] %></a>
-            <h4>
+            </h4>
             <p class="section-header-date">
             <% _.each(setting_type_list_map['section_setting_type'], function(setting_type) { %>
                 <strong><%= section_setting_map[setting_type]%>:</strong> <%= section_settings[setting_type]%>
@@ -31,11 +31,12 @@
                     <td width = "8%"><%= unit_settings['ispublic'] %></td> <!--hard coded right now-->
                 </tr>
 
-                <% _.each(unit_settings['children'], function(problem_settings) { %>
+                <% _.each(unit_settings['children'], function(component_settings) { %>
                     <tr class="problem-header">
-                        <td width="52%"><strong><a href="<%= problem_settings['url'] %>"><%= problem_settings['name'] %></a></strong></td>
-                        <% _.each(setting_type_list_map['problem_setting_types'], function(setting_type) { %>
-                            <td width="8%"><%= problem_settings[setting_type] %></td>
+                        <td width="52%"><strong><a href="<%= component_settings['url'] %>"><%= component_settings['name'] %></a></strong></td>
+                        <% _.each(setting_type_list_map[setting_type], function(setting) { %>
+
+                            <td width="8%"><%= component_settings[setting] %></td>
                         <% }); %>
                         <td width="8%"></td> <!-- Padding-->
                     </tr>
