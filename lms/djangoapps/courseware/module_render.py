@@ -44,7 +44,8 @@ from xmodule_modifiers import (
     replace_static_urls,
     add_staff_markup,
     wrap_xblock,
-    request_token
+    request_token,
+    add_inline_analytics,
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
@@ -478,6 +479,12 @@ def get_module_system_for_user(user, field_data_cache,
         if has_access(user, 'staff', descriptor, course_id):
             has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
             block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
+
+    # Add button for in-line analytics
+    if settings.ANALYTICS_DATA_URL:
+        if has_access(user, 'staff', descriptor, course_id):
+            has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
+            block_wrappers.append(partial(add_inline_analytics, user, has_instructor_access))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with

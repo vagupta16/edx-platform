@@ -1,0 +1,66 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+${block_content}
+<div aria-hidden="true" class="wrap-instructor-info">
+  
+      <a class="instructor-info-action instructor-analytics-action" id="id_analytics" data-correct_response="ccc" data-num_choices="num_choices" data-problem_type="problem_type" data-div_id="div_id">${_("Staff Analytics Infoxxx")}</a>
+
+</div>
+
+
+
+
+% for part_id, b, c, d, problem_type in responses_data:
+   <li>${problem_type}</li>
+
+  % if problem_type == 'radio':
+
+    <div id="${part_id}_radio" style="display: none;">
+      <div id="${part_id}_radio_close" href="#">X
+        <section aria-hidden="true" >
+          <div class="grid-wrapper radio">
+            <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question.</p>
+            <p>Last updated: <strong class="last-update"></strong></p>
+            <div class="grid-block table">
+              <table cellspacing="2px" id="${part_id}_radio_table">
+                <tr>
+                  <td width="65px">Choice</td>
+                  <td width="50px"></td>
+                  <td width="125px" colspan="2">Last Attempt</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  % endif 
+  
+  % if problem_type == 'checkbox':
+
+    <div id="${part_id}_checkbox" style="display: none;">
+      <div id="${part_id}_checkbox_close" href="#">X
+        <section aria-hidden="true" >
+          <div class="grid-wrapper checkbox">
+            <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question:</p>
+            <p>Last updated: <strong class="last-update"></strong></p>
+            <div class="grid-block table">
+              <table cellspacing="2px" id="${part_id}_checkbox_table">
+                <tr class="checkbox_header_row">
+                  <td width="65px">Choice</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  % endif 
+   
+% endfor
+
+   
+

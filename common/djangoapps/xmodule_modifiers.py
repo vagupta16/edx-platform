@@ -254,9 +254,6 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
             log.warning("Unable to read field in Staff Debug information", exc_info=True)
             field_contents.append((name, "WARNING: Unable to read field"))
 
-    # Determine type of problem for in-line analytics.
-    correct_response, num_choices, problem_type, choice_text = get_problem_type(block)
-
     staff_context = {'fields': field_contents,
                      'xml_attributes': getattr(block, 'xml_attributes', {}),
                      'location': block.location,
@@ -274,51 +271,95 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
                      'block_content': frag.content,
                      'is_released': is_released,
                      'has_instructor_access': has_instructor_access,
-                     'get_analytics_answer_dist': reverse('get_analytics_answer_dist'),
-                     'correct_response': correct_response,
-                     'num_choices': num_choices,
-                     'problem_type': problem_type,
-                     'div_id': block.location.html_id(),
+     #                'get_analytics_answer_dist': reverse('get_analytics_answer_dist'),
+     #                'correct_response': correct_response,
+     #                'num_choices': num_choices,
+     #                'problem_type': problem_type,
+     #                'div_id': block.location.html_id(),
                      }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 
 
-def get_problem_type(block):
+def add_inline_analytics(user, has_instructor_access, block, view, frag, context):  # pylint: disable=unused-argument
+    
+
+    d = {"person": {"first_name": "Joe", "last_name": "Johnson"}}
+    responses_data = get_responses_data(block)
+    if responses_data:
+        analytics_context = {'block_content': frag.content,
+                         'responses_data': responses_data,
+                         }
+        return wrap_fragment(frag, render_to_string("inline_analytics.html", analytics_context))
+
+    else:
+        return frag
+    
+    
+def get_responses_data(block):
     """
     Determines the problem type; used by the in-line analytics display.
     Currently supported problem types, for in-line analytics are:
-       checkboxgroup, radiogroup
+       checkboxgroup, choicegroup
     All other problem types return None
+    Responses with shuffle are not supported for in-line analytics
     If settings.ANALYTICS_DATA_URL not set then returns None
     """
 
-    correct_response = None
-    num_choices = 0
-    problem_type = None
-    choice_text = []
+    responses_data = []
+    holding_data = {}
 
-    if settings.ANALYTICS_DATA_URL and isinstance(block, CapaModule):
+    if isinstance(block, CapaModule):
 
-        # Determine type of response
-        response = block.lcp.responders.values()[0]
-        if isinstance(response, MultipleChoiceResponse):
-            problem_type = 'radio'
-        elif isinstance(response, ChoiceResponse):
-            problem_type = 'checkbox'
+        responses = block.lcp.responders.values()
+        valid_responses = {}
 
-        if problem_type:
-            # Determine the correct response; should only be 1 answer id
-            answer_id = block.lcp.get_answer_ids()[0][0]
-            question_answers = block.lcp.get_question_answers()
-            correct_response = question_answers[answer_id]
+        # Each response is an individual question
+        for response in responses:
+            problem_type = None
+            has_shuffle = response.has_shuffle()
+            if isinstance(response, MultipleChoiceResponse) and not response.has_shuffle():
+                problem_type = 'radio'
+            elif isinstance(response, ChoiceResponse) and not response.has_shuffle():
+                problem_type = 'checkbox'
 
+            # Only radio and checkbox types are support for in-line analytics at this time
+            if problem_type:
+                # The is only 1 part_id and correct response for each question
+                part_id, correct_response = response.get_answers().items()[0]
+                valid_responses[part_id] = [correct_response, problem_type]
+        
+        if valid_responses:
+            parent_node = None
+            part_id = None
+            num_choices = 0
+            choice_text = []
+            
+            # Loop through all the nodes finding the choice elements for each question
+            # The parent of the choice elements has an id = part_id
             for node in block.lcp.tree.iter(tag=etree.Element):
-                if node.tag == 'choice':
-                    # Determine number of choices
+                parent_nodes = node.xpath('..')
+                if parent_nodes:
+                    parent_node = parent_nodes[0]
+                    part_id = parent_node.attrib.get('id', None)
+                
+                # If this is a valid question according to the list of valid responses and we have a choice node
+                if part_id and part_id in list(valid_responses) and node.tag == 'choice':
                     num_choices += 1
-
-                    # Build list of choice text
                     choice_text.append(node.text)
 
-    return correct_response, num_choices, problem_type, choice_text
+                    holding_data[part_id] = [num_choices, choice_text]
+                elif node.tag == 'checkboxgroup' or node.tag == 'choicegroup':
+                    # Reset as we are changing to a new question
+                    num_choices = 0
+                    choice_text = []
 
+            for data in holding_data.items():
+                part_id = data[0]
+                correct_response = valid_responses[part_id][0]
+                num_choices = data[1][0]
+                choice_text = data[1][1]
+                problem_type = valid_responses[part_id][1]
+                responses_data.append([part_id, correct_response, num_choices, choice_text, problem_type])
+ 
+                
+    return responses_data
