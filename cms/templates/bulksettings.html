@@ -60,6 +60,9 @@
                 <script type="text/template" id="problem-settings-template">
                     <%static:include path="js/problem-settings-view.underscore" />
                 </script>
+                <script type="text/template" id="video-settings-template">
+                    <%static:include path="js/video-settings-view.underscore" />
+                </script>
 
             <div class="bulk-settings-wrapper" id="bulk-settings-wrapper"></div>
 
@@ -184,9 +187,7 @@
                         console.log("Nice job!");
                         console.log(data['settings_data']);
                         var template = $('#bulk-settings-template').html();
-                        var settings_template;
-                        if(selected_setting == "problem")
-                            settings_template = _.template($('#problem-settings-template').html());
+                        var settings_template = _.template($('#' + selected_setting + '-settings-template').html());
                         var rendered = _.template(template, {
                             'settings_data': data['settings_data'],
                             'setting_type_list_map': data['setting_type_list_map'],

@@ -1,0 +1,10 @@
+<% var main_display_settings = ['sub', 'download_track', 'track', 'show_captions', 'handout', 'download_video'] %>
+
+<% _.each(components, function(component) { %>
+    <tr class="problem-header">
+        <td width="52%"><strong><a href="<%= component['url'] %>"><%= component['name'] %></a></strong></td>
+        <% _.each(main_display_settings, function(setting) { %>
+            <td width="8%"><%= component[setting] %></td>
+        <% }); %>
+    </tr>
+<% }); %>

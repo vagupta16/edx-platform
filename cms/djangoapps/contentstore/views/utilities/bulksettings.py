@@ -49,7 +49,6 @@ def utility_bulksettings_handler(request, course_key_string):
     response_format = request.REQUEST.get('format', 'html')
 
     if request.is_ajax():
-        import pdb; pdb.set_trace()
         course = _get_course_module(course_key, request.user, depth=3)
         desired_settings = request.GET.get('setting_type')
         settings_data = BulkSettingsUtil.get_bulksettings_metadata(course, desired_settings)
