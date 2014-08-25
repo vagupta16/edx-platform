@@ -30,17 +30,13 @@
                     <td width = "92%" colspan="6"><strong><a href="<%= unit_settings['url'] %>"><%= unit_settings['name'] %></a></strong></td>
                     <td width = "8%"><%= unit_settings['ispublic'] %></td> <!--hard coded right now-->
                 </tr>
-
-                <% _.each(unit_settings['children'], function(component_settings) { %>
-                    <tr class="problem-header">
-                        <td width="52%"><strong><a href="<%= component_settings['url'] %>"><%= component_settings['name'] %></a></strong></td>
-                        <% _.each(setting_type_list_map[setting_type], function(setting) { %>
-
-                            <td width="8%"><%= component_settings[setting] %></td>
-                        <% }); %>
-                        <td width="8%"></td> <!-- Padding-->
-                    </tr>
-                <% }); %>
+                <% if (setting_type == "problem") { %>
+                    <script type="text/template" src="problem-settings-view.underscore" id="problems-template"></script>
+                    <div id="individual-problem-settings"></div>
+                    <% var template = $('#problems-template').html() %>
+                    <% var rendered = _.template(template, { 'components': unit_settings['children'], 'setting_type_list_map': setting_type_list_map, 'setting_type': setting_type }); %>
+                    <% $('#individual-problem-settings').html(rendered); %>
+                <% } %>
             <% }); %>
         <% }); %>
         </table>

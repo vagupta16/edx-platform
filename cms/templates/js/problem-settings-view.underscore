@@ -1,0 +1,9 @@
+<% _.each(components, function(component) { %>
+    <tr class = "problem header">
+        <td width= "52%"><strong><a href="<%= component['url'] %>"><%= component['name'] %></a></strong></td>
+        <% _.each(setting_type_list_map[setting_type], function(setting) { %>
+            <td width="8%"><%= component[setting] %></td>
+        <% }); %>
+        <td width="8%"></td> <!-- Padding -->
+    </tr>
+<% }); %>
