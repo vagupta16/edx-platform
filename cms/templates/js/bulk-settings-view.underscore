@@ -30,13 +30,7 @@
                     <td width = "92%" colspan="6"><strong><a href="<%= unit_settings['url'] %>"><%= unit_settings['name'] %></a></strong></td>
                     <td width = "8%"><%= unit_settings['ispublic'] %></td> <!--hard coded right now-->
                 </tr>
-                <% if (setting_type == "problem") { %>
-                    <script type="text/template" src="problem-settings-view.underscore" id="problems-template"></script>
-                    <div id="individual-problem-settings"></div>
-                    <% var template = $('#problems-template').html() %>
-                    <% var rendered = _.template(template, { 'components': unit_settings['children'], 'setting_type_list_map': setting_type_list_map, 'setting_type': setting_type }); %>
-                    <% $('#individual-problem-settings').html(rendered); %>
-                <% } %>
+                <%= settings_template({'components': unit_settings['children'], 'setting_type_list_map': setting_type_list_map, 'setting_type': setting_type }) %>
             <% }); %>
         <% }); %>
         </table>
