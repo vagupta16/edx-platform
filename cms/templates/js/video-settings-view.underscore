@@ -10,8 +10,10 @@
                 <td width="8%"><%= component[setting] %></td>
             <% } %>
         <% }); %>
-        <td width="8%">
-            <a class="additional-info-button"><i class='icon-info-sign'></i></a>
+        <td width="8%"><!-- padding --></td>
+    </tr>
+    <tr class="additional-settings-row">
+        <td width="100%" colspan="6">
             <div class="video-additional-settings">
                 <h2><%= component['name'] %></h3>
                 <h3>Transcripts:</h3>

@@ -35,14 +35,16 @@
 
             <!-- Static Bulk Settings Header Table -->
             <section class="course-utility" id="settings-header">
-                <select name="select-displayed-settings" id="select-displayed-settings">
-                    <option value="choose">Choose settings</option>
-                    <option value="problem">Problem settings</option>
-                    <option value="video">Video settings</option>
-                </select>
                 <table width="100%" style="margin: 10px">
                     <tr>
-                        <td width="52%"><strong>Problem Settings:</strong></td>
+                        <td width="52%">
+                            <select name="select-displayed-settings" id="select-displayed-settings">
+                                <option value="choose">Choose settings</option>
+                                <option value="problem">Problem settings</option>
+                                <option value="video">Video settings</option>
+                            </select>
+                            <a id='expand-video-settings'>Expand Settings</a>
+                        </td>
                         <td width="8%" title="Attempts"><i class="icon-list-ol"></i></td>
                         <td width="8%" title="Weight"><i class="icon-dashboard"></i></td>
                         <td width="8%" title="Randomization"><i class="icon-random"></i></td>
@@ -175,7 +177,7 @@
     $('document').ready(function() {
         $('#select-displayed-settings').change(function() {
             var selected_setting = this.value;
-            if(selected_setting != 'choose'){
+            if(selected_setting !== 'choose'){
                 $.ajax({
                     url: '${ bulk_settings_path }',
                     type: 'get',
@@ -199,12 +201,16 @@
                         $('#bulk-settings-wrapper').html(rendered);
 
                         if(selected_setting === 'video'){
-                            $('.problem-header .additional-info-button').on('click', function(event) {
-                                console.log('Pressed button!');
-                                var buttonPressed = $(event.target);
-                                console.log('Button that was pressed:');
-                                console.log(buttonPressed);
-                                buttonPressed.parent().next().show();
+                            $('#expand-video-settings').on('click', function(){
+                                var $expandButton = $('#expand-video-settings')
+                                var currText = $expandButton.text();
+                                if(currText === 'Expand Settings'){
+                                    $('.additional-settings-row').show();
+                                    $expandButton.text('Shrink Settings');
+                                } else {
+                                    $('.additional-settings-row').hide();
+                                    $expandButton.text('Expand Settings');
+                                }
                             });
                         }
                     }, //Make handler here
