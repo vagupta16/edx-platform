@@ -88,6 +88,18 @@
         }
     }
 
+    .video-additional-settings {
+        display: none;
+        position: absolute;
+        left: 50px;
+        width: 825px;
+        height: 250px;
+        z-index: 1000;
+        border: 1px solid black;
+        background-color:#B3D4FC;
+        padding: 20px;
+    }
+
     // utilities - general
     .course-utility {
         @extend %ui-window;
@@ -371,4 +383,5 @@
   .content-supplementary {
     width: flex-grid(3, 12);
   }
+
 }

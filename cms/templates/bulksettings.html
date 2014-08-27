@@ -197,6 +197,16 @@
                             'settings_template': settings_template,
                         });
                         $('#bulk-settings-wrapper').html(rendered);
+
+                        if(selected_setting === 'video'){
+                            $('.problem-header .additional-info-button').on('click', function(event) {
+                                console.log('Pressed button!');
+                                var buttonPressed = $(event.target);
+                                console.log('Button that was pressed:');
+                                console.log(buttonPressed);
+                                buttonPressed.parent().next().show();
+                            });
+                        }
                     }, //Make handler here
                 });
             }

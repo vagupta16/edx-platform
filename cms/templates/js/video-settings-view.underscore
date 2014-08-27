@@ -1,10 +1,26 @@
-<% var main_display_settings = ['sub', 'download_track', 'track', 'show_captions', 'handout', 'download_video'] %>
+<% var main_display_settings = ['sub', 'download_track', 'show_captions', 'handout', 'download_video'] %>
 
 <% _.each(components, function(component) { %>
     <tr class="problem-header">
         <td width="52%"><strong><a href="<%= component['url'] %>"><%= component['name'] %></a></strong></td>
         <% _.each(main_display_settings, function(setting) { %>
-            <td width="8%"><%= component[setting] %></td>
+            <% if(setting === 'sub' && component['track'] !== '') { %>
+                <td width="8%"><a href="<%= component['track'] %>"><%= component[setting] %></a></td>
+            <% } else { %>
+                <td width="8%"><%= component[setting] %></td>
+            <% } %>
         <% }); %>
+        <td width="8%">
+            <a class="additional-info-button"><i class='icon-info-sign'></i></a>
+            <div class="video-additional-settings">
+                <h2><%= component['name'] %></h3>
+                <h3>Transcripts:</h3>
+                <ul>
+                    <%_.each(component['transcripts'], function(transcript) { %>
+                        <li><%= transcript %></li>
+                    <% }); %>
+                </ul>
+            </div>
+        </td>
     </tr>
 <% }); %>
