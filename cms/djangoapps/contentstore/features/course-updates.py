@@ -19,6 +19,7 @@ def add_update(_step, text):
     update_css = 'a.new-update-button'
     world.css_click(update_css)
     change_text(text)
+    save_update()
 
 
 @step(u'I should see the update "([^"]*)"$')
@@ -39,16 +40,13 @@ def modify_update(_step, text):
     button_css = 'div.post-preview a.edit-button'
     world.css_click(button_css)
     change_text(text)
+    save_update()
 
 
 @step(u'I change the update from "([^"]*)" to "([^"]*)"$')
 def change_existing_update(_step, before, after):
     verify_text_in_editor_and_update('div.post-preview a.edit-button', before, after)
-
-
-@step(u'I change the handout from "([^"]*)" to "([^"]*)"$')
-def change_existing_handout(_step, before, after):
-    verify_text_in_editor_and_update('div.course-handouts a.edit-button', before, after)
+    save_update()
 
 
 @step(u'I delete the update$')
@@ -81,6 +79,7 @@ def edit_handouts(_step, text):
     edit_css = 'div.course-handouts > a.edit-button'
     world.css_click(edit_css)
     change_text(text)
+    save_handout()
 
 
 @step(u'I see the handout "([^"]*)"$')
@@ -95,8 +94,14 @@ def change_text(text):
     editor.setContent(arguments[0]);"""
     world.browser.driver.execute_script(script, str(text))
     world.wait_for_ajax_complete()
-    save_css = 'a.save-button'
-    world.css_click(save_css)
+
+
+def save_update():
+    world.css_click('a.save-button')
+
+
+def save_handout():
+    world.css_click('a.action-save')
 
 
 def verify_text_in_editor_and_update(button_css, before, after):
