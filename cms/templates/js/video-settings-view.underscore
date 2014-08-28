@@ -4,24 +4,42 @@
     <tr class="problem-header">
         <td width="52%"><strong><a href="<%= component['url'] %>"><%= component['name'] %></a></strong></td>
         <% _.each(main_display_settings, function(setting) { %>
+            <% var to_display = component[setting] || 'None' %>
             <% if(setting === 'sub' && component['track'] !== '') { %>
-                <td width="8%"><a href="<%= component['track'] %>"><%= component[setting] %></a></td>
+                <td width="8%"><a href="<%= component['track'] %>"><%= to_display %></a></td>
             <% } else { %>
-                <td width="8%"><%= component[setting] %></td>
+                <td width="8%"><%= to_display %></td>
             <% } %>
         <% }); %>
         <td width="8%"><!-- padding --></td>
     </tr>
+
     <tr class="additional-settings-row">
         <td width="100%" colspan="6">
-            <div class="video-additional-settings">
+            <div class="additional-setting">
                 <h2><%= component['name'] %></h3>
                 <h3>Transcripts:</h3>
                 <ul>
-                    <%_.each(component['transcripts'], function(transcript) { %>
+                    <% _.each(component['transcripts'], function(transcript) { %>
                         <li><%= transcript %></li>
                     <% }); %>
                 </ul>
+            </div>
+            <div class="additional-setting">
+                <h2>Video File URL(s):</h2>
+                <ul>
+                    <% _.each(component['html5_sources'], function(source) { %>
+                        <li><%= source %></li>
+                    <% }); %>
+                </ul>
+            </div>
+            <div class="additional-setting">
+                <h2>Start Time:</h2>
+                <p><%= component['start_time'] %></p>
+            </div>
+            <div class="additional-setting">
+                <h2>End Time:</h2>
+                <p><%= component['end_time'] %></p>
             </div>
         </td>
     </tr>
