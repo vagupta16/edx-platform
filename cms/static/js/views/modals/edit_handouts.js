@@ -1,5 +1,5 @@
-define(["js/views/modals/base_modal", "js/views/course_info_helper"],
-    function(BaseModal, CourseInfoHelper) {
+define(["js/views/modals/base_modal", "js/views/course_info_helper", "js/views/feedback_notification"],
+    function(BaseModal, CourseInfoHelper, NotificationView) {
         var htmlHeight = $('html').height();
         
         var EditHandoutsModal = BaseModal.extend({
@@ -17,13 +17,15 @@ define(["js/views/modals/base_modal", "js/views/course_info_helper"],
                 this.template = this.loadTemplate('edit-course-handouts');
             },
 
-            edit: function(content, base_asset_url) {
+            edit: function(model, base_asset_url, refresh) {
                 $('html').css({'height': '100%', 'overflow': 'hidden'});
+                this.model = model;
+                this.refresh = refresh;
                 this.show();
-                this.$('.handouts-content-editor').html(content);
+
+                this.$('.handouts-content-editor').html(this.model.get('data'));
                 CourseInfoHelper.editWithTinyMCE(
                     base_asset_url, this.$('.handouts-content-editor').get(0).id);
-                this.$('.modal-window-title').text('STUPID');
                 this.resize();
             },
 
@@ -32,8 +34,23 @@ define(["js/views/modals/base_modal", "js/views/course_info_helper"],
             },
 
             save: function() {
-                //move code from course_info_handouts.js
                 $('html').css({'height': htmlHeight, 'overflow': 'auto'});
+                this.model.set('data', tinymce.activeEditor.getContent({format: 'raw', no_events: 1}));
+                var saving = new NotificationView.Mini({
+                    title: gettext('Saving&hellip;')
+                });
+                saving.show();
+                this.model.save({}, {
+                    success: function() {
+                        saving.hide();
+                    }
+                });
+                this.hide();
+                this.refresh();
+
+                analytics.track('Saved Course Handouts', {
+                    'course': course_location_analytics
+                });
             },
             
             cancel: function() {

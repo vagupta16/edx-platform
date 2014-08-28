@@ -1,6 +1,6 @@
-define(["js/views/baseview", "tinymce", "js/models/course_update",
+define(["js/views/baseview", "js/models/course_update",
     "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
-    function(BaseView, TinyMCE, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
+    function(BaseView, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
 
     var CourseInfoUpdateView = BaseView.extend({
         // collection is CourseUpdateCollection
@@ -89,6 +89,16 @@ define(["js/views/baseview", "tinymce", "js/models/course_update",
                     ele.remove();
                 }
             });
+
+            var content = CourseInfoHelper.changeContentToPreview(
+                targetModel, 'content', this.options['base_asset_url']);
+            try {
+                // just in case the content causes an error (embedded js errors)
+                this.$currentPost.find('.update-contents').html(content);
+                this.$currentPost.find('.new-update-content').val(content);
+            } catch (e) {
+                // ignore but handle rest of page
+            }
             this.closeEditor(false);
 
             analytics.track('Saved Course Update', {
@@ -104,6 +114,8 @@ define(["js/views/baseview", "tinymce", "js/models/course_update",
             // If the model was never created (user created a new update, then pressed Cancel),
             // we wish to remove it from the DOM.
             var targetModel = this.eventModel(event);
+            // reset editor contents to model values
+            tinyMCE.activeEditor.setContent(targetModel.get('content'));
             this.closeEditor(!targetModel.id);
         },
 
@@ -184,16 +196,6 @@ define(["js/views/baseview", "tinymce", "js/models/course_update",
                 this.$currentPost.removeClass('editing');
                 this.$currentPost.find('.date-display').html(targetModel.get('date'));
                 this.$currentPost.find('.date').val(targetModel.get('date'));
-
-                var content = CourseInfoHelper.changeContentToPreview(
-                    targetModel, 'content', this.options['base_asset_url']);
-                try {
-                    // just in case the content causes an error (embedded js errors)
-                    this.$currentPost.find('.update-contents').html(content);
-                    this.$currentPost.find('.new-update-content').val(content);
-                } catch (e) {
-                    // ignore but handle rest of page
-                }
                 this.$currentPost.find('form').hide();
                 tinymce.remove(tinymce.activeEditor);
             }
