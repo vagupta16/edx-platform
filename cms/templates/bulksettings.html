@@ -202,21 +202,21 @@
                     }, //Make handler here
                 });
             }
-        });
 
-        $('#expand-video-settings').on('click', function(){
-            var selected_setting = $('#select-displayed-settings').val();
-            if(selected_setting === 'video'){
-                var $expandButton = $('#expand-video-settings')
-                var currText = $expandButton.text();
-                if(currText === 'Expand Settings'){
-                    $('.additional-settings-row').show();
-                    $expandButton.text('Shrink Settings');
-                } else {
-                    $('.additional-settings-row').hide();
-                    $expandButton.text('Expand Settings');
+            $('#expand-video-settings').on('click', function(){
+                var selected_setting = $('#select-displayed-settings').val();
+                if(selected_setting === 'video'){
+                    var $expandButton = $('#expand-video-settings')
+                    var currText = $expandButton.text();
+                    if(currText === 'Expand Settings'){
+                        $('.additional-settings-row').show();
+                        $expandButton.text('Shrink Settings');
+                    } else {
+                        $('.additional-settings-row').hide();
+                        $expandButton.text('Expand Settings');
+                    }
                 }
-            }
+            });
         });
 
     });
