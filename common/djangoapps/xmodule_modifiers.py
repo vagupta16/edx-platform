@@ -23,6 +23,7 @@ from xmodule.modulestore.django import modulestore
 from django.core.urlresolvers import reverse
 from xmodule.capa_module import CapaModule
 from capa.responsetypes import ChoiceResponse, MultipleChoiceResponse
+from django.core import serializers
 
 log = logging.getLogger(__name__)
 
@@ -286,9 +287,14 @@ def add_inline_analytics(user, has_instructor_access, block, view, frag, context
     d = {"person": {"first_name": "Joe", "last_name": "Johnson"}}
     responses_data = get_responses_data(block)
     if responses_data:
+  #      json_data = json.dumps(responses_data)
+    #    import pudb; pudb.set_trace()
         analytics_context = {'block_content': frag.content,
-                         'responses_data': responses_data,
-                         }
+                             'location': block.location,
+                             'element_id': block.location.html_id().replace('-', '_'),
+                             'get_analytics_answer_dist': reverse('get_analytics_answer_dist'),
+                             'responses_data': responses_data,
+                            }
         return wrap_fragment(frag, render_to_string("inline_analytics.html", analytics_context))
 
     else:
@@ -315,18 +321,18 @@ def get_responses_data(block):
 
         # Each response is an individual question
         for response in responses:
-            problem_type = None
+            question_type = None
             has_shuffle = response.has_shuffle()
-            if isinstance(response, MultipleChoiceResponse) and not response.has_shuffle():
-                problem_type = 'radio'
-            elif isinstance(response, ChoiceResponse) and not response.has_shuffle():
-                problem_type = 'checkbox'
+            if isinstance(response, MultipleChoiceResponse):
+                question_type = 'radio'
+            elif isinstance(response, ChoiceResponse):
+                question_type = 'checkbox'
 
             # Only radio and checkbox types are support for in-line analytics at this time
-            if problem_type:
+            if question_type:
                 # The is only 1 part_id and correct response for each question
                 part_id, correct_response = response.get_answers().items()[0]
-                valid_responses[part_id] = [correct_response, problem_type]
+                valid_responses[part_id] = [correct_response, question_type, has_shuffle]
         
         if valid_responses:
             parent_node = None
@@ -358,8 +364,9 @@ def get_responses_data(block):
                 correct_response = valid_responses[part_id][0]
                 num_choices = data[1][0]
                 choice_text = data[1][1]
-                problem_type = valid_responses[part_id][1]
-                responses_data.append([part_id, correct_response, num_choices, choice_text, problem_type])
+                question_type = valid_responses[part_id][1]
+                has_shuffle = valid_responses[part_id][2]
+                responses_data.append([part_id, correct_response, num_choices, choice_text, question_type, has_shuffle])
  
                 
     return responses_data

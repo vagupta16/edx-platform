@@ -4,19 +4,24 @@
 ${block_content}
 <div aria-hidden="true" class="wrap-instructor-info">
   
-      <a class="instructor-info-action instructor-analytics-action" id="id_analytics" data-correct_response="ccc" data-num_choices="num_choices" data-problem_type="problem_type" data-div_id="div_id">${_("Staff Analytics Infoxxx")}</a>
+      <a class="instructor-info-action instructor-analytics-action" id="${element_id}_analytics">${_("Staff Analytics Info")}</a>
 
 </div>
 
+% for part_id, correct_response, num_choices, choice_text, question_type, has_shuffle in responses_data:
+   <li>${question_type}</li>
+   
+   
+  % if has_shuffle == True:
+    <div id="${part_id}_analytics" style="display: none;" data-has_shuffle="${has_shuffle}">The analytics cannot be displayed as the question uses randomize.
+      <p><strong></strong></p>
+    </div>
+ 
+    <li>${has_shuffle}</li>
 
+  % elif question_type == 'radio':
 
-
-% for part_id, b, c, d, problem_type in responses_data:
-   <li>${problem_type}</li>
-
-  % if problem_type == 'radio':
-
-    <div id="${part_id}_radio" style="display: none;">
+    <div id="${part_id}_analytics" style="display: none;" data-correct_response="${correct_response}" data-question_type="${question_type}" data-has_shuffle="${has_shuffle}">
       <div id="${part_id}_radio_close" href="#">X
         <section aria-hidden="true" >
           <div class="grid-wrapper radio">
@@ -36,11 +41,10 @@ ${block_content}
       </div>
     </div>
 
-  % endif 
   
-  % if problem_type == 'checkbox':
+  % elif question_type == 'checkbox':
 
-    <div id="${part_id}_checkbox" style="display: none;">
+    <div id="${part_id}_analytics" style="display: none;" data-correct_response="${correct_response}" data-question_type="${question_type}" data-has_shuffle="${has_shuffle}">
       <div id="${part_id}_checkbox_close" href="#">X
         <section aria-hidden="true" >
           <div class="grid-wrapper checkbox">
@@ -59,8 +63,151 @@ ${block_content}
     </div>
 
   % endif 
-   
+
 % endfor
 
-   
+<script type="text/javascript">
 
+  $('#${element_id}_analytics').click(function(event) {
+    
+    
+//    var div = $("#i4x-HumanitiesScience-StatLearning-problem-d9330c956fa2445fa6ea0c09391e020f_3_1_analytics");
+//    var div = $("#i4x-Medicine-SciWrite-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1");
+//    console.log(div);
+//    var correct_response = div[0].dataset.correct_response;
+//    console.log(correct_response);
+
+//    if (correct_response.indexOf("choice_2") != -1) {
+//        console.log("This is the correct response");
+//    }else {
+//        console.log("Not the correct response");
+//    }
+    
+    // Find divs for each question
+    var divs = $( "div[id*='analytics'] ");
+
+    var parts_to_get = [];
+    var parts_to_not_get = [];
+    var question_types = {}
+    
+    // Construct arrays so we don't call api for questions with randomize
+    var arrayLength = divs.length;
+    var id, part_id;
+    for (var i = 0; i < arrayLength; i++) {
+      id = divs[i].id;
+      part_id = id.substring(0, id.indexOf('_analytics'))
+      if (divs[i].dataset.has_shuffle == "True") {
+        parts_to_not_get.push(part_id);
+      }else {
+    	parts_to_get.push(part_id);
+      }
+      
+      // Build dict of question types
+      question_types[part_id] = divs[i].dataset.question_type;
+    }
+    
+    if (parts_to_get.length > 0) {
+    
+      $.ajax({
+        context: this,
+        url: "${get_analytics_answer_dist}",
+        type: "GET",
+        data: {module_id: "${location.to_deprecated_string()}"},
+        dataType: "json",
+        
+        
+        success: function(response) {
+          
+          // Construct vars from data
+ //         var element_id = this.id.replace("_analytics", '_'+this.dataset.problem_type);
+ //         var correct_response = this.dataset.correct_response;
+ //         var num_choices = this.dataset.num_choices;
+ //         var div_id = "problem_"+this.dataset.div_id;
+          
+     //     var responses_data = "${responses_data}";
+     //     console.log(responses_data);
+     
+          if (response != '{}') {
+            process_response(response.data, parts_to_get, question_types);
+          }
+     
+     
+        }
+      });
+    }
+    
+});
+  
+function process_response(data, parts_to_get, question_types) {
+	    
+	  var result = JSON.parse(data);
+	  var choice_text_dict = {};
+	  var choice_text;
+	  var total_count = 0;
+	  var total_count_dict = {};
+	  var part_id;
+	  var value_id;
+	  var current_index;
+	  var value_index;
+	 
+	  // Build the dict of choice texts
+	  var arrayLength = parts_to_get.length;
+	  for (var i = 0; i < arrayLength; i++) {
+	    
+	    // Build the dict of choice texts for each question
+	    choice_text = []
+	    $('#'+'inputtype_'+parts_to_get[i]).find("fieldset label").each(function(index) {
+	      choice_text[index] = $(this).text();
+	    });
+	    choice_text_dict[parts_to_get[i]] = choice_text;
+	  }
+	  
+	  
+	  // Calculate the total number of responses for each question
+	  for (var index in result) {
+		part_id = result[index]['part_id']
+		if (part_id in total_count_dict) {
+	      total_count_dict[part_id] += result[index]['count'];
+		} else {
+			total_count_dict[part_id] = result[index]['count'];
+		}
+	  }
+	  
+	  // Render the appropriate graphics
+	  for (var i = 0; i < arrayLength; i++) {
+	    if (question_types[parts_to_get[i]] == 'radio') {
+	    	render_radio_analytics(result, parts_to_get[i], choice_text_dict, total_count_dict);
+	    }else {
+	    	render_checkbox_analytics(result, parts_to_get[i], choice_text_dict, total_count_dict);
+	    }
+	  }
+	  
+	  // Loop through results creating rows
+//	  for (var index in result) {
+		
+//	    value_id = result[index]['value_id'];
+	        
+//		current_index = index;
+//		value_index = value_id.replace("choice_", "");
+		
+	    // Display rows for gaps in answers in the results
+//	    if (current_index < value_index) {
+//	     insert_missing_rows(element_id, current_index, value_index, correct_response, choice_text);
+//	    }
+	    
+//	  }
+	  
+}
+
+function render_radio_analytics(result, part_id, choice_text_dict, total_count_dict) {
+	console.log("in the radio");
+	console.log(part_id);
+}
+
+function render_checkbox_analytics(result, part_id, choice_text_dict, total_count_dict) {
+	console.log("in the checkbox");
+	console.log(part_id);
+}
+
+</script>
+    
