@@ -102,6 +102,11 @@ body {
   font-weight:bold;
   padding-bottom: 5px;
 }
+.close{
+  position:relative;
+  top:0;
+  left:600px;
+}
 </style>
 
 
@@ -112,72 +117,68 @@ body {
 
 ${block_content}
 <div aria-hidden="true" class="wrap-instructor-info">
-  
-      <a class="instructor-info-action instructor-analytics-action" id="${element_id}_analytics_button">${_("Staff Analytics Info")}</a>
-
+  <a class="instructor-info-action instructor-analytics-action" id="${element_id}_analytics_button">${_("Staff Analytics Info")}</a>
 </div>
 
+<div id="${element_id}_analytics_close" style="display: none;" class="analytics_close_button" href="#">
+  <button class="close">X</button>
+
 % for part_id, correct_response, question_type, has_shuffle in responses_data:
-   <li>${question_type}</li>
-   
-   
   % if has_shuffle == True:
-    <div id="${part_id}_analytics" class="${element_id}_analytics_div" style="display: none;" data-has_shuffle="${has_shuffle}">The analytics cannot be displayed as the question uses randomize.
+    <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-has_shuffle="${has_shuffle}">The analytics cannot be displayed as the question uses randomize.
       <p><strong></strong></p>
     </div>
- 
-    <li>${has_shuffle}</li>
-
   % elif question_type == 'radio':
-
-    <div id="${part_id}_analytics" class="${element_id}_analytics_div" style="display: none;" data-correct_response="${correct_response}" data-question_type="${question_type}" data-has_shuffle="${has_shuffle}">
-      <div id="${part_id}_radio_close" href="#">X
-        <section aria-hidden="true" >
-          <div class="grid-wrapper radio">
-            <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question.</p>
-            <p>Last updated: <strong class="last-update"></strong></p>
-            <div class="grid-block table">
-              <table cellspacing="2px" id="${part_id}_table">
-                <tr>
-                  <td width="65px">Choice</td>
-                  <td width="50px"></td>
-                  <td width="125px" colspan="2">Last Attempt</td>
-                </tr>
-              </table>
-            </div>
+    <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-correct_response="${correct_response}" data-question_type="${question_type}" data-has_shuffle="${has_shuffle}">
+      <section aria-hidden="true" >
+        <div class="grid-wrapper radio">
+          <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question.</p>
+          <p>Last updated: <strong class="last-update"></strong></p>
+          <div class="grid-block table">
+            <table cellspacing="2px" id="${part_id}_table">
+              <tr>
+                <td width="65px">Choice</td>
+                <td width="50px"></td>
+                <td width="125px" colspan="2">Last Attempt</td>
+              </tr>
+            </table>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
-
-  
   % elif question_type == 'checkbox':
-
-    <div id="${part_id}_analytics" class="${element_id}_analytics_div" style="display: none;" data-correct_response="${correct_response}" data-question_type="${question_type}" data-has_shuffle="${has_shuffle}">
-      <div id="${part_id}_checkbox_close" href="#">X
-        <section aria-hidden="true" >
-          <div class="grid-wrapper checkbox">
-            <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question:</p>
-            <p>Last updated: <strong class="last-update"></strong></p>
-            <div class="grid-block table">
-              <table cellspacing="2px" id="${part_id}_table">
-                <tr class="checkbox_header_row">
-                  <td width="65px">Choice</td>
-                </tr>
-              </table>
-            </div>
+    <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-correct_response="${correct_response}" data-question_type="${question_type}" data-has_shuffle="${has_shuffle}">
+      <section aria-hidden="true" >
+        <div class="grid-wrapper checkbox">
+          <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question:</p>
+          <p>Last updated: <strong class="last-update"></strong></p>
+          <div class="grid-block table">
+            <table cellspacing="2px" id="${part_id}_table">
+              <tr class="checkbox_header_row">
+                <td width="65px">Choice</td>
+              </tr>
+            </table>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
-
   % endif 
-
 % endfor
+</div>
 
 <script type="text/javascript">
 
+  //Variable for storing if a problem's analytics data has previously been retrieved.
+  var elements_retrieved = [];
+
   $('#${element_id}_analytics_button').click(function(event) {
+
+    // If data already retrieved for this problem, show the div
+	if (elements_retrieved.indexOf(this.id) != -1) {
+	  $('#${element_id}_analytics_close').show();
+	  return;
+	}
+	elements_retrieved.push(this.id);
 
     var parts_to_get = [];
     var parts_to_not_get = [];
@@ -186,7 +187,7 @@ ${block_content}
     
     var divs = $(".${element_id}"+'_analytics_div');
     
-    // Construct arrays so we don't call api for questions with randomize
+    // Construct arrays so we don't call the api for questions with randomize
     var arrayLength = divs.length;
     var id, part_id;
     for (var i = 0; i < arrayLength; i++) {
@@ -215,18 +216,22 @@ ${block_content}
         
         success: function(response) {
           if (response != '{}') {
-            process_response(response.data, parts_to_get, question_types, correct_responses);
+            process_response(response, parts_to_get, question_types, correct_responses);
+            
+            // Show all the graphics
+            $('#${element_id}_analytics_close').show();
+   
           }
-     
         }
       });
     }
     
 });
   
-function process_response(data, parts_to_get, question_types, correct_responses) {
+function process_response(response, parts_to_get, question_types, correct_responses) {
 	  
-  var result = JSON.parse(data);
+  var result = JSON.parse(response.data);
+  var last_update_date = response.last_update_date;
   var total_count = 0;
   var total_count_dict = {};
   var part_id;
@@ -234,9 +239,8 @@ function process_response(data, parts_to_get, question_types, correct_responses)
   var data_by_part = {};
   var temp_array = []
   
-  // Calculate the total number of responses for each question
-  // and split result by part_id
   for (var index in result) {
+	// Calculate the total number of responses for each question
     part_id = result[index]['part_id']
     if (part_id in total_count_dict) {
       total_count_dict[part_id] += result[index]['count'];
@@ -244,6 +248,7 @@ function process_response(data, parts_to_get, question_types, correct_responses)
         total_count_dict[part_id] = result[index]['count'];
     }
     
+    // Split result by part_id
     if (part_id in data_by_part) {
     	temp_array = data_by_part[part_id];
     	temp_array.push(result[index]);
@@ -258,16 +263,24 @@ function process_response(data, parts_to_get, question_types, correct_responses)
   var arrayLength = parts_to_get.length;
   for (var i = 0; i < arrayLength; i++) {
     part_id = parts_to_get[i];
+    
+    // May not have any results for this part_id
+    if (total_count_dict[part_id]) {
+    	total_count = total_count_dict[part_id];
+    } else {
+    	total_count = 0;
+    }
+    
     if (question_types[part_id] == 'radio') {
-        render_radio_analytics(data_by_part[part_id], part_id, total_count_dict[part_id], correct_responses[part_id]);
+      render_radio_analytics(data_by_part[part_id], part_id, total_count, correct_responses[part_id], last_update_date);
     }else {
-        render_checkbox_analytics(data_by_part[part_id], part_id, total_count_dict[part_id], correct_responses[part_id]);
+      render_checkbox_analytics(data_by_part[part_id], part_id, total_count, correct_responses[part_id], last_update_date);
     }
   }
 }
 
 
-function render_radio_analytics(result, part_id, total_count, correct_response) {
+function render_radio_analytics(result, part_id, total_count, correct_response, last_update_date) {
     
     var value_id;
     var current_index;
@@ -284,18 +297,17 @@ function render_radio_analytics(result, part_id, total_count, correct_response) 
     });
     
     // Loop through results creating rows
-    for (var index in result) {
-      
-      if (result[index]['part_id'] == part_id) {
+    if (result) {
+      for (var index in result) {
         value_id = result[index]['value_id'];
             
         current_index = index;
         value_index = value_id.replace("choice_", "");
             
-      // Display rows for gaps in answers in the results
-      if (current_index < value_index) {
-        insert_missing_rows(part_id, current_index, value_index, correct_response, choice_text);
-      }
+        // Display rows for gaps in answers in the results
+        if (current_index < value_index) {
+          insert_missing_rows(part_id, current_index, value_index, correct_response, choice_text);
+        }
             
         correct = result[index]['correct'];
         count = result[index]['count'];
@@ -307,39 +319,36 @@ function render_radio_analytics(result, part_id, total_count, correct_response) 
         } else if (!correct) {
           answer_class = 'wrong';
         }
-        $('#'+part_id+'_table tr:last').after('<tr><td class="answer_box" title=\"'+choice_text[index]+'\">'+(parseInt(index)+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">'+count+'</td><td class="answer_box">'+percent+'%</td></tr>');
-      }  
-    }
-        
-    // Display rows for missing answers at the end of results
-//    last_index = parseInt(result[result.length -1]['value_id'].replace("choice_", ""));
-//    if (last_index < num_choices -1) {
-//      insert_missing_rows(element_id, last_index + 1, num_choices, correct_response, choice_text);  
-//    }
-    
+        $('#'+part_id+'_table tr:last').after('<tr><td class="answer_box" title=\"'+choice_text[index]+'\">'+(parseInt(index)+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">'+count+'</td><td class="answer_box">'+percent+'%</td></tr>');  
+      }
+      // Display rows for missing answers at the end of results
+      last_index = parseInt(result[result.length -1]['value_id'].replace("choice_", ""));
+      if (last_index < choice_text.length -1) {
+        insert_missing_rows(part_id, last_index + 1, choice_text.length, correct_response, choice_text);  
+      }
+      
+    } else {
+      // There were no results
+      insert_missing_rows(part_id, 0, choice_text.length, correct_response, choice_text); 
+    }    
+   
     // Set the student count
-//    $('#'+part_id+' .num-students').text(total_count);
-        
+    $('#'+part_id+'_analytics .num-students').text(total_count);
     //Set last updated
-//    $('#'+part_id+' .last-update').text(last_update_date);
-              
-    // Show the div
-    $('#'+part_id+'_analytics').show();
-    
-    
+    $('#'+part_id+'_analytics .last-update').text(last_update_date);
     
 }
 
 
-function insert_missing_rows(element_id, current_index, final_index, correct_response, choice_text) {
+function insert_missing_rows(part_id, current_index, final_index, correct_response, choice_text) {
 
   var answer_class;
 
   while (current_index < final_index) {
-    if ("choice_"+current_index == correct_response) {
-	  answer_class = 'right';
-	} else {
+	if (correct_response.indexOf("choice_"+current_index) == -1) {
 	  answer_class = 'wrong';
+	} else {
+	  answer_class = 'right';
 	}
 	$('#'+part_id+'_table tr:last').after('<tr><td class="answer_box" title=\"'+choice_text[current_index]+'\">'+(current_index+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">0</td><td class="answer_box">0%</td></tr>');
 	current_index += 1;
@@ -347,8 +356,7 @@ function insert_missing_rows(element_id, current_index, final_index, correct_res
 }
 
 
-
-function render_checkbox_analytics(result, part_id, total_count, correct_response) {
+function render_checkbox_analytics(result, part_id, total_count, correct_response, last_update_date) {
 	
 	 var choice_text = [];
 	 var count;
@@ -361,7 +369,7 @@ function render_checkbox_analytics(result, part_id, total_count, correct_respons
 	 var max_columns = 10;
 	 
 	 // Sort the results in decending response count order
-	 result.sort(compare);
+	 result.sort(order_by_count);
 	 
 	 // Build the array of choice texts
 	 $('#inputtype_'+part_id).find("fieldset label").each(function(index) {
@@ -380,59 +388,65 @@ function render_checkbox_analytics(result, part_id, total_count, correct_respons
 	 }
 	 
 	 // Loop through results creating columns
-	 for (var index in result) {
+	 if (result) {
+	   for (var index in result) {
 		 
-	   // Append to the header row
-	   $( '<th width="65px"></th>' ).appendTo( $('#'+part_id+'_table tr:eq(0)') );
+	     // Append to the header row
+	     $( '<th width="65px"></th>' ).appendTo( $('#'+part_id+'_table tr:eq(0)') );
 	   
-	   // Append message and break if number of distinct choices >= max_columns
-	   if (index >= max_columns) {
-	     $( '<th width="400px">+ '+result.length+' columns not displayed.</th>' ).appendTo( $('#'+part_id+'_table tr:eq(0)') );
-	     break;
-	   }
-	   actual_response = result[index]['value_id'];
-	   choice_counter = 1;
-	 
-	   while (choice_counter <= choice_text.length) {
-	     imagined_response = 'choice_'+(choice_counter -1);
-	 
-	     // Can't rely in contains method in all browsers so use indexOf
-	     if ((correct_response.indexOf(imagined_response) == -1) &&
-	         (actual_response.indexOf(imagined_response) == -1) ||
-	         (correct_response.indexOf(imagined_response) > -1 &&
-	          actual_response.indexOf(imagined_response) > -1)) {
-	       answer_class = 'right';
-	     }else {
-	       answer_class = 'wrong';
+	     // Append message and break if number of distinct choices >= max_columns
+	     if (index >= max_columns) {
+	       var not_displayed = result.length - max_columns;
+	       $( '<th width="400px"> '+not_displayed+' columns not displayed.</th>' ).appendTo( $('#'+part_id+'_table tr:eq(0)') );
+	       break;
 	     }
-	     if (actual_response.indexOf(imagined_response) != -1) {
-	       checkbox_checked = '<span class="dot"></span>';
-	     }else {
-	       checkbox_checked = '';
+	     actual_response = result[index]['value_id'];
+	     choice_counter = 1;
+	 
+	     while (choice_counter <= choice_text.length) {
+	       imagined_response = 'choice_'+(choice_counter -1);
+	 
+	       // Can't rely in contains method in all browsers so use indexOf
+	       if ((correct_response.indexOf(imagined_response) == -1) &&
+	           (actual_response.indexOf(imagined_response) == -1) ||
+	           (correct_response.indexOf(imagined_response) > -1 &&
+	            actual_response.indexOf(imagined_response) > -1)) {
+	         answer_class = 'right';
+	       }else {
+	         answer_class = 'wrong';
+	       }
+	       if (actual_response.indexOf(imagined_response) != -1) {
+	         checkbox_checked = '<span class="dot"></span>';
+	       }else {
+	         checkbox_checked = '';
+	       }
+	       $( '<td id="column'+index+':row'+choice_counter+'" class="answer_box '+answer_class+'">'+checkbox_checked+'</td>' ).appendTo( $('#'+part_id+'_table tr:eq('+choice_counter+')') );
+	       choice_counter += 1;
 	     }
-	     $( '<td id="column'+index+':row'+choice_counter+'" class="answer_box '+answer_class+'">'+checkbox_checked+'</td>' ).appendTo( $('#'+part_id+'_table tr:eq('+choice_counter+')') );
-	     choice_counter += 1;
-	   }
 	   
-	   // Construct the Last Attempt row
-	   count = result[index]['count'];
-	   percent = Math.round(count*1000/(total_count*10));
-	   count_row += '<td class="answer_box">'+count+'<br/>'+percent+'%</td>'
-	 }
-	 
+	     // Construct the Last Attempt row
+	     count = result[index]['count'];
+	     percent = Math.round(count*1000/(total_count*10));
+	     count_row += '<td class="answer_box">'+count+'<br/>'+percent+'%</td>'
+	   }
+     }
 	 // Append count row to the last attempt row
 	 $('#'+part_id+'_table #last_attempt' ).after( count_row );
+	 
 	 // Set the student count
 	 $('#'+part_id+'_analytics .num-students').text(total_count);
 	 //Set last updated
-//	 $('#'+part_id+' .last-update').text(last_update_date);
-	 // Show the div
-	 $('#'+part_id+'_analytics').show();
-	
+	 $('#'+part_id+'_analytics .last-update').text(last_update_date);
 	
 }
 
-function compare(a,b) {
+
+$('#${element_id}_analytics_close').click(function(event) {
+  this.style.display = 'none';
+});
+	
+
+function order_by_count(a,b) {
 	if (a.count > b.count) {
 	return -1;
 	}

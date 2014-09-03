@@ -273,11 +273,6 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
                      'block_content': frag.content,
                      'is_released': is_released,
                      'has_instructor_access': has_instructor_access,
-     #                'get_analytics_answer_dist': reverse('get_analytics_answer_dist'),
-     #                'correct_response': correct_response,
-     #                'num_choices': num_choices,
-     #                'problem_type': problem_type,
-     #                'div_id': block.location.html_id(),
                      }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 
@@ -300,19 +295,17 @@ def add_inline_analytics(user, has_instructor_access, block, view, frag, context
     
 def get_responses_data(block):
     """
-    Determines the problem type; used by the in-line analytics display.
-    Currently supported problem types, for in-line analytics are:
+    Determines the question type; used by the in-line analytics display.
+    Currently supported question types, for in-line analytics are:
        checkboxgroup, choicegroup
-    All other problem types return None
-    Responses with shuffle are not supported for in-line analytics
+
+    Responses with shuffle are not currently supported for in-line analytics
     If settings.ANALYTICS_DATA_URL not set then returns None
     """
 
     responses_data = []
-    part_data = OrderedDict()
-
-    if isinstance(block, CapaModule):
-
+    
+    if settings.ANALYTICS_DATA_URL and isinstance(block, CapaModule):
         responses = block.lcp.responders.values()
         valid_responses = {}
 
@@ -332,30 +325,16 @@ def get_responses_data(block):
                 valid_responses[part_id] = [correct_response, question_type, has_shuffle]
         
         if valid_responses:
-            parent_node = None
             part_id = None
             
             # Loop through all the nodes finding the choice elements for each question
             # We need to do this to get the questions in the same order as on the page
             # The parent of the choice elements has an id = part_id
             for node in block.lcp.tree.iter(tag=etree.Element):
-                parent_nodes = node.xpath('..')
-                if parent_nodes:
-                    parent_node = parent_nodes[0]
-                    part_id = parent_node.attrib.get('id', None)
-                 
-                # If this is a valid question according to the list of valid responses and we have a choice node
-                if part_id and part_id in list(valid_responses) and node.tag == 'choice':
-                    part_data[part_id] = [None]
+                part_id = node.attrib.get('id', None)
+                    
+                # If this is a valid question according to the list of valid responses and we have the group node
+                if part_id and part_id in list(valid_responses) and node.tag in ['checkboxgroup', 'choicegroup']:
+                    responses_data.append([part_id, valid_responses[part_id][0], valid_responses[part_id][1], valid_responses[part_id][2]])
 
-            for data in part_data.items():
-                part_id = data[0]
-                correct_response = valid_responses[part_id][0]
-                question_type = valid_responses[part_id][1]
-                has_shuffle = valid_responses[part_id][2]
-                
-                responses_data.append([part_id, correct_response, question_type, has_shuffle])
-
-                
-                
     return responses_data
