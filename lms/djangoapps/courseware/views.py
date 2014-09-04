@@ -21,7 +21,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect
 from edxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
@@ -1035,8 +1035,10 @@ def get_course_lti_endpoints(request, course_id):
 @require_GET
 def get_analytics_answer_dist(request):
     """
-    Makes a call the the analytics api to retrieve answer distribution data for the in-line analytics display.
-    Returns an empty json string if there was an error.
+    Calls the the analytics api
+    
+    Retrieves answer distribution data for the in-line analytics display.
+
     From the result, gets the date/time the data was last updated and reformats to the client TZ.
     Returns a json payload of the api data and last updated string.
     """
@@ -1054,8 +1056,9 @@ def get_analytics_answer_dist(request):
         response = urllib2.urlopen(analytics_req)
         data = response.read()
         
-    except urllib2.URLError as e:
-        return JsonResponse('{}')
+    except urllib2.HTTPError, e:
+        log.warning('Analytics API error: ' +str(e))
+        return HttpResponse(status=e.code)
 
     # Determine the last updated date, convert to client TZ and format
     created_date = json.loads(data)[0]['created']

@@ -278,11 +278,14 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
 
 
 def add_inline_analytics(user, has_instructor_access, block, view, frag, context):  # pylint: disable=unused-argument
+    """
+    Add some stuff here
+    """
 
     responses_data = get_responses_data(block)
     if responses_data:
         analytics_context = {'block_content': frag.content,
-                             'location': block.location,
+                             'location': block.location.to_deprecated_string(),
                              'element_id': block.location.html_id().replace('-', '_'),
                              'get_analytics_answer_dist': reverse('get_analytics_answer_dist'),
                              'responses_data': responses_data,
@@ -291,20 +294,20 @@ def add_inline_analytics(user, has_instructor_access, block, view, frag, context
 
     else:
         return frag
-    
-    
+
+
 def get_responses_data(block):
     """
-    Determines the question type; used by the in-line analytics display.
-    Currently supported question types, for in-line analytics are:
-       checkboxgroup, choicegroup
-
-    Responses with shuffle are not currently supported for in-line analytics
-    If settings.ANALYTICS_DATA_URL not set then returns None
-    """
-
-    responses_data = []
+    Gets Capa data for questions; used by the in-line analytics display.
     
+    Currently supported question types, for in-line analytics are:
+       - checkboxgroup
+       - choicegroup
+
+    Questions with shuffle are not currently supported for in-line analytics.
+    If settings.ANALYTICS_DATA_URL is unset then returns None
+    """
+    responses_data = []
     if settings.ANALYTICS_DATA_URL and isinstance(block, CapaModule):
         responses = block.lcp.responders.values()
         valid_responses = {}
@@ -323,18 +326,16 @@ def get_responses_data(block):
                 # There is only 1 part_id and correct response for each question
                 part_id, correct_response = response.get_answers().items()[0]
                 valid_responses[part_id] = [correct_response, question_type, has_shuffle]
-        
+
         if valid_responses:
             part_id = None
-            
-            # Loop through all the nodes finding the choice elements for each question
+
+            # Loop through all the nodes finding the group elements for each question
             # We need to do this to get the questions in the same order as on the page
-            # The parent of the choice elements has an id = part_id
             for node in block.lcp.tree.iter(tag=etree.Element):
                 part_id = node.attrib.get('id', None)
-                    
-                # If this is a valid question according to the list of valid responses and we have the group node
                 if part_id and part_id in list(valid_responses) and node.tag in ['checkboxgroup', 'choicegroup']:
+                    # This is a valid question according to the list of valid responses and we have the group node
                     responses_data.append([part_id, valid_responses[part_id][0], valid_responses[part_id][1], valid_responses[part_id][2]])
 
     return responses_data
