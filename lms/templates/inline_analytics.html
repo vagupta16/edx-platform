@@ -177,7 +177,7 @@ ${block_content}
     'use strict';
 
   // Variable for storing if a problem's analytics data has previously been retrieved.
-  var elements_retrieved = [];
+  var elementsRetrieved = [];
 
   // We need to turn off, then on, all click handlers since the click handler gets attached each time the 
   // in-line analytics fragment is added. So, if there are 3 problems on the page, there are three fragments
@@ -185,46 +185,43 @@ ${block_content}
   $('.instructor-analytics-action').off('click.inline-analytics').on('click.inline-analytics', function(event) {
   		
   	
-    var element_id = this.id.substring(0, this.id.indexOf('_analytics_button'));
+    var elementId = this.id.substring(0, this.id.indexOf('_analytics_button'));
     var location = this.dataset.location;    
 
     // If data already retrieved for this problem, show the div
-	if (elements_retrieved.indexOf(element_id) !== -1) {
-	  $('#'+element_id+'_analytics_close').show();
+	if (elementsRetrieved.indexOf(elementId) !== -1) {
+	  $('#'+elementId+'_analytics_close').show();
 	  return;
 	}
 
     //Hide the error message div
-    $('#'+element_id+'_analytics_error_message').hide();
+    $('#'+elementId+'_analytics_error_message').hide();
     
-    var parts_to_get = [];
-    var parts_to_not_get = [];
-    var question_types = {}
-    var correct_responses = {};
+    var partsToGet = [];
+    var questionTypes = {}
+    var correctResponses = {};
     var index;
-    var id, part_id;
+    var id, partId;
     
-    var divs = $('.'+element_id+'_analytics_div');
+    var divs = $('.'+elementId+'_analytics_div');
     
     // Construct arrays so we don't call the api for questions with randomize
     var arrayLength = divs.length;
     for (index = 0; index < arrayLength; index++) {
       id = divs[index].id;
-      part_id = id.substring(0, id.indexOf('_analytics'))
-      if (divs[index].dataset.has_shuffle == "True") {
-        parts_to_not_get.push(part_id);
-      }else {
-    	parts_to_get.push(part_id);
+      partId = id.substring(0, id.indexOf('_analytics'))
+      if (divs[index].dataset.has_shuffle == "False") {
+    	partsToGet.push(partId);
       }
       
       // Build dict of question types
-      question_types[part_id] = divs[index].dataset.question_type;
+      questionTypes[partId] = divs[index].dataset.question_type;
       
       // Build dict of correct responses
-      correct_responses[part_id] = divs[index].dataset.correct_response;
+      correctResponses[partId] = divs[index].dataset.correct_response;
     }
     
-    if (parts_to_get.length > 0) {
+    if (partsToGet.length > 0) {
       $.ajax({
         context: this,
         url: "${get_analytics_answer_dist}",
@@ -234,19 +231,19 @@ ${block_content}
         
         success: function(response) {
           if (response) {
-            process_response(response, parts_to_get, question_types, correct_responses);
+            process_response(response, partsToGet, questionTypes, correctResponses);
             // Store that we retrieved data for this problem
-        	elements_retrieved.push(element_id);
+        	elementsRetrieved.push(elementId);
             // Show all the graphics
-            $('#'+element_id+'_analytics_close').show();
+            $('#'+elementId+'_analytics_close').show();
           }
         },
         
         error: function(jqXHR, textStatus, errorThrown) {
           if (jqXHR.status == 404) {
-        	$('#'+element_id+'_analytics_error_message').text("The analytics data could not be retrieved, please try again later.").show();
+        	$('#'+elementId+'_analytics_error_message').text("The analytics data could not be retrieved, please try again later.").show();
           } else {
-        	$('#'+element_id+'_analytics_error_message').text("A problem has occurred retrieving the data, please contact customer support.").show();
+        	$('#'+elementId+'_analytics_error_message').text("A problem has occurred retrieving the data, please contact customer support.").show();
         }
       }
     });
@@ -254,56 +251,55 @@ ${block_content}
   } 
 });
   
-function process_response(response, parts_to_get, question_types, correct_responses) {
+function process_response(response, partsToGet, questionTypes, correct_responses) {
 	  
   var result = JSON.parse(response.data);
-  var last_update_date = response.last_update_date;
-  var total_count = 0;
-  var total_count_dict = {};
-  var part_id;
+  var lastUpdateDate = response.last_update_date;
+  var totalCount = 0;
+  var totalCountDict = {};
+  var partId;
   var index;
 
-  var data_by_part = {};
-  var temp_array = []
+  var dataByPart = {};
+  var tempArray = []
   
   for (index in result) {
 	if (result.hasOwnProperty(index)) {
-	  
 	// Calculate the total number of responses for each question
-    part_id = result[index]['part_id']
-    if (part_id in total_count_dict) {
-      total_count_dict[part_id] += result[index]['count'];
+    partId = result[index]['part_id']
+    if (partId in totalCountDict) {
+      totalCountDict[partId] += result[index]['count'];
     } else {
-        total_count_dict[part_id] = result[index]['count'];
+        totalCountDict[partId] = result[index]['count'];
     }
     
-    // Split result by part_id
-    if (part_id in data_by_part) {
-    	temp_array = data_by_part[part_id];
-    	temp_array.push(result[index]);
-    	data_by_part[part_id] = temp_array;
+    // Split result by partId
+    if (partId in dataByPart) {
+    	tempArray = dataByPart[partId];
+    	tempArray.push(result[index]);
+    	dataByPart[partId] = tempArray;
     } else {
-    	data_by_part[part_id] = [result[index]];
+    	dataByPart[partId] = [result[index]];
     }
 	}
   }
   
   // Render the appropriate analytics graphics
-  var arrayLength = parts_to_get.length;
+  var arrayLength = partsToGet.length;
   for (index = 0; index < arrayLength; index++) {
-    part_id = parts_to_get[index];
+    partId = partsToGet[index];
     
     // May not have any results for this part_id
-    if (total_count_dict[part_id]) {
-    	total_count = total_count_dict[part_id];
+    if (totalCountDict[partId]) {
+    	totalCount = totalCountDict[partId];
     } else {
-    	total_count = 0;
+    	totalCount = 0;
     }
     
-    if (question_types[part_id] === 'radio') {
-      render_radio_analytics(data_by_part[part_id], part_id, total_count, correct_responses[part_id], last_update_date);
+    if (questionTypes[partId] === 'radio') {
+      render_radio_analytics(dataByPart[partId], partId, totalCount, correct_responses[partId], lastUpdateDate);
     }else {
-      render_checkbox_analytics(data_by_part[part_id], part_id, total_count, correct_responses[part_id], last_update_date);
+      render_checkbox_analytics(dataByPart[partId], partId, totalCount, correct_responses[partId], lastUpdateDate);
     }
   }
 }

@@ -336,6 +336,7 @@ def get_responses_data(block):
                 part_id = node.attrib.get('id', None)
                 if part_id and part_id in list(valid_responses) and node.tag in ['checkboxgroup', 'choicegroup']:
                     # This is a valid question according to the list of valid responses and we have the group node
+                    # add part_id, correct_response, question_type, has_shufle
                     responses_data.append([part_id, valid_responses[part_id][0], valid_responses[part_id][1], valid_responses[part_id][2]])
 
     return responses_data
