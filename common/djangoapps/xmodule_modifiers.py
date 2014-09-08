@@ -305,10 +305,10 @@ def get_responses_data(block):
        - choicegroup
 
     Questions with shuffle are not currently supported for in-line analytics.
-    If settings.ANALYTICS_DATA_URL is unset then returns None
+    If settings.ANALYTICS_ANSWER_DIST_URL is unset then returns None
     """
     responses_data = []
-    if settings.ANALYTICS_DATA_URL and isinstance(block, CapaModule):
+    if settings.ANALYTICS_ANSWER_DIST_URL and isinstance(block, CapaModule):
         responses = block.lcp.responders.values()
         valid_responses = {}
 

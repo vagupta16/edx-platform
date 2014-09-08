@@ -1760,3 +1760,7 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
     "HarvardX/SW12.9x/3T2014",
     "HarvardX/SW12.8x/3T2014",
 ])
+
+####################### In-line Analytics ######################
+ANALYTICS_API_SECRET = None
+ANALYTICS_ANSWER_DIST_URL = None

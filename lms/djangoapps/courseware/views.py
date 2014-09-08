@@ -1045,7 +1045,8 @@ def get_analytics_answer_dist(request):
 
     # Construct api request
     module_id = request.GET['module_id']
-    url = settings.ANALYTICS_DATA_URL + '/problems/' +module_id + '/answer_distribution'
+   # url = settings.INLINE_ANALYTICS_DATA_URL + '/problems/' +module_id + '/answer_distribution'
+    url = settings.ANALYTICS_ANSWER_DIST_URL.format(module_id=module_id)
     api_secret = settings.ANALYTICS_API_SECRET
     token = 'Token %s' % api_secret
 

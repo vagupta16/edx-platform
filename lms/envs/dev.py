@@ -302,6 +302,10 @@ FEATURES['CLASS_DASHBOARD'] = True
 ### This settings is for the course registration code length ############
 REGISTRATION_CODE_LENGTH = 8
 
+####################### In-line Analytics ######################
+ANALYTICS_API_SECRET = None
+ANALYTICS_ANSWER_DIST_URL = None
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

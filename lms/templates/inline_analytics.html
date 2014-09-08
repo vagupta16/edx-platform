@@ -351,7 +351,7 @@ function render_radio_analytics(result, part_id, total_count, correct_response, 
         } else if (!correct) {
           answer_class = 'wrong';
         }  
-        tr = $('<tr><td class="answer_box" title=\"'+choice_text[index]+'\">'+(parseInt(index, 10)+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">'+count+'</td><td class="answer_box">'+percent+'%</td></tr>');
+        tr = $('<tr><td class="answer_box" title="'+choice_text[index]+'">'+(parseInt(index, 10)+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">'+count+'</td><td class="answer_box">'+percent+'%</td></tr>');
         trs.push(tr[0]);
       }
       }
@@ -386,7 +386,7 @@ function insert_missing_rows(part_id, current_index, final_index, correct_respon
 	} else {
 	  answer_class = 'wrong';
 	}
-  	tr = $('<tr><td class="answer_box" title=\"'+choice_text[current_index]+'\">'+(current_index+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">0</td><td class="answer_box">0%</td></tr>');
+  	tr = $('<tr><td class="answer_box" title="'+choice_text[current_index]+'">'+(current_index+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">0</td><td class="answer_box">0%</td></tr>');
 	trs.push(tr[0]);
 	current_index += 1;
   }
@@ -416,7 +416,7 @@ function render_checkbox_analytics(result, part_id, total_count, correct_respons
 	 
 	 // Contruct the choice number column
 	 while (choice_counter > 0) {
-	   $('#'+part_id+'_table .checkbox_header_row').after('<tr><td id="column0:row'+choice_counter+'" class="answer_box" title=\"'+choice_text[choice_counter-1]+'\">'+choice_counter+'</td></tr>');
+	   $('#'+part_id+'_table .checkbox_header_row').after('<tr><td id="column0:row'+choice_counter+'" class="answer_box" title="'+choice_text[choice_counter-1]+'">'+choice_counter+'</td></tr>');
 	   choice_counter -= 1;
 	 }
 	 
