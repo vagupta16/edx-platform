@@ -7,11 +7,10 @@ import json
 import logging
 import static_replace
 import uuid
-from lxml import etree
-from collections import OrderedDict
 
 from django.conf import settings
 from django.utils.timezone import UTC
+from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_string
 from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
@@ -21,10 +20,7 @@ from xmodule.vertical_module import VerticalModule
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from django.core.urlresolvers import reverse
-from xmodule.capa_module import CapaModule
-from capa.responsetypes import ChoiceResponse, MultipleChoiceResponse
-from django.core import serializers
+from capa.inline_analytics_utils import get_responses_data
 
 log = logging.getLogger(__name__)
 
@@ -279,7 +275,13 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
 
 def add_inline_analytics(user, has_instructor_access, block, view, frag, context):  # pylint: disable=unused-argument
     """
-    Add some stuff here
+    Adds a fragment for in-line analytics
+    
+    Fragment consists of a button and some placeholder divs
+    
+    Returns the wrapped fragment if the problem has a valid question. See get_responses_data
+    for valid questions. 
+    Otherwise, returns the fragment unchanged.
     """
 
     responses_data = get_responses_data(block)
@@ -294,49 +296,3 @@ def add_inline_analytics(user, has_instructor_access, block, view, frag, context
 
     else:
         return frag
-
-
-def get_responses_data(block):
-    """
-    Gets Capa data for questions; used by the in-line analytics display.
-    
-    Currently supported question types, for in-line analytics are:
-       - checkboxgroup
-       - choicegroup
-
-    Questions with shuffle are not currently supported for in-line analytics.
-    If settings.ANALYTICS_ANSWER_DIST_URL is unset then returns None
-    """
-    responses_data = []
-    if settings.ANALYTICS_ANSWER_DIST_URL and isinstance(block, CapaModule):
-        responses = block.lcp.responders.values()
-        valid_responses = {}
-
-        # Each response is an individual question
-        for response in responses:
-            question_type = None
-            has_shuffle = response.has_shuffle()
-            if isinstance(response, MultipleChoiceResponse):
-                question_type = 'radio'
-            elif isinstance(response, ChoiceResponse):
-                question_type = 'checkbox'
-
-            # Only radio and checkbox types are support for in-line analytics at this time
-            if question_type:
-                # There is only 1 part_id and correct response for each question
-                part_id, correct_response = response.get_answers().items()[0]
-                valid_responses[part_id] = [correct_response, question_type, has_shuffle]
-
-        if valid_responses:
-            part_id = None
-
-            # Loop through all the nodes finding the group elements for each question
-            # We need to do this to get the questions in the same order as on the page
-            for node in block.lcp.tree.iter(tag=etree.Element):
-                part_id = node.attrib.get('id', None)
-                if part_id and part_id in list(valid_responses) and node.tag in ['checkboxgroup', 'choicegroup']:
-                    # This is a valid question according to the list of valid responses and we have the group node
-                    # add part_id, correct_response, question_type, has_shufle
-                    responses_data.append([part_id, valid_responses[part_id][0], valid_responses[part_id][1], valid_responses[part_id][2]])
-
-    return responses_data

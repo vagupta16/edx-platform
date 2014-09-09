@@ -86,9 +86,6 @@ body {
   background-color:#efefef;
 }
 
-.check{
-  content:url('https://class.stanford.edu/static/images/correct-icon.ea93859cc9ff.png');
-}
 .dot{
   display: inline-block;
   height:20px;
@@ -182,7 +179,7 @@ ${block_content}
   // We need to turn off, then on, all click handlers since the click handler gets attached each time the 
   // in-line analytics fragment is added. So, if there are 3 problems on the page, there are three fragments
   // and the same click handler would get called 3 times.
-  $('.instructor-analytics-action').off('click.inline-analytics').on('click.inline-analytics', function(event) {
+  $('.instructor-analytics-action').off('click.inline-analytics').on('click.inline-analytics', function (event) {
   		
   	
     var elementId = this.id.substring(0, this.id.indexOf('_analytics_button'));
@@ -190,12 +187,12 @@ ${block_content}
 
     // If data already retrieved for this problem, show the div
 	if (elementsRetrieved.indexOf(elementId) !== -1) {
-	  $('#'+elementId+'_analytics_close').show();
+	  $('#' + elementId+'_analytics_close').show();
 	  return;
 	}
 
     //Hide the error message div
-    $('#'+elementId+'_analytics_error_message').hide();
+    $('#' + elementId+'_analytics_error_message').hide();
     
     var partsToGet = [];
     var questionTypes = {}
@@ -203,14 +200,14 @@ ${block_content}
     var index;
     var id, partId;
     
-    var divs = $('.'+elementId+'_analytics_div');
+    var divs = $('.' + elementId+'_analytics_div');
     
     // Construct arrays so we don't call the api for questions with randomize
     var arrayLength = divs.length;
     for (index = 0; index < arrayLength; index++) {
       id = divs[index].id;
       partId = id.substring(0, id.indexOf('_analytics'))
-      if (divs[index].dataset.has_shuffle == "False") {
+      if (divs[index].dataset.has_shuffle === 'False') {
     	partsToGet.push(partId);
       }
       
@@ -224,34 +221,30 @@ ${block_content}
     if (partsToGet.length > 0) {
       $.ajax({
         context: this,
-        url: "${get_analytics_answer_dist}",
-        type: "GET",
+        url: '${get_analytics_answer_dist}',
+        type: 'GET',
         data: {module_id: location},
-        dataType: "json",
+        dataType: 'json',
         
-        success: function(response) {
+        success: function (response) {
           if (response) {
             process_response(response, partsToGet, questionTypes, correctResponses);
             // Store that we retrieved data for this problem
         	elementsRetrieved.push(elementId);
             // Show all the graphics
-            $('#'+elementId+'_analytics_close').show();
-          }
+            $('#' + elementId + '_analytics_close').show();
+          } 
         },
         
-        error: function(jqXHR, textStatus, errorThrown) {
-          if (jqXHR.status == 404) {
-        	$('#'+elementId+'_analytics_error_message').text("The analytics data could not be retrieved, please try again later.").show();
-          } else {
-        	$('#'+elementId+'_analytics_error_message').text("A problem has occurred retrieving the data, please contact customer support.").show();
-        }
+        error: function (jqXHR, textStatus, errorThrown) {
+          $('#' + elementId + '_analytics_error_message').text(jqXHR.responseText).show();
       }
     });
     
   } 
 });
   
-function process_response(response, partsToGet, questionTypes, correct_responses) {
+function process_response(response, partsToGet, questionTypes, correctResponses) {
 	  
   var result = JSON.parse(response.data);
   var lastUpdateDate = response.last_update_date;
@@ -297,123 +290,123 @@ function process_response(response, partsToGet, questionTypes, correct_responses
     }
     
     if (questionTypes[partId] === 'radio') {
-      render_radio_analytics(dataByPart[partId], partId, totalCount, correct_responses[partId], lastUpdateDate);
+      render_radio_analytics(dataByPart[partId], partId, totalCount, correctResponses[partId], lastUpdateDate);
     }else {
-      render_checkbox_analytics(dataByPart[partId], partId, totalCount, correct_responses[partId], lastUpdateDate);
+      render_checkbox_analytics(dataByPart[partId], partId, totalCount, correctResponses[partId], lastUpdateDate);
     }
   }
 }
 
 
-function render_radio_analytics(result, part_id, total_count, correct_response, last_update_date) {
+function render_radio_analytics(result, partId, totalCount, correctResponse, lastUpdateDate) {
     
-    var value_id;
-    var current_index;
-    var value_index;
-    var last_index;
+    var valueId;
+    var currentIndex;
+    var valueIndex;
+    var lastIndex;
     var correct;
     var count;
     var percent;
-    var answer_class;
+    var answerClass;
     var index;
     var tr;
     var trs = [];
-    var last_row = $('#'+part_id+'_table tr:last');
+    var lastRow = $('#' + partId + '_table tr:last');
     
     // Build the array of choice texts
-    var choice_text = get_choice_texts(part_id);
+    var choiceText = get_choice_texts(partId);
     
     // Loop through results creating rows
     if (result) {
       for (index in result) {
     	if (result.hasOwnProperty(index)) {
-        value_id = result[index]['value_id'];
-            
-        current_index = index;
-        value_index = value_id.replace("choice_", "");
-            
+        valueId = result[index]['value_id'];
+
+        currentIndex = index;
+        valueIndex = valueId.replace('choice_', '');
+
         // Display rows for gaps in answers in the results
-        if (current_index < value_index) {
-          insert_missing_rows(part_id, current_index, value_index, correct_response, choice_text, trs);
+        if (currentIndex < valueIndex) {
+          insert_missing_rows(partId, currentIndex, valueIndex, correctResponse, choiceText, trs);
         }
-            
+
         correct = result[index]['correct'];
         count = result[index]['count'];
-        percent = Math.round(count*1000/(total_count*10));
-        
+        percent = Math.round(count*1000/(totalCount*10));
+
         // Display row for the result
         if (correct) {
-          answer_class = 'right';
+          answerClass = 'right';
         } else if (!correct) {
-          answer_class = 'wrong';
+          answerClass = 'wrong';
         }  
-        tr = $('<tr><td class="answer_box" title="'+choice_text[index]+'">'+(parseInt(index, 10)+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">'+count+'</td><td class="answer_box">'+percent+'%</td></tr>');
+        tr = $('<tr><td class="answer_box" title="' + choiceText[index] + '">'+(parseInt(index, 10)+1) + '</td><td class="answer_box ' + answerClass + '"><span class="dot"></span></td><td class="answer_box">' + count + '</td><td class="answer_box">' + percent + '%</td></tr>');
         trs.push(tr[0]);
       }
       }
       // Display rows for missing answers at the end of results
-      last_index = parseInt(result[result.length -1]['value_id'].replace("choice_", ""), 10);
-      if (last_index < choice_text.length -1) {
-        insert_missing_rows(part_id, last_index + 1, choice_text.length, correct_response, choice_text, trs);  
+      lastIndex = parseInt(result[result.length -1]['value_id'].replace('choice_', ''), 10);
+      if (lastIndex < choiceText.length -1) {
+        insert_missing_rows(partId, lastIndex + 1, choiceText.length, correctResponse, choiceText, trs);  
       }
       
     } else {
       // There were no results
-      trs = insert_missing_rows(part_id, 0, choice_text.length, correct_response, choice_text, trs); 
+      trs = insert_missing_rows(partId, 0, choiceText.length, correctResponse, choiceText, trs); 
     }
     
     // Append the rows to the table
-    last_row.after(trs);
+    lastRow.after(trs);
     // Set student count and last_update_date
-    set_count_and_date(part_id, total_count, last_update_date);
+    set_count_and_date(partId, totalCount, lastUpdateDate);
     
 }
 
 
-function insert_missing_rows(part_id, current_index, final_index, correct_response, choice_text, trs) {
+function insert_missing_rows(partId, currentIndex, finalIndex, correctResponse, choiceText, trs) {
 
-  var answer_class;
+  var answerClass;
   var tr;
-  correct_response = correct_response.replace(/(^\[\')|(\'\]$)/g, "");
+  correctResponse = correctResponse.replace(/(^\[\')|(\'\]$)/g, '');
   
-  while (current_index < final_index) {
-	if ("choice_"+current_index == correct_response) {
-	  answer_class = 'right';
+  while (currentIndex < finalIndex) {
+	if ('choice_' + currentIndex == correctResponse) {
+	  answerClass = 'right';
 	} else {
-	  answer_class = 'wrong';
+	  answerClass = 'wrong';
 	}
-  	tr = $('<tr><td class="answer_box" title="'+choice_text[current_index]+'">'+(current_index+1)+'</td><td class="answer_box '+answer_class+'"><span class="dot"></span></td><td class="answer_box">0</td><td class="answer_box">0%</td></tr>');
+  	tr = $('<tr><td class="answer_box" title="' + choiceText[currentIndex] + '">'+(currentIndex + 1)+'</td><td class="answer_box ' + answerClass + '"><span class="dot"></span></td><td class="answer_box">0</td><td class="answer_box">0%</td></tr>');
 	trs.push(tr[0]);
-	current_index += 1;
+	currentIndex += 1;
   }
   return trs;
 }
 
 
-function render_checkbox_analytics(result, part_id, total_count, correct_response, last_update_date) {
+function render_checkbox_analytics(result, partId, totalCount, correctResponse, lastUpdateDate) {
 	
 	 var count;
 	 var percent;
-	 var answer_class;
-	 var actual_response;
-	 var imagined_response;
-	 var checkbox_checked;
-	 var count_row;
+	 var answerClass;
+	 var actualResponse;
+	 var imaginedResponse;
+	 var checkboxChecked;
+	 var countRow;
 	 var index;
-	 var max_columns = 10;
+	 var maxColumns = 10;
 	 
 	 // Build the array of choice texts
-	 var choice_text = get_choice_texts(part_id);
+	 var choiceText = get_choice_texts(partId);
 	 
-	 var choice_counter = choice_text.length;
+	 var choiceCounter = choiceText.length;
 	 
 	 // Add "Last Attempt" to the choice number column
-	 $('#'+part_id+'_table .checkbox_header_row').after('<tr><td id="last_attempt" class="answer_box checkbox_last_attempt">Last Attempt</td></tr>');
+	 $('#' + partId + '_table .checkbox_header_row').after('<tr><td id="last_attempt" class="answer_box checkbox_last_attempt">Last Attempt</td></tr>');
 	 
 	 // Contruct the choice number column
-	 while (choice_counter > 0) {
-	   $('#'+part_id+'_table .checkbox_header_row').after('<tr><td id="column0:row'+choice_counter+'" class="answer_box" title="'+choice_text[choice_counter-1]+'">'+choice_counter+'</td></tr>');
-	   choice_counter -= 1;
+	 while (choiceCounter > 0) {
+	   $('#' + partId + '_table .checkbox_header_row').after('<tr><td id="column0:row' + choiceCounter + '" class="answer_box" title="' + choiceText[choiceCounter-1] + '">' + choiceCounter + '</td></tr>');
+	   choiceCounter -= 1;
 	 }
 	 
 	 // Loop through results creating columns
@@ -424,71 +417,72 @@ function render_checkbox_analytics(result, part_id, total_count, correct_respons
 		 if (result.hasOwnProperty(index)) {
 		   
 	     // Append to the header row
-	     $( '<th width="65px"></th>' ).appendTo( $('#'+part_id+'_table tr:eq(0)') );
+	     $( '<th width="65px"></th>' ).appendTo( $('#' + partId + '_table tr:eq(0)') );
 	   
 	     // Append message and break if number of distinct choices >= max_columns
-	     if (index >= max_columns) {
-	       var not_displayed = result.length - max_columns;
-	       $( '<th width="400px"> '+not_displayed+' columns not displayed.</th>' ).appendTo( $('#'+part_id+'_table tr:eq(0)') );
+	     if (index >= maxColumns) {
+	       var notDisplayed = result.length - maxColumns;
+	       $( '<th width="400px"> ' + notDisplayed + ' columns not displayed.</th>' ).appendTo( $('#' + partId + '_table tr:eq(0)') );
 	       break;
 	     }
-	     actual_response = result[index]['value_id'];
-	     choice_counter = 1;
+	     actualResponse = result[index]['value_id'];
+	     choiceCounter = 1;
 	 
-	     while (choice_counter <= choice_text.length) {
-	       imagined_response = 'choice_'+(choice_counter -1);
+	     while (choiceCounter <= choiceText.length) {
+	       imaginedResponse = 'choice_'+(choiceCounter -1);
 	 
 	       // Can't rely in contains method in all browsers so use indexOf
-	       if ((correct_response.indexOf(imagined_response) == -1) &&
-	           (actual_response.indexOf(imagined_response) == -1) ||
-	           (correct_response.indexOf(imagined_response) > -1 &&
-	            actual_response.indexOf(imagined_response) > -1)) {
-	         answer_class = 'right';
+	       if ((correctResponse.indexOf(imaginedResponse) === -1) &&
+	           (actualResponse.indexOf(imaginedResponse) === -1) ||
+	           (correctResponse.indexOf(imaginedResponse) > -1 &&
+	            actualResponse.indexOf(imaginedResponse) > -1)) {
+	         answerClass = 'right';
 	       }else {
-	         answer_class = 'wrong';
+	         answerClass = 'wrong';
 	       }
-	       if (actual_response.indexOf(imagined_response) != -1) {
-	         checkbox_checked = '<span class="dot"></span>';
+	       if (actualResponse.indexOf(imaginedResponse) != -1) {
+	         checkboxChecked = '<span class="dot"></span>';
 	       }else {
-	         checkbox_checked = '';
+	         checkboxChecked = '';
 	       }
-	       $( '<td id="column'+index+':row'+choice_counter+'" class="answer_box '+answer_class+'">'+checkbox_checked+'</td>' ).appendTo( $('#'+part_id+'_table tr:eq('+choice_counter+')') );
-	       choice_counter += 1;
+	       $( '<td id="column' + index + ':row' + choiceCounter + '" class="answer_box ' + answerClass + '">' + checkboxChecked + '</td>' ).appendTo( $('#' + partId + '_table tr:eq(' + choiceCounter + ')') );
+	       choiceCounter += 1;
 	     }
 
 	     // Construct the Last Attempt row
 	     count = result[index]['count'];
-	     percent = Math.round(count*1000/(total_count*10));
-	     count_row += '<td class="answer_box">'+count+'<br/>'+percent+'%</td>'
+	     percent = Math.round(count*1000/(totalCount*10));
+	     countRow += '<td class="answer_box">' + count + '<br/>' + percent + '%</td>'
 	   }
 	   }
      }
 	 // Append count row to the last attempt row
-	 $('#'+part_id+'_table #last_attempt' ).after( count_row );
+	 $('#' + partId + '_table #last_attempt' ).after( countRow );
 	 
 	 // Set student count and last_update_date
-	 set_count_and_date(part_id, total_count, last_update_date);
+	 set_count_and_date(partId, totalCount, lastUpdateDate);
 	
 }
 
 
-$('#${element_id}_analytics_close').click(function(event) {
+$('#${element_id}_analytics_close').click(function (event) {
   this.style.display = 'none';
 });
+
 	
-function get_choice_texts(part_id) {
-  var choice_text = [];
-  $('#inputtype_'+part_id).find("fieldset label").each(function(index) {
-    choice_text[index] = $(this).text();
+function get_choice_texts(partId) {
+  var choiceText = [];
+  $('#inputtype_' + partId).find("fieldset label").each(function (index) {
+    choiceText[index] = $(this).text();
   });
-  return choice_text;
+  return choiceText;
 }
 
-function set_count_and_date (part_id, total_count, last_update_date) {
-  var part = document.getElementById(part_id+'_analytics');
+function set_count_and_date (partId, totalCount, lastUpdateDate) {
+  var part = document.getElementById(partId+'_analytics');
   part = $(part);
-  part.find('.num-students').text(total_count);
-  part.find('.last-update').text(last_update_date);
+  part.find('.num-students').text(totalCount);
+  part.find('.last-update').text(lastUpdateDate);
 }
 	
 

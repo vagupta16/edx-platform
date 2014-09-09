@@ -21,7 +21,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
-from django.http import Http404, HttpResponse, HttpResponseNotFound
+from django.http import Http404, HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
 from edxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
@@ -1043,9 +1043,11 @@ def get_analytics_answer_dist(request):
     Returns a json payload of the api data and last updated string.
     """
 
+    if not request.user.is_staff:
+        return HttpResponse(status=500)
+
     # Construct api request
     module_id = request.GET['module_id']
-   # url = settings.INLINE_ANALYTICS_DATA_URL + '/problems/' +module_id + '/answer_distribution'
     url = settings.ANALYTICS_ANSWER_DIST_URL.format(module_id=module_id)
     api_secret = settings.ANALYTICS_API_SECRET
     token = 'Token %s' % api_secret
@@ -1059,7 +1061,10 @@ def get_analytics_answer_dist(request):
         
     except urllib2.HTTPError, e:
         log.warning('Analytics API error: ' +str(e))
-        return HttpResponse(status=e.code)
+        if e.code == 404:
+            return HttpResponseNotFound(_('The analytics data could not be retrieved, please try again later.'))
+        else:
+            return HttpResponseServerError(_('A problem has occurred retrieving the data, please contact your support rep.'))
 
     # Determine the last updated date, convert to client TZ and format
     created_date = json.loads(data)[0]['created']
