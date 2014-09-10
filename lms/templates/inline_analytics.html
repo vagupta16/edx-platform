@@ -124,13 +124,13 @@ ${block_content}
 <div id="${element_id}_analytics_close" style="display: none;" class="analytics_close_button" href="#">
   <button class="close">X</button>
 
-% for part_id, correct_response, question_type, has_shuffle in responses_data:
-  % if has_shuffle == True:
-    <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-has_shuffle="${has_shuffle}">The analytics cannot be displayed as the question uses randomize.
+% for part_id, correct_response, question_type, message in responses_data:
+  % if message != None:
+    <div id="${part_id}_analytics" class="${element_id}_analytics_div">${message}
       <p><strong></strong></p>
     </div>
   % elif question_type == 'radio':
-    <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-correct_response="${correct_response}" data-question_type="${question_type}" data-has_shuffle="${has_shuffle}">
+    <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-correct_response="${correct_response}" data-question_type="${question_type}">
       <section aria-hidden="true" >
         <div class="grid-wrapper radio">
           <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question.</p>
@@ -148,7 +148,7 @@ ${block_content}
       </section>
     </div>
   % elif question_type == 'checkbox':
-    <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-correct_response="${correct_response}" data-question_type="${question_type}" data-has_shuffle="${has_shuffle}">
+    <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-correct_response="${correct_response}" data-question_type="${question_type}">
       <section aria-hidden="true" >
         <div class="grid-wrapper checkbox">
           <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question:</p>
@@ -163,7 +163,16 @@ ${block_content}
         </div>
       </section>
     </div>
-  % endif 
+  % elif message == None:
+    <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-question_type="${question_type}">
+      <section aria-hidden="true" >
+        <div class="grid-wrapper">
+          <p><strong class="num-students"></strong> students answered this question:</p>
+          <p>Last updated: <strong class="last-update"></strong></p>
+        </div>
+      </section>
+    </div>
+  % endif
 % endfor
 </div>
 
@@ -194,6 +203,7 @@ ${block_content}
     //Hide the error message div
     $('#' + elementId+'_analytics_error_message').hide();
     
+    var validTypes = ['radio', 'checkbox', 'option', 'numerical', 'string', 'formula'];
     var partsToGet = [];
     var questionTypes = {}
     var correctResponses = {};
@@ -202,12 +212,12 @@ ${block_content}
     
     var divs = $('.' + elementId+'_analytics_div');
     
-    // Construct arrays so we don't call the api for questions with randomize
+    // Construct array so we don't call the api for questions that are not supported in the api
     var arrayLength = divs.length;
     for (index = 0; index < arrayLength; index++) {
       id = divs[index].id;
       partId = id.substring(0, id.indexOf('_analytics'))
-      if (divs[index].dataset.has_shuffle === 'False') {
+	  if (validTypes.indexOf(divs[index].dataset.question_type) !== -1) {
     	partsToGet.push(partId);
       }
       
