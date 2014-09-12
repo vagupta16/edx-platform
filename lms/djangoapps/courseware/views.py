@@ -1040,7 +1040,10 @@ def get_analytics_answer_dist(request):
     Retrieves answer distribution data for the in-line analytics display.
 
     From the result, gets the date/time the data was last updated and reformats to the client TZ.
-    Returns a json payload of the api data and last updated string.
+    Returns a json payload of:
+     - data by part [[value_id, correct, count]]
+     - count by part [totalAttemptCount, totalCorrectCount, TotalIncorrectCount]
+     - last updated string
     """
 
     if not request.user.is_staff:
@@ -1057,7 +1060,7 @@ def get_analytics_answer_dist(request):
 
     try:
         response = urllib2.urlopen(analytics_req)
-        data = response.read()
+        data = json.loads(response.read())
         
     except urllib2.HTTPError, e:
         log.warning('Analytics API error: ' +str(e))
@@ -1066,14 +1069,31 @@ def get_analytics_answer_dist(request):
         else:
             return HttpResponseServerError(_('A problem has occurred retrieving the data, please contact your support rep.'))
 
+    # Each element in count_by_part is an array of [totalAttemptCount, totalCorrectCount, TotalIncorrectCount]
+    count_by_part = {}
+    
+    # Each element in data_by_part is an array of arrays of [value_id, correct, count]
+    data_by_part = {}
+    for item in data:
+        part_id = item['part_id']
+    
+        temp_array = count_by_part.get(part_id, [0, 0, 0])
+        if item['correct']:
+            count_by_part[part_id] = [temp_array[0] + item['count'], temp_array[1] + item['count'], temp_array[2]]
+        else:
+            count_by_part[part_id] = [temp_array[0] + item['count'], temp_array[1], temp_array[2] + item['count']]
+        
+        data_by_part[part_id] = data_by_part.get(part_id, []) + [[item['value_id'], item['correct'], item['count']]]
+        
     # Determine the last updated date, convert to client TZ and format
-    created_date = json.loads(data)[0]['created']
+    created_date = data[0]['created']
     obj_date = datetime.strptime(created_date, '%Y-%m-%dT%H:%M:%S')
     obj_date = timezone('UTC').localize(obj_date)
     formatted_date_string = get_time_display(obj_date, None, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
-
+    
     response_payload = {
-        'data': data,
+        'data_by_part': data_by_part,
+        'count_by_part': count_by_part,
         'last_update_date': formatted_date_string,
     }
     

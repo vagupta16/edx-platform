@@ -168,6 +168,7 @@ ${block_content}
       <section aria-hidden="true" >
         <div class="grid-wrapper">
           <p><strong class="num-students"></strong> students answered this question:</p>
+          <p><strong class="num-students-extra"></strong></p>
           <p>Last updated: <strong class="last-update"></strong></p>
         </div>
       </section>
@@ -176,10 +177,9 @@ ${block_content}
 % endfor
 </div>
 
-<script src=path></script>
 
 <script type="text/javascript">
-//(function () {
+(function () {
     'use strict';
 
   // Variable for storing if a problem's analytics data has previously been retrieved.
@@ -192,7 +192,7 @@ ${block_content}
   		
   	
     var elementId = this.id.substring(0, this.id.indexOf('_analytics_button'));
-    var location = this.dataset.location;    
+    var location = this.dataset.location;
 
     // If data already retrieved for this problem, show the div
 	if (elementsRetrieved.indexOf(elementId) !== -1) {
@@ -202,7 +202,8 @@ ${block_content}
 
     //Hide the error message div
     $('#' + elementId+'_analytics_error_message').hide();
-    
+
+    // List of question types supported by the analytics api
     var validTypes = ['radio', 'checkbox', 'option', 'numerical', 'string', 'formula'];
     var partsToGet = [];
     var questionTypes = {}
@@ -212,7 +213,7 @@ ${block_content}
     
     var divs = $('.' + elementId+'_analytics_div');
     
-    // Construct array so we don't call the api for questions that are not supported in the api
+    // Construct array so we don't call the api for problems that have no questions supported by the api
     var arrayLength = divs.length;
     for (index = 0; index < arrayLength; index++) {
       id = divs[index].id;
@@ -256,60 +257,45 @@ ${block_content}
   
 
 function process_response(response, partsToGet, questionTypes, correctResponses) {
-	  
-  var result = JSON.parse(response.data);
+  
+  var dataByPart = response.data_by_part;
+  var countByPart = response.count_by_part;
   var lastUpdateDate = response.last_update_date;
-  var totalCount = 0;
-  var totalCountDict = {};
+  var totalAttemptCount;
+  var totalCorrectCount;
+  var totalIncorrectCount;
+  
   var partId;
   var index;
-
-  var dataByPart = {};
-  var tempArray = []
   
-  for (index in result) {
-	if (result.hasOwnProperty(index)) {
-	// Calculate the total number of responses for each question
-    partId = result[index]['part_id']
-    if (partId in totalCountDict) {
-      totalCountDict[partId] += result[index]['count'];
-    } else {
-        totalCountDict[partId] = result[index]['count'];
-    }
-    
-    // Split result by partId
-    if (partId in dataByPart) {
-    	tempArray = dataByPart[partId];
-    	tempArray.push(result[index]);
-    	dataByPart[partId] = tempArray;
-    } else {
-    	dataByPart[partId] = [result[index]];
-    }
-	}
-  }
-  
-  // Render the appropriate analytics graphics
+  // Render the appropriate analytics graphics for each part_id
   var arrayLength = partsToGet.length;
   for (index = 0; index < arrayLength; index++) {
     partId = partsToGet[index];
     
-    // May not have any results for this part_id
-    if (totalCountDict[partId]) {
-    	totalCount = totalCountDict[partId];
-    } else {
-    	totalCount = 0;
+    if (countByPart[partId]) {
+    	totalAttemptCount = countByPart[partId][0];
+    	totalCorrectCount = countByPart[partId][1];
+    	totalIncorrectCount = countByPart[partId][2];
+    }else {
+    	totalAttemptCount = 0;
+    	totalCorrectCount = 0;
+    	totalIncorrectCount = 0;
     }
     
     if (questionTypes[partId] === 'radio') {
-      render_radio_analytics(dataByPart[partId], partId, totalCount, correctResponses[partId], lastUpdateDate);
+      render_radio_analytics(dataByPart[partId], partId, totalAttemptCount, totalCorrectCount, totalIncorrectCount, correctResponses[partId], lastUpdateDate);
+    }else if (questionTypes[partId] === 'checkbox') {
+      render_checkbox_analytics(dataByPart[partId], partId, totalAttemptCount, totalCorrectCount, totalIncorrectCount, correctResponses[partId], lastUpdateDate);
     }else {
-      render_checkbox_analytics(dataByPart[partId], partId, totalCount, correctResponses[partId], lastUpdateDate);
+      // Just set the text on the div
+      set_count_and_date(partId, totalAttemptCount, totalCorrectCount, totalIncorrectCount, lastUpdateDate, false)
     }
   }
 }
 
 
-function render_radio_analytics(result, partId, totalCount, correctResponse, lastUpdateDate) {
+function render_radio_analytics(result, partId, totalAttemptCount, totalCorrectCount, totalIncorrectCount, correctResponse, lastUpdateDate) {
     
     var valueId;
     var currentIndex;
@@ -327,12 +313,12 @@ function render_radio_analytics(result, partId, totalCount, correctResponse, las
     // Build the array of choice texts
     var choiceText = get_choice_texts(partId);
     
-    // Loop through results and construct row array
     if (result) {
-      for (index in result) {
-    	if (result.hasOwnProperty(index)) {
-        valueId = result[index]['value_id'];
-
+       // Loop through results and construct row array
+   	   var arrayLength = result.length;
+	   for (index = 0; index < arrayLength; index++) {
+    		
+    	valueId = result[index][0];
         currentIndex = index;
         valueIndex = valueId.replace('choice_', '');
 
@@ -341,11 +327,10 @@ function render_radio_analytics(result, partId, totalCount, correctResponse, las
           insert_missing_rows(partId, currentIndex, valueIndex, correctResponse, choiceText, trs);
         }
 
-        correct = result[index]['correct'];
-        count = result[index]['count'];
-        percent = Math.round(count*1000/(totalCount*10));
+        correct = result[index][1];
+        count = result[index][2];
+        percent = Math.round(count*1000/(totalAttemptCount*10));
 
-        // Display row for the result
         if (correct) {
           answerClass = 'right';
         } else if (!correct) {
@@ -354,10 +339,9 @@ function render_radio_analytics(result, partId, totalCount, correctResponse, las
         tr = $('<tr><td class="answer_box" title="' + choiceText[index] + '">'+(parseInt(index, 10)+1) + '</td><td class="answer_box ' + answerClass + '"><span class="dot"></span></td><td class="answer_box">' + count + '</td><td class="answer_box">' + percent + '%</td></tr>');
         trs.push(tr[0]);
       }
-      }
       
       // Generate rows for missing answers at the end of results
-      lastIndex = parseInt(result[result.length -1]['value_id'].replace('choice_', ''), 10);
+      lastIndex = parseInt(result[result.length -1][0].replace('choice_', ''), 10);
       if (lastIndex < choiceText.length -1) {
         insert_missing_rows(partId, lastIndex + 1, choiceText.length, correctResponse, choiceText, trs);  
       }
@@ -371,7 +355,7 @@ function render_radio_analytics(result, partId, totalCount, correctResponse, las
     lastRow.after(trs);
     
     // Set student count and last_update_date
-    set_count_and_date(partId, totalCount, lastUpdateDate);
+    set_count_and_date(partId, totalAttemptCount, totalCorrectCount, totalIncorrectCount, lastUpdateDate, true);
     
 }
 
@@ -396,7 +380,7 @@ function insert_missing_rows(partId, currentIndex, finalIndex, correctResponse, 
 }
 
 
-function render_checkbox_analytics(result, partId, totalCount, correctResponse, lastUpdateDate) {
+function render_checkbox_analytics(result, partId, totalAttemptCount, totalCorrectCount, totalIncorrectCount, correctResponse, lastUpdateDate) {
 	
 	 var count;
 	 var percent;
@@ -435,9 +419,8 @@ function render_checkbox_analytics(result, partId, totalCount, correctResponse, 
 	   // Sort the results in decending response count order
 	   result.sort(order_by_count);
 	   
-	   for (index in result) {
-		 if (result.hasOwnProperty(index)) {
-		   
+	   var arrayLength = result.length;
+	   for (index = 0; index < arrayLength; index++) { 
 	     // Append columns to the header row array
 	     tr = $( '<th width="65px"></th>' );
 	     headerTrs.push(tr[0]);
@@ -445,13 +428,12 @@ function render_checkbox_analytics(result, partId, totalCount, correctResponse, 
 	     // Append message and break if number of distinct choices >= max_columns
 	     if (index >= maxColumns) {
 	       var notDisplayed = result.length - maxColumns;
-	       
 	       tr = $( '<th width="400px"> ' + notDisplayed + ' columns not displayed.</th>' );
 	       headerTrs.push(tr[0]);
 	       break;
 	     }
 	     
-	     actualResponse = result[index]['value_id'];
+	     actualResponse = result[index][0];
 	     choiceCounter = 1;
 	 
 	     // Construct the data row array from student responses
@@ -463,7 +445,8 @@ function render_checkbox_analytics(result, partId, totalCount, correctResponse, 
 	           (actualResponse.indexOf(imaginedResponse) === -1) ||
 	           (correctResponse.indexOf(imaginedResponse) > -1 &&
 	            actualResponse.indexOf(imaginedResponse) > -1)) {
-	         answerClass = 'right';
+	          
+	    	 answerClass = 'right';
 	       }else {
 	         answerClass = 'wrong';
 	       }
@@ -479,10 +462,9 @@ function render_checkbox_analytics(result, partId, totalCount, correctResponse, 
 	     }
 	     
 	     // Construct the Last Attempt row
-	     count = result[index]['count'];
-	     percent = Math.round(count*1000/(totalCount*10));
+	     count = result[index][2];
+	     percent = Math.round(count*1000/(totalAttemptCount*10));
 	     countRow += '<td class="answer_box">' + count + '<br/>' + percent + '%</td>'
-	   }
 	   }
 	   
 	   // Append the header row array to the header row
@@ -508,7 +490,7 @@ function render_checkbox_analytics(result, partId, totalCount, correctResponse, 
 	 $('#' + partId + '_table #last_attempt' ).after(countRow);
 	 
 	 // Set student count and last_update_date
-	 set_count_and_date(partId, totalCount, lastUpdateDate);
+	 set_count_and_date(partId, totalAttemptCount, totalCorrectCount, totalIncorrectCount, lastUpdateDate, true);
 	
 }
 
@@ -526,24 +508,30 @@ function get_choice_texts(partId) {
   return choiceText;
 }
 
-function set_count_and_date (partId, totalCount, lastUpdateDate) {
+function set_count_and_date(partId, totalAttemptCount, totalCorrectCount, totalIncorrectCount, lastUpdateDate, graphicsFlag) {
   var part = document.getElementById(partId+'_analytics');
   part = $(part);
-  part.find('.num-students').text(totalCount);
+  part.find('.num-students').text(totalAttemptCount);
   part.find('.last-update').text(lastUpdateDate);
+  
+  if (graphicsFlag === false) {
+	  var correctPercent = Math.round(totalCorrectCount*1000/(totalAttemptCount*10));
+	  var incorrectPercent = Math.round(totalIncorrectCount*1000/(totalAttemptCount*10));
+	  part.find('.num-students-extra').text(totalCorrectCount + ' (' + correctPercent + '%) correct and ' + totalIncorrectCount + ' (' + incorrectPercent + '%) incorrect.')
+  }
 }
 	
 
 function order_by_count(a,b) {
-  if (a.count > b.count) {
+  if (a[2] > b[2]) {
 	return -1;
   }
-  if (a.count < b.count) {
+  if (a[2] < b[2]) {
 	return 1;
   }
   return 0;
 }
 
-//}());
+}());
 </script>
     

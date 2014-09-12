@@ -27,7 +27,7 @@ def get_responses_data(block):
         # Each response is an individual question
         for response in responses:
             question_type = None
-#            has_shuffle = response.has_shuffle()
+            # Categorize response type if supported by the analytics api
             if isinstance(response, MultipleChoiceResponse):
                 question_type = 'radio'
             elif isinstance(response, ChoiceResponse):
@@ -41,6 +41,7 @@ def get_responses_data(block):
             elif isinstance(response, FormulaResponse):
                 question_type = 'formula'
             else:
+                # Response types not supported by the analytics api categorized as "other"
                 question_type == 'other'
 
             # Only radio and checkbox types are supported for in-line analytics graphics at this time
@@ -52,23 +53,25 @@ def get_responses_data(block):
 
         if valid_responses:
             part_id = None
+            
+            # List of response types supported by the analytics api
             valid_types = ['checkboxgroup', 'choicegroup', 'optioninput', 'textline', 'formulaequationinput', 'textline']
 
-            # Loop through all the nodes finding the group elements for each question
-            # We need to do this to get the questions in the same order as on the page
+            # Loop through all the nodes finding the group elements for each response
+            # We need to do this to get the responses in the same order as on the page
             for node in block.lcp.tree.iter(tag=etree.Element):
                 part_id = node.attrib.get('id', None)
                 if part_id and part_id in list(valid_responses) and node.tag in valid_types:
                     # This is a valid question according to the list of valid responses and we have the group node
                     
-                    # Question is not one analytics has data for
                     if valid_responses[part_id][1] == 'other':
+                        # Response type is not supported by the analytics api
                         responses_data.append([part_id, None, None, "The analytics cannot be displayed for this type of question."])
-                    # Question (problem actually) has rerandomize != never
                     elif rerandomize:
+                        # Response, actually the problem, has rerandomize != 'never'
                         responses_data.append([part_id, valid_responses[part_id][0], valid_responses[part_id][1], "The analytics cannot be displayed for this question as it uses randomize."])
-                    # Question is one analytics has data for
                     else:
+                        # Response is supported by the analytics api and rerandomize == 'never'
                         responses_data.append([part_id, valid_responses[part_id][0], valid_responses[part_id][1], None])
 
     return responses_data
