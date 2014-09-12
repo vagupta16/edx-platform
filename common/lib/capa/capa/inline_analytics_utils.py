@@ -17,6 +17,7 @@ def get_responses_data(block):
     If settings.ANALYTICS_ANSWER_DIST_URL is unset then returns None
     """
     responses_data = []
+    valid_group_nodes = []
     if settings.ANALYTICS_ANSWER_DIST_URL and isinstance(block, CapaModule):
         responses = block.lcp.responders.values()
         valid_responses = {}
@@ -24,44 +25,33 @@ def get_responses_data(block):
         if block.rerandomize != 'never':
             rerandomize = True
 
-        # Each response is an individual question
+        valid_types = settings.INLINE_ANALYTICS_SUPPORTED_TYPES
+        
+        # Categorize response type; 'other' if not supported by the analytics api
         for response in responses:
-            question_type = None
-            # Categorize response type if supported by the analytics api
-            if isinstance(response, MultipleChoiceResponse):
-                question_type = 'radio'
-            elif isinstance(response, ChoiceResponse):
-                question_type = 'checkbox'
-            elif isinstance(response, OptionResponse):
-                question_type = 'option'
-            elif isinstance(response, NumericalResponse):
-                question_type = 'numerical'
-            elif isinstance(response, StringResponse):
-                question_type = 'string'
-            elif isinstance(response, FormulaResponse):
-                question_type = 'formula'
-            else:
-                # Response types not supported by the analytics api categorized as "other"
-                question_type == 'other'
-
-            # Only radio and checkbox types are supported for in-line analytics graphics at this time
-            # Option, numerical, string and formula are supported for number of students answered and date last updated
-            if question_type:
-                # There is only 1 part_id and correct response for each question
+            response_type = 'other'
+            
+            # Build list of group nodes supported by the analytics api
+            valid_group_nodes.extend(response.allowed_inputfields)
+            
+            for type, code in valid_types:
+                if type == response.__class__.__name__:
+                    response_type = code
+                    break
+   
+            # Determine the part id and correct answer
+            response_answers = response.get_answers().items()
+            if len(response_answers):
                 part_id, correct_response = response.get_answers().items()[0]
-                valid_responses[part_id] = [correct_response, question_type, ]
+                valid_responses[part_id] = [correct_response, response_type]
 
         if valid_responses:
-            part_id = None
-            
-            # List of response types supported by the analytics api
-            valid_types = ['checkboxgroup', 'choicegroup', 'optioninput', 'textline', 'formulaequationinput', 'textline']
 
             # Loop through all the nodes finding the group elements for each response
             # We need to do this to get the responses in the same order as on the page
             for node in block.lcp.tree.iter(tag=etree.Element):
                 part_id = node.attrib.get('id', None)
-                if part_id and part_id in list(valid_responses) and node.tag in valid_types:
+                if part_id and part_id in list(valid_responses) and node.tag in valid_group_nodes:
                     # This is a valid question according to the list of valid responses and we have the group node
                     
                     if valid_responses[part_id][1] == 'other':

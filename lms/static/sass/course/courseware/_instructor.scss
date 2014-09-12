@@ -1,0 +1,102 @@
+/***********************************************
+* Inline Analytics Style
+***********************************************/
+
+.grid-wrapper{
+  position: relative;
+  float: left;
+  clear: both;
+  margin:30px 100px 100px 30px;
+}
+
+.grid-block{
+  position: relative;
+  float: left;
+  margin: 0 25px 0 0;
+}
+.grid-block .graph{
+  float: left;
+  width: 300px;
+  margin-left: 50px;
+  border-left: 2px solid #444;
+  border-bottom: 2px solid #444;
+}
+.grid-wrapper.radio .graph{
+  height: 150px;
+}
+.grid-wrapper.checkbox .graph{
+  height: 250px;
+}
+.grid-block .graph .y-label{
+  position: absolute;
+  width: 45px;
+  top: -8px;
+  left: 0;
+  text-align: right;
+}
+.grid-block .graph .column{
+  position: relative;
+  height: 100%;
+  width: 45px;
+  margin: 0 15px;
+  float: left;
+}
+.grid-block .graph .column .block {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+.grid-block .legend{
+  float: left;
+  clear: both;
+  height: 28px;
+  width: 300px;
+  margin-left: 50px;
+}
+.grid-block .legend .label{
+  float: left;
+  width: 75px;
+  padding: 5px 0;
+  text-align: center;
+}
+.grid .view {
+}
+.answer_box{
+  padding:5px 0px;
+  background-color:#efefef;
+  text-align: center;
+}
+.wrong{
+  background-color:#ffa4a2;
+}
+.right{
+  background-color:#96ec9c;
+}
+.correct_answer {
+  color:#96ec9c;
+  background-color: #444;
+}
+.correct_answer .dot {
+  background-color:#efefef;
+}
+
+.dot{
+  display: inline-block;
+  height:20px;
+  width: 20px;
+  border-radius: 10px;
+  background-color: #444;
+  margin: 0;
+}
+.plus{
+  font-size:36px;
+  font-weight:bold;
+  padding-bottom: 5px;
+}
+.close{
+  position:relative;
+  top:0;
+  left:600px;
+}
+
+/**********************************************/

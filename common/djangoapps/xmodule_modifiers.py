@@ -279,8 +279,9 @@ def add_inline_analytics(user, has_instructor_access, block, view, frag, context
     
     Fragment consists of a button and some placeholder divs
     
-    Returns the wrapped fragment if the problem has a valid question. See get_responses_data
-    for valid questions. 
+    Returns the wrapped fragment if the problem has a valid question. See get_responses_data function
+    for valid responses.
+     
     Otherwise, returns the fragment unchanged.
     """
 
@@ -289,7 +290,7 @@ def add_inline_analytics(user, has_instructor_access, block, view, frag, context
         analytics_context = {'block_content': frag.content,
                              'location': block.location.to_deprecated_string(),
                              'element_id': block.location.html_id().replace('-', '_'),
-                             'get_analytics_answer_dist': reverse('get_analytics_answer_dist'),
+                             'answer_dist_url': reverse('get_analytics_answer_dist'),
                              'responses_data': responses_data,
                             }
         return wrap_fragment(frag, render_to_string("inline_analytics.html", analytics_context))

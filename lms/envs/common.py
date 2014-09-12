@@ -1762,5 +1762,12 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
 ])
 
 ####################### In-line Analytics ######################
-ANALYTICS_API_SECRET = None
 ANALYTICS_ANSWER_DIST_URL = None
+INLINE_ANALYTICS_SUPPORTED_TYPES = (
+   ['MultipleChoiceResponse', 'radio'],
+   ['ChoiceResponse', 'checkbox'],
+   ['OptionResponse', 'option'],
+   ['NumericalResponse', 'numerical'],
+   ['StringResponse', 'string'],
+   ['FormulaResponse', 'formula']
+)

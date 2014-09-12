@@ -1052,7 +1052,7 @@ def get_analytics_answer_dist(request):
     # Construct api request
     module_id = request.GET['module_id']
     url = settings.ANALYTICS_ANSWER_DIST_URL.format(module_id=module_id)
-    api_secret = settings.ANALYTICS_API_SECRET
+    api_secret = settings.ANALYTICS_DATA_TOKEN
     token = 'Token %s' % api_secret
 
     analytics_req = urllib2.Request(url)
