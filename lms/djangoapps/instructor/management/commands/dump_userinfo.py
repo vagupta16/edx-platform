@@ -20,17 +20,15 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import PaidCourseRegistration
 from student.models import UserProfile
 
-
 PROFILE_FIELDS = [
-                  ('username', "Username"), # TODO: does this mess CME ingestion up? If so, drop; it's just for debug.
-                  ('first_name', "First Name"),
-                  ('middle_initial', "Middle Initial"),
                   ('last_name', "Last Name"),
+                  ('middle_initial', "Middle Initial"),
+                  ('first_name', "First Name"),
                   ('email', "Email Address"),
                   ('birth_date', "Birth Date"),
                   ('professional_designation', "Professional Designation"),
                   ('license_number', "Professional License Number"),
-                  ('license_countr', "Professional License Country"),
+                  ('license_country', "Professional License Country"),
                   ('license_state', "Professional License State"),
                   ('physician_status', "Physician Status"),
                   ('patient_population', "Patient Population"),
@@ -46,8 +44,9 @@ PROFILE_FIELDS = [
                   ('address_2', 'Address 2'),
                   ('city', 'City'),
                   ('state', 'State'),
+                  ('postal_code', 'Postal Code'),
                   ('county_province', 'County/Province'),
-                  ('country', 'Country'),
+                  ('country_cme', 'Country'),
                   ('phone_number_untracked', 'Phone Number'), # Untracked
                   ('gender', 'Gender'),
                   ('marketing_opt_in_fixme', 'Marketing Opt-In'), # FIXME: where do we get this?
@@ -73,7 +72,6 @@ class Command(BaseCommand):
                     help='The file path to which to write the output.'),
     )
 
-
     def handle(self, *args, **options):
 
         course_id = options['course']
@@ -84,9 +82,9 @@ class Command(BaseCommand):
         if do_all_courses:
             raise CommandError('--all is not currently implemented; please use --course')
         if not (do_all_courses or course_id):
-            raise CommandError('--course and --all are mutually exclusive')
+            raise CommandError('One of --course or --all must be given')
         elif (do_all_courses and course_id):
-            raise CommandError('One of --coure or --all must be given')
+            raise CommandError('--course and --all are mutually exclusive')
 
         try:
             course_id = CourseKey.from_string(course_id)
@@ -104,7 +102,7 @@ class Command(BaseCommand):
         csv_fieldnames.extend(['System ID', 'Date Registered', 'Fee Charged', 'Payment Type', 'Amount Paid',
                                'Reference Number', 'Reference', 'Paid By', 'Dietary Restrictions',
                                'Marketing Source', 'Credits Issued', 'Credit Date', 'Certif'])
-        csvwriter = csv.DictWriter(outfile, fieldnames=csv_fieldnames, delimiter='\t', quoting=csv.QUOTE_ALL)
+        csvwriter = csv.DictWriter(outfile, fieldnames=csv_fieldnames, delimiter=',', quoting=csv.QUOTE_ALL)
         csvwriter.writeheader()
 
         sys.stdout.write("Fetching enrolled students for {course}...".format(course=course_id))
@@ -121,7 +119,7 @@ class Command(BaseCommand):
 
         for student in enrolled_students:
 
-            student_dict = {'Credits Issued': 0.0,
+            student_dict = {'Credits Issued': None,
                             'Credit Date': None,
                             'Certif': False
                            } 
@@ -157,12 +155,12 @@ class Command(BaseCommand):
                 registration = registration[0]
                 registration_order = registration.order
             student_dict['Date Registered'] = getattr(registration_order, 'purchase_time', '')
-            student_dict['System ID'] = '' # FIXME what is this?
-            student_dict['Reference'] = '' # FIXME what is this?
+            student_dict['System ID'] = '' # FIXME Untracked?
+            student_dict['Reference'] = '' # FIXME Untracked?
             student_dict['Dietary Restrictions'] = '' # Untracked
             student_dict['Marketing Source'] = '' # Untracked
-            student_dict['Fee Charged'] = getattr(registration, 'line_cost', '') # FIXME how are these different?
-            student_dict['Amount Paid'] = getattr(registration, 'line_cost', '') # FIXME how are these different?
+            student_dict['Fee Charged'] = getattr(registration, 'line_cost', '')
+            student_dict['Amount Paid'] = getattr(registration, 'line_cost', '')
             student_dict['Payment Type'] = getattr(registration_order, 'bill_to_cardtype', '')
             student_dict['Reference Number'] = getattr(registration_order, 'bill_to_ccnum', '')
             student_dict['Paid By'] = ' '.join((getattr(registration_order, 'bill_to_first', ''), 
@@ -175,20 +173,16 @@ class Command(BaseCommand):
             student_dict['Credit Date'] = getattr(cert_info, 'created_date', '')
             student_dict['Certif'] = (cert_status == 'downloadable')
             if cert_status in ('downloadable', 'generating'):
-                student_dict['Credits Issued'] = 30.0  # FIXME: should retrieve from course def.
+                student_dict['Credits Issued'] = 23.5
 
-            # DEBUG output, replace with csvwriter 
-            #outfile.write("\n{d}\n".format(d=student_dict))
+            for item in student_dict:
+              if type(student_dict[item]) is datetime:
+                student_dict[item] = student_dict[item].strftime("%m/%d/%Y")
+
+              student_dict[item] = unicode(student_dict[item]).encode('utf-8')
+              student_dict[item] = student_dict[item].replace("_"," ")
+
             csvwriter.writerow(student_dict)
-
-#            import pdb; pdb.set_trace()
-#
-#        writer = csv.writer(fp, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-#        writer.writerow(datatable['header'])
-#        for datarow in datatable['data']:
-#            encoded_row = [unicode(s).encode('utf-8') for s in datarow]
-#            writer.writerow(encoded_row)
-
 
         outfile.close()
         sys.stdout.write("Data written to {name}\n".format(name=outfile_name))
