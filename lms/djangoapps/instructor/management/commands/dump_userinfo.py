@@ -21,59 +21,67 @@ from shoppingcart.models import PaidCourseRegistration
 from student.models import UserProfile
 
 PROFILE_FIELDS = [
-                  ('last_name', "Last Name"),
-                  ('middle_initial', "Middle Initial"),
-                  ('first_name', "First Name"),
-                  ('email', "Email Address"),
-                  ('birth_date', "Birth Date"),
-                  ('professional_designation', "Professional Designation"),
-                  ('license_number', "Professional License Number"),
-                  ('license_country', "Professional License Country"),
-                  ('license_state', "Professional License State"),
-                  ('physician_status', "Physician Status"),
-                  ('patient_population', "Patient Population"),
-                  ('specialty', 'Specialty'),
-                  ('sub_specialty', "Sub Specialty"),
-                  ('affiliation', "Stanford Medicine Affiliation"),
-                  ('sub_affiliation', "Stanford Sub Affiliation"),
-                  ('stanford_department', "Stanford Department"),
-                  ('sunet_id', "SUNet ID"),
-                  ('other_affiliation', "Other Affiliation"),
-                  ('job_title_position_untracked', 'Job Title or Position'), # Untracked
-                  ('address_1', 'Address 1'),
-                  ('address_2', 'Address 2'),
-                  ('city', 'City'),
-                  ('state', 'State'),
-                  ('postal_code', 'Postal Code'),
-                  ('county_province', 'County/Province'),
-                  ('country_cme', 'Country'),
-                  ('phone_number_untracked', 'Phone Number'), # Untracked
-                  ('gender', 'Gender'),
-                  ('marketing_opt_in_fixme', 'Marketing Opt-In'), # FIXME: where do we get this?
-                 ]
+    ('last_name', 'Last Name'),
+    ('middle_initial', 'Middle Initial'),
+    ('first_name', 'First Name'),
+    ('email', 'Email Address'),
+    ('birth_date', 'Birth Date'),
+    ('professional_designation', 'Professional Designation'),
+    ('license_number', 'Professional License Number'),
+    ('license_country', 'Professional License Country'),
+    ('license_state', 'Professional License State'),
+    ('physician_status', 'Physician Status'),
+    ('patient_population', 'Patient Population'),
+    ('specialty', 'Specialty'),
+    ('sub_specialty', 'Sub Specialty'),
+    ('affiliation', 'Stanford Medicine Affiliation'),
+    ('sub_affiliation', 'Stanford Sub Affiliation'),
+    ('stanford_department', 'Stanford Department'),
+    ('sunet_id', 'SUNet ID'),
+    ('other_affiliation', 'Other Affiliation'),
+    ('job_title_position_untracked', 'Job Title or Position'), # Untracked
+    ('address_1', 'Address 1'),
+    ('address_2', 'Address 2'),
+    ('city', 'City'),
+    ('state', 'State'),
+    ('postal_code', 'Postal Code'),
+    ('county_province', 'County/Province'),
+    ('country_cme', 'Country'),
+    ('phone_number_untracked', 'Phone Number'), # Untracked
+    ('gender', 'Gender'),
+    ('marketing_opt_in_fixme', 'Marketing Opt-In'), # FIXME: where do we get this?
+]
 
 class Command(BaseCommand):
     help = """Export data required by Stanford SCCME Tracker Project to .csv file."""
 
     option_list = BaseCommand.option_list + (
-        make_option('-c', '--course',
-                    metavar='COURSE_ID',
-                    dest='course',
-                    default=False,
-                    help='The course id (e.g., CME/001/2013-2015) to select from. Mutually exclusive with "--all"'),
-        make_option('-a', '--all',
-                    dest='all',
-                    default=False,
-                    help='Request all users dumped for all courses; mutually exclusive with "--course"'),
-        make_option('-o', '--outfile',
-                    metavar='OUTFILE',
-                    dest='outfile',
-                    default=False,
-                    help='The file path to which to write the output.'),
+        make_option(
+            '-c',
+            '--course',
+            metavar='COURSE_ID',
+            dest='course',
+            default=False,
+            help='The course id (e.g., CME/001/2013-2015) to select from. Mutually exclusive with "--all"',
+        ),
+        make_option(
+            '-a',
+            '--all',
+            dest='all',
+            default=False,
+            help='Request all users dumped for all courses; mutually exclusive with "--course"',
+        ),
+        make_option(
+            '-o',
+            '--outfile',
+            metavar='OUTFILE',
+            dest='outfile',
+            default=False,
+            help='The file path to which to write the output.',
+        ),
     )
 
     def handle(self, *args, **options):
-
         course_id = options['course']
         do_all_courses = options['all']
         outfile_name = options['outfile']
