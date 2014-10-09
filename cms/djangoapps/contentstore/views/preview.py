@@ -175,6 +175,7 @@ def _load_preview_module(request, descriptor):
     """
     student_data = KvsFieldData(SessionKeyValueStore(request))
     if _has_author_view(descriptor):
+        import ipdb; ipdb.set_trace();
         field_data = CmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
     else:
         field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access

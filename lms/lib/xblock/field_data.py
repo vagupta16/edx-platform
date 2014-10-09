@@ -24,6 +24,7 @@ class LmsFieldData(SplitFieldData):
         self._student_data = student_data
 
         super(LmsFieldData, self).__init__({
+            Scope.configuration: authored_data,
             Scope.content: authored_data,
             Scope.settings: authored_data,
             Scope.parent: authored_data,

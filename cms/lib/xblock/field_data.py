@@ -2,7 +2,7 @@
 :class:`~xblock.field_data.FieldData` subclasses used by the CMS
 """
 
-from xblock.field_data import SplitFieldData
+from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope
 
 
@@ -10,17 +10,23 @@ class CmsFieldData(SplitFieldData):
     """
     A :class:`~xblock.field_data.FieldData` that
     reads all UserScope.ONE and UserScope.ALL fields from `student_data`
-    and all UserScope.NONE fields from `authored_data`. It allows writing to`authored_data`.
+    and most UserScope.NONE fields from `authored_data`. UserScope.NONE,
+    BlockScope.TYPE (i.e., Scope.configuration) is read from 'platform_data'.
+    It allows writing to `student_data` and `authored_data`, but not 
+    `platform_data`.
     """
     def __init__(self, authored_data, student_data):
         # Make sure that we don't repeatedly nest CmsFieldData instances
         if isinstance(authored_data, CmsFieldData):
             authored_data = authored_data._authored_data  # pylint: disable=protected-access
+        platform_data = ReadOnlyFieldData(authored_data)
 
         self._authored_data = authored_data
         self._student_data = student_data
+        self._platform_data = platform_data
 
         super(CmsFieldData, self).__init__({
+            Scope.configuration: platform_data,
             Scope.content: authored_data,
             Scope.settings: authored_data,
             Scope.parent: authored_data,
