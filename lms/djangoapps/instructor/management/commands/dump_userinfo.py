@@ -76,16 +76,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         course_id = options['course']
-        do_all_courses = options['all']
         outfile_name = options['outfile']
         verbose = int(options['verbosity']) > 1
 
-        if do_all_courses:
-            raise CommandError('--all is not currently implemented; please use --course')
-        if not (do_all_courses or course_id):
-            raise CommandError('One of --course or --all must be given')
-        elif (do_all_courses and course_id):
-            raise CommandError('--course and --all are mutually exclusive')
+        if not (course_id):
+            raise CommandError('--course must be specified')
 
         try:
             course_id = CourseKey.from_string(course_id)
