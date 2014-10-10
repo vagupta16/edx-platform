@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #
 # CME management command: dump userinfo to csv files for reporting
 
@@ -39,7 +39,7 @@ PROFILE_FIELDS = [
     ('stanford_department', 'Stanford Department'),
     ('sunet_id', 'SUNet ID'),
     ('other_affiliation', 'Other Affiliation'),
-    ('job_title_position_untracked', 'Job Title or Position'), # Untracked
+    ('job_title_position_untracked', 'Job Title or Position'),
     ('address_1', 'Address 1'),
     ('address_2', 'Address 2'),
     ('city', 'City'),
@@ -47,9 +47,9 @@ PROFILE_FIELDS = [
     ('postal_code', 'Postal Code'),
     ('county_province', 'County/Province'),
     ('country_cme', 'Country'),
-    ('phone_number_untracked', 'Phone Number'), # Untracked
+    ('phone_number_untracked', 'Phone Number'),
     ('gender', 'Gender'),
-    ('marketing_opt_in_fixme', 'Marketing Opt-In'), # FIXME: where do we get this?
+    ('marketing_opt_in_untracked', 'Marketing Opt-In'),
 ]
 
 class Command(BaseCommand):
@@ -62,14 +62,7 @@ class Command(BaseCommand):
             metavar='COURSE_ID',
             dest='course',
             default=False,
-            help='The course id (e.g., CME/001/2013-2015) to select from. Mutually exclusive with "--all"',
-        ),
-        make_option(
-            '-a',
-            '--all',
-            dest='all',
-            default=False,
-            help='Request all users dumped for all courses; mutually exclusive with "--course"',
+            help='The course id (e.g., CME/001/2013-2015) to select from.',
         ),
         make_option(
             '-o',
@@ -163,8 +156,8 @@ class Command(BaseCommand):
                 registration = registration[0]
                 registration_order = registration.order
             student_dict['Date Registered'] = getattr(registration_order, 'purchase_time', '')
-            student_dict['System ID'] = '' # FIXME Untracked?
-            student_dict['Reference'] = '' # FIXME Untracked?
+            student_dict['System ID'] = '' # Untracked
+            student_dict['Reference'] = '' # Untracked
             student_dict['Dietary Restrictions'] = '' # Untracked
             student_dict['Marketing Source'] = '' # Untracked
             student_dict['Fee Charged'] = getattr(registration, 'line_cost', '')
@@ -181,6 +174,7 @@ class Command(BaseCommand):
             student_dict['Credit Date'] = getattr(cert_info, 'created_date', '')
             student_dict['Certif'] = (cert_status == 'downloadable')
             if cert_status in ('downloadable', 'generating'):
+                #XXX should be revisited when credit count functionality implemented
                 student_dict['Credits Issued'] = 23.5
 
             for item in student_dict:
