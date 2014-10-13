@@ -26,8 +26,6 @@ class CmsFieldData(SplitFieldData):
         self._authored_data = authored_data
         self._student_data = student_data
         self._platform_data = platform_data
-        import wtf; wtf.wtf(wvars=['settings', 'authored_data', 'student_data', 'platform_data'])
-        print "********************\n{}\n********************".format(str(platform_data._data))
 
         super(CmsFieldData, self).__init__({
             Scope.configuration: platform_data,
