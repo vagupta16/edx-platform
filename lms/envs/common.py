@@ -1790,3 +1790,6 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
     "HarvardX/SW12.9x/3T2014",
     "HarvardX/SW12.8x/3T2014",
 ])
+
+### Configuration passed into XBlocks at runtime
+XBLOCK_CONFIGURATION = {}

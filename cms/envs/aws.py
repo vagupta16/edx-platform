@@ -300,3 +300,14 @@ ADVANCED_SECURITY_CONFIG = ENV_TOKENS.get('ADVANCED_SECURITY_CONFIG', {})
 
 ADVANCED_COMPONENT_TYPES = ENV_TOKENS.get('ADVANCED_COMPONENT_TYPES', ADVANCED_COMPONENT_TYPES)
 ADVANCED_PROBLEM_TYPES = ENV_TOKENS.get('ADVANCED_PROBLEM_TYPES', ADVANCED_PROBLEM_TYPES)
+
+#### Additional settings used to configure xblocks
+#XBLOCK_CONFIGURATION = ENV_TOKENS.get('XBLOCK_CONFIGURATION', {})
+XBLOCK_CONFIGURATION = {
+    "_default": {
+        "ConfiguredBySettings": True,
+    },
+    "OpenAssessmentBlock": {
+        "TrackChangesUrl": "https://www.google.com",
+    },
+}

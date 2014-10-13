@@ -723,3 +723,6 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+
+### Configuration passed into XBlocks at runtime
+XBLOCK_CONFIGURATION = {}
