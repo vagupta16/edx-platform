@@ -23,6 +23,9 @@ from django.conf import settings
       </b>
     </p>
   </div>
+  <div class="timer" data-start="${ start_time }" data-end="${ end_time_to_display }" data-seconds-left="${ seconds_left }">
+      You have <span class="minutes-left">${ float(seconds_left) / 1000 }</span> minutes left to complete these questions.
+  </div>
 % endif
 
 <div class="problem" aria-live="polite" aria-relevant="all">

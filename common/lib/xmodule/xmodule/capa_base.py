@@ -616,7 +616,8 @@ class CapaMixin(CapaFields):
 
     def get_problem_html(self, encapsulate=True):
         """
-        Return html for the problem.
+        Return html for the problem. For timed problems, returns an interstitial view if
+        the problem has not yet been started.
 
         Adds check, reset, save buttons as necessary based on the problem config and state.
         """
@@ -640,14 +641,22 @@ class CapaMixin(CapaFields):
             check_button = False
             check_button_checking = False
 
+        # For timed problems
+        now = datetime.datetime.now(UTC())
         problem_is_timed = self.minutes_allowed > 0
+        problem_has_finished = False
+        seconds_left = -1
+        end_time_to_display = None
 
-        if problem_is_timed and not self.time_started:
-            self.set_time_started()
 
-        end_time_to_display = (self.time_started + datetime.timedelta(minutes=self.minutes_allowed)
-                               if problem_is_timed
-                               else None)
+        if problem_is_timed and self.time_started:
+                end_time_to_display = self.time_started + \
+                    datetime.timedelta(minutes=self.minutes_allowed)
+                problem_has_finished= end_time_to_display >= now
+                time_left = end_time_to_display - self.time_started
+                seconds_left = (time_left).total_seconds()
+
+
 
         # because we use self.due and not self.close_date below, this is not the actual end_time, but the
         # end_time we want to display to the user
@@ -664,7 +673,10 @@ class CapaMixin(CapaFields):
             'problem': content,
             'id': self.location.to_deprecated_string(),
             'problem_is_timed': problem_is_timed,
+            'problem_has_finished': problem_has_finished,
             'start_time': self.time_started,
+            'seconds_left': seconds_left,
+            'minutes_allowed': self.minutes_allowed,
             'end_time_to_display': end_time_to_display,
             'check_button': check_button,
             'check_button_checking': check_button_checking,
@@ -675,7 +687,10 @@ class CapaMixin(CapaFields):
             'attempts_allowed': self.max_attempts,
         }
 
-        html = self.runtime.render_template('problem.html', context)
+        if problem_is_timed and not self.time_started:
+            html = self.runtime.render_template('problem_interstitial.html', context)
+        else:
+            html = self.runtime.render_template('problem.html', context)
 
         if encapsulate:
             html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
@@ -692,6 +707,20 @@ class CapaMixin(CapaFields):
             html = self.runtime.replace_jump_to_id_urls(html)
 
         return html
+
+    def start_problem(self, _data):
+        """
+        Called from the interstitial view, starts a timed problem if
+        it hasn't already been started.
+
+        Returns html response for the problem.
+        """
+        problem_is_timed = self.minutes_allowed > 0
+
+        if problem_is_timed and not self.time_started:
+            self.set_time_started()
+
+        return {'html': self.get_problem_html(encapsulate=False)}
 
     def exceeded_time_limit(self):
         """

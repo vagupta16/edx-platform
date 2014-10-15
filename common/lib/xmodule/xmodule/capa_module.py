@@ -61,6 +61,7 @@ class CapaModule(CapaMixin, XModule):
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
+            'problem_start': self.start_problem,
             'score_update': self.update_score,
             'input_ajax': self.handle_input_ajax,
             'ungraded_response': self.handle_ungraded_response
