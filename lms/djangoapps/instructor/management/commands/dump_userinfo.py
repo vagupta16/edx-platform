@@ -20,6 +20,8 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import PaidCourseRegistration
 
+from unidecode import unidecode
+
 PROFILE_FIELDS = [
     ('user__profile__cmeuserprofile__last_name', 'Last Name'),
     ('user__profile__cmeuserprofile__middle_initial', 'Middle Initial'),
@@ -42,7 +44,7 @@ PROFILE_FIELDS = [
     ('user__profile__cmeuserprofile__job_title_position_untracked', 'Job Title or Position'),
     ('user__profile__cmeuserprofile__address_1', 'Address 1'),
     ('user__profile__cmeuserprofile__address_2', 'Address 2'),
-    ('user__profile__cmeuserprofile__city', 'City'),
+    ('user__profile__cmeuserprofile__city_cme', 'City'),
     ('user__profile__cmeuserprofile__state', 'State'),
     ('user__profile__cmeuserprofile__postal_code', 'Postal Code'),
     ('user__profile__cmeuserprofile__county_province', 'County/Province'),
@@ -119,7 +121,7 @@ class Command(BaseCommand):
         all_fields = PROFILE_FIELDS + REGISTRATION_FIELDS + ORDER_FIELDS + CERTIFICATE_FIELDS
 
         csv_fieldnames = [label for field, label in all_fields if len(label) > 0]
-        csvwriter = csv.DictWriter(outfile, fieldnames=csv_fieldnames, delimiter=',', quoting=csv.QUOTE_ALL)
+        csvwriter = csv.DictWriter(outfile, fieldnames=csv_fieldnames, delimiter='\t', quoting=csv.QUOTE_ALL)
         csvwriter.writeheader()
 
         sys.stdout.write("Fetching enrolled students for {course}...".format(course=course_id))
@@ -147,14 +149,15 @@ class Command(BaseCommand):
 
         for cme_profile in cme_profiles:
             student_dict = {
-                'Credits Issued': None,
+                'Credits Issued': 0.0,
                 'Credit Date': None,
-                'Certif': False
+                'Certif': False,
+                'Marketing Opt-In' : True,
             } 
 
             for field, label in PROFILE_FIELDS:
                 try:
-                    if len(label) > 0:
+                    if len(label) > 0 and 'untracked' not in field:
                         student_dict[label] = cme_profile[field] if cme_profile[field] != None else ''
                 except KeyError:
                     student_dict[label] = ''
@@ -166,6 +169,13 @@ class Command(BaseCommand):
             if registration:
                 self.add_fields_to(student_dict, ORDER_FIELDS, {user_id : registration.order}, user_id)
 
+                #Registration order special case values
+                if student_dict['Payment Type'] == 'Visa':
+                    student_dict['Payment Type'] = "VISA"
+
+                if student_dict['Payment Type'] == 'MasterCard':
+                    student_dict['Payment Type'] = "MC"
+
             certificate = self.add_fields_to(student_dict, CERTIFICATE_FIELDS, certificate_table, user_id)
 
             #Certificate special case values
@@ -175,6 +185,8 @@ class Command(BaseCommand):
             #XXX should be revisited when credit count functionality implemented
             if student_dict['Certif']:
                 student_dict['Credits Issued'] = 23.5
+            else:
+                student_dict['Credits Issued'] = 0.0
 
             for item in student_dict:
                 student_dict[item] = self.preprocess(student_dict[item])
@@ -220,11 +232,11 @@ class Command(BaseCommand):
         return registration
 
     def preprocess(self, value):
-      if type(value) is datetime:
-        value = value.strftime("%m/%d/%Y")
+        if type(value) is datetime:
+            value = value.strftime("%m/%d/%Y")
 
-      value = unicode(value).encode('utf-8')
-      value = value.replace("_"," ")
+        value = unidecode(unicode(value))
+        value = value.replace("_"," ")
 
-      return value
+        return value
 
