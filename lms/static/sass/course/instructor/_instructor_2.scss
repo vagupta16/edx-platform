@@ -533,6 +533,110 @@ section.instructor-dashboard-content-2 {
       }
     }
   }
+
+
+  .email-lists-management {
+
+    .wrapper-member-select {
+      background-color: $light-gray;
+      padding: ($baseline/2);
+    }
+
+    .member-lists-selector {
+      display: block;
+      margin: ($baseline/4) 0;
+      padding: ($baseline/4);
+    }
+
+    .email-list-container {
+      margin-bottom: ($baseline*1.5);
+
+      .email-list-widget {
+
+        .header {
+          @include box-sizing(border-box);
+          @include border-top-radius(3);
+          position: relative;
+          padding: ($baseline/2);
+          background-color: #efefef;
+          border: 1px solid $light-gray;
+          display: none; // hiding to prefer dropdown as header
+        }
+
+        .title {
+          @include font-size(16);
+        }
+
+        .label {
+          @extend %t-copy-sub1;
+          color: $lighter-base-font-color;
+        }
+
+        .info {
+          @include box-sizing(border-box);
+          padding: ($baseline/2);
+
+          border: 1px solid $light-gray;
+          color: $lighter-base-font-color;
+          line-height: 1.3em;
+          font-size: .85em;
+        }
+
+        .email-list {
+          @include box-sizing(border-box);
+
+          table {
+            width: 100%;
+          }
+
+          thead {
+            background-color: $light-gray;
+          }
+
+          tr {
+            border-bottom: 1px solid $light-gray;
+          }
+
+          td {
+            @extend %t-copy-sub1;
+            vertical-align: middle;
+            word-wrap: break-word;
+            padding: ($baseline/2) ($baseline/4);
+            border-left:  1px solid $light-gray;
+            border-right: 1px solid $light-gray;
+          }
+        }
+
+        .bottom-bar {
+          @include box-sizing(border-box);
+          @include border-bottom-radius(3);
+          position: relative;
+          padding: ($baseline/2);
+          margin-top: -1px;
+          border: 1px solid $light-gray;
+          background-color: #efefef;
+          box-shadow: inset #bbb 0px 1px 1px 0px;
+        }
+
+        // .add-field
+
+        input[type="button"].add {
+          @include idashbutton($blue);
+          position: absolute;
+          right: $baseline;
+        }
+      }
+
+      .revoke {
+        color: $lighter-base-font-color;
+        cursor: pointer;
+
+        &:hover, &:focus {
+          color: $alert-color;
+        }
+      }
+    }
+  }
 }
 
 

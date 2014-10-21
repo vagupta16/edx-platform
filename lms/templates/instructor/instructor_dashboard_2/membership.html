@@ -26,6 +26,27 @@
   </div>
 </script>
 
+
+
+<script type="text/template" id="email-list-widget-template">
+  <div class="email-list-widget">
+    <div class="email-list">
+      <table>
+        <thead>
+          <tr>
+            {{#labels}}
+              <td class="label">{{.}}</td>
+            {{/labels}}
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</script>
+
+
+
 <div class="vert-left">
 <div class="batch-enrollment">
   <h2> ${_("Batch Enrollment")} </h2>
@@ -114,7 +135,8 @@
 %endif
 </div>
 
-<div class="vert-right member-lists-management">
+<div class="vert-right">
+<div class="member-lists-management">
   ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
   <h2> ${_("Administration List Management")} </h2>
 
@@ -128,7 +150,6 @@
     </select>
 
   </div>
-
 
   %if not section_data['access']['instructor']:
     <p>
@@ -214,5 +235,30 @@
       data-add-button-label="${_("Add Community TA")}"
     ></div>
   %endif
+ </div>
+ <div class="email-lists-management">
+
+    <div class="email-widget">
+      <div class="header">
+	<h2 class="title"> ${_("Email Distribution")} </h2>
+	<p>${_("Blah blah blah")}
+	  ${_("More blather.")}</p>
+	<br />
+	<div id="email-selection-label">${_("Some text")}:</div> <select id="email-selector">
+          <option> ${_("Loading problem list...")} </option>
+	</select>
+    <div class="email-list-container">
+
+    </div>
+  <!--div class="emails-widget-container"
+       data-endpoint="${ section_data['list_course_role_members_url'] }"
+       >
+  </div-->
+
+ </div>
+
+
+
+
 
 </div>

@@ -569,6 +569,32 @@ class AuthList
       error: std_ajax_err => @$request_response_error.text gettext "Error changing user's permissions."
 
 
+class EmailWidget
+  constructor: (@$container, params={}) ->
+    params = _.defaults params,
+      labels: ["Type", "Specification", "Criteria",""]
+
+    template_html = $("#email-list-widget-template").html()
+    @$container.html Mustache.render template_html, params
+    # clear all table rows
+    clear_rows: -> @$('table tbody').empty()
+
+    # takes a table row as an array items are inserted as text, unless detected
+    # as a jquery objects in which case they are inserted directly. if an
+    # element is a jquery object
+    add_row: (row_array) ->
+      $tbody = @$('table tbody')
+      $tr = $ '<tr>'
+      for item in row_array
+        $td = $ '<td>'
+        if item instanceof jQuery
+          $td.append item
+        else
+          $td.text item
+        $tr.append $td
+      $tbody.append $tr
+
+
 # Membership Section
 class Membership
   # enable subsections.
@@ -594,6 +620,12 @@ class Membership
     @auth_lists = _.map (@$auth_list_containers), (auth_list_container) =>
       rolename = $(auth_list_container).data 'rolename'
       new AuthListWidget $(auth_list_container), rolename, @$auth_list_errors
+
+    @$email_list_containers = @$section.find '.email-list-container'
+    @email_lists = _.map (@$email_list_containers), (email_list_container) =>
+      new EmailWidget $(email_list_container)
+
+
 
     # populate selector
     @$list_selector.empty()
