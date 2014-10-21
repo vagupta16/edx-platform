@@ -653,7 +653,7 @@ class CapaMixin(CapaFields):
                 end_time_to_display = self.time_started + \
                     datetime.timedelta(minutes=self.minutes_allowed)
                 problem_has_finished= end_time_to_display >= now
-                time_left = end_time_to_display - self.time_started
+                time_left = end_time_to_display - now
                 seconds_left = (time_left).total_seconds()
 
 

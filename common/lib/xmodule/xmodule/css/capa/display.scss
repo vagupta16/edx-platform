@@ -39,6 +39,29 @@ div.problem-progress {
   font-size: em(16);
 }
 
+div.problem-timer {
+  display: none;
+  background: $white;
+  border: 1px solid #dedede;
+  color: $green;
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  padding: 7px 21px;
+  z-index: 9999;
+
+  span.minutes-left {
+      color: $green;
+      font-weight: bold;
+  }
+}
+
+div.problem-timer.danger {
+  color: $red;
+  .minutes-left { color: $red; }
+}
+
 div.problem {
   @media print {
     display: block;

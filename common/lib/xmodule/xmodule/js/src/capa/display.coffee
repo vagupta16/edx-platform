@@ -146,6 +146,8 @@ class @Problem
         @setupInputTypes()
         @bind()
         @queueing()
+        if @el.find(".problem-timer").length
+          @setupTimer()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -158,44 +160,27 @@ class @Problem
 
   # TODO add hooks for problem types here by inspecting response.html and doing
   # stuff if a div w a class is found
-        if @el.find(".timer").length
-          @setupTimer()
+          if @el.find(".problem-timer").length
+            @setupTimer()
 
   setupTimer: =>
-    # Timer logic in here. There should only
-    # be one timer on the page
-    SECONDS = 1000
+    SECONDS_IN_MINUTE = 60
 
-    $timer = @el.find('.timer')
+    $timer = @el.find('.problem-timer')
     $display = @el.find('.minutes-left')
     start = new Date($timer.data('start'))
     end = new Date($timer.data('end'))
     secondsLeft = parseInt($timer.data('secondsLeft'), 10)
-    minutesLeft = secondsLeft / SECONDS
+    minutesLeft = Math.round(secondsLeft / SECONDS_IN_MINUTE)
 
-    # TODO Migrate into stylesheets and make margins conform
-    # to style guidelines
-    $timer.css({
-      background: "white",
-      border: "1px solid #dedede",
-      color: 'green',
-      fontSize: "14px",
-      fontWeight: "bold",
-      padding: "7px 21px",
-      marginTop: "14px",
-      marginBottom: "14px",
-      zIndex: 9999,
-    })
-    $display.css({
-      fontWeight: "bold",
-      color: 'green'
-    })
+    # Activate timer to show it
+    $timer.show()
 
     # TODO i18n conversion
     # TODO check cases and sync clock periodically
     syncTimer = ->
       minutesLeft = minutesLeft - 1
-      if minutesLeft < 0
+      if minutesLeft <= 0
         $timer.empty()
         $timer.text("Time has expired")
       else if minutesLeft <= 1
@@ -204,9 +189,9 @@ class @Problem
       else
         $display.text(minutesLeft)
       if minutesLeft < 1
-        $timer.css("color", "red")
-        $display.css("color", "red")
-    setInterval(syncTimer, 60 * SECONDS)
+        $timer.addClass("danger")
+
+    setInterval(syncTimer, SECONDS_IN_MINUTE * 1000)
 
     # Initialize to populate the initial timer
     syncTimer()
