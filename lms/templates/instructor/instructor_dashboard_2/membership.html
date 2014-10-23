@@ -29,10 +29,12 @@
 
 
 <script type="text/template" id="email-list-widget-template">
-    <div class="email-selection-label">{{label}}</div>
-    <select class="single-email-selector">
-          <option> ${_("Loading problem list...")} </option>
-	</select>
+    <div class="wrapper-email-select">
+        <div class="email-selection-label">{{label}}</div>
+        <select class="single-email-selector">
+              <option> ${_("Loading problem list...")} </option>
+        </select>
+    </div>
 </script>
 
 
@@ -231,18 +233,18 @@
     <div class="email-widget">
       <div class="header">
 	<h2 class="title"> ${_("Email Distribution")} </h2>
-	<p>${_("Blah blah blah")}
-	  ${_("More blather.")}</p>
-	<br />
+    <div class="beginning_specific">
 
-    <div class="email-list-container"
-         data-label ="Select a Type"
-         data-selections="Section <> Problem">
-    </div>
+        <div class="email-list-container"
+             data-label ="Inclusion"
+             data-selections="Must Include <> Don't Include <> Include Any">
+        </div>
 
-    <div class="email-list-container"
-         data-label ="Inclusion"
-         data-selections="Don't Include <> Include Any">
+        <div class="email-list-container"
+             data-label ="Select a Type"
+             data-selections="Section <> Problem">
+        </div>
+
     </div>
 
     <div class="section_specific>
@@ -276,7 +278,7 @@
     </div>
 
 
-  <div class="email-list-widget">
+    <div class="email-list-widget">
     <div class="email-list">
       <table>
         <thead>

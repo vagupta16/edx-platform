@@ -586,55 +586,33 @@ class EmailWidget
           text: label
 
 
-    # one-time first selection of top list.
-    @$list_selector.change()
-
-
-
-class EmailWidget2
-  constructor: (@$container, @$section, params={}) ->
-    params = _.defaults params,
-      labels: ["Type", "Specification", "Criteria",""]
-
-    template_html = $("#email-list-widget-template").html()
-
-    @$container.html Mustache.render template_html, params
-    # clear all table rows
-    clear_rows: -> @$('table tbody').empty()
-
-
-    # takes a table row as an array items are inserted as text, unless detected
-    # as a jquery objects in which case they are inserted directly. if an
-    # element is a jquery object
-    add_row: (row_array) ->
-      $tbody = @$('table tbody')
-      $tr = $ '<tr>'
-      for item in row_array
-        $td = $ '<td>'
-        if item instanceof jQuery
-          $td.append item
-        else
-          $td.text item
-        $tr.append $td
-      $tbody.append $tr
-
-    @$list_selector = @$section.find 'select#single-email-selector'
-    # populate selector
-    @$list_selector.empty()
+    @parent = @$container.parent()
+    @idx = @$container.prevAll().length
     @$list_selector.append $ '<option/>',
-        text: 'Section'
+      text: "hai"
+
     @$list_selector.append $ '<option/>',
-        text: 'Problem'
+        text: 1
 
+    ###
+    @$list_selector.change =>
+      $opt = @$list_selector.children('option:selected')
+      return unless $opt.length > 0
+      #get the parent of this container
+      #if (@idx != @parent.children.length-1)
+      #  (@parent.children[@idx+1]).addClass 'active'
 
-    # one-time first selection of top list.
+      @$list_selector.append $ '<option/>',
+        text: "hai"
+      #@$container.removeClass 'active'
+      for auth_list in @auth_lists
+        auth_list.$container.removeClass 'active'
+      auth_list = $opt.data('auth_list')
+      auth_list.$container.addClass 'active'
+      auth_list.re_view()
+
     @$list_selector.change()
-
-
-
-
-
-
+    ###
 
 # Membership Section
 class Membership
@@ -667,6 +645,10 @@ class Membership
       new EmailWidget $(email_list_container), @$section
 
 
+    for email_list in @email_lists
+      email_list.$container.removeClass 'active'
+    @email_lists[0].$container.addClass 'active'
+
 
     # populate selector
     @$list_selector.empty()
@@ -689,6 +671,7 @@ class Membership
 
     # one-time first selection of top list.
     @$list_selector.change()
+
 
   # handler for when the section title is clicked.
   onClickTitle: ->

@@ -560,9 +560,19 @@ section.instructor-dashboard-content-2 {
       display: None;
     }
 
+    .email-lists-selector {
+      display: block;
+      margin: ($baseline/4) 0;
+      padding: ($baseline/4);
+    }
+
     .email-list-container {
+      display: None;
       margin-bottom: ($baseline*1.5);
 
+      &.active {
+        display: block;
+      }
       .email-list-widget {
 
         .header {
