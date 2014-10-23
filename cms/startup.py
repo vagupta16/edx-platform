@@ -10,6 +10,8 @@ settings.INSTALLED_APPS  # pylint: disable=W0104
 from django_startup import autostartup
 from monkey_patch import django_utils_translation
 
+from lms.startup import enable_theme
+
 
 def run():
     """
@@ -20,6 +22,9 @@ def run():
     autostartup()
 
     add_mimetypes()
+
+    if settings.FEATURES.get('USE_CUSTOM_THEME', False):
+        enable_theme()
 
 
 def add_mimetypes():

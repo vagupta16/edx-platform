@@ -174,6 +174,10 @@ def get_course_about_section(course, section_key):
     - faq
     - more_info
     - ocw_links
+    - pre_enrollment_email
+    - post_enrollment_email
+    - pre_enrollment_email_subject
+    - post_enrollment_email_subject
     """
 
     # Many of these are stored as html files instead of some semantic
@@ -185,7 +189,9 @@ def get_course_about_section(course, section_key):
                        'course_staff_short', 'course_staff_extended',
                        'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
                        'number', 'instructors', 'overview',
-                       'effort', 'end_date', 'prerequisites', 'ocw_links']:
+                       'effort', 'end_date', 'prerequisites', 'ocw_links', 
+                       'pre_enrollment_email', 'post_enrollment_email', 
+                       'pre_enrollment_email_subject', 'post_enrollment_email_subject']:
 
         try:
 

@@ -31,6 +31,7 @@ class CourseMetadata(object):
                      'name',  # from xblock
                      'tags',  # from xblock
                      'visible_to_staff_only'
+                     'enable_enrollment_email'
     ]
 
     @classmethod

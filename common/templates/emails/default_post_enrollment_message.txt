@@ -1,0 +1,24 @@
+<%! from django.utils.translation import ugettext as _ %>${_("Hi there!")}
+
+${_("Thank you for enrolling in a {platform_name} course.  You are receiving this "
+"email from the {platform_name} Team as a confirmation that you have "
+"successfully enrolled in one of our online courses.  Your chosen course will "
+"now appear on your dashboard ({dashboard_url}).  This course is already under "
+"way, so make sure to sign in ({signin_url}) and click \"View Course\" from your "
+"dashboard in order to get started.  Doing this will take you to the Course "
+"Info page for more information.").format(
+  platform_name=settings.PLATFORM_NAME,
+  dashboard_url=dashboard_url,
+  signin_url=signin_url
+)}
+
+${_("Have more questions?  Please visit the course's About page or review some "
+"frequently asked questions in the Help Center at http://www.edx.org/student-faq.  "
+"Or, send the {platform_name} course support team a message by clicking on the Help tab "
+"that displays on all {site_url} pages.").format(
+  platform_name=settings.PLATFORM_NAME,
+  site_url=settings.SITE_NAME
+)}
+
+${_("See you soon!\n"
+"The {platform_name} Team").format(platform_name=settings.PLATFORM_NAME)}

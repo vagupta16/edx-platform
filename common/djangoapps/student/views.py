@@ -9,6 +9,8 @@ import time
 import json
 from collections import defaultdict
 from pytz import UTC
+from pytz import timezone
+import json
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -60,10 +62,11 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.course_module import CourseDescriptor
 
 from collections import namedtuple
 
-from courseware.courses import get_courses, sort_by_announcement
+from courseware.courses import get_courses, sort_by_announcement, get_course_about_section
 from courseware.access import has_access
 
 from django_comment_common.models import Role
@@ -71,7 +74,8 @@ from django_comment_common.models import Role
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 
-from bulk_email.models import Optout, CourseAuthorization
+from bulk_email.models import Optout, CourseEmailTemplate, CourseAuthorization
+from bulk_email.tasks import _get_course_email_context
 import shoppingcart
 from shoppingcart.models import DonationConfiguration
 from user_api.models import UserPreference
@@ -811,6 +815,11 @@ def change_enrollment(request, check_access=True):
             # to "honor".
             try:
                 CourseEnrollment.enroll(user, course_id, check_access=check_access)
+
+                # notify the user of the enrollment via email
+                course = modulestore().get_course(course_id)
+                if (not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')) and course.enable_enrollment_email):
+                    notify_enrollment_by_email(course, user, request)
             except Exception:
                 return HttpResponseBadRequest(_("Could not enroll"))
 
@@ -846,6 +855,36 @@ def change_enrollment(request, check_access=True):
         return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
+
+def notify_enrollment_by_email(course, user, request):
+    """
+    Updates the user about the course enrollment by email.
+
+    If the Course has already started, use post_enrollment_email
+    If the Course has not yet started, use pre_enrollment_email
+    """
+    template_name = microsite.get_value('course_email_template_name')
+    template = CourseEmailTemplate.get_template()
+    from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+
+    try:
+        # Check if the course has already started and set subject & message accordingly
+        if course.has_started():
+            subject = get_course_about_section(course, 'post_enrollment_email_subject')
+            message = get_course_about_section(course, 'post_enrollment_email')
+        else:
+            subject = get_course_about_section(course, 'pre_enrollment_email_subject')
+            message = get_course_about_section(course, 'pre_enrollment_email')
+
+        subject = ''.join(subject.splitlines())
+        email_context = _get_course_email_context(course)
+        email_context['email'] = user.email
+        message = template.render_plaintext(message, email_context)
+        user.email_user(subject, message, from_address)
+
+    except Exception:
+        log.error('Unable to send course enrollment verification email to user from "{from_address}"'.format(
+                    from_address=from_address), exc_info = True)
 
 
 # TODO: This function is kind of gnarly/hackish/etc and is only used in one location.

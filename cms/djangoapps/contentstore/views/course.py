@@ -13,11 +13,12 @@ from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
+from smtplib import SMTPException
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.date_utils import get_default_time_display
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 
-from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
@@ -35,6 +36,8 @@ from contentstore.utils import (
     add_instructor,
     initialize_permissions,
     get_lms_link_for_item,
+    get_lms_link_for_about_page,
+    course_image_url,
     add_extra_panel_tab,
     remove_extra_panel_tab,
     reverse_course_url,
@@ -58,7 +61,6 @@ from .component import (
 from contentstore.tasks import rerun_course
 from .item import create_xblock_info
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
-from contentstore import utils
 from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
 )
@@ -67,6 +69,8 @@ from course_action_state.models import CourseRerunState, CourseRerunUIStateManag
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
+from bulk_email.models import CourseEmailTemplate
+from bulk_email.tasks import _get_course_email_context
 
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
@@ -76,7 +80,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'advanced_settings_handler',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
-           'group_configurations_list_handler', 'group_configurations_detail_handler']
+           'group_configurations_list_handler', 'group_configurations_detail_handler',
+           'send_test_enrollment_email']
 
 log = logging.getLogger(__name__)
 
@@ -723,6 +728,33 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
             )
 
 
+@require_http_methods("POST")
+def send_test_enrollment_email(request, course_key_string):
+    """
+    Handles ajax request for sending test enrollment emails to the instructor
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course = modulestore().get_course(course_key)
+    user = request.user
+    subject = request.POST.get('subject')
+    subject = ''.join(subject.splitlines())
+    message = request.POST.get('message')
+
+    template_name = microsite.get_value('course_email_template_name')
+    from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+
+    template = CourseEmailTemplate.get_template()
+    email_context = _get_course_email_context(course)
+    email_context['email'] = user.email
+    message = template.render_plaintext(message, email_context)
+
+    try:
+        user.email_user(subject, message, from_address)
+    except SMTPException:
+        return HttpResponseBadRequest(_("Error while sending test email."))
+    return HttpResponse()
+
+
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "PUT", "POST"))
@@ -755,12 +787,15 @@ def settings_handler(request, course_key_string):
             return render_to_response('settings.html', {
                 'context_course': course_module,
                 'course_locator': course_key,
-                'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
-                'course_image_url': utils.course_image_url(course_module),
+                'lms_link_for_about_page': get_lms_link_for_about_page(course_key),
+                'course_image_url': course_image_url(course_module),
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
-                'upload_asset_url': upload_asset_url
+                'upload_asset_url': upload_asset_url,
+                'test_email_url': reverse_course_url('send_test_enrollment_email', course_key),
+                'default_pre_template': CourseDetails.get_default_pre_enrollment_email(),
+                'default_post_template': CourseDetails.get_default_post_enrollment_email(),
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
