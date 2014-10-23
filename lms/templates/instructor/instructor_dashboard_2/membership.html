@@ -29,20 +29,10 @@
 
 
 <script type="text/template" id="email-list-widget-template">
-  <div class="email-list-widget">
-    <div class="email-list">
-      <table>
-        <thead>
-          <tr>
-            {{#labels}}
-              <td class="label">{{.}}</td>
-            {{/labels}}
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
+    <div class="email-selection-label">{{label}}</div>
+    <select class="single-email-selector">
+          <option> ${_("Loading problem list...")} </option>
+	</select>
 </script>
 
 
@@ -244,16 +234,63 @@
 	<p>${_("Blah blah blah")}
 	  ${_("More blather.")}</p>
 	<br />
-	<div id="email-selection-label">${_("Some text")}:</div> <select id="email-selector">
-          <option> ${_("Loading problem list...")} </option>
-	</select>
-    <div class="email-list-container">
 
+    <div class="email-list-container"
+         data-label ="Select a Type"
+         data-selections="Section <> Problem">
     </div>
-  <!--div class="emails-widget-container"
-       data-endpoint="${ section_data['list_course_role_members_url'] }"
-       >
-  </div-->
+
+    <div class="email-list-container"
+         data-label ="Inclusion"
+         data-selections="Don't Include <> Include Any">
+    </div>
+
+    <div class="section_specific>
+        <div class="email-list-container"
+             data-label ="Select Section"
+             data-selections="Loading sections...">
+        </div>
+
+        <div class="email-list-container"
+         data-label ="Filter On"
+         data-selections="Has student opened <>
+                          Has student completed">
+
+        </div>
+    </div>
+
+
+    <div class="problem_specific">
+        <div class="email-list-container"
+             data-label ="Select Problem"
+             data-selections="Loading problems...">
+        </div>
+
+        <div class="email-list-container"
+         data-label ="Filter On"
+         data-selections="Has student attempted <>
+                          Has student completed <>
+                          Score <>
+                          Number of peer responses graded">
+        </div>
+    </div>
+
+
+  <div class="email-list-widget">
+    <div class="email-list">
+      <table>
+        <thead>
+          <tr>
+              <td class="label"> Type </td>
+              <td class="label"> Specification </td>
+              <td class="label"> Criteria </td>
+              <td class="label"> </td>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 
  </div>
 

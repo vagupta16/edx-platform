@@ -568,16 +568,40 @@ class AuthList
       success: (data) -> cb?(data)
       error: std_ajax_err => @$request_response_error.text gettext "Error changing user's permissions."
 
-
 class EmailWidget
-  constructor: (@$container, params={}) ->
+  constructor: (@$container, @$section, params={}) ->
+    params = _.defaults params,
+      label : $container.data 'label'
+
+
+    template_html = $("#email-list-widget-template").html()
+    @$container.html Mustache.render template_html, params
+
+    @labelArray = ($container.data 'selections').split '<>'
+    @$list_selector = @$container.find 'select.single-email-selector'
+    # populate selector
+    @$list_selector.empty()
+    for label in @labelArray
+        @$list_selector.append $ '<option/>',
+          text: label
+
+
+    # one-time first selection of top list.
+    @$list_selector.change()
+
+
+
+class EmailWidget2
+  constructor: (@$container, @$section, params={}) ->
     params = _.defaults params,
       labels: ["Type", "Specification", "Criteria",""]
 
     template_html = $("#email-list-widget-template").html()
+
     @$container.html Mustache.render template_html, params
     # clear all table rows
     clear_rows: -> @$('table tbody').empty()
+
 
     # takes a table row as an array items are inserted as text, unless detected
     # as a jquery objects in which case they are inserted directly. if an
@@ -593,6 +617,23 @@ class EmailWidget
           $td.text item
         $tr.append $td
       $tbody.append $tr
+
+    @$list_selector = @$section.find 'select#single-email-selector'
+    # populate selector
+    @$list_selector.empty()
+    @$list_selector.append $ '<option/>',
+        text: 'Section'
+    @$list_selector.append $ '<option/>',
+        text: 'Problem'
+
+
+    # one-time first selection of top list.
+    @$list_selector.change()
+
+
+
+
+
 
 
 # Membership Section
@@ -623,7 +664,7 @@ class Membership
 
     @$email_list_containers = @$section.find '.email-list-container'
     @email_lists = _.map (@$email_list_containers), (email_list_container) =>
-      new EmailWidget $(email_list_container)
+      new EmailWidget $(email_list_container), @$section
 
 
 

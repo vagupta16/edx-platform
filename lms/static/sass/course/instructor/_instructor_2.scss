@@ -537,15 +537,27 @@ section.instructor-dashboard-content-2 {
 
   .email-lists-management {
 
-    .wrapper-member-select {
+    .wrapper-email-select {
       background-color: $light-gray;
       padding: ($baseline/2);
     }
 
-    .member-lists-selector {
+    #single-email-selector {
+      width: 50%;
       display: block;
       margin: ($baseline/4) 0;
       padding: ($baseline/4);
+    }
+
+    .triple-email-selector{
+       width: 30%;
+       display: None;
+       margin: ($baseline/4) 0;
+       padding: ($baseline/4);
+    }
+
+    #triple-email-selection-label{
+      display: None;
     }
 
     .email-list-container {
@@ -582,7 +594,36 @@ section.instructor-dashboard-content-2 {
           font-size: .85em;
         }
 
-        .email-list {
+        .first_selector {
+          @include box-sizing(border-box);
+          @include border-bottom-radius(3);
+          position: relative;
+          padding: ($baseline/2);
+          margin-top: -1px;
+          border: 1px solid $light-gray;
+          background-color: #efefef;
+          box-shadow: inset #bbb 0px 1px 1px 0px;
+        }
+
+        input[type="button"].insert {
+          @include idashbutton($blue);
+          position: absolute;
+          right:$baseline/2;
+        }
+      }
+      }
+
+      .revoke {
+        color: $lighter-base-font-color;
+        cursor: pointer;
+
+        &:hover, &:focus {
+          color: $alert-color;
+        }
+      }
+
+  }
+     .email-list {
           @include box-sizing(border-box);
 
           table {
@@ -607,36 +648,6 @@ section.instructor-dashboard-content-2 {
           }
         }
 
-        .bottom-bar {
-          @include box-sizing(border-box);
-          @include border-bottom-radius(3);
-          position: relative;
-          padding: ($baseline/2);
-          margin-top: -1px;
-          border: 1px solid $light-gray;
-          background-color: #efefef;
-          box-shadow: inset #bbb 0px 1px 1px 0px;
-        }
-
-        // .add-field
-
-        input[type="button"].add {
-          @include idashbutton($blue);
-          position: absolute;
-          right: $baseline;
-        }
-      }
-
-      .revoke {
-        color: $lighter-base-font-color;
-        cursor: pointer;
-
-        &:hover, &:focus {
-          color: $alert-color;
-        }
-      }
-    }
-  }
 }
 
 
