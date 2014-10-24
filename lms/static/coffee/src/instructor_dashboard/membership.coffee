@@ -588,31 +588,40 @@ class EmailWidget
 
     @parent = @$container.parent()
     @idx = @$container.prevAll().length
-    @$list_selector.append $ '<option/>',
-      text: "hai"
+
+    #@parent.children()[0].hidden = true
+
+    @c = @$section.find('.section_specific').get(0).children[0]
 
     @$list_selector.append $ '<option/>',
-        text: 1
+        text:@c.classList
 
-    ###
+
+
     @$list_selector.change =>
       $opt = @$list_selector.children('option:selected')
       return unless $opt.length > 0
       #get the parent of this container
-      #if (@idx != @parent.children.length-1)
-      #  (@parent.children[@idx+1]).addClass 'active'
+      if (@idx != @parent.children().length-1)
+        @c = @parent.children()[@idx+1]
+        @c.classList.add("active")
+      else
+        @chosen_class = $opt.attr("class")
+        if (@chosen_class="Section")
+          @sec_child = @$section.find('.section_specific').get(0).children[0]
+          @sec_child.classList.add("active")
+        else
+          @sec_child = @$section.find('.problem_specific').get(0).children[0]
+          @sec_child.classList.add("active")
+      $container.removeClass("active")
+        #@c .addClass 'active'
 
-      @$list_selector.append $ '<option/>',
-        text: "hai"
+
       #@$container.removeClass 'active'
-      for auth_list in @auth_lists
-        auth_list.$container.removeClass 'active'
-      auth_list = $opt.data('auth_list')
-      auth_list.$container.addClass 'active'
-      auth_list.re_view()
+
 
     @$list_selector.change()
-    ###
+
 
 # Membership Section
 class Membership
