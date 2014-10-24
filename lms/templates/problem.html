@@ -18,8 +18,9 @@ from django.conf import settings
           start_time=get_time_display(start_time, coerce_tz=settings.TIME_ZONE))}
       <br />
       <b>
-      ${_("By {end_time}, you must manually click the 'Final Submit' button below!").format(
-          end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE))}
+      ${_("By {end_time}, you must manually click the '{check_button}' button below!").format(
+          end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE),
+          check_button=check_button)}
       </b>
     </p>
   </div>

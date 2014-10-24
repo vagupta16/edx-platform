@@ -646,7 +646,7 @@ class CapaMixin(CapaFields):
         problem_is_timed = self.minutes_allowed > 0
         problem_has_finished = False
         seconds_left = -1
-        end_time_to_display = None
+        end_time_to_display = now + datetime.timedelta(minutes=self.minutes_allowed)
 
 
         if problem_is_timed and self.time_started:

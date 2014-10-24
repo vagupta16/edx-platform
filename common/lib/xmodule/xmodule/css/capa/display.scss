@@ -51,15 +51,15 @@ div.problem-timer {
   padding: 7px 21px;
   z-index: 9999;
 
-  span.minutes-left {
-      color: $green;
-      font-weight: bold;
+  &.danger {
+    color: $red;
+    .minutes-left { color: $red; }
   }
-}
 
-div.problem-timer.danger {
-  color: $red;
-  .minutes-left { color: $red; }
+  .minutes-left {
+    color: $green;
+    font-weight: bold;
+  }
 }
 
 div.problem {

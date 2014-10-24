@@ -18,8 +18,9 @@ from django.conf import settings
           minutes_allowed=minutes_allowed)}
       <br />
       <b>
-      ${_("At around {end_time}, you must manually click the 'Final Submit' button below.").format(
-          end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE))}
+      ${_("At around {end_time}, you must manually click the '{check_button}' button below.").format(
+          end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE),
+          check_button=check_button)}
       </b>
     </p>
   </div>
@@ -28,6 +29,6 @@ from django.conf import settings
 <div class="problem" role="application">
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
-    <input class="start" type="button" value="${_('Start')}" />
+    <input class="start" type="button" value="${_('Start Timer')}" />
   </div>
 </div>

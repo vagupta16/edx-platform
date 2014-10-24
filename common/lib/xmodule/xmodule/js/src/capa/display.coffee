@@ -171,29 +171,35 @@ class @Problem
     start = new Date($timer.data('start'))
     end = new Date($timer.data('end'))
     secondsLeft = parseInt($timer.data('secondsLeft'), 10)
-    minutesLeft = Math.round(secondsLeft / SECONDS_IN_MINUTE)
 
-    # Activate timer to show it
     $timer.show()
+
+    getDisplayText = (s) ->
+      if s < 0
+        return "0:00"
+      else
+        min = Math.floor(s / SECONDS_IN_MINUTE)
+        sec = s % SECONDS_IN_MINUTE
+        if sec < 10
+          sec = "0" + sec
+        return "#{min}:#{sec}"
 
     # TODO i18n conversion
     # TODO check cases and sync clock periodically
     syncTimer = ->
-      minutesLeft = minutesLeft - 1
-      if minutesLeft <= 0
+      secondsLeft -= 1
+      if secondsLeft <= 0
         $timer.empty()
         $timer.text("Time has expired")
-      else if minutesLeft <= 1
-        $timer.empty()
-        $timer.text("You have less than 1 minute remaining")
       else
-        $display.text(minutesLeft)
-      if minutesLeft < 1
+        $display.text(getDisplayText(secondsLeft))
+      if secondsLeft < SECONDS_IN_MINUTE
         $timer.addClass("danger")
 
-    setInterval(syncTimer, SECONDS_IN_MINUTE * 1000)
+    # Sync every second
+    setInterval(syncTimer, 1000)
 
-    # Initialize to populate the initial timer
+    # Initialize and show timer
     syncTimer()
 
 
