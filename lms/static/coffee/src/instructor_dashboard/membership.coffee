@@ -574,6 +574,7 @@ class EmailWidget
       label : $container.data 'label'
 
 
+
     template_html = $("#email-list-widget-template").html()
     @$container.html Mustache.render template_html, params
 
@@ -581,22 +582,27 @@ class EmailWidget
     @$list_selector = @$container.find 'select.single-email-selector'
     # populate selector
     @$list_selector.empty()
-    for label in @labelArray
-        @$list_selector.append $ '<option/>',
-          text: label
+    @$list_endpoint = $container.data 'list-endpoint'
+    @$rolename = $container.data 'rolename'
+    @$list_selector.append $ '<option/>',
+          text: ""
+
+
+    if this.$container.attr('data-label')=='Select Section'
+      @b = 0
+      @c = @reload_list()
+      @a = 0
+    else if this.$container.attr('data-label')=='Select Problem'
+      @b=0
+    else
+      for label in @labelArray
+          @$list_selector.append $ '<option/>',
+            text: label
 
 
     @parent = @$container.parent()
     @idx = @$container.prevAll().length
-
-    #@parent.children()[0].hidden = true
-
     @c = @$section.find('.section_specific').get(0).children[0]
-
-    @$list_selector.append $ '<option/>',
-        text:@c.classList
-
-
 
     @$list_selector.change =>
       $opt = @$list_selector.children('option:selected')
@@ -606,8 +612,8 @@ class EmailWidget
         @c = @parent.children()[@idx+1]
         @c.classList.add("active")
       else
-        @chosen_class = $opt.attr("class")
-        if (@chosen_class="Section")
+        @chosen_class = $opt.text().trim()
+        if (@chosen_class == "Section")
           @sec_child = @$section.find('.section_specific').get(0).children[0]
           @sec_child.classList.add("active")
         else
@@ -618,9 +624,42 @@ class EmailWidget
 
 
       #@$container.removeClass 'active'
-
-
     @$list_selector.change()
+
+    # send ajax request to list members
+    # `cb` is called with cb(error, member_list)
+  get_list: (cb)->
+    $.ajax
+      dataType: 'json'
+      url: @$list_endpoint
+      data: rolename: @$rolename
+      success: (data) => cb? null, data[@$rolename]
+      error: std_ajax_err =>
+        `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
+        cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
+
+ # reload the list of members
+  reload_list: ->
+    # @clear_rows()
+    @get_list (error, member_list) =>
+      # abort on error
+      return @show_errors error unless error is null
+      # use _.each instead of 'for' so that member
+      # is bound in the button callback.
+      _.each member_list, (member) =>
+        # if there are members, show the list
+        @add_row [member.username, member.email]
+
+  add_row: (row_array) ->
+    @long = ""
+    for item in row_array
+      @long = @long.concat(item)
+
+    @$list_selector.append $ '<option/>',
+            text: @long
+
+
+
 
 
 # Membership Section

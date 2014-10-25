@@ -249,9 +249,11 @@
 
     <div class="section_specific">
         <div class="email-list-container"
+             data-rolename="staff"
              data-label ="Select Section"
-             data-selections="Loading sections...">
-        </div>
+             data-selections="Loading sections..."
+             data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+             ></div>
 
         <div class="email-list-container"
          data-label ="Filter On"
