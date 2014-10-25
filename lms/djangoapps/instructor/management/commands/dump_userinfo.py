@@ -9,12 +9,10 @@ import sys
 import tempfile
 
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth.models import User
 from pytz import UTC
 
 from certificates.models import GeneratedCertificate
 from cme_registration.models import CmeUserProfile
-from student.models import CourseEnrollment
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -23,36 +21,36 @@ from shoppingcart.models import PaidCourseRegistration
 from unidecode import unidecode
 
 PROFILE_FIELDS = [
-    ('user__profile__cmeuserprofile__last_name', 'Last Name'),
-    ('user__profile__cmeuserprofile__middle_initial', 'Middle Initial'),
-    ('user__profile__cmeuserprofile__first_name', 'First Name'),
+    ('last_name', 'Last Name'),
+    ('middle_initial', 'Middle Initial'),
+    ('first_name', 'First Name'),
     ('user__email', 'Email Address'),
-    ('user__profile__cmeuserprofile__birth_date', 'Birth Date'),
-    ('user__profile__cmeuserprofile__professional_designation', 'Professional Designation'),
-    ('user__profile__cmeuserprofile__license_number', 'Professional License Number'),
-    ('user__profile__cmeuserprofile__license_country', 'Professional License Country'),
-    ('user__profile__cmeuserprofile__license_state', 'Professional License State'),
-    ('user__profile__cmeuserprofile__physician_status', 'Physician Status'),
-    ('user__profile__cmeuserprofile__patient_population', 'Patient Population'),
-    ('user__profile__cmeuserprofile__specialty', 'Specialty'),
-    ('user__profile__cmeuserprofile__sub_specialty', 'Sub Specialty'),
-    ('user__profile__cmeuserprofile__affiliation', 'Stanford Medicine Affiliation'),
-    ('user__profile__cmeuserprofile__sub_affiliation', 'Stanford Sub Affiliation'),
-    ('user__profile__cmeuserprofile__stanford_department', 'Stanford Department'),
-    ('user__profile__cmeuserprofile__sunet_id', 'SUNet ID'),
-    ('user__profile__cmeuserprofile__other_affiliation', 'Other Affiliation'),
-    ('user__profile__cmeuserprofile__job_title_position_untracked', 'Job Title or Position'),
-    ('user__profile__cmeuserprofile__address_1', 'Address 1'),
-    ('user__profile__cmeuserprofile__address_2', 'Address 2'),
-    ('user__profile__cmeuserprofile__city_cme', 'City'),
-    ('user__profile__cmeuserprofile__state', 'State'),
-    ('user__profile__cmeuserprofile__postal_code', 'Postal Code'),
-    ('user__profile__cmeuserprofile__county_province', 'County/Province'),
-    ('user__profile__cmeuserprofile__country_cme', 'Country'),
-    ('user__profile__cmeuserprofile__phone_number_untracked', 'Phone Number'),
-    ('user__profile__cmeuserprofile__gender', 'Gender'),
-    ('user__profile__cmeuserprofile__marketing_opt_in_untracked', 'Marketing Opt-In'),
-    ('user__id', '')
+    ('birth_date', 'Birth Date'),
+    ('professional_designation', 'Professional Designation'),
+    ('license_number', 'Professional License Number'),
+    ('license_country', 'Professional License Country'),
+    ('license_state', 'Professional License State'),
+    ('physician_status', 'Physician Status'),
+    ('patient_population', 'Patient Population'),
+    ('specialty', 'Specialty'),
+    ('sub_specialty', 'Sub Specialty'),
+    ('affiliation', 'Stanford Medicine Affiliation'),
+    ('sub_affiliation', 'Stanford Sub Affiliation'),
+    ('stanford_department', 'Stanford Department'),
+    ('sunet_id', 'SUNet ID'),
+    ('other_affiliation', 'Other Affiliation'),
+    ('job_title_position_untracked', 'Job Title or Position'),
+    ('address_1', 'Address 1'),
+    ('address_2', 'Address 2'),
+    ('city_cme', 'City'),
+    ('state', 'State'),
+    ('postal_code', 'Postal Code'),
+    ('county_province', 'County/Province'),
+    ('country_cme', 'Country'),
+    ('phone_number_untracked', 'Phone Number'),
+    ('gender', 'Gender'),
+    ('marketing_opt_in_untracked', 'Marketing Opt-In'),
+    ('user_id', ''),
 ]
 
 REGISTRATION_FIELDS = [
@@ -119,18 +117,14 @@ class Command(BaseCommand):
             outfile_name = outfile.name
 
         all_fields = PROFILE_FIELDS + REGISTRATION_FIELDS + ORDER_FIELDS + CERTIFICATE_FIELDS
-
         csv_fieldnames = [label for field, label in all_fields if len(label) > 0]
+
         csvwriter = csv.DictWriter(outfile, fieldnames=csv_fieldnames, delimiter='\t', quoting=csv.QUOTE_ALL)
         csvwriter.writeheader()
 
         sys.stdout.write("Fetching enrolled students for {course}...".format(course=course_id))
 
-        cme_profiles = CourseEnrollment.objects.select_related('user__profile__cmeuserprofile').filter(course_id=course_id).values(
-            *[field for field, label in PROFILE_FIELDS if 'untracked' not in field]).order_by('user__username')
-
-        registrations = PaidCourseRegistration.objects.filter(status='purchased', course_id=course_id)
-        certificates = GeneratedCertificate.objects.filter(course_id=course_id)
+        certificates, profiles, registrations = self.query_database_for(course_id)
 
         registration_table = self.build_user_table(registrations)
         certificate_table = self.build_user_table(certificates)
@@ -138,7 +132,7 @@ class Command(BaseCommand):
         sys.stdout.write(" done.\n")
 
         count = 0
-        total = cme_profiles.count()
+        total = len(profiles)
         start = datetime.now(UTC)
 
         intervals = int(0.10 * total)
@@ -147,22 +141,19 @@ class Command(BaseCommand):
         
         sys.stdout.write("Processing users")
 
-        for cme_profile in cme_profiles:
+        for profile in profiles:
+            user_id = profile['user_id']
+            self.print_progress(count, intervals, verbose)
+
             student_dict = {
-                'Credits Issued': 0.0,
+                'Credits Issued': 23.5, #XXX should be revisited when credit count functionality implemented
                 'Credit Date': None,
-                'Certif': False,
-                'Marketing Opt-In' : True,
+                'Certif': True,
             } 
 
             for field, label in PROFILE_FIELDS:
-                try:
-                    if len(label) > 0 and 'untracked' not in field:
-                        student_dict[label] = cme_profile[field] if cme_profile[field] != None else ''
-                except KeyError:
-                    student_dict[label] = ''
-
-            user_id = cme_profile['user__id']
+                if 'untracked' not in field and len(label) > 0:
+                    student_dict[label] = profile[field]
 
             registration = self.add_fields_to(student_dict, REGISTRATION_FIELDS, registration_table, user_id)
 
@@ -171,22 +162,12 @@ class Command(BaseCommand):
 
                 #Registration order special case values
                 if student_dict['Payment Type'] == 'Visa':
-                    student_dict['Payment Type'] = "VISA"
+                    student_dict['Payment Type'] = 'VISA'
 
                 if student_dict['Payment Type'] == 'MasterCard':
-                    student_dict['Payment Type'] = "MC"
+                    student_dict['Payment Type'] = 'MC'
 
             certificate = self.add_fields_to(student_dict, CERTIFICATE_FIELDS, certificate_table, user_id)
-
-            #Certificate special case values
-            certificate_status = getattr(certificate, 'status', '')
-            student_dict['Certif'] = (certificate_status in ('downloadable', 'generating'))
-
-            #XXX should be revisited when credit count functionality implemented
-            if student_dict['Certif']:
-                student_dict['Credits Issued'] = 23.5
-            else:
-                student_dict['Credits Issued'] = 0.0
 
             for item in student_dict:
                 student_dict[item] = self.preprocess(student_dict[item])
@@ -194,20 +175,21 @@ class Command(BaseCommand):
             csvwriter.writerow(student_dict)
 
             count += 1
-            if count % intervals == 0:
-                if verbose:
-                    diff = datetime.now(UTC) - start
-                    timeleft = diff * (total - count) / intervals
-                    hours, remainder = divmod(timeleft.seconds, 3600)
-                    minutes, seconds = divmod(remainder, 60)
-                    sys.stdout.write("\n{count}/{total} completed ~{hours:02}:{minutes:02} remaining\n"
-                        .format(count=count, total=total, hours=hours, minutes=minutes))
-                    start = datetime.now(UTC)
-                else:
-                    sys.stdout.write('.')
 
         outfile.close()
         sys.stdout.write("Data written to {name}\n".format(name=outfile_name))
+
+    def query_database_for(self, course_id):
+        certificates = GeneratedCertificate.objects.filter(course_id=course_id, status__in=['downloadable', 'generating'])
+        
+        credited_user_ids = [getattr(certificate, 'user_id') for certificate in certificates]
+
+        cme_profiles = CmeUserProfile.objects.select_related('user').filter(user_id__in=credited_user_ids).values(
+            *[field for field, label in PROFILE_FIELDS if 'untracked' not in field]).order_by('user__username')
+
+        registrations = PaidCourseRegistration.objects.filter(course_id=course_id, status='purchased', user_id__in=credited_user_ids)
+
+        return certificates, cme_profiles, registrations
 
     def build_user_table(self, data_rows):
         table = {}
@@ -219,17 +201,18 @@ class Command(BaseCommand):
 
     def add_fields_to(self, values, fields, table, user_id):
         try:
-            registration = table[user_id]
+            raw_data = table[user_id]
         except KeyError:
-            registration = None
+            raw_data = None
 
         for field, label in fields:
-            if type(field) is list:
-                values[label] = ' '.join([getattr(registration, f, '') for f in field])
-            else:
-                values[label] = getattr(registration, field, '')
+            if label not in values:
+                if type(field) is list:
+                    values[label] = ' '.join([getattr(raw_data, f, '') for f in field])
+                else:
+                    values[label] = getattr(raw_data, field, '')
 
-        return registration
+        return raw_data
 
     def preprocess(self, value):
         if type(value) is datetime:
@@ -240,3 +223,15 @@ class Command(BaseCommand):
 
         return value
 
+    def print_progress(self, count, intervals, verbose):
+        if count % intervals == 0:
+            if verbose:
+                diff = datetime.now(UTC) - start
+                timeleft = diff * (total - count) / intervals
+                hours, remainder = divmod(timeleft.seconds, 3600)
+                minutes, seconds = divmod(remainder, 60)
+                sys.stdout.write("\n{count}/{total} completed ~{hours:02}:{minutes:02} remaining\n"
+                    .format(count=count, total=total, hours=hours, minutes=minutes))
+                start = datetime.now(UTC)
+            else:
+                sys.stdout.write('.')
