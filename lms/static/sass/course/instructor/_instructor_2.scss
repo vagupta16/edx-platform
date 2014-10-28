@@ -648,6 +648,18 @@ section.instructor-dashboard-content-2 {
             border-bottom: 1px solid $light-gray;
           }
 
+          .any{
+             background-color: lightcyan;
+          }
+
+          .must{
+             background-color: lightgreen;
+          }
+
+          .dont{
+             background-color: palevioletred;
+          }
+
           td {
             @extend %t-copy-sub1;
             vertical-align: middle;

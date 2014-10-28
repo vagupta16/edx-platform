@@ -23,6 +23,7 @@ from courseware.module_render import get_module
 from student.models import CourseEnrollment
 import branding
 from student.models import CourseEnrollment
+from xmodule import seq_module, vertical_module
 
 log = logging.getLogger(__name__)
 

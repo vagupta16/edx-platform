@@ -252,7 +252,7 @@
              data-rolename="staff"
              data-label ="Select Section"
              data-selections="Loading sections..."
-             data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+             data-list-endpoint="${ section_data['list_course_sections'] }"
              ></div>
 
         <div class="email-list-container"
@@ -266,8 +266,10 @@
 
     <div class="problem_specific">
         <div class="email-list-container"
+             data-rolename="staff"
              data-label ="Select Problem"
-             data-selections="Loading problems...">
+             data-selections="Loading problems..."
+             data-list-endpoint="${ section_data['list_course_problems'] }">
         </div>
 
         <div class="email-list-container"
@@ -291,7 +293,7 @@
               <td class="label"> </td>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="emailTable"></tbody>
       </table>
     </div>
   </div>

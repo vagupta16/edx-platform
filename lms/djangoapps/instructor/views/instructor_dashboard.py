@@ -253,6 +253,8 @@ def _section_membership(course_key, access):
         'modify_access_url': reverse('modify_access', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': course_key.to_deprecated_string()}),
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'list_course_sections': reverse('list_course_sections', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'list_course_problems': reverse('list_course_problems', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
     return section_data
 

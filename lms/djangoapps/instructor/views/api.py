@@ -540,6 +540,147 @@ def list_course_role_members(request, course_id):
     return JsonResponse(response_payload)
 
 
+def buildCourseTree(course):
+    courseTree = []
+    idx = 0
+    for c in course.get_children():
+        if not c.hide_from_toc:
+            using = course.children[idx]
+            courseTree.append({'display_name':c.display_name_with_default,
+                      'block_id' : using.block_id,
+                      'block_type' : using.block_type,
+                      'sub': buildCourseTree(c)})
+        idx+=1
+    return courseTree
+
+#TODO: think about caching this
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@require_query_params(rolename="'instructor', 'staff', or 'beta'")
+def list_course_tree(request, course_id):
+    """
+    List course tree
+    Requires instructor access.
+    """
+    rolename = request.GET.get('rolename')
+
+    if not rolename in ['instructor', 'staff', 'beta']:
+        return HttpResponseBadRequest()
+
+
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(
+        request.user, 'instructor', course_id, depth=None
+    )
+
+    courseTree = buildCourseTree(course)
+
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'data': courseTree
+    }
+    return JsonResponse(response_payload)
+
+
+def pruneCourseTree(courseTree, includePattern):
+    newTree = []
+    for child in courseTree:
+        if includePattern.match(child['block_type']):
+            child['sub'] = pruneCourseTree(child['sub'], includePattern)
+            newTree.append(child)
+    return newTree
+
+#just get the top two parents
+#todo: feels hacky
+def selectCourseTree(courseTree, includePattern):
+    return selectCourseTree_r(courseTree, includePattern, [], topMost=True)
+def selectCourseTree_r(courseTree, includePattern, returnContainer = None, parents = None, topMost = False):
+    if returnContainer==None:
+        returnContainer = []
+    for child in courseTree:
+        if topMost:
+            parents = []
+        subtree = child['sub']
+        del child['sub']
+        if includePattern.match(child['block_type']):
+            #don't return sub
+            child['parents'] = '/'.join(parents)
+            returnContainer.append(child)
+        if len(parents) < 2:
+            parents.append(child['display_name'])
+        selectCourseTree_r(subtree, includePattern, returnContainer, parents)
+    return returnContainer
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@require_query_params(rolename="'instructor', 'staff', or 'beta'")
+def list_course_sections(request, course_id):
+    """
+    List instructors and staff.
+    Requires instructor access.
+
+    rolename is one of ['instructor', 'staff', 'beta']
+
+    """
+    rolename = request.GET.get('rolename')
+
+    if not rolename in ['instructor', 'staff', 'beta']:
+        return HttpResponseBadRequest()
+
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(
+        request.user, 'instructor', course_id, depth=None
+    )
+
+    courseTree = buildCourseTree(course)
+    includePattern = re.compile('chapter|sequential')
+    sectionTree = pruneCourseTree(courseTree, includePattern)
+
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'data': sectionTree
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@require_query_params(rolename="'instructor', 'staff', or 'beta'")
+def list_course_problems(request, course_id):
+    """
+    List instructors and staff.
+    Requires instructor access.
+
+    rolename is one of ['instructor', 'staff', 'beta']
+
+    """
+    rolename = request.GET.get('rolename')
+
+    if not rolename in ['instructor', 'staff', 'beta']:
+        return HttpResponseBadRequest()
+
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(
+        request.user, 'instructor', course_id, depth=None
+    )
+
+    courseTree = buildCourseTree(course)
+    includePattern = re.compile('problem')
+    problemList = selectCourseTree(courseTree, includePattern)
+
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'data': problemList
+    }
+    return JsonResponse(response_payload)
+
+
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')

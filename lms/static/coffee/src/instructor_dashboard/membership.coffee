@@ -573,10 +573,9 @@ class EmailWidget
     params = _.defaults params,
       label : $container.data 'label'
 
-
-
     template_html = $("#email-list-widget-template").html()
     @$container.html Mustache.render template_html, params
+    @cur_row = 0
 
     @labelArray = ($container.data 'selections').split '<>'
     @$list_selector = @$container.find 'select.single-email-selector'
@@ -589,11 +588,9 @@ class EmailWidget
 
 
     if this.$container.attr('data-label')=='Select Section'
-      @b = 0
-      @c = @reload_list()
-      @a = 0
+      @reload_list()
     else if this.$container.attr('data-label')=='Select Problem'
-      @b=0
+      @reload_list()
     else
       for label in @labelArray
           @$list_selector.append $ '<option/>',
@@ -607,19 +604,33 @@ class EmailWidget
     @$list_selector.change =>
       $opt = @$list_selector.children('option:selected')
       return unless $opt.length > 0
+      if this.$container.attr('data-label')=="Inclusion"
+        @chosen = $opt.text().trim()
+        if @chosen !=""
+          if @chosen=="Must Include"
+            @start_row("must")
+          else if @chosen=="Don't Include"
+            @start_row("dont")
+          else
+            @start_row("any")
       #get the parent of this container
       if (@idx != @parent.children().length-1)
         @c = @parent.children()[@idx+1]
         @c.classList.add("active")
       else
-        @chosen_class = $opt.text().trim()
-        if (@chosen_class == "Section")
-          @sec_child = @$section.find('.section_specific').get(0).children[0]
-          @sec_child.classList.add("active")
+        if (@parent.attr('class')=="beginning_specific")
+          @chosen_class = $opt.text().trim()
+          if (@chosen_class == "Section")
+            @sec_child = @$section.find('.section_specific').get(0).children[0]
+            @sec_child.classList.add("active")
+          else
+            @sec_child = @$section.find('.problem_specific').get(0).children[0]
+            @sec_child.classList.add("active")
         else
-          @sec_child = @$section.find('.problem_specific').get(0).children[0]
-          @sec_child.classList.add("active")
+            @sec_child = @$section.find('.beginning_specific').get(0).children[0]
+            @sec_child.classList.add("active")
       $container.removeClass("active")
+      @$list_selector.prop('selectedIndex',0);
         #@c .addClass 'active'
 
 
@@ -632,8 +643,8 @@ class EmailWidget
     $.ajax
       dataType: 'json'
       url: @$list_endpoint
-      data: rolename: @$rolename
-      success: (data) => cb? null, data[@$rolename]
+      data: rolename: 'instructor'
+      success: (data) => cb? null, data['data']
       error: std_ajax_err =>
         `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
         cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
@@ -641,23 +652,53 @@ class EmailWidget
  # reload the list of members
   reload_list: ->
     # @clear_rows()
-    @get_list (error, member_list) =>
+    @get_list (error, section_list) =>
       # abort on error
       return @show_errors error unless error is null
       # use _.each instead of 'for' so that member
       # is bound in the button callback.
-      _.each member_list, (member) =>
+      _.each section_list, (section) =>
         # if there are members, show the list
-        @add_row [member.username, member.email]
+        #@add_row([section.display_name], "section")
+        @add_row( section, "section")
+        _.each section.sub, (subsection) =>
+          @add_row(subsection , "subsection")
 
-  add_row: (row_array) ->
-    @long = ""
-    for item in row_array
-      @long = @long.concat(item)
 
+  add_row: (node, useClass) ->
+    @idArr = [node.block_type, node.block_id]
+    @idSt = @idArr.join("/")
+    @toDisplay = node.display_name
+    if node.parents
+      @toDisplay = [node.parents,@toDisplay].join("<>")
     @$list_selector.append $ '<option/>',
-            text: @long
+            text: @toDisplay
+            class: useClass
+            id : @idSt
 
+
+  start_row: (color) ->
+    $tbody = $( "#emailTable" )
+    $tr = $ '<tr>',
+       class: color
+    for num in [1..3]
+      $td = $ '<td>',
+        text : "Some text goes here"
+      $tr.append $td
+    $tbody.append $tr
+    ###
+       add_row: (row_array) ->
+    $tbody = @$('table tbody')
+    $tr = $ '<tr>'
+    for item in row_array
+      $td = $ '<td>'
+      if item instanceof jQuery
+        $td.append item
+      else
+        $td.text item
+      $tr.append $td
+    $tbody.append $tr
+    ###
 
 
 
