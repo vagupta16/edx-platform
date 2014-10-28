@@ -43,4 +43,4 @@
 
 # TODO: CHANGE THIS!
 # This SHA will change when the XBlock itself merges.
--e git+https://github.com/Stanford-Online/xblock-factory.git@ac9c9c65e50d98b1c7cab4c23f648308f50b297f#egg=image-modal
+-e git+https://github.com/Stanford-Online/xblock-factory.git@ac9c9c65e50d98b1c7cab4c23f648308f50b297f#egg=xblock_image_modal-image-modal
