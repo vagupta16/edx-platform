@@ -10,7 +10,6 @@ from datetime import datetime
 from io import BytesIO
 from pytz import UTC
 import json
-import os
 from django.conf import settings
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
@@ -25,7 +24,7 @@ import mock
 from ddt import ddt
 from ddt import data
 
-MAX_FILE_SIZE= settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000**2
+MAX_FILE_SIZE = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000 ** 2
 
 class AssetsTestCase(CourseTestCase):
     """
@@ -36,10 +35,12 @@ class AssetsTestCase(CourseTestCase):
         self.url = reverse_course_url('assets_handler', self.course.id)
 
     def upload_asset(self, name="asset-1"):
+        """Uploads in-memory file with the given name to assets"""
         f = self.get_sample_asset(name)
         return self.client.post(self.url, {"name": name, "file": f})
 
     def get_sample_asset(self, name):
+        """Returns an in-memory file with the given name for testing"""
         f = BytesIO(name)
         f.name = name + ".txt"
         return f
@@ -145,9 +146,9 @@ class UploadTestCase(AssetsTestCase):
         self.assertEquals(resp.status_code, 400)
 
     @data(
-      (int(MAX_FILE_SIZE / 2.0), "small.file.test", 200),
-      (MAX_FILE_SIZE, "justequals.file.test", 200),
-      (MAX_FILE_SIZE + 90, "large.file.test", 413),
+        (int(MAX_FILE_SIZE / 2.0), "small.file.test", 200),
+        (MAX_FILE_SIZE, "justequals.file.test", 200),
+        (MAX_FILE_SIZE + 90, "large.file.test", 413),
     )
     @mock.patch('contentstore.views.assets.get_file_size')
     def test_file_size(self, case, get_file_size):
@@ -161,6 +162,7 @@ class UploadTestCase(AssetsTestCase):
             "file": f
         })
         self.assertEquals(resp.status_code, status_code)
+
 
 class AssetToJsonTestCase(AssetsTestCase):
     """

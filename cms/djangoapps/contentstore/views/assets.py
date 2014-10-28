@@ -155,12 +155,12 @@ def _get_assets_for_page(request, course_key, current_page, page_size, sort):
     )
 
 
-def get_file_size(file):
-    '''
+def get_file_size(upload_file):
+    """
     Helper method for getting file size of an upload file.
     Can be used for mocking test file sizes.
-    '''
-    return file.size
+    """
+    return upload_file.size
 
 
 @require_POST
@@ -194,17 +194,17 @@ def _upload_asset(request, course_key):
     # the front-end may batch large file uploads in smaller chunks,
     # we validate the file-size on the front-end in addition to
     # validating on the backend. (see cms/static/js/views/assets.js)
-    max_file_size_in_bytes = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000**2
+    max_file_size_in_bytes = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000 ** 2
     if size > max_file_size_in_bytes:
         return JsonResponse({
-            'error': _('File {filename} exceeds maximum size of '
-                '{size_in_mb} MB. Please follow the instructions here '
+            'error': _(
+                'File {filename} exceeds maximum size of '
+                '{size_mb} MB. Please follow the instructions here '
                 'to upload a file elsewhere and link to it instead: '
                 '{faq_url}').format(
                     filename=filename,
-                    size_in_mb=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
-                    faq_url=settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
-            )
+                    size_mb=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
+                    faq_url=settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,)
         }, status=413)
 
     content_loc = StaticContent.compute_location(course_key, filename)
