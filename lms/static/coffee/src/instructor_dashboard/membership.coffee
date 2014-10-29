@@ -575,7 +575,8 @@ class EmailWidget
 
     template_html = $("#email-list-widget-template").html()
     @$container.html Mustache.render template_html, params
-    @cur_row = 0
+    @cur_column = 0
+    @$table = $( "#emailTable" )
 
     @labelArray = ($container.data 'selections').split '<>'
     @$list_selector = @$container.find 'select.single-email-selector'
@@ -617,18 +618,23 @@ class EmailWidget
       if (@idx != @parent.children().length-1)
         @c = @parent.children()[@idx+1]
         @c.classList.add("active")
+        if this.$container.attr('data-label') !="Inclusion"
+          @set_cell($opt.text().trim(),1, $opt.attr('id'))
       else
         if (@parent.attr('class')=="beginning_specific")
           @chosen_class = $opt.text().trim()
           if (@chosen_class == "Section")
             @sec_child = @$section.find('.section_specific').get(0).children[0]
             @sec_child.classList.add("active")
+            @set_cell($opt.text().trim() ,0,"")
           else
             @sec_child = @$section.find('.problem_specific').get(0).children[0]
             @sec_child.classList.add("active")
+            @set_cell($opt.text().trim() ,0,"")
         else
             @sec_child = @$section.find('.beginning_specific').get(0).children[0]
             @sec_child.classList.add("active")
+            @set_cell($opt.text().trim() ,2,"")
       $container.removeClass("active")
       @$list_selector.prop('selectedIndex',0);
         #@c .addClass 'active'
@@ -676,14 +682,28 @@ class EmailWidget
             class: useClass
             id : @idSt
 
-
-  start_row: (color) ->
+  set_cell: (text, colNumber,tableid) ->
     $tbody = $( "#emailTable" )
+    rowNumber = $tbody[0].children.length
+    cell = $(["#emailtable",rowNumber, colNumber].join("-"))
+    if cell.length>0
+      cell[0].innerHTML = text
+      if tableid !=""
+        cell[0].id = tableid
+    #cell[0].text = text
+
+
+  start_row: (color, colNumber) ->
+    $tbody = $( "#emailTable" )
+    numRows = $tbody[0].children.length
     $tr = $ '<tr>',
        class: color
-    for num in [1..3]
+    @id = 0
+    for num in [1..4]
       $td = $ '<td>',
-        text : "Some text goes here"
+        text : ""
+        id : ["emailtable",numRows+1, @id].join("-")
+      @id = @id+1
       $tr.append $td
     $tbody.append $tr
     ###

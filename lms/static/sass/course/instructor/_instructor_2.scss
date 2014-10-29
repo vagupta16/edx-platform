@@ -614,12 +614,6 @@ section.instructor-dashboard-content-2 {
           background-color: #efefef;
           box-shadow: inset #bbb 0px 1px 1px 0px;
         }
-
-        input[type="button"].insert {
-          @include idashbutton($blue);
-          position: absolute;
-          right:$baseline/2;
-        }
       }
       }
 
@@ -649,15 +643,15 @@ section.instructor-dashboard-content-2 {
           }
 
           .any{
-             background-color: lightcyan;
+             background-color: lightgrey;
           }
 
           .must{
-             background-color: lightgreen;
+             background-color: dodgerblue;
           }
 
           .dont{
-             background-color: palevioletred;
+             background-color: mediumvioletred;
           }
 
           td {
@@ -668,6 +662,27 @@ section.instructor-dashboard-content-2 {
             border-left:  1px solid $light-gray;
             border-right: 1px solid $light-gray;
           }
+
+         .estimated{
+           color:dodgerblue;
+         }
+
+        .bottom-email {
+          @include box-sizing(border-box);
+          @include border-bottom-radius(3);
+          position: relative;
+          padding: ($baseline/2);
+          margin-top: -1px;
+          border: 1px solid $light-gray;
+          background-color: #efefef;
+          box-shadow: inset #bbb 0px 1px 1px 0px;
+        }
+
+       input[type="button"].getcsv {
+          @include idashbutton($blue);
+          position: absolute;
+          right: $baseline;
+        }
         }
 
 }

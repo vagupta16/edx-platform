@@ -73,7 +73,6 @@
       </p>
     </div>
   </div>
-
   <div>
     <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" data-action="enroll" >
     <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" data-action="unenroll" >
@@ -290,11 +289,17 @@
               <td class="label"> Type </td>
               <td class="label"> Specification </td>
               <td class="label"> Criteria </td>
-              <td class="label"> </td>
+              <td class="label"> Delete (todo)</td>
           </tr>
         </thead>
         <tbody id="emailTable"></tbody>
       </table>
+      <br/>
+      <div class="bottom-email">
+          <div id="estimated">Estimated number</div>
+          <input type="button" name="getcsv" class="getcsv" value="Get CSV">
+      </div>
+
     </div>
   </div>
 
