@@ -583,6 +583,27 @@ def list_course_tree(request, course_id):
     return JsonResponse(response_payload)
 
 
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@require_query_params(rolename="'instructor', 'staff', or 'beta'")
+def get_student_data(request, course_id):
+    rolename = request.GET.get('rolename')
+    queries = request.GET.get('queries')
+    data = ["abc@edx.org", "def@edx.org"]
+
+    #warning possible code injection
+    #luckily we only look up things we recognize
+    queries = eval(request.GET.get('queries'))
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'data': data
+    }
+
+    return  JsonResponse(response_payload)
+
+
 def pruneCourseTree(courseTree, includePattern):
     newTree = []
     for child in courseTree:
@@ -590,6 +611,7 @@ def pruneCourseTree(courseTree, includePattern):
             child['sub'] = pruneCourseTree(child['sub'], includePattern)
             newTree.append(child)
     return newTree
+
 
 #just get the top two parents
 #todo: feels hacky

@@ -573,6 +573,8 @@ class EmailWidget
     params = _.defaults params,
       label : $container.data 'label'
 
+    $containers = @$section.find '.email-lists-management'
+    @$query_endpoint = $containers.data 'query-endpoint'
     template_html = $("#email-list-widget-template").html()
     @$container.html Mustache.render template_html, params
     @cur_column = 0
@@ -635,6 +637,7 @@ class EmailWidget
             @sec_child = @$section.find('.beginning_specific').get(0).children[0]
             @sec_child.classList.add("active")
             @set_cell($opt.text().trim() ,2,"")
+            @reload_students()
       $container.removeClass("active")
       @$list_selector.prop('selectedIndex',0);
         #@c .addClass 'active'
@@ -642,6 +645,44 @@ class EmailWidget
 
       #@$container.removeClass 'active'
     @$list_selector.change()
+
+
+  get_students: (cb)->
+    tab = $("#emailTable")
+    b = []
+    rows = tab.find("tr")
+    _.each rows, (row) =>
+      type = row.classList[0]
+      problems = []
+      children = row.children
+      _.each children, (child) =>
+        id = child.id
+        html = child.innerHTML
+        problems.push({"id":id, "text":html})
+      b.push([type, problems])
+    send_data =
+      rolename: 'instructor'
+      queries: JSON.stringify(b)
+    $.ajax
+      dataType: 'json'
+      url: @$query_endpoint
+      data: send_data
+      success: (data) => cb? null, data['data']
+      error: std_ajax_err =>
+        `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
+        cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
+
+ # reload the list of members
+  reload_students: ->
+    # @clear_rows()
+    @get_students (error, students_list) =>
+      # abort on error
+      return @show_errors error unless error is null
+      # use _.each instead of 'for' so that member
+      # is bound in the button callback.
+      $number_students = students_list.length
+      $("#estimated")[0].innerHTML= $number_students+" students selected"
+
 
     # send ajax request to list members
     # `cb` is called with cb(error, member_list)
