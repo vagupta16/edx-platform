@@ -587,21 +587,30 @@ def list_course_tree(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @require_query_params(rolename="'instructor', 'staff', or 'beta'")
-def get_student_data(request, course_id):
+def get_student_data(request, course_id, csv=False):
     rolename = request.GET.get('rolename')
     queries = request.GET.get('queries')
-    data = ["abc@edx.org", "def@edx.org"]
+    if not queries==None:
+        queries = eval(queries)
+        data = ["abc@edx.org"]*len(queries)
+    else:
+        data = []
+        queries = []
 
     #warning possible code injection
     #luckily we only look up things we recognize
-    queries = eval(request.GET.get('queries'))
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    response_payload = {
-        'course_id': course_id.to_deprecated_string(),
-        'data': data
-    }
 
-    return  JsonResponse(response_payload)
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    if not csv:
+        response_payload = {
+            'course_id': course_id.to_deprecated_string(),
+            'data': data
+        }
+        return  JsonResponse(response_payload)
+    else:
+        return instructor_analytics.csvs.create_csv_response("blahblah.csv", ["emails"], [[item] for item in data])
+
+
 
 
 def pruneCourseTree(courseTree, includePattern):

@@ -798,6 +798,28 @@ class Membership
     for email_list in @email_lists
       email_list.$container.removeClass 'active'
     @email_lists[0].$container.addClass 'active'
+    @$email_csv_btn = @$section.find("input[name='getcsv']'")
+    @$email_csv_btn.click (e) =>
+      tab = $("#emailTable")
+      b = []
+      rows = tab.find("tr")
+      _.each rows, (row) =>
+        type = row.classList[0]
+        problems = []
+        children = row.children
+        _.each children, (child) =>
+          id = child.id
+          html = child.innerHTML
+          problems.push({"id":id, "text":html})
+        b.push([type, problems])
+      url = @$email_csv_btn.data 'endpoint'
+      # handle csv special case
+      # redirect the document to the csv file.
+      url += '/csv'
+      url += "?rolename=instructor"
+      url += "&queries="+ encodeURIComponent(JSON.stringify(b))
+      location.href = url
+
 
 
     # populate selector
