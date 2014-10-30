@@ -644,7 +644,7 @@ class EmailWidget
 
 
       #@$container.removeClass 'active'
-    @$list_selector.change()
+    #@$list_selector.change()
 
 
   get_students: (cb)->

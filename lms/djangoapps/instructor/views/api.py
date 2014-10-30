@@ -82,7 +82,10 @@ from .tools import (
     add_block_ids,
 )
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys import InvalidKeyError
+import data_access
+from data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, QUERY_KEYS
 
 log = logging.getLogger(__name__)
 
@@ -582,6 +585,41 @@ def list_course_tree(request, course_id):
     }
     return JsonResponse(response_payload)
 
+def processQuery(courseId, query):
+    queryIncl = query[0]
+    if queryIncl=="must":
+        queryIncl = INCLUSION.AND
+    elif queryIncl=="dont":
+        queryIncl = INCLUSION.NOT
+    else:
+        queryIncl = INCLUSION.OR
+    queryProps = query[1]
+    queryType = queryProps[0]['text'].lower().strip()
+    queryId = queryProps[1]['id']
+    block_type, block_id = queryId.split("/")
+    queryId = courseId.make_usage_key(block_type, block_id)
+    queryFiltering = queryProps[2]['text'].lower().strip()
+
+    if queryType=="section":
+        queryType = QUERY_TYPE.SECTION
+        if queryFiltering =="has student opened":
+            queryFiltering=SECTION_FILTERS.OPENED
+        elif queryFiltering == "has student completed":
+            queryFiltering = SECTION_FILTERS.COMPLETED
+    else:
+        queryType = QUERY_TYPE.PROBLEM
+        if queryFiltering =="has student opened":
+            queryFiltering=PROBLEM_FILTERS.OPENED
+        elif queryFiltering == "has student completed":
+            queryFiltering = PROBLEM_FILTERS.COMPLETED
+        elif queryFiltering== "score":
+            queryFiltering = PROBLEM_FILTERS.SCORE
+        elif queryFiltering == "number of peer responses graded":
+            queryFiltering = PROBLEM_FILTERS.NUMBER_PEER_GRADED
+    return {QUERY_KEYS.TYPE:queryType,
+            QUERY_KEYS.INCLUSION: queryIncl,
+            QUERY_KEYS.ID: queryId,
+            QUERY_KEYS.FILTER: queryFiltering}
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -597,10 +635,17 @@ def get_student_data(request, course_id, csv=False):
         data = []
         queries = []
 
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     #warning possible code injection
     #luckily we only look up things we recognize
+    processedQueries = []
+    for query in queries:
+        processed = processQuery(course_id, query)
+        processedQueries.append(processed)
 
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    data = data_access.get_users(course_id, processedQueries)
+
+
     if not csv:
         response_payload = {
             'course_id': course_id.to_deprecated_string(),
