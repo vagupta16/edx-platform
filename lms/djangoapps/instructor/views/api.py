@@ -85,7 +85,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys import InvalidKeyError
 import data_access
-from data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, QUERY_KEYS
+from data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query
 
 log = logging.getLogger(__name__)
 
@@ -616,10 +616,9 @@ def processQuery(courseId, query):
             queryFiltering = PROBLEM_FILTERS.SCORE
         elif queryFiltering == "number of peer responses graded":
             queryFiltering = PROBLEM_FILTERS.NUMBER_PEER_GRADED
-    return {QUERY_KEYS.TYPE:queryType,
-            QUERY_KEYS.INCLUSION: queryIncl,
-            QUERY_KEYS.ID: queryId,
-            QUERY_KEYS.FILTER: queryFiltering}
+
+
+    return Query(queryType, queryIncl, queryId, queryFiltering)
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -630,9 +629,7 @@ def get_student_data(request, course_id, csv=False):
     queries = request.GET.get('queries')
     if not queries==None:
         queries = eval(queries)
-        data = ["abc@edx.org"]*len(queries)
     else:
-        data = []
         queries = []
 
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
@@ -645,15 +642,16 @@ def get_student_data(request, course_id, csv=False):
 
     data = data_access.get_users(course_id, processedQueries)
 
+    emails = [pair[1] for pair in data]
 
     if not csv:
         response_payload = {
             'course_id': course_id.to_deprecated_string(),
-            'data': data
+            'data': emails
         }
         return  JsonResponse(response_payload)
     else:
-        return instructor_analytics.csvs.create_csv_response("blahblah.csv", ["emails"], [[item] for item in data])
+        return instructor_analytics.csvs.create_csv_response("blahblah.csv", ["emails"], [[item] for item in emails])
 
 
 
