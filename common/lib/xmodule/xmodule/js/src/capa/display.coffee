@@ -164,44 +164,64 @@ class @Problem
             @setupTimer()
 
   setupTimer: =>
-    SECONDS_IN_MINUTE = 60
+    @$timer = @el.find('.problem-timer')
+    @$display = @el.find('.minutes-left')
+    @seconds_left = parseInt(@$timer.data('secondsLeft'), 10)
+    @seconds_before_warning = 60 * parseInt(@$timer.data('minutesBeforeWarning'), 10)
+    @submitted_before_time_expired = false
 
-    $timer = @el.find('.problem-timer')
-    $display = @el.find('.minutes-left')
-    start = new Date($timer.data('start'))
-    end = new Date($timer.data('end'))
-    secondsLeft = parseInt($timer.data('secondsLeft'), 10)
+    # The timer is initially hidden by CSS 
+    @$timer.show()
 
-    $timer.show()
-
-    getDisplayText = (s) ->
-      if s < 0
-        return "0:00"
-      else
-        min = Math.floor(s / SECONDS_IN_MINUTE)
-        sec = s % SECONDS_IN_MINUTE
-        if sec < 10
-          sec = "0" + sec
-        return "#{min}:#{sec}"
-
-    # TODO i18n conversion
-    # TODO check cases and sync clock periodically
-    syncTimer = ->
-      secondsLeft -= 1
-      if secondsLeft <= 0
-        $timer.empty()
-        $timer.text("Time has expired")
-      else
-        $display.text(getDisplayText(secondsLeft))
-      if secondsLeft < SECONDS_IN_MINUTE
-        $timer.addClass("danger")
+    # Clear old timers, eg. if we press the submit button
+    if @timer_id 
+      clearInterval(@timer_id)
 
     # Sync every second
-    setInterval(syncTimer, 1000)
+    @timer_id = setInterval(@syncTimer, 1000)
 
     # Initialize and show timer
-    syncTimer()
+    @syncTimer()
 
+  # TODO i18n conversion
+  # TODO check cases and sync clock periodically
+  syncTimer: =>
+    @seconds_left -= 1
+    if @seconds_left < @seconds_before_warning 
+      @showTimerWarning()
+
+    if @submitted_before_time_expired
+      @$timer
+        .removeClass("danger")
+        .text("Submitted.")
+
+    if @seconds_left <= 0
+      if not @submitted_before_time_expired
+        @$timer
+          .addClass("danger")
+          .text("Timer has expired")
+      clearInterval(@timer_id)
+    else
+      @$display.text(@getDisplayText())
+
+  showTimerWarning: =>
+    if @$timer.length < 2
+      $clone = @el.find('.problem-timer').clone()
+      @el.find('.problem').after($clone.get(0))
+      # Re-find cached jQuery objects
+      @$timer = @el.find('.problem-timer')
+      @$display = @el.find('.minutes-left')
+      @$timer.addClass('danger')
+
+  getDisplayText: =>
+    s = @seconds_left
+    if s < 0
+      return "0:00"
+    min = Math.floor(s / 60)
+    sec = s % 60
+    if sec < 10
+      sec = "0" + sec
+    return "#{min}:#{sec}"
 
   setupInputTypes: =>
     @inputtypeDisplays = {}
@@ -365,6 +385,11 @@ class @Problem
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
     ).always(@enableCheckButtonAfterResponse)
+
+    # For timed exams, check that we've submitted before
+    # time has expired, and then tick down timer to 0
+    if @seconds_left > 0 
+      @submitted_before_time_expired = true
 
   reset: =>
     Logger.log 'problem_reset', @answers
