@@ -651,7 +651,8 @@ def get_student_data(request, course_id, csv=False):
         }
         return  JsonResponse(response_payload)
     else:
-        return instructor_analytics.csvs.create_csv_response("blahblah.csv", ["emails"], [[item] for item in emails])
+        filename =  time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
+        return instructor_analytics.csvs.create_csv_response(filename, ["emails"], [[item] for item in emails])
 
 
 

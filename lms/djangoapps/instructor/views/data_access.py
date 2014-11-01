@@ -38,15 +38,26 @@ def get_problem_users(course_id, queries):
     for query in queries:
         querySpecific = set()
         #query for people that have interacted with the section
-        qresults = open_query(query)
+        if query.filter==PROBLEM_FILTERS.OPENED:
+            qresults = open_query(query)
+        elif query.filter==PROBLEM_FILTERS.COMPLETED:
+            qresults = completed_query(query)
         results.mergeIn(qresults)
     return results
 
+def completed_query(query):
+    queryset = StudentModule.objects.filter(module_state_key=query.id).filter(~Q(grade=None))
+    return processResults(query, queryset)
+
 
 def open_query(query):
+    queryset = StudentModule.objects.filter(module_state_key=query.id)
+    return processResults(query, queryset)
+
+
+def processResults(query, queryset):
     results = QueryResults()
     querySpecific = set()
-    queryset = StudentModule.objects.filter(module_state_key=query.id)
     if query.filter==SECTION_FILTERS.OPENED:
         for row in queryset:
             student = row.student

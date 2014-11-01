@@ -616,16 +616,6 @@ section.instructor-dashboard-content-2 {
         }
       }
       }
-
-      .revoke {
-        color: $lighter-base-font-color;
-        cursor: pointer;
-
-        &:hover, &:focus {
-          color: $alert-color;
-        }
-      }
-
   }
      .email-list {
           @include box-sizing(border-box);
@@ -654,6 +644,15 @@ section.instructor-dashboard-content-2 {
              background-color: mediumvioletred;
           }
 
+         .remove {
+          color: $lighter-base-font-color;
+          cursor: pointer;
+
+          &:hover, &:focus {
+            color: $alert-color;
+          }
+         }
+
           td {
             @extend %t-copy-sub1;
             vertical-align: middle;
@@ -663,8 +662,13 @@ section.instructor-dashboard-content-2 {
             border-right: 1px solid $light-gray;
           }
 
-         .estimated{
+
+         #estimated{
            color:dodgerblue;
+         }
+
+         .subsection{
+            text-indent: 10px;
          }
 
         .bottom-email {
