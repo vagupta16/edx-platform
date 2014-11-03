@@ -619,19 +619,20 @@ class EmailWidget
           $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"}),
             class: 'remove'
 
-          $revoke_btn.click =>
-            b = c
-
           @set_cell($revoke_btn[0].outerHTML,3,"")
           $('.remove').click =>
             rowIdx = event.target.parentElement.parentElement.rowIndex
-            $("#emailTable")[0].deleteRow(rowIdx-1);
+            totalRows =$("#emailTable")[0].rows.length
+            #$("#emailTable")[0].deleteRow(rowIdx-1);
+            event.target.parentElement.parentElement.remove()
             @reload_students()
-            $(".email-list-container").removeClass('active')
-            @sec_child = @$section.find('.beginning_specific').get(0).children[0]
-            @sec_child.classList.add("active")
-            @$list_selector.prop('selectedIndex',0);
-            @reload_students()
+            #reset selection if we're deleting the last row
+            if (rowIdx == totalRows)
+              $(".email-list-container").removeClass('active')
+              @sec_child = @$section.find('.beginning_specific').get(0).children[0]
+              @sec_child.classList.add("active")
+              @$list_selector.prop('selectedIndex',0);
+              @reload_students()
 
 
       #get the parent of this container
@@ -746,12 +747,16 @@ class EmailWidget
 
   set_cell: (text, colNumber,cellid) ->
     $tbody = $( "#emailTable" )
-    rowNumber = $tbody[0].children.length
-    cell = $(["#emailtable",rowNumber, colNumber].join("-"))
-    if cell.length>0
-      cell[0].innerHTML = text
+    rows = $("#emailTable")[0].rows
+    rowNumber = rows.length
+    cell = rows[rows.length-1].children[colNumber]
+    #rowNumber = $tbody[0].children.length
+
+    #cell = $(["#emailtable",rowNumber, colNumber].join("-"))
+    if cell
+      cell.innerHTML = text
       if cellid !=""
-        cell[0].id = cellid
+        cell.id = cellid
 
   start_row: (color, colNumber) ->
     $tbody = $( "#emailTable" )
@@ -762,8 +767,9 @@ class EmailWidget
     for num in [1..4]
       $td = $ '<td>',
         text : ""
-        id : ["emailtable",numRows+1, @id].join("-")
-      @id = @id+1
+        #id is not useful anymore because we can delete rows
+        #id : ["emailtable",numRows+1, @id].join("-")
+      #@id = @id+1
       $tr.append $td
     $tbody.append $tr
     ###

@@ -596,7 +596,11 @@ def processQuery(courseId, query):
     queryProps = query[1]
     queryType = queryProps[0]['text'].lower().strip()
     queryId = queryProps[1]['id']
-    block_type, block_id = queryId.split("/")
+    blocks = queryId.split("/")
+    if len(blocks) !=2:
+        return
+    else:
+        block_type, block_id = blocks
     queryId = courseId.make_usage_key(block_type, block_id)
     queryFiltering = queryProps[2]['text'].lower().strip()
 
@@ -638,6 +642,9 @@ def get_student_data(request, course_id, csv=False):
     processedQueries = []
     for query in queries:
         processed = processQuery(course_id, query)
+        #error if None is returned
+        if processed==None:
+            continue
         processedQueries.append(processed)
 
     data = data_access.get_users(course_id, processedQueries)
