@@ -36,13 +36,15 @@ def get_section_users(course_id, queries):
 def get_problem_users(course_id, queries):
     results = QueryResults()
     for query in queries:
+        qresults = None
         querySpecific = set()
         #query for people that have interacted with the section
         if query.filter==PROBLEM_FILTERS.OPENED:
             qresults = open_query(query)
         elif query.filter==PROBLEM_FILTERS.COMPLETED:
             qresults = completed_query(query)
-        results.mergeIn(qresults)
+        if qresults:
+            results.mergeIn(qresults)
     return results
 
 def completed_query(query):

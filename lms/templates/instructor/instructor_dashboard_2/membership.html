@@ -232,8 +232,11 @@
     <div class="email-widget">
       <div class="header">
 	<h2 class="title"> ${_("Email Distribution")} </h2>
+    <label for="beginning_specific">
+    Select criteria on which to generate a list of student emails
+    </label>
+    <br/>
     <div class="beginning_specific">
-
         <div class="email-list-container"
              data-label ="Inclusion"
              data-selections="Must Include <> Don't Include <> Include Any">
@@ -273,9 +276,7 @@
         <div class="email-list-container"
          data-label ="Filter On"
          data-selections="Has student opened <>
-                          Has student completed <>
-                          Score <>
-                          Number of peer responses graded">
+                          Has student completed ">
         </div>
     </div>
 
@@ -299,6 +300,20 @@
           <input type="button" name="getcsv" class="getcsv" value="Get CSV" data-endpoint="${ section_data['get_student_data'] }" data-csv="true">
 
       </div>
+        <h3>Example:</h3>
+        <div> MUST INCLUDE, Problem 1, OPENED </div>
+        <div> DON'T INCLUDE, Problem 1, COMPLETED</div>
+        <div> INCLUDE ANY, Problem 2, OPENED</div>
+        <br/>
+        <div>Returns: Students who have not opened but not completed problem 1 and
+            students who have opened problem 2. <br/><br/>
+            <i>MUST INCLUDE</i> and <i>DON'T INCLUDE</i> queries are grouped together and
+            the intersection of the results is taken.<br/>
+            <i>INCLUDE ANY </i> queries are grouped together and the union of the results is taken. <br/>
+            The final result is (<i>MUST INCLUDE</i>)-(<i>DON'T INCLUDE</i>)+(<i>INCLUDE_ANY</i>)
+        </div>
+
+
 
     </div>
   </div>
