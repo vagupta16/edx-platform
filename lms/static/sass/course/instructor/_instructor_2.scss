@@ -567,12 +567,9 @@ section.instructor-dashboard-content-2 {
     }
 
     .email-list-container {
-      display: None;
       margin-bottom: ($baseline*1.5);
 
-      &.active {
-        display: block;
-      }
+
       .email-list-widget {
 
         .header {
@@ -632,17 +629,33 @@ section.instructor-dashboard-content-2 {
             border-bottom: 1px solid $light-gray;
           }
 
-          .any{
+          .or{
              background-color: lightgray;
           }
 
-          .must{
+          .and{
              background-color: $blue;
           }
 
-          .dont{
+          .not{
              background-color: mediumvioletred;
           }
+
+          .problem_specific,.section_specific{
+            display: none;
+          }
+
+          .active {
+            display: table-cell;
+          }
+
+          #addQuery {
+            @include idashbutton($blue);
+            position: relative;
+            right: $baseline;
+            font-size: 12px;
+          }
+
 
          .remove {
           color: $lighter-base-font-color;
@@ -652,7 +665,6 @@ section.instructor-dashboard-content-2 {
             color: $alert-color;
           }
          }
-
           td {
             @extend %t-copy-sub1;
             vertical-align: middle;
@@ -665,28 +677,35 @@ section.instructor-dashboard-content-2 {
 
          #estimated{
            color:dodgerblue;
+           font-size: 20px;
          }
 
          .subsection{
             text-indent: 10px;
          }
 
+
+        // .add-field
+
+
+
         .bottom-email {
           @include box-sizing(border-box);
           @include border-bottom-radius(3);
           position: relative;
-          padding: ($baseline/2);
+          padding: ($baseline/2*2);
           margin-top: -1px;
           border: 1px solid $light-gray;
           background-color: #efefef;
           box-shadow: inset #bbb 0px 1px 1px 0px;
         }
-
-       input[type="button"].getcsv {
+       input[type="button"]#getcsv {
           @include idashbutton($blue);
           position: absolute;
           right: $baseline;
+          font-size: 15px;
         }
+
         }
 
 }

@@ -587,22 +587,22 @@ def list_course_tree(request, course_id):
 
 def processQuery(courseId, query):
     queryIncl = query[0]
-    if queryIncl=="must":
+    if queryIncl=="and":
         queryIncl = INCLUSION.AND
-    elif queryIncl=="dont":
+    elif queryIncl=="not":
         queryIncl = INCLUSION.NOT
     else:
         queryIncl = INCLUSION.OR
     queryProps = query[1]
-    queryType = queryProps[0]['text'].lower().strip()
-    queryId = queryProps[1]['id']
+    queryType = queryProps[1]['text'].lower().strip()
+    queryId = queryProps[2]['id']
     blocks = queryId.split("/")
     if len(blocks) !=2:
         return
     else:
         block_type, block_id = blocks
     queryId = courseId.make_usage_key(block_type, block_id)
-    queryFiltering = queryProps[2]['text'].lower().strip()
+    queryFiltering = queryProps[3]['text'].lower().strip()
 
     if queryType=="section":
         queryType = QUERY_TYPE.SECTION

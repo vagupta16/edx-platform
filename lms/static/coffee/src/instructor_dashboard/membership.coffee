@@ -607,58 +607,28 @@ class EmailWidget
     @$list_selector.change =>
       $opt = @$list_selector.children('option:selected')
       return unless $opt.length > 0
-      if this.$container.attr('data-label')=="Inclusion"
-        @chosen = $opt.text().trim()
-        if @chosen !=""
-          if @chosen=="Must Include"
-            @start_row("must")
-          else if @chosen=="Don't Include"
-            @start_row("dont")
-          else
-            @start_row("any")
-          $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"}),
-            class: 'remove'
-
-          @set_cell($revoke_btn[0].outerHTML,3,"")
-          $('.remove').click =>
-            rowIdx = event.target.parentElement.parentElement.rowIndex
-            totalRows =$("#emailTable")[0].rows.length
-            #$("#emailTable")[0].deleteRow(rowIdx-1);
-            event.target.parentElement.parentElement.remove()
-            @reload_students()
-            #reset selection if we're deleting the last row
-            if (rowIdx == totalRows)
-              $(".email-list-container").removeClass('active')
-              @sec_child = @$section.find('.beginning_specific').get(0).children[0]
-              @sec_child.classList.add("active")
-              @$list_selector.prop('selectedIndex',0);
-              @reload_students()
-
 
       #get the parent of this container
-      if (@idx != @parent.children().length-1)
-        @c = @parent.children()[@idx+1]
-        @c.classList.add("active")
-        if this.$container.attr('data-label') !="Inclusion"
-          @set_cell($opt.text().trim(),1, $opt.attr('id'))
-      else
-        if (@parent.attr('class')=="beginning_specific")
-          @chosen_class = $opt.text().trim()
-          if (@chosen_class == "Section")
-            @sec_child = @$section.find('.section_specific').get(0).children[0]
-            @sec_child.classList.add("active")
-            @set_cell($opt.text().trim() ,0,"")
-          else
-            @sec_child = @$section.find('.problem_specific').get(0).children[0]
-            @sec_child.classList.add("active")
-            @set_cell($opt.text().trim() ,0,"")
-        else
-            @sec_child = @$section.find('.beginning_specific').get(0).children[0]
-            @sec_child.classList.add("active")
-            @set_cell($opt.text().trim() ,2,"")
-            @reload_students()
-      $container.removeClass("active")
-      @$list_selector.prop('selectedIndex',0);
+      #if (@idx != @parent.children().length-1)
+      @c = @parent.children()[@idx+1]
+      #if this.$container.attr('data-label') !="Inclusion"
+          #@set_cell($opt.text().trim(),2, $opt.attr('id'))
+      #else
+      #if (@parent.attr('class')=="beginning_specific")
+      if this.$container.attr('data-label')=="Select a Type"
+        @chosen_class = $opt.text().trim()
+        if (@chosen_class == "Section")
+          @$section.find('.problem_specific').removeClass("active")
+          @$section.find('.section_specific').addClass("active")
+        else if (@chosen_class == "Problem")
+          @$section.find('.section_specific').removeClass("active")
+          @$section.find('.problem_specific').addClass("active")
+          #@set_cell($opt.text().trim() ,1,"")
+        #@sec_child = @$section.find('.beginning_specific').get(0).children[0]
+        #@sec_child.classList.add("active")
+        #@set_cell($opt.text().trim() ,3,"")
+        #@reload_students()
+      #@$list_selector.prop('selectedIndex',0);
         #@c .addClass 'active'
 
 
@@ -666,41 +636,7 @@ class EmailWidget
     #@$list_selector.change()
 
 
-  get_students: (cb)->
-    tab = $("#emailTable")
-    b = []
-    rows = tab.find("tr")
-    _.each rows, (row) =>
-      type = row.classList[0]
-      problems = []
-      children = row.children
-      _.each children, (child) =>
-        id = child.id
-        html = child.innerHTML
-        problems.push({"id":id, "text":html})
-      b.push([type, problems])
-    send_data =
-      rolename: 'instructor'
-      queries: JSON.stringify(b)
-    $.ajax
-      dataType: 'json'
-      url: @$query_endpoint
-      data: send_data
-      success: (data) => cb? null, data['data']
-      error: std_ajax_err =>
-        `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
-        cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
 
- # reload the list of members
-  reload_students: ->
-    # @clear_rows()
-    @get_students (error, students_list) =>
-      # abort on error
-      return @show_errors error unless error is null
-      # use _.each instead of 'for' so that member
-      # is bound in the button callback.
-      $number_students = students_list.length
-      $("#estimated")[0].innerHTML= $number_students+" students selected"
 
 
     # send ajax request to list members
@@ -740,6 +676,8 @@ class EmailWidget
     #hacky, but can't style select tags
     if useClass=="subsection"
       @toDisplay = "---"+@toDisplay
+    if @toDisplay.length>50
+      @toDisplay = "..."+@toDisplay.substring(@toDisplay.length-80, @toDisplay.length)
     @$list_selector.append $ '<option/>',
             text: @toDisplay
             class: useClass
@@ -758,20 +696,7 @@ class EmailWidget
       if cellid !=""
         cell.id = cellid
 
-  start_row: (color, colNumber) ->
-    $tbody = $( "#emailTable" )
-    numRows = $tbody[0].children.length
-    $tr = $ '<tr>',
-       class: color
-    @id = 0
-    for num in [1..4]
-      $td = $ '<td>',
-        text : ""
-        #id is not useful anymore because we can delete rows
-        #id : ["emailtable",numRows+1, @id].join("-")
-      #@id = @id+1
-      $tr.append $td
-    $tbody.append $tr
+
     ###
        add_row: (row_array) ->
     $tbody = @$('table tbody')
@@ -821,8 +746,8 @@ class Membership
 
 
     for email_list in @email_lists
-      email_list.$container.removeClass 'active'
-    @email_lists[0].$container.addClass 'active'
+      email_list.$container.addClass 'active'
+    #@email_lists[0].$container.addClass 'active'
     @$email_csv_btn = @$section.find("input[name='getcsv']'")
     @$email_csv_btn.click (e) =>
       tab = $("#emailTable")
@@ -866,10 +791,110 @@ class Membership
       auth_list.$container.addClass 'active'
       auth_list.re_view()
 
+      $('#addQuery').click =>
+        selected = @$email_list_containers.find('select.single-email-selector').children('option:selected')
+        @chosen = selected[0].text
+        if @chosen !=""
+          if @chosen=="AND"
+            @start_row("and")
+          else if @chosen=="NOT"
+            @start_row("not")
+          else
+            @start_row("or")
+        if selected[1].text=="Section"
+          @arr = [selected[0], selected[1], selected[4], selected[5]]
+        else
+          @arr = [selected[0], selected[1], selected[2], selected[3]]
+        i = 0
+        for item in @arr
+          @set_cell(item.text,i, item.id )
+          i= i+1
+        @$email_list_containers.find('select.single-email-selector').prop('selectedIndex',0);
+        $(".problem_specific").removeClass('active')
+        $(".section_specific").removeClass('active')
+        @reload_students()
+
+
     # one-time first selection of top list.
     @$list_selector.change()
 
+  set_cell: (text, colNumber,cellid) ->
+    $tbody = $( "#emailTable" )
+    rows = $("#emailTable")[0].rows
+    rowNumber = rows.length
+    cell = rows[rows.length-1].children[colNumber]
+    #rowNumber = $tbody[0].children.length
 
+    #cell = $(["#emailtable",rowNumber, colNumber].join("-"))
+    if cell
+      cell.innerHTML = text
+      if cellid !=""
+        cell.id = cellid
+
+  start_row: (color) ->
+    $tbody = $( "#emailTable" )
+    numRows = $tbody[0].children.length
+    $tr = $ '<tr>',
+       class: color
+    @id = 0
+    for num in [1..5]
+      $td = $ '<td>',
+        text : ""
+        #id is not useful anymore because we can delete rows
+        #id : ["emailtable",numRows+1, @id].join("-")
+      #@id = @id+1
+      $tr.append $td
+    $tbody.append $tr
+    $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"}),
+            class: 'remove'
+
+    @set_cell($revoke_btn[0].outerHTML,4,"")
+    $('.remove').click =>
+      rowIdx = event.target.parentElement.parentElement.rowIndex
+      totalRows =$("#emailTable")[0].rows.length
+      #$("#emailTable")[0].deleteRow(rowIdx-1);
+      event.target.parentElement.parentElement.remove()
+      @reload_students()
+      #reset selection if we're deleting the last row
+      if (rowIdx == totalRows)
+        #todo: remove problem/section specific selections
+        @reload_students()
+
+  get_students: (cb)->
+      tab = $("#emailTable")
+      b = []
+      rows = tab.find("tr")
+      _.each rows, (row) =>
+        type = row.classList[0]
+        problems = []
+        children = row.children
+        _.each children, (child) =>
+          id = child.id
+          html = child.innerHTML
+          problems.push({"id":id, "text":html})
+        b.push([type, problems])
+      send_data =
+        rolename: 'instructor'
+        queries: JSON.stringify(b)
+      $.ajax
+        dataType: 'json'
+        url: @$query_endpoint
+        data: send_data
+        success: (data) => cb? null, data['data']
+        error: std_ajax_err =>
+          `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
+          cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
+
+   # reload the list of members
+    reload_students: ->
+      # @clear_rows()
+      @get_students (error, students_list) =>
+        # abort on error
+        return @show_errors error unless error is null
+        # use _.each instead of 'for' so that member
+        # is bound in the button callback.
+        $number_students = students_list.length
+        $("#estimated")[0].innerHTML= $number_students+" students selected"
   # handler for when the section title is clicked.
   onClickTitle: ->
 
@@ -880,3 +905,31 @@ _.defaults window, InstructorDashboard: {}
 _.defaults window.InstructorDashboard, sections: {}
 _.defaults window.InstructorDashboard.sections,
   Membership: Membership
+
+
+        ###
+      if this.$container.attr('data-label')=="Inclusion"
+        @chosen = $opt.text().trim()
+        if @chosen !=""
+          if @chosen=="AND"
+            @start_row("and")
+          else if @chosen=="NOT"
+            @start_row("not")
+          else
+            @start_row("or")
+          #@set_cell(@chosen,0,"")
+          $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"}),
+            class: 'remove'
+
+          #@set_cell($revoke_btn[0].outerHTML,4,"")
+          $('.remove').click =>
+            rowIdx = event.target.parentElement.parentElement.rowIndex
+            totalRows =$("#emailTable")[0].rows.length
+            #$("#emailTable")[0].deleteRow(rowIdx-1);
+            event.target.parentElement.parentElement.remove()
+            @reload_students()
+            #reset selection if we're deleting the last row
+            if (rowIdx == totalRows)
+              #todo: remove problem/section specific selections
+              @reload_students()
+      ###
