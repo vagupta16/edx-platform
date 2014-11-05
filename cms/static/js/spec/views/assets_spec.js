@@ -1,6 +1,6 @@
 define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views/assets",
-    "js/models/asset", "js/collections/asset", "js/spec_helpers/view_helpers" ],
-    function ($, AjaxHelpers, AssetView, AssetsView, AssetModel, AssetCollection, ViewHelpers) {
+    "js/models/asset", "js/collections/asset", "js/spec_helpers/view_helpers", "sinon"],
+    function ($, AjaxHelpers, AssetView, AssetsView, AssetModel, AssetCollection, ViewHelpers, sinon) {
 
         describe("Assets", function() {
             var assetsView, mockEmptyAssetsResponse, mockAssetUploadResponse,
@@ -53,6 +53,15 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                 msg: "Upload completed"
             };
 
+            mockAssetUploadFailedResponse = {
+                asset: mockAsset,
+                msg: "Max "
+            };
+
+            mockLargeFileUpload = {
+                files: [{name: 'largefile', size: 1000 * 1000 * 1000}]
+            };
+
             $.fn.fileupload = function() {
                 return '';
             };
@@ -61,12 +70,20 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
             event.target = {"value": "dummy.jpg"};
 
             describe("AssetsView", function () {
-                var setup;
+                var setup, setupFailedServer;
                 setup = function() {
                     var requests;
                     requests = AjaxHelpers.requests(this);
                     assetsView.setPage(0);
                     AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
+                    return requests;
+                };
+
+                setupFailedServer = function() {
+                    var requests;
+                    requests = AjaxHelpers.requests(this);
+                    assetsView.setPage(0);
+                    AjaxHelpers.respondWithEntityTooLarge(requests, mockAssetUploadFailedResponse);
                     return requests;
                 };
 
@@ -95,6 +112,15 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                     expect($('.upload-modal').is(':visible')).toBe(false);
                 });
 
+                it('has properly initialized constants for handling upload file errors', function() {
+                    expect(assetsView).toBeDefined();
+                    expect(assetsView.uploadChunkSizeInMBs).toBeDefined();
+                    expect(assetsView.maxFileSizeInMBs).toBeDefined();
+                    expect(assetsView.uploadChunkSizeInBytes).toBeDefined();
+                    expect(assetsView.maxFileSizeInBytes).toBeDefined();
+                    expect(assetsView.largeFileErrorMsg).toBeNull();
+                });
+
                 it('uploads file properly', function () {
                     var requests = setup.call(this);
                     expect(assetsView).toBeDefined();
@@ -121,6 +147,21 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
 
                     expect($('#asset_table_body').html()).toContain("dummy.jpg");
                     expect(assetsView.collection.length).toBe(1);
+                });
+
+                it('blocks large file uploads on the front end', function() {
+                    expect(assetsView).toBeDefined();
+
+                    $('.choose-file-button').click();
+                    $(".upload-modal .file-chooser").fileupload('add', mockLargeFileUpload);
+                    expect($('.upload-modal h1').text()).not.toContain("Uploading");
+
+                    expect(assetsView.largeFileErrorMsg).toBeDefined();
+                    expect($('div.progress-bar').text()).not.toContain("Upload completed");
+                    expect($('div.progress-fill').width()).toBe(0);
+
+                    expect($('#asset_table_body').html()).not.toContain(mockLargeFileUpload.files[0].name);
+                    expect(assetsView.collection.length).not.toBe(1);
                 });
             });
         });
