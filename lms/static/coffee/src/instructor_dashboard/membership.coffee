@@ -574,7 +574,6 @@ class EmailWidget
       label : $container.data 'label'
 
     $containers = @$section.find '.email-lists-management'
-    @$query_endpoint = $containers.data 'query-endpoint'
     template_html = $("#email-list-widget-template").html()
     @$container.html Mustache.render template_html, params
     @cur_column = 0
@@ -744,7 +743,7 @@ class Membership
     @email_lists = _.map (@$email_list_containers), (email_list_container) =>
       new EmailWidget $(email_list_container), @$section
 
-
+    @$query_endpoint = $(".email-lists-management").data('query-endpoint')
     for email_list in @email_lists
       email_list.$container.addClass 'active'
     #@email_lists[0].$container.addClass 'active'
@@ -761,7 +760,9 @@ class Membership
           id = child.id
           html = child.innerHTML
           problems.push({"id":id, "text":html})
+        problems = problems.slice(0,-1)
         b.push([type, problems])
+
       url = @$email_csv_btn.data 'endpoint'
       # handle csv special case
       # redirect the document to the csv file.
@@ -853,7 +854,7 @@ class Membership
       rowIdx = event.target.parentElement.parentElement.rowIndex
       totalRows =$("#emailTable")[0].rows.length
       #$("#emailTable")[0].deleteRow(rowIdx-1);
-      event.target.parentElement.parentElement.remove()
+      event.target.parentNode.parentNode.remove()
       @reload_students()
       #reset selection if we're deleting the last row
       if (rowIdx == totalRows)
@@ -872,6 +873,7 @@ class Membership
           id = child.id
           html = child.innerHTML
           problems.push({"id":id, "text":html})
+        problems = problems.slice(0,-1)
         b.push([type, problems])
       send_data =
         rolename: 'instructor'

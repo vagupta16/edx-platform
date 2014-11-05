@@ -616,6 +616,9 @@ section.instructor-dashboard-content-2 {
   }
      .email-list {
           @include box-sizing(border-box);
+          background-color: $light-gray;
+          margin: ($baseline/4) 0;
+          padding: ($baseline/4);
 
           table {
             width: 100%;
