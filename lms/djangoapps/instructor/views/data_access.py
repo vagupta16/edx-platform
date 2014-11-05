@@ -1,4 +1,5 @@
 from courseware.models import StudentModule
+from bulk_email.models import Optout
 #todo: specific imports
 from data_access_constants import *
 from django.db.models import Q
@@ -49,21 +50,31 @@ def get_problem_users(course_id, queries):
 
 def completed_query(course_id, query):
     queryset = StudentModule.objects.filter(module_state_key=query.id, course_id = course_id).filter(~Q(grade=None))
-    return processResults(query, queryset)
+    return processResults(course_id, query, queryset)
 
 
 def open_query(course_id, query):
     queryset = StudentModule.objects.filter(module_state_key=query.id, course_id = course_id)
-    return processResults(query, queryset)
+    return processResults(course_id, query, queryset)
+
+def filter_out_students(course_id):
+    filterOut = Optout.objects.filter(course_id=course_id)
+    filterout_ids = set([result.user.id for result in filterOut])
+    return filterout_ids
 
 
-def processResults(query, queryset):
+
+def processResults(course_id, query, queryset):
+    filterout_ids = filter_out_students(course_id)
+
     results = QueryResults()
     querySpecific = set()
     if query.filter==SECTION_FILTERS.OPENED:
         for row in queryset:
             student = row.student
-            querySpecific.add((student.id, student.email))
+            if (student.id not in filterout_ids):
+                querySpecific.add((student.id, student.email))
+
     if query.inclusion == INCLUSION.OR:
         results.addCanInclude(querySpecific)
     elif query.inclusion == INCLUSION.AND:
