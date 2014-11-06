@@ -4,6 +4,7 @@ Tests for users API
 
 import ddt
 from rest_framework.test import APITestCase
+from unittest import skip
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
@@ -133,7 +134,7 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         modulestore().update_item(self.course, self.user.id)
 
         self.client.login(username=self.username, password=self.password)
-        self._enroll()
+        self._enroll(self.course)
         serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=E1101
         self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
         self.assertEqual(serialized['course']['org'], self.course.display_organization)
