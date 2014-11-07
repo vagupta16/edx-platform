@@ -4,6 +4,7 @@ from bulk_email.models import Optout
 from data_access_constants import *
 from django.db.models import Q
 
+
 def get_users(course_id, queries):
     splitted = {QUERY_TYPE.SECTION:[],
                 QUERY_TYPE.PROBLEM:[]
@@ -50,6 +51,7 @@ def get_problem_users(course_id, queries):
 
 def completed_query(course_id, query):
     queryset = StudentModule.objects.filter(module_state_key=query.id, course_id = course_id).filter(~Q(grade=None))
+    print queryset.query
     return processResults(course_id, query, queryset)
 
 

@@ -794,6 +794,17 @@ class Membership
 
       $('#addQuery').click =>
         selected = @$email_list_containers.find('select.single-email-selector').children('option:selected')
+        #check to see if stuff has been filled out
+        if selected[1].text=="Section"
+          @arr = [selected[0], selected[1], selected[4], selected[5]]
+        else
+          @arr = [selected[0], selected[1], selected[2], selected[3]]
+
+        for thing in @arr
+          if thing.text==""
+            $("#incompleteMessage")[0].innerHTML = "Query is incomplete. Please make all the selections."
+            return
+        $("#incompleteMessage")[0].innerHTML = ""
         @chosen = selected[0].text
         if @chosen !=""
           if @chosen=="AND"
@@ -802,10 +813,6 @@ class Membership
             @start_row("not")
           else
             @start_row("or")
-        if selected[1].text=="Section"
-          @arr = [selected[0], selected[1], selected[4], selected[5]]
-        else
-          @arr = [selected[0], selected[1], selected[2], selected[3]]
         i = 0
         for item in @arr
           @set_cell(item.text,i, item.id )
@@ -856,10 +863,7 @@ class Membership
       #$("#emailTable")[0].deleteRow(rowIdx-1);
       event.target.parentNode.parentNode.remove()
       @reload_students()
-      #reset selection if we're deleting the last row
-      if (rowIdx == totalRows)
-        #todo: remove problem/section specific selections
-        @reload_students()
+
 
   get_students: (cb)->
       tab = $("#emailTable")
@@ -890,12 +894,15 @@ class Membership
    # reload the list of members
     reload_students: ->
       # @clear_rows()
+      $("#estimated")[0].innerHTML= "Calculating"
+      $("#estimated").addClass('glowing')
       @get_students (error, students_list) =>
         # abort on error
         return @show_errors error unless error is null
         # use _.each instead of 'for' so that member
         # is bound in the button callback.
         $number_students = students_list.length
+        $("#estimated").removeClass('glowing')
         $("#estimated")[0].innerHTML= $number_students+" students selected"
   # handler for when the section title is clicked.
   onClickTitle: ->
@@ -908,30 +915,3 @@ _.defaults window.InstructorDashboard, sections: {}
 _.defaults window.InstructorDashboard.sections,
   Membership: Membership
 
-
-        ###
-      if this.$container.attr('data-label')=="Inclusion"
-        @chosen = $opt.text().trim()
-        if @chosen !=""
-          if @chosen=="AND"
-            @start_row("and")
-          else if @chosen=="NOT"
-            @start_row("not")
-          else
-            @start_row("or")
-          #@set_cell(@chosen,0,"")
-          $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"}),
-            class: 'remove'
-
-          #@set_cell($revoke_btn[0].outerHTML,4,"")
-          $('.remove').click =>
-            rowIdx = event.target.parentElement.parentElement.rowIndex
-            totalRows =$("#emailTable")[0].rows.length
-            #$("#emailTable")[0].deleteRow(rowIdx-1);
-            event.target.parentElement.parentElement.remove()
-            @reload_students()
-            #reset selection if we're deleting the last row
-            if (rowIdx == totalRows)
-              #todo: remove problem/section specific selections
-              @reload_students()
-      ###

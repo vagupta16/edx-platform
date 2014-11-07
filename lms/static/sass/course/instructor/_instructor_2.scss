@@ -659,6 +659,10 @@ section.instructor-dashboard-content-2 {
             font-size: 12px;
           }
 
+          #incompleteMessage{
+            padding-right:40px;
+            color: mediumvioletred;
+          }
 
          .remove {
           color: $lighter-base-font-color;

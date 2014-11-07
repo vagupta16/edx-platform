@@ -1,5 +1,3 @@
-from courseware.models import StudentModule
-
 class Query:
     def __init__(self, type, inclusion, id, filter):
         self.type= type

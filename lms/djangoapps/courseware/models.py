@@ -17,6 +17,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from instructor.views.data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query
+
 
 from xmodule_django.models import CourseKeyField, LocationKeyField
 
@@ -287,3 +289,95 @@ class CoursePreference(models.Model):
 
     def __unicode__(self):
         return u"{} : {} : {}".format(self.course_id, self.pref_key, self.pref_value)
+
+
+class GroupedQueries(models.Model):
+    title=models.CharField(max_length=255)
+    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    def __unicode__(self):
+        return "[GroupedQueries] Query %d for Course %s, %s" % (self.id,
+                                                                self.course_id,
+                                                                self.title)
+
+
+class QueriesSaved(models.Model):
+    inclusions = (
+        ('A', INCLUSION.AND),
+        ('N', INCLUSION.NOT),
+        ('O', INCLUSION.OR),
+    )
+
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
+    inclusion = models.CharField(max_length=1, choices=inclusions)
+    filter_on = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,
+                                                             self.course_id,
+                                                             self.module_state_key,
+                                                             self.get_inclusion_display(),
+                                                             self.filter_on)
+
+
+class QueriesTemporary(models.Model):
+    inclusions = (
+        ('A', INCLUSION.AND),
+        ('N', INCLUSION.NOT),
+        ('O', INCLUSION.OR),
+    )
+
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
+    inclusion = models.CharField(max_length=1, choices=inclusions)
+    filter_on = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,
+                                                             self.course_id,
+                                                             self.module_state_key,
+                                                             self.get_inclusion_display(),
+                                                             self.filter_on)
+
+
+
+class QueriesStudents(models.Model):
+    inclusions = (
+        ('A', INCLUSION.AND),
+        ('N', INCLUSION.NOT),
+        ('O', INCLUSION.OR),
+    )
+
+    query = models.ForeignKey('QueriesTemporary')
+    student = models.ForeignKey(User, db_index=True)
+    inclusion = models.CharField(max_length=1, choices=inclusions)
+
+    def __unicode__(self):
+        return "[QueriesStudents] Query %d for %s, %s" % (self.query.id,
+                                                             self.student,
+                                                             self.get_inclusion_display())
+
+
+class GroupedQueriesStudents(models.Model):
+    grouped = models.ForeignKey('GroupedQueries')
+    student = models.ForeignKey(User, db_index=True)
+
+    def __unicode__(self):
+        return "[GroupedQueriesStudents] Query %d has %s" % (self.grouped.id,
+                                                                 self.student)
+
+
+
+class GroupedQueriesSubqueries(models.Model):
+    """
+    Saved queries per course
+    """
+    grouped = models.ForeignKey('GroupedQueries')
+    query = models.ForeignKey('QueriesSaved')
+
+    def __unicode__(self):
+        return "[GroupedQueriesSubqueries] Group %d has Query %d" % (self.grouped.id, self.query.id)
+
+
+

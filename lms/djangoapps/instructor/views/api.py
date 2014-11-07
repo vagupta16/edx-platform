@@ -650,7 +650,7 @@ def get_student_data(request, course_id, csv=False):
     data = data_access.get_users(course_id, processedQueries)
 
     emails = [pair[1] for pair in data]
-
+    time.sleep(5)
     if not csv:
         response_payload = {
             'course_id': course_id.to_deprecated_string(),
