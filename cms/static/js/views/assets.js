@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging", "js/views/asset",
     "js/views/paging_header", "js/views/paging_footer", "js/utils/modal", "js/views/utils/view_utils",
-    "js/views/feedback_notification"],
+    "js/views/feedback_notification", "jquery.fileupload-process", "jquery.fileupload-validate"],
     function($, _, gettext, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter, ModalUtils, ViewUtils, NotificationView) {
 
         var CONVERSION_FACTOR_MBS_TO_BYTES = 1000 * 1000;
@@ -147,35 +147,31 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     },
                     maxFileSize: self.maxFileSizeInBytes,
                     maxNumberofFiles: 100,
-                    add: function(event, data) {
-                        var file = data.files[0];
-                        if (file.size > self.maxFileSizeInBytes) {
-                            var error = gettext("File {filename} exceeds maximum size of \
-                                    {maxFileSizeInMBs} MB. Please follow \
-                                    the instructions here to upload a file elsewhere \
-                                    and link to it: {maxFileSizeRedirectUrl}");
-                            error = error
-                                .replace("{filename}", file.name)
-                                .replace("{maxFileSizeInMBs}", self.maxFileSizeInMBs)
-                                .replace("{maxFileSizeRedirectUrl}", self.maxFileSizeRedirectUrl);
-
-                            self.largeFileErrorMsg = new NotificationView.Error({
-                                "title": gettext("Studio's having trouble saving your work"),
-                                "message": error
-                            });
-                            self.largeFileErrorMsg.show();
-
-                            self.displayFailedUpload({
-                                "msg": gettext("Max file size exceeded")
-                            });
-                        } else {
-                            data.process().done(function () {
-                                data.submit();
-                            });
-                        }
-                    },
                     done: function(event, data) {
                         self.displayFinishedUpload(data.result);
+                    },
+                    processfail: function(event, data) {
+                        var filename = data.files[data.index].name;
+                        var error = gettext("File {filename} exceeds maximum size of \
+                                {maxFileSizeInMBs} MB. Please follow \
+                                the instructions here to upload a file elsewhere \
+                                and link to it: {maxFileSizeRedirectUrl}")
+                                    .replace("{filename}", filename)
+                                    .replace("{maxFileSizeInMBs}", self.maxFileSizeInMBs)
+                                    .replace("{maxFileSizeRedirectUrl}", self.maxFileSizeRedirectUrl);
+
+                        assetsView.largeFileErrorMsg = new NotificationView.Error({
+                            "title": gettext("Studio's having trouble saving your work"),
+                            "message": error
+                        });
+                        assetsView.largeFileErrorMsg.show();
+
+                        assetsView.displayFailedUpload({
+                            "msg": gettext("Max file size exceeded")
+                        });
+                    },
+                    processdone: function(event, data) {
+                        assetsView.largeFileErrorMsg = null;
                     }
                 });
             },
