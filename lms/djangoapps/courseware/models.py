@@ -294,6 +294,7 @@ class CoursePreference(models.Model):
 class GroupedQueries(models.Model):
     title=models.CharField(max_length=255)
     course_id = CourseKeyField(max_length=255, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     def __unicode__(self):
         return "[GroupedQueries] Query %d for Course %s, %s" % (self.id,
@@ -312,6 +313,7 @@ class QueriesSaved(models.Model):
     module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
     inclusion = models.CharField(max_length=1, choices=inclusions)
     filter_on = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     def __unicode__(self):
         return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,
@@ -332,6 +334,7 @@ class QueriesTemporary(models.Model):
     module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
     inclusion = models.CharField(max_length=1, choices=inclusions)
     filter_on = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     def __unicode__(self):
         return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,

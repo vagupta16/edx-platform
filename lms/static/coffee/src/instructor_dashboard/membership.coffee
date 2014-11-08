@@ -797,8 +797,10 @@ class Membership
         #check to see if stuff has been filled out
         if selected[1].text=="Section"
           @arr = [selected[0], selected[1], selected[4], selected[5]]
+          @arr_text = [selected[0].text, selected[1].text, selected[4].text, selected[5].text]
         else
           @arr = [selected[0], selected[1], selected[2], selected[3]]
+          @arr_text = [selected[0].text, selected[1].text, selected[2].text, selected[3].text]
 
         for thing in @arr
           if thing.text==""
@@ -813,6 +815,9 @@ class Membership
             @start_row("not")
           else
             @start_row("or")
+        @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).join("/")+"/"+@arr[2].id
+        @filtering = @arr[3].text
+        @reload_students()
         i = 0
         for item in @arr
           @set_cell(item.text,i, item.id )
@@ -880,11 +885,10 @@ class Membership
         problems = problems.slice(0,-1)
         b.push([type, problems])
       send_data =
-        rolename: 'instructor'
-        queries: JSON.stringify(b)
+        filter: @filtering
       $.ajax
         dataType: 'json'
-        url: @$query_endpoint
+        url: @use_query_endpoint
         data: send_data
         success: (data) => cb? null, data['data']
         error: std_ajax_err =>
@@ -892,7 +896,7 @@ class Membership
           cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
 
    # reload the list of members
-    reload_students: ->
+    reload_students: (arr) ->
       # @clear_rows()
       $("#estimated")[0].innerHTML= "Calculating"
       $("#estimated").addClass('glowing')

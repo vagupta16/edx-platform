@@ -46,6 +46,10 @@ class INCLUSION:
     OR="OR"
     NOT="NOT"
 
+INCLUSION_MAP = {INCLUSION.AND : 'A',
+                 INCLUSION.OR : 'O',
+                 INCLUSION.NOT : 'N'}
+
 class SECTION_FILTERS:
     OPENED="OPENED"
     COMPLETED="COMPLETED"

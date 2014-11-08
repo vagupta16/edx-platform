@@ -624,6 +624,78 @@ def processQuery(courseId, query):
 
     return Query(queryType, queryIncl, queryId, queryFiltering)
 
+def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering):
+    if queryIncl=="and":
+        queryIncl = INCLUSION.AND
+    elif queryIncl=="not":
+        queryIncl = INCLUSION.NOT
+    else:
+        queryIncl = INCLUSION.OR
+
+    blocks = queryId.split("/")
+    if len(blocks) !=2:
+        return
+    else:
+        block_type, block_id = blocks
+    queryId = courseId.make_usage_key(block_type, block_id)
+    queryFiltering = queryFiltering.lower().strip()
+
+    queryType = queryType.lower().strip()
+    if queryType=="section":
+        queryType = QUERY_TYPE.SECTION
+        if queryFiltering =="has student opened":
+            queryFiltering=SECTION_FILTERS.OPENED
+        elif queryFiltering == "has student completed":
+            queryFiltering = SECTION_FILTERS.COMPLETED
+    else:
+        queryType = QUERY_TYPE.PROBLEM
+        if queryFiltering =="has student opened":
+            queryFiltering=PROBLEM_FILTERS.OPENED
+        elif queryFiltering == "has student completed":
+            queryFiltering = PROBLEM_FILTERS.COMPLETED
+        elif queryFiltering== "score":
+            queryFiltering = PROBLEM_FILTERS.SCORE
+        elif queryFiltering == "number of peer responses graded":
+            queryFiltering = PROBLEM_FILTERS.NUMBER_PEER_GRADED
+
+    return Query(queryType, queryIncl, queryId, queryFiltering)
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+def get_filtered_students(request, course_id, inclusion=None, queryType=None, stateType=None, stateId=None, csv=False):
+    filter = request.GET.get('filter')
+    #rolename = request.GET.get('rolename')
+    #queries = request.GET.get('queries')
+    #if not queries==None:
+    #    queries = eval(queries)
+    #else:
+    #    queries = []
+
+
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    processed = processNewQuery(course_id, inclusion, queryType, stateType+"/"+stateId, filter)
+    data = data_access.make_query(course_id, processed)
+
+
+    results = data[data.keys()[0]]
+    emails = [pair[1] for pair in results]
+    id = data.keys()[0]
+
+    if not csv:
+        response_payload = {
+            'course_id': course_id.to_deprecated_string(),
+            'data': emails
+        }
+        return  JsonResponse(response_payload)
+    else:
+        filename =  time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
+        return instructor_analytics.csvs.create_csv_response(filename, ["emails"], [[item] for item in emails])
+
+
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')

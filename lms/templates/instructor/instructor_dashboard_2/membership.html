@@ -230,7 +230,7 @@
  </div>
 </div>
 
- <div class="email-lists-management" data-query-endpoint="${ section_data['get_student_data'] }">
+ <div class="email-lists-management" data-query-endpoint="${ section_data['get_filtered_students'] }">
 
     <div class="email-widget">
     <div class="header">
@@ -282,8 +282,8 @@
         </span>
     </div>
         <div align="right">
-            <span id="incompleteMessage" class="glowing"></span>
-                <input type="button" name="addQuery" id="addQuery" value="Add Query" align="right">
+            <span id="incompleteMessage"></span>
+            <input type="button" name="addQuery" id="addQuery" value="Add Query" align="right">
          </div>
     </div>
 
@@ -303,7 +303,7 @@
       </table>
       <br/>
       <div class="bottom-email">
-          <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_student_data'] }" data-csv="true">
+          <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_filtered_students'] }" data-csv="true">
 
           <div id="estimated">0 students selected</div>
 

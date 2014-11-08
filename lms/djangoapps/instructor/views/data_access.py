@@ -1,9 +1,34 @@
 from courseware.models import StudentModule
+from courseware.models import GroupedQueries, GroupedQueriesStudents, GroupedQueriesSubqueries
+from courseware.models import QueriesSaved, QueriesStudents, QueriesTemporary
 from bulk_email.models import Optout
 #todo: specific imports
 from data_access_constants import *
 from django.db.models import Q
 
+
+
+def make_query(course_id, query):
+    print query
+    if query.type==QUERY_TYPE.SECTION:
+        results = open_query(course_id, query)
+    else:
+        results = get_problem_users_s(course_id, query)
+
+    #store query into QueriesTemporary
+    q = QueriesTemporary(inclusion=INCLUSION_MAP.get(query.inclusion),
+                         course_id = course_id,
+                         module_state_key=query.id,
+                         filter_on=query.filter)
+
+    q.save()
+
+    #store students into QueriesStudents
+
+
+
+    #merge
+    return {q.id:results}
 
 def get_users(course_id, queries):
     splitted = {QUERY_TYPE.SECTION:[],
@@ -23,8 +48,6 @@ def get_users(course_id, queries):
     sectionResults.mergeIn(problemResults)
     return sectionResults.getResults()
 
-
-
 def get_section_users(course_id, queries):
     results = QueryResults()
     for query in queries:
@@ -33,6 +56,16 @@ def get_section_users(course_id, queries):
         qresults = open_query(course_id, query)
         results.mergeIn(qresults)
     return results
+
+def get_problem_users_s(course_id, query):
+    if query.filter==PROBLEM_FILTERS.OPENED:
+        results = open_query(course_id, query)
+    elif query.filter==PROBLEM_FILTERS.COMPLETED:
+        results = completed_query(course_id, query)
+    return results
+
+def get_section_users_s(course_id, query):
+    return open_query(course_id, query)
 
 
 def get_problem_users(course_id, queries):
@@ -71,11 +104,11 @@ def processResults(course_id, query, queryset):
 
     results = QueryResults()
     querySpecific = set()
-    if query.filter==SECTION_FILTERS.OPENED:
-        for row in queryset:
-            student = row.student
-            if (student.id not in filterout_ids):
-                querySpecific.add((student.id, student.email))
+    #if query.filter==SECTION_FILTERS.OPENED:
+    for row in queryset:
+        student = row.student
+        if (student.id not in filterout_ids):
+            querySpecific.add((student.id, student.email))
 
     if query.inclusion == INCLUSION.OR:
         results.addCanInclude(querySpecific)
