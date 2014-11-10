@@ -3,17 +3,17 @@ from courseware.models import GroupedQueries, GroupedQueriesStudents, GroupedQue
 from courseware.models import QueriesSaved, QueriesStudents, QueriesTemporary
 from bulk_email.models import Optout
 #todo: specific imports
+from django.contrib.auth.models import User
 from data_access_constants import *
 from django.db.models import Q
 
 
 
-def make_query(course_id, query):
-    print query
+def make_query(course_id, query, existing_queries):
     if query.type==QUERY_TYPE.SECTION:
-        results = open_query(course_id, query)
+        results = get_section_users_s(course_id, query, existing_queries)
     else:
-        results = get_problem_users_s(course_id, query)
+        results = get_problem_users_s(course_id, query, existing_queries)
 
     #store query into QueriesTemporary
     q = QueriesTemporary(inclusion=INCLUSION_MAP.get(query.inclusion),
@@ -25,8 +25,10 @@ def make_query(course_id, query):
 
     #store students into QueriesStudents
 
-
-
+    students = results.getResults()
+    for student in students:
+        row = QueriesStudents(query=q, inclusion=INCLUSION_MAP[query.inclusion], student=User.objects.filter(id=3)[0])
+        row.save()
     #merge
     return {q.id:results}
 
@@ -57,18 +59,20 @@ def get_section_users(course_id, queries):
         results.mergeIn(qresults)
     return results
 
-def get_problem_users_s(course_id, query):
+
+
+def get_problem_users_s(course_id, query, existing_queries):
     if query.filter==PROBLEM_FILTERS.OPENED:
         results = open_query(course_id, query)
     elif query.filter==PROBLEM_FILTERS.COMPLETED:
         results = completed_query(course_id, query)
     return results
 
-def get_section_users_s(course_id, query):
+def get_section_users_s(course_id, query, existing_queries):
     return open_query(course_id, query)
 
 
-def get_problem_users(course_id, queries):
+def get_problem_users(course_id, queries, existing_queries):
     results = QueryResults()
     for query in queries:
         qresults = None

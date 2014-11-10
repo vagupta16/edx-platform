@@ -638,6 +638,8 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering):
     else:
         block_type, block_id = blocks
     queryId = courseId.make_usage_key(block_type, block_id)
+    if queryFiltering==None:
+        return None
     queryFiltering = queryFiltering.lower().strip()
 
     queryType = queryType.lower().strip()
@@ -665,6 +667,11 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering):
 @require_level('instructor')
 def get_filtered_students(request, course_id, inclusion=None, queryType=None, stateType=None, stateId=None, csv=False):
     filter = request.GET.get('filter')
+    existing = request.GET.get('existing')
+    if (existing !=None):
+        existing_queries = existing.split()
+    else:
+        existing_queries = []
     #rolename = request.GET.get('rolename')
     #queries = request.GET.get('queries')
     #if not queries==None:
@@ -676,16 +683,19 @@ def get_filtered_students(request, course_id, inclusion=None, queryType=None, st
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     processed = processNewQuery(course_id, inclusion, queryType, stateType+"/"+stateId, filter)
-    data = data_access.make_query(course_id, processed)
+    if processed !=None:
+        data = data_access.make_query(course_id, processed, existing_queries)
+        results = data[data.keys()[0]].getResults()
+        emails = [pair[1] for pair in results]
+    else:
+        emails = []
 
-
-    results = data[data.keys()[0]]
-    emails = [pair[1] for pair in results]
     id = data.keys()[0]
 
     if not csv:
         response_payload = {
             'course_id': course_id.to_deprecated_string(),
+            'query_id': id,
             'data': emails
         }
         return  JsonResponse(response_payload)

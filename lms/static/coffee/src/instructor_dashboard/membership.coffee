@@ -817,7 +817,9 @@ class Membership
             @start_row("or")
         @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).join("/")+"/"+@arr[2].id
         @filtering = @arr[3].text
+        @existing = $("#estimated")[0].classList.toString()
         @reload_students()
+
         i = 0
         for item in @arr
           @set_cell(item.text,i, item.id )
@@ -825,7 +827,7 @@ class Membership
         @$email_list_containers.find('select.single-email-selector').prop('selectedIndex',0);
         $(".problem_specific").removeClass('active')
         $(".section_specific").removeClass('active')
-        @reload_students()
+
 
 
     # one-time first selection of top list.
@@ -886,11 +888,12 @@ class Membership
         b.push([type, problems])
       send_data =
         filter: @filtering
+        existing : @existing
       $.ajax
         dataType: 'json'
         url: @use_query_endpoint
         data: send_data
-        success: (data) => cb? null, data['data']
+        success: (data) => cb? null, data
         error: std_ajax_err =>
           `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
           cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
@@ -899,15 +902,16 @@ class Membership
     reload_students: (arr) ->
       # @clear_rows()
       $("#estimated")[0].innerHTML= "Calculating"
-      $("#estimated").addClass('glowing')
-      @get_students (error, students_list) =>
+      @get_students (error, students) =>
+        students_list = students['data']
+        query_id = students['query_id']
         # abort on error
         return @show_errors error unless error is null
         # use _.each instead of 'for' so that member
         # is bound in the button callback.
         $number_students = students_list.length
-        $("#estimated").removeClass('glowing')
         $("#estimated")[0].innerHTML= $number_students+" students selected"
+        $("#estimated").addClass(query_id.toString())
   # handler for when the section title is clicked.
   onClickTitle: ->
 
