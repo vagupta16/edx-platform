@@ -45,10 +45,12 @@ class INCLUSION:
     AND="AND"
     OR="OR"
     NOT="NOT"
+    FILTER="FILTER"
 
 INCLUSION_MAP = {INCLUSION.AND : 'A',
                  INCLUSION.OR : 'O',
-                 INCLUSION.NOT : 'N'}
+                 INCLUSION.NOT : 'N',
+                 INCLUSION.FILTER:'F'}
 
 class SECTION_FILTERS:
     OPENED="OPENED"

@@ -230,7 +230,8 @@
  </div>
 </div>
 
- <div class="email-lists-management" data-query-endpoint="${ section_data['get_filtered_students'] }">
+ <div class="email-lists-management" data-query-endpoint="${ section_data['get_single_query'] }"
+                                     data-total-endpoint="${ section_data['get_total_students'] }" >
 
     <div class="email-widget">
     <div class="header">
@@ -303,9 +304,11 @@
       </table>
       <br/>
       <div class="bottom-email">
-          <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_filtered_students'] }" data-csv="true">
+          <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_single_query'] }" data-csv="true">
 
           <div id="estimated">0 students selected</div>
+          <input type="button" name="getest" id="getest" value="Update Estimate" data-endpoint="${ section_data['get_single_query'] }">
+
 
       </div>
         <br/>
@@ -319,7 +322,7 @@
             students who have opened problem 2. <br/><br/>
             <i>AND</i> queries are grouped together and the intersection of the results is taken.<br/>
             <i>NOT</i> and </i><i>OR</i> queries are grouped together and the union of the results is taken. <br/>
-            The final result is (<i>AND</i>)-(<i>NOT</i>)+(<i>OR</i>)
+            The final result is (<i>AND</i>)+(<i>OR</i>) -(<i>NOT</i>)
         </div>
         </div>
 

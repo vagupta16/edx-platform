@@ -744,8 +744,17 @@ class Membership
       new EmailWidget $(email_list_container), @$section
 
     @$query_endpoint = $(".email-lists-management").data('query-endpoint')
+    @$total_endpoint = $(".email-lists-management").data('total-endpoint')
     for email_list in @email_lists
       email_list.$container.addClass 'active'
+
+    @$get_est_btn = @$section.find("input[name='getest']'")
+    @$get_est_btn.click (e) =>
+      @reload_estimated()
+      #$number_students = students_list.length
+      #$("#estimated")[0].innerHTML= $number_students+" students selected"
+      #$("#estimated").addClass(query_id.toString())
+
     #@email_lists[0].$container.addClass 'active'
     @$email_csv_btn = @$section.find("input[name='getcsv']'")
     @$email_csv_btn.click (e) =>
@@ -810,15 +819,16 @@ class Membership
         @chosen = selected[0].text
         if @chosen !=""
           if @chosen=="AND"
-            @start_row("and")
+            @tr = @start_row("and")
           else if @chosen=="NOT"
-            @start_row("not")
+            @tr = @start_row("not")
           else
-            @start_row("or")
+            @tr = @start_row("or")
         @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).join("/")+"/"+@arr[2].id
         @filtering = @arr[3].text
         @existing = $("#estimated")[0].classList.toString()
-        @reload_students()
+        @tr.addClass("working")
+        @reload_students(@tr)
 
         i = 0
         for item in @arr
@@ -865,11 +875,12 @@ class Membership
 
     @set_cell($revoke_btn[0].outerHTML,4,"")
     $('.remove').click =>
-      rowIdx = event.target.parentElement.parentElement.rowIndex
-      totalRows =$("#emailTable")[0].rows.length
+      #rowIdx = event.target.parentElement.parentElement.rowIndex
+      #totalRows =$("#emailTable")[0].rows.length
       #$("#emailTable")[0].deleteRow(rowIdx-1);
       event.target.parentNode.parentNode.remove()
-      @reload_students()
+    return $tr
+      #@reload_students()
 
 
   get_students: (cb)->
@@ -899,10 +910,48 @@ class Membership
           cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
 
    # reload the list of members
-    reload_students: (arr) ->
+    reload_students: (tr) ->
+      # @clear_rows()
+      #$("#estimated")[0].innerHTML= "Calculating"
+      @get_students (error, students) =>
+        students_list = students['data']
+        query_id = students['query_id']
+        # abort on error
+        return @show_errors error unless error is null
+        # use _.each instead of 'for' so that member
+        # is bound in the button callback.
+        #$number_students = students_list.length
+        #$("#estimated")[0].innerHTML= $number_students+" students selected"
+        tr.removeClass('working')
+        tr.addClass(query_id.toString())
+        #$("#estimated").addClass(query_id.toString())
+
+
+
+  get_estimated: (cb)->
+      b = []
+      tab = $("#emailTable")
+      rows = tab.find("tr")
+      _.each rows, (row) =>
+        #todo: wait here if still computing?
+        for i in [1..row.classList.length-1] by 1
+                b.push(row.classList[i])
+      send_data =
+        existing: b.join(',')
+      $.ajax
+        dataType: 'json'
+        url: @$total_endpoint
+        data: send_data
+        success: (data) => cb? null, data
+        error: std_ajax_err =>
+          `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
+          cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
+
+    # reload the list of members
+    reload_estimated: (tr) ->
       # @clear_rows()
       $("#estimated")[0].innerHTML= "Calculating"
-      @get_students (error, students) =>
+      @get_estimated (error, students) =>
         students_list = students['data']
         query_id = students['query_id']
         # abort on error
@@ -911,7 +960,9 @@ class Membership
         # is bound in the button callback.
         $number_students = students_list.length
         $("#estimated")[0].innerHTML= $number_students+" students selected"
-        $("#estimated").addClass(query_id.toString())
+        #tr.removeClass('working')
+        #tr.addClass(query_id.toString())
+        #$("#estimated").addClass(query_id.toString())
   # handler for when the section title is clicked.
   onClickTitle: ->
 
