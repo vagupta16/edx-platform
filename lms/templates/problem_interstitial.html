@@ -18,7 +18,7 @@ from django.conf import settings
           minutes_allowed=minutes_allowed)}
       <br />
       <b>
-      ${_("At around {end_time}, you must manually click the '{check_button}' button below.").format(
+      ${_("At {end_time}, you must manually click the '{check_button}' button below.").format(
           end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE),
           check_button=check_button)}
       </b>

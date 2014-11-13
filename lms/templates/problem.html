@@ -42,7 +42,11 @@ from django.conf import settings
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
     % if reset_button:
+        % if attempts_allowed:
+    <input class="reset" type="button" value="${_('Retry')}" />
+        % else:
     <input class="reset" type="button" value="${_('Reset')}" />
+        % endif
     % endif
     % if save_button:
     <input class="save" type="button" value="${_('Save')}" />
