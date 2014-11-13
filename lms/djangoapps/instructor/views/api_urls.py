@@ -27,8 +27,6 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_single_query', name="get_single_query"),
     url(r'^get_single_query',
         'instructor.views.api.get_single_query', name="get_single_query"),
-    url(r'^get_student_data(?P<csv>/csv)?$',
-        'instructor.views.api.get_student_data', name="get_student_data"),
     url(r'^get_students_features(?P<csv>/csv)?$',
         'instructor.views.api.get_students_features', name="get_students_features"),
     url(r'^get_purchase_transaction(?P<csv>/csv)?$',

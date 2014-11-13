@@ -758,26 +758,21 @@ class Membership
     #@email_lists[0].$container.addClass 'active'
     @$email_csv_btn = @$section.find("input[name='getcsv']'")
     @$email_csv_btn.click (e) =>
-      tab = $("#emailTable")
       b = []
+      tab = $("#emailTable")
       rows = tab.find("tr")
       _.each rows, (row) =>
-        type = row.classList[0]
-        problems = []
-        children = row.children
-        _.each children, (child) =>
-          id = child.id
-          html = child.innerHTML
-          problems.push({"id":id, "text":html})
-        problems = problems.slice(0,-1)
-        b.push([type, problems])
+        #todo: wait here if still computing?
+        for i in [1..row.classList.length-1] by 1
+                b.push(row.classList[i])
 
+      send_data = b.join(',')
       url = @$email_csv_btn.data 'endpoint'
       # handle csv special case
       # redirect the document to the csv file.
       url += '/csv'
       url += "?rolename=instructor"
-      url += "&queries="+ encodeURIComponent(JSON.stringify(b))
+      url += "&existing="+ encodeURIComponent(send_data)
       location.href = url
 
 

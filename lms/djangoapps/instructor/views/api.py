@@ -661,21 +661,15 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering):
 @require_level('instructor')
 def get_total_students(request, course_id, csv=False):
     existing = request.GET.get('existing')
-    if (existing !=None):
+    if (existing !=None and existing !=""):
         existing_queries = existing.split(',')
     else:
         existing_queries = []
-    #rolename = request.GET.get('rolename')
-    #queries = request.GET.get('queries')
-    #if not queries==None:
-    #    queries = eval(queries)
-    #else:
-    #    queries = []
-
-
+    rolename = request.GET.get('rolename')
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    data = data_access.make_query(course_id, existing_queries=existing_queries)
+    clean_existing = [query for query in existing_queries if (query !="working" and query!="")]
+    data = data_access.make_total_query(course_id,clean_existing)
     results = data[data.keys()[0]].getResults()
     emails = [pair[1] for pair in results]
 
@@ -696,19 +690,13 @@ def get_total_students(request, course_id, csv=False):
 @require_level('instructor')
 def get_single_query(request, course_id, inclusion, queryType, stateType, stateId, csv=False):
     filter = request.GET.get('filter')
-    #rolename = request.GET.get('rolename')
-    #queries = request.GET.get('queries')
-    #if not queries==None:
-    #    queries = eval(queries)
-    #else:
-    #    queries = []
-
+    rolename = request.GET.get('rolename')
 
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     processed = processNewQuery(course_id, inclusion, queryType, stateType+"/"+stateId, filter)
     if processed !=None:
-        data = data_access.make_query(course_id, processed)
+        data = data_access.make_single_query(course_id, processed)
         results = data[data.keys()[0]].getResults()
         emails = [pair[1] for pair in results]
     else:
@@ -726,45 +714,6 @@ def get_single_query(request, course_id, inclusion, queryType, stateType, stateI
     else:
         filename =  time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
         return instructor_analytics.csvs.create_csv_response(filename, ["emails"], [[item] for item in emails])
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
-@require_query_params(rolename="'instructor', 'staff', or 'beta'")
-def get_student_data(request, course_id, csv=False):
-    rolename = request.GET.get('rolename')
-    queries = request.GET.get('queries')
-    if not queries==None:
-        queries = eval(queries)
-    else:
-        queries = []
-
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    #warning possible code injection
-    #luckily we only look up things we recognize
-    processedQueries = []
-    for query in queries:
-        processed = processQuery(course_id, query)
-        #error if None is returned
-        if processed==None:
-            continue
-        processedQueries.append(processed)
-
-    data = data_access.get_users(course_id, processedQueries)
-
-    emails = [pair[1] for pair in data]
-    time.sleep(5)
-    if not csv:
-        response_payload = {
-            'course_id': course_id.to_deprecated_string(),
-            'data': emails
-        }
-        return  JsonResponse(response_payload)
-    else:
-        filename =  time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
-        return instructor_analytics.csvs.create_csv_response(filename, ["emails"], [[item] for item in emails])
-
-
 
 
 def pruneCourseTree(courseTree, includePattern):
