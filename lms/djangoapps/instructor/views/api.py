@@ -670,7 +670,7 @@ def get_total_students(request, course_id, csv=False):
 
     clean_existing = [query for query in existing_queries if (query !="working" and query!="")]
     data = data_access.make_total_query(course_id,clean_existing)
-    results = data[data.keys()[0]].getResults()
+    results = data[data.keys()[0]]
     emails = [pair[1] for pair in results]
 
     if not csv:
@@ -697,7 +697,7 @@ def get_single_query(request, course_id, inclusion, queryType, stateType, stateI
     processed = processNewQuery(course_id, inclusion, queryType, stateType+"/"+stateId, filter)
     if processed !=None:
         data = data_access.make_single_query(course_id, processed)
-        results = data[data.keys()[0]].getResults()
+        results = data[data.keys()[0]]
         emails = [pair[1] for pair in results]
     else:
         emails = []
