@@ -9,6 +9,7 @@ import os
 import traceback
 import struct
 import sys
+import pdb
 
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
@@ -801,6 +802,7 @@ class CapaMixin(CapaFields):
     def is_past_due(self):
         """
         Is it now past this problem's due date, including grace period?
+        self.close_date accounts for the grace period add-on
         """
         return (self.close_date is not None and
                 datetime.datetime.now(UTC()) > self.close_date)
@@ -1074,6 +1076,18 @@ class CapaMixin(CapaFields):
 
         return {'grade': score['score'], 'max_grade': score['total']}
 
+    def get_empty_response(self):
+        """
+        Returns a dict representing an empty response (empty string) to
+        all questions. Useful for auto-submitting for the student at the
+        end of timed mulit-attempt exams
+        """
+        answers = {}
+        for row in self.lcp.get_answer_ids():
+            answer_id = row[0]
+            answers[answer_id] = ''
+        return answers
+
     # pylint: disable=too-many-statements
     def check_problem(self, data, override_time=False):
         """
@@ -1108,7 +1122,8 @@ class CapaMixin(CapaFields):
             # set the answers as the last ones saved, and move on.
             # This is equivalent to "auto-submitting" for the student
             if self.is_timed_problem() and self.attempts_still_available():
-                answers = self.student_answers
+                answers = self.get_empty_response()
+                answers.update(self.student_answers)
                 time_expired = True
                 # TODO Find appropriate dog stats metric and record
                 # that we've failed recording things
