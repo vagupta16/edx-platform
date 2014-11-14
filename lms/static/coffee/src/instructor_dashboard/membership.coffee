@@ -874,6 +874,7 @@ class Membership
       #totalRows =$("#emailTable")[0].rows.length
       #$("#emailTable")[0].deleteRow(rowIdx-1);
       event.target.parentNode.parentNode.remove()
+      @remove_row($tr)
     return $tr
       #@reload_students()
 
@@ -905,7 +906,7 @@ class Membership
           cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
 
    # reload the list of members
-    reload_students: (tr) ->
+  reload_students: (tr) ->
       # @clear_rows()
       #$("#estimated")[0].innerHTML= "Calculating"
       @get_students (error, students) =>
@@ -921,6 +922,37 @@ class Membership
         tr.addClass(query_id.toString())
         #$("#estimated").addClass(query_id.toString())
 
+
+  remove_query: (tr)->
+      tab = $("#emailTable")
+      b = []
+      rows = tab.find("tr")
+      _.each rows, (row) =>
+        type = row.classList[0]
+        problems = []
+        children = row.children
+        _.each children, (child) =>
+          id = child.id
+          html = child.innerHTML
+          problems.push({"id":id, "text":html})
+        problems = problems.slice(0,-1)
+        b.push([type, problems])
+      send_data =
+        filter: @filtering
+        existing : @existing
+      $.ajax
+        dataType: 'json'
+        url: @use_query_endpoint
+        data: send_data
+        success: (data) => cb? null, data
+        error: std_ajax_err =>
+          `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
+          cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
+
+   # reload the list of members
+  remove_row: (tr) ->
+      #$("#estimated")[0].innerHTML= "Calculating"
+      @remove_query( tr)
 
 
   get_estimated: (cb)->
@@ -942,8 +974,8 @@ class Membership
           `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
           cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
 
-    # reload the list of members
-    reload_estimated: (tr) ->
+  # reload the list of members
+  reload_estimated: (tr) ->
       # @clear_rows()
       $("#estimated")[0].innerHTML= "Calculating"
       @get_estimated (error, students) =>
