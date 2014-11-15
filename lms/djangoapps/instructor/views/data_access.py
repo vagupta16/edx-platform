@@ -7,9 +7,11 @@ from django.contrib.auth.models import User
 from data_access_constants import *
 from django.db.models import Q
 from collections import defaultdict
+import time
 
 def make_single_query(course_id, query):
     #store query into QueriesTemporary
+    time.sleep(10)
     q = QueriesTemporary(inclusion=INCLUSION_MAP.get(query.inclusion),
                          course_id = course_id,
                          module_state_key=query.id,

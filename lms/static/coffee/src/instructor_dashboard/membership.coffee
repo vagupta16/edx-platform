@@ -797,6 +797,9 @@ class Membership
       auth_list.re_view()
 
       $('#addQuery').click =>
+        @$email_csv_btn.addClass("disabled")
+        @$email_csv_btn[0].value = "Aggregating Queries"
+
         selected = @$email_list_containers.find('select.single-email-selector').children('option:selected')
         #check to see if stuff has been filled out
         if selected[1].text=="Section"
@@ -851,6 +854,25 @@ class Membership
       if cellid !=""
         cell.id = cellid
 
+  check_done: ->
+    #check if all other queries have returned, if so can get total csv
+    b = []
+    tab = $("#emailTable")
+    rows = tab.find("tr")
+    _.each rows, (row) =>
+      for i in [1..row.classList.length-1] by 1
+              b.push(row.classList[i])
+
+    allGood = true
+    _.each b, (status) =>
+      if status=="working"
+        allGood = false
+
+    if allGood
+      @$email_csv_btn.removeClass("disabled")
+      @$email_csv_btn[0].value = "Download CSV"
+
+
   start_row: (color) ->
     $tbody = $( "#emailTable" )
     numRows = $tbody[0].children.length
@@ -874,7 +896,7 @@ class Membership
       #totalRows =$("#emailTable")[0].rows.length
       #$("#emailTable")[0].deleteRow(rowIdx-1);
       event.target.parentNode.parentNode.remove()
-      @remove_row($tr)
+      @check_done()
     return $tr
       #@reload_students()
 
@@ -920,39 +942,9 @@ class Membership
         #$("#estimated")[0].innerHTML= $number_students+" students selected"
         tr.removeClass('working')
         tr.addClass(query_id.toString())
+        @check_done()
+
         #$("#estimated").addClass(query_id.toString())
-
-
-  remove_query: (tr)->
-      tab = $("#emailTable")
-      b = []
-      rows = tab.find("tr")
-      _.each rows, (row) =>
-        type = row.classList[0]
-        problems = []
-        children = row.children
-        _.each children, (child) =>
-          id = child.id
-          html = child.innerHTML
-          problems.push({"id":id, "text":html})
-        problems = problems.slice(0,-1)
-        b.push([type, problems])
-      send_data =
-        filter: @filtering
-        existing : @existing
-      $.ajax
-        dataType: 'json'
-        url: @use_query_endpoint
-        data: send_data
-        success: (data) => cb? null, data
-        error: std_ajax_err =>
-          `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
-          cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
-
-   # reload the list of members
-  remove_row: (tr) ->
-      #$("#estimated")[0].innerHTML= "Calculating"
-      @remove_query( tr)
 
 
   get_estimated: (cb)->
@@ -960,7 +952,6 @@ class Membership
       tab = $("#emailTable")
       rows = tab.find("tr")
       _.each rows, (row) =>
-        #todo: wait here if still computing?
         for i in [1..row.classList.length-1] by 1
                 b.push(row.classList[i])
       send_data =

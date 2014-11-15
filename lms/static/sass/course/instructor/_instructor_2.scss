@@ -693,7 +693,9 @@ section.instructor-dashboard-content-2 {
 
 
         // .add-field
-
+       .working{
+         color:white;
+       }
 
 
         .bottom-email {
@@ -712,6 +714,10 @@ section.instructor-dashboard-content-2 {
           right: $baseline;
           font-size: 15px;
         }
+
+       .disabled{
+         button:disabled;
+       }
 
         }
 
