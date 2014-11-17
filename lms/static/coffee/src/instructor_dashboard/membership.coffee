@@ -676,7 +676,8 @@ class EmailWidget
     if useClass=="subsection"
       @toDisplay = "---"+@toDisplay
     if @toDisplay.length>50
-      @toDisplay = "..."+@toDisplay.substring(@toDisplay.length-80, @toDisplay.length)
+      #displaying the last n characters
+      @toDisplay = "..."+@toDisplay.substring(@toDisplay.length-60, @toDisplay.length)
     @$list_selector.append $ '<option/>',
             text: @toDisplay
             class: useClass
@@ -756,6 +757,7 @@ class Membership
       #$("#estimated").addClass(query_id.toString())
 
     #@email_lists[0].$container.addClass 'active'
+    @$save_query_btn = @$section.find("input[name='savequery']'")
     @$email_csv_btn = @$section.find("input[name='getcsv']'")
     @$email_csv_btn.click (e) =>
       b = []
@@ -797,6 +799,7 @@ class Membership
       auth_list.re_view()
 
       $('#addQuery').click =>
+        @$save_query_btn.addClass("disabled")
         @$email_csv_btn.addClass("disabled")
         @$email_csv_btn[0].value = "Aggregating Queries"
 
@@ -815,23 +818,12 @@ class Membership
             return
         $("#incompleteMessage")[0].innerHTML = ""
         @chosen = selected[0].text
-        if @chosen !=""
-          if @chosen=="AND"
-            @tr = @start_row("and")
-          else if @chosen=="NOT"
-            @tr = @start_row("not")
-          else
-            @tr = @start_row("or")
+        @tr = @start_row(@chosen.toLowerCase(), @arr)
         @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).join("/")+"/"+@arr[2].id
         @filtering = @arr[3].text
         @existing = $("#estimated")[0].classList.toString()
         @tr.addClass("working")
         @reload_students(@tr)
-
-        i = 0
-        for item in @arr
-          @set_cell(item.text,i, item.id )
-          i= i+1
         @$email_list_containers.find('select.single-email-selector').prop('selectedIndex',0);
         $(".problem_specific").removeClass('active')
         $(".section_specific").removeClass('active')
@@ -840,19 +832,6 @@ class Membership
 
     # one-time first selection of top list.
     @$list_selector.change()
-
-  set_cell: (text, colNumber,cellid) ->
-    $tbody = $( "#emailTable" )
-    rows = $("#emailTable")[0].rows
-    rowNumber = rows.length
-    cell = rows[rows.length-1].children[colNumber]
-    #rowNumber = $tbody[0].children.length
-
-    #cell = $(["#emailtable",rowNumber, colNumber].join("-"))
-    if cell
-      cell.innerHTML = text
-      if cellid !=""
-        cell.id = cellid
 
   check_done: ->
     #check if all other queries have returned, if so can get total csv
@@ -869,36 +848,53 @@ class Membership
         allGood = false
 
     if allGood
+      @$save_query_btn.removeClass("disabled")
       @$email_csv_btn.removeClass("disabled")
       @$email_csv_btn[0].value = "Download CSV"
 
 
-  start_row: (color) ->
-    $tbody = $( "#emailTable" )
-    numRows = $tbody[0].children.length
-    $tr = $ '<tr>',
-       class: color
-    @id = 0
-    for num in [1..5]
-      $td = $ '<td>',
-        text : ""
-        #id is not useful anymore because we can delete rows
-        #id : ["emailtable",numRows+1, @id].join("-")
-      #@id = @id+1
-      $tr.append $td
-    $tbody.append $tr
-    $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"}),
-            class: 'remove'
+  start_row:(color, arr) ->
+    $table = $( "#emailTable" )
+    #find which row to insert in
+    idx =0
+    orIdx = 0
+    andIdx = 0
+    notIdx = 0
+    useIdx = 0
+    rows = $("#emailTable" )[0].children
+    #figuring out where to place the new row
+    #we want the group order to be and, or, not
+    for curRow in rows
+      idx +=1
+      if curRow.classList.contains("or")
+        orIdx = idx
+      if curRow.classList.contains("and")
+        andIdx = idx
+      if curRow.classList.contains("not")
+        notIdx = idx
+      if curRow.classList.contains(color)
+        useIdx = idx
 
-    @set_cell($revoke_btn[0].outerHTML,4,"")
+    if color=="or" and useIdx==0
+      useIdx =notIdx
+    if color=="not" and useIdx==0
+      useIdx =andIdx
+    row = $table[0].insertRow(useIdx);
+    row.classList.add(color)
+    for num in [0..3]
+      cell = row.insertCell(num)
+      item = arr[num]
+      cell.innerHTML = item.text
+      if item.id !=""
+        cell.id = item.id
+    $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"}),
+      class: 'remove'
+    lastcell =row.insertCell(4)
+    lastcell.innerHTML = $revoke_btn[0].outerHTML
     $('.remove').click =>
-      #rowIdx = event.target.parentElement.parentElement.rowIndex
-      #totalRows =$("#emailTable")[0].rows.length
-      #$("#emailTable")[0].deleteRow(rowIdx-1);
       event.target.parentNode.parentNode.remove()
       @check_done()
-    return $tr
-      #@reload_students()
+    return $(row)
 
 
   get_students: (cb)->

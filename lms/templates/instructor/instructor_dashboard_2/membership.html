@@ -305,6 +305,7 @@
       <br/>
       <div class="bottom-email">
           <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_total_students'] }" data-csv="true" class="disabled">
+          <input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['get_total_students'] }" data-csv="true" class="disabled">
 
           <div id="estimated">0 students selected</div>
           <input type="button" name="getest" id="getest" value="Update Estimate" data-endpoint="${ section_data['get_total_students'] }" >
@@ -322,7 +323,7 @@
             students who have opened problem 2. <br/><br/>
             <i>AND</i> queries are grouped together and the intersection of the results is taken.<br/>
             <i>NOT</i> and </i><i>OR</i> queries are grouped together and the union of the results is taken. <br/>
-            The final result is (<i>AND</i>)+(<i>OR</i>) -(<i>NOT</i>)
+            The final result is ((<i>AND</i>)-(<i>NOT</i>))+(<i>OR</i>)
         </div>
         </div>
 

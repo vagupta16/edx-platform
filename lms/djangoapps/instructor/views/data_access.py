@@ -11,7 +11,6 @@ import time
 
 def make_single_query(course_id, query):
     #store query into QueriesTemporary
-    time.sleep(10)
     q = QueriesTemporary(inclusion=INCLUSION_MAP.get(query.inclusion),
                          course_id = course_id,
                          module_state_key=query.id,
@@ -19,9 +18,9 @@ def make_single_query(course_id, query):
     q.save()
 
     if query.type==QUERY_TYPE.SECTION:
-        students = get_section_users_s(course_id, query, None)
+        students = get_section_users_s(course_id, query)
     else:
-        students = get_problem_users_s(course_id, query, None)
+        students = get_problem_users_s(course_id, query)
 
     for studentid, studentemail in students:
         row = QueriesStudents(query=q, inclusion=INCLUSION_MAP[query.inclusion], student=User.objects.filter(id=studentid)[0])
@@ -41,15 +40,15 @@ def make_total_query(course_id, existing_queries):
 
 
 
-def get_problem_users_s(course_id, query, existing_queries):
+def get_problem_users_s(course_id, query):
     if query.filter==PROBLEM_FILTERS.OPENED:
-        results = open_query(course_id, query, existing_queries)
+        results = open_query(course_id, query)
     elif query.filter==PROBLEM_FILTERS.COMPLETED:
-        results = completed_query(course_id, query, existing_queries)
+        results = completed_query(course_id, query)
     return results
 
-def get_section_users_s(course_id, query, existing_queries):
-    return open_query(course_id, query, existing_queries)
+def get_section_users_s(course_id, query):
+    return open_query(course_id, query)
 
 
 def make_existing(existing_queries):
@@ -89,7 +88,7 @@ def completed_query(course_id, query):
     return processResults(course_id, query, querySet)
 
 
-def open_query(course_id, query,  existing_queries):
+def open_query(course_id, query):
     #starting = make_existing(existing_queries)
     queryset = StudentModule.objects.filter(module_state_key=query.id, course_id = course_id)
     return processResults(course_id, query, queryset)

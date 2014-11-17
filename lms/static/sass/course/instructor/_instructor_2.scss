@@ -625,7 +625,7 @@ section.instructor-dashboard-content-2 {
           }
 
           thead {
-            background-color: $light-gray;
+            background-color: dimgrey;
           }
 
           tr {
@@ -633,7 +633,7 @@ section.instructor-dashboard-content-2 {
           }
 
           .or{
-             background-color: lightgray;
+             background-color: lightslategrey;
           }
 
           .and{
@@ -665,7 +665,7 @@ section.instructor-dashboard-content-2 {
           }
 
          .remove {
-          color: $lighter-base-font-color;
+          color: white;
           cursor: pointer;
 
           &:hover, &:focus {
@@ -679,6 +679,7 @@ section.instructor-dashboard-content-2 {
             padding: ($baseline/2) ($baseline/4);
             border-left:  1px solid $light-gray;
             border-right: 1px solid $light-gray;
+            color: white;
           }
 
 
@@ -693,9 +694,9 @@ section.instructor-dashboard-content-2 {
 
 
         // .add-field
-       .working{
-         color:white;
-       }
+         .working{
+           color:black;
+         }
 
 
         .bottom-email {
@@ -708,9 +709,17 @@ section.instructor-dashboard-content-2 {
           background-color: #efefef;
           box-shadow: inset #bbb 0px 1px 1px 0px;
         }
+
+       input[type="button"]#savequery {
+          @include idashbutton($red);
+          float:right;
+          right: $baseline;
+          font-size: 15px;
+        }
+
        input[type="button"]#getcsv {
           @include idashbutton($blue);
-          position: absolute;
+          float:right;
           right: $baseline;
           font-size: 15px;
         }
