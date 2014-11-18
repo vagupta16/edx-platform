@@ -1,9 +1,10 @@
 class Query:
-    def __init__(self, type, inclusion, id, filter):
+    def __init__(self, type, inclusion, id, filter, entityName):
         self.type= type
         self.inclusion= inclusion
         self.id = id
         self.filter = filter
+        self.entityName = entityName
 
 class QueryResults:
     def __init__(self):

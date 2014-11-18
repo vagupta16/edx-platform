@@ -624,7 +624,7 @@ def processQuery(courseId, query):
 
     return Query(queryType, queryIncl, queryId, queryFiltering)
 
-def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering):
+def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, entityName):
     blocks = queryId.split("/")
     if len(blocks) !=2:
         return
@@ -653,7 +653,59 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering):
         elif queryFiltering == "number of peer responses graded":
             queryFiltering = PROBLEM_FILTERS.NUMBER_PEER_GRADED
 
-    return Query(queryType, queryIncl, queryId, queryFiltering)
+    return Query(queryType, queryIncl, queryId, queryFiltering, entityName)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+def save_query(request, course_id):
+    existing = request.GET.get('existing')
+    if (existing !=None and existing !=""):
+        existing_queries = existing.split(',')
+    else:
+        existing_queries = []
+    rolename = request.GET.get('rolename')
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    #it should be clean when we get it. this is just in case
+    clean_existing = [query for query in existing_queries if (query !="working" and query!="")]
+    success = data_access.saveQuery(course_id,clean_existing)
+
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'success' : success
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+def get_saved_queries(request, course_id):
+    rolename = request.GET.get('rolename')
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    #it should be clean when we get it. this is just in case
+    created, queries = data_access.retrieveSavedQueries(course_id)
+    formatted_created = created.strftime("%m-%d-%y %H:%M")
+    cleaned_queries = []
+    for query in queries:
+        cleaned_queries.append({'inclusion':query.inclusion,
+                                'block_type': query.module_state_key.block_type,
+                                'block_id':query.module_state_key.block_id,
+                                'filter_on' : query.filter_on,
+                                'display_name':query.entity_name
+                                })
+
+
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'created': formatted_created,
+        'queries':cleaned_queries
+    }
+    return  JsonResponse(response_payload)
+
+
+
 
 
 @ensure_csrf_cookie
@@ -690,11 +742,12 @@ def get_total_students(request, course_id, csv=False):
 @require_level('instructor')
 def get_single_query(request, course_id, inclusion, queryType, stateType, stateId, csv=False):
     filter = request.GET.get('filter')
+    entity_name = request.GET.get('entityName')
     rolename = request.GET.get('rolename')
 
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    processed = processNewQuery(course_id, inclusion, queryType, stateType+"/"+stateId, filter)
+    processed = processNewQuery(course_id, inclusion, queryType, stateType+"/"+stateId, filter, entity_name)
     if processed !=None:
         data = data_access.make_single_query(course_id, processed)
         results = data[data.keys()[0]]

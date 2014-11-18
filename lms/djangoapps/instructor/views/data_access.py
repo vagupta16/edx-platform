@@ -9,12 +9,44 @@ from django.db.models import Q
 from collections import defaultdict
 import time
 
+
+def saveQuery(course_id, queries):
+    tempQueries = QueriesTemporary.objects.filter(id__in=queries)
+    group = GroupedQueries(course_id = course_id, title = "")
+    group.save()
+    for tempQuery in tempQueries:
+        permQuery = QueriesSaved(inclusion=tempQuery.inclusion,
+                                 course_id=course_id,
+                                 module_state_key=tempQuery.module_state_key,
+                                 filter_on=tempQuery.filter_on,
+                                 entity_name=tempQuery.entity_name)
+        permQuery.save()
+        relation = GroupedQueriesSubqueries(grouped=group,
+                                            query=permQuery)
+        relation.save()
+    return True
+
+def retrieveSavedQueries(course_id):
+    group = GroupedQueries.objects.filter(course_id = course_id)
+    relation = GroupedQueriesSubqueries.objects.filter(grouped__in=group)
+    queries = QueriesSaved.objects.filter(id__in=relation.values_list('query'))
+
+    if len(group)>0:
+        return group[0].created, queries
+    else:
+        return 0, []
+
+
+
+
+
 def make_single_query(course_id, query):
     #store query into QueriesTemporary
     q = QueriesTemporary(inclusion=INCLUSION_MAP.get(query.inclusion),
                          course_id = course_id,
                          module_state_key=query.id,
-                         filter_on=query.filter)
+                         filter_on=query.filter,
+                         entity_name=query.entityName)
     q.save()
 
     if query.type==QUERY_TYPE.SECTION:

@@ -257,6 +257,8 @@ def _section_membership(course_key, access):
         'list_course_problems': reverse('list_course_problems', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_total_students': reverse('get_total_students' ,kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_single_query': reverse('get_single_query' ,kwargs={'course_id': course_key.to_deprecated_string()}),
+        'save_query': reverse('save_query' ,kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_saved_queries': reverse('get_saved_queries' ,kwargs={'course_id': course_key.to_deprecated_string()}),
     }
     return section_data
 

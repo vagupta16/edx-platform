@@ -577,7 +577,7 @@ class EmailWidget
     template_html = $("#email-list-widget-template").html()
     @$container.html Mustache.render template_html, params
     @cur_column = 0
-    @$table = $( "#emailTable" )
+    @$table = $( "#queryTableBody" )
 
     @labelArray = ($container.data 'selections').split '<>'
     @$list_selector = @$container.find 'select.single-email-selector'
@@ -684,8 +684,8 @@ class EmailWidget
             id : @idSt
 
   set_cell: (text, colNumber,cellid) ->
-    $tbody = $( "#emailTable" )
-    rows = $("#emailTable")[0].rows
+    $tbody = $( "#queryTableBody" )
+    rows = $("#queryTableBody")[0].rows
     rowNumber = rows.length
     cell = rows[rows.length-1].children[colNumber]
     #rowNumber = $tbody[0].children.length
@@ -758,13 +758,35 @@ class Membership
 
     #@email_lists[0].$container.addClass 'active'
     @$save_query_btn = @$section.find("input[name='savequery']'")
+    @$save_query_btn.click (e) =>
+      b = []
+      tab = $("#queryTableBody")
+      rows = tab.find("tr")
+      _.each rows, (row) =>
+        for i in [1..row.classList.length-1] by 1
+                b.push(row.classList[i])
+
+      send_data = b.join(',')
+      url = @$save_query_btn.data 'endpoint'
+
+      send_data =
+        existing: b.join(',')
+      $.ajax
+        dataType: 'json'
+        url: url
+        data: send_data
+        #success: (data) => cb? null, data
+        #error: std_ajax_err =>
+
+
+
+
     @$email_csv_btn = @$section.find("input[name='getcsv']'")
     @$email_csv_btn.click (e) =>
       b = []
-      tab = $("#emailTable")
+      tab = $("#queryTableBody")
       rows = tab.find("tr")
       _.each rows, (row) =>
-        #todo: wait here if still computing?
         for i in [1..row.classList.length-1] by 1
                 b.push(row.classList[i])
 
@@ -821,7 +843,7 @@ class Membership
         @tr = @start_row(@chosen.toLowerCase(), @arr)
         @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).join("/")+"/"+@arr[2].id
         @filtering = @arr[3].text
-        @existing = $("#estimated")[0].classList.toString()
+        @entityName = @arr[2].text
         @tr.addClass("working")
         @reload_students(@tr)
         @$email_list_containers.find('select.single-email-selector').prop('selectedIndex',0);
@@ -836,7 +858,7 @@ class Membership
   check_done: ->
     #check if all other queries have returned, if so can get total csv
     b = []
-    tab = $("#emailTable")
+    tab = $("#queryTableBody")
     rows = tab.find("tr")
     _.each rows, (row) =>
       for i in [1..row.classList.length-1] by 1
@@ -854,14 +876,14 @@ class Membership
 
 
   start_row:(color, arr) ->
-    $table = $( "#emailTable" )
+    $table = $( "#queryTableBody" )
     #find which row to insert in
     idx =0
     orIdx = 0
     andIdx = 0
     notIdx = 0
     useIdx = 0
-    rows = $("#emailTable" )[0].children
+    rows = $("#queryTableBody" )[0].children
     #figuring out where to place the new row
     #we want the group order to be and, or, not
     for curRow in rows
@@ -898,7 +920,7 @@ class Membership
 
 
   get_students: (cb)->
-      tab = $("#emailTable")
+      tab = $("#queryTableBody")
       b = []
       rows = tab.find("tr")
       _.each rows, (row) =>
@@ -913,7 +935,7 @@ class Membership
         b.push([type, problems])
       send_data =
         filter: @filtering
-        existing : @existing
+        entityName: @entityName
       $.ajax
         dataType: 'json'
         url: @use_query_endpoint
@@ -943,9 +965,12 @@ class Membership
         #$("#estimated").addClass(query_id.toString())
 
 
+
+
+
   get_estimated: (cb)->
       b = []
-      tab = $("#emailTable")
+      tab = $("#queryTableBody")
       rows = tab.find("tr")
       _.each rows, (row) =>
         for i in [1..row.classList.length-1] by 1

@@ -290,7 +290,7 @@
 
     <div class="email-list-widget">
     <div class="email-list">
-      <table>
+      <table id="queryTable">
         <thead>
           <tr>
               <td class="label"> Inclusion</td>
@@ -300,18 +300,33 @@
               <td class="label"> </td>
           </tr>
         </thead>
-        <tbody id="emailTable"></tbody>
+        <tbody id="queryTableBody"></tbody>
       </table>
       <br/>
       <div class="bottom-email">
           <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_total_students'] }" data-csv="true" class="disabled">
-          <input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['get_total_students'] }" data-csv="true" class="disabled">
+          <input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['save_query'] }" data-csv="true" class="disabled">
+          <!--input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['get_saved_queries'] }" data-csv="true"-->
 
           <div id="estimated">0 students selected</div>
           <input type="button" name="getest" id="getest" value="Update Estimate" data-endpoint="${ section_data['get_total_students'] }" >
 
-
       </div>
+
+      <table>
+        <thead>
+          <tr>
+              <td class="label"> Date Saved</td>
+              <td class="label"> Query </td>
+              <td class="label"> Load </td>
+              <td class="label"> Delete </td>
+          </tr>
+        </thead>
+        <tbody id="emailTable"></tbody>
+      </table>
+       <br/>
+
+
         <br/>
         <div>
         <h3>Example:</h3>
