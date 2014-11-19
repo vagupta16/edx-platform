@@ -314,6 +314,7 @@ class QueriesSaved(models.Model):
     inclusion = models.CharField(max_length=1, choices=inclusions)
     filter_on = models.CharField(max_length=255)
     entity_name = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
     def __unicode__(self):
         return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,
                                                              self.course_id,
@@ -335,6 +336,7 @@ class QueriesTemporary(models.Model):
     filter_on = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     entity_name = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
 
     def __unicode__(self):
         return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,

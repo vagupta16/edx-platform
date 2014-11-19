@@ -799,7 +799,9 @@ class Membership
       url += "&existing="+ encodeURIComponent(send_data)
       location.href = url
 
-
+    @$savedQueriesTable = $("#savedQueriesTable")
+    @$savedQueriesEndpoint = @$savedQueriesTable.data 'endpoint'
+    @load_saved_queries()
 
     # populate selector
     @$list_selector.empty()
@@ -828,19 +830,26 @@ class Membership
         selected = @$email_list_containers.find('select.single-email-selector').children('option:selected')
         #check to see if stuff has been filled out
         if selected[1].text=="Section"
-          @arr = [selected[0], selected[1], selected[4], selected[5]]
+          @arr = [{'text':selected[0].text, 'id':selected[0].id},
+                  {'text':selected[1].text, 'id':selected[1].id},
+                  {'text':selected[4].text, 'id':selected[4].id},
+                  {'text':selected[5].text, 'id':selected[5].id}]
           @arr_text = [selected[0].text, selected[1].text, selected[4].text, selected[5].text]
+
         else
-          @arr = [selected[0], selected[1], selected[2], selected[3]]
+          @arr = [{'text':selected[0].text, 'id':selected[0].id},
+                  {'text':selected[1].text, 'id':selected[1].id},
+                  {'text':selected[2].text, 'id':selected[2].id},
+                  {'text':selected[3].text, 'id':selected[3].id}]
           @arr_text = [selected[0].text, selected[1].text, selected[2].text, selected[3].text]
 
         for thing in @arr
-          if thing.text==""
+          if thing['text']==""
             $("#incompleteMessage")[0].innerHTML = "Query is incomplete. Please make all the selections."
             return
         $("#incompleteMessage")[0].innerHTML = ""
         @chosen = selected[0].text
-        @tr = @start_row(@chosen.toLowerCase(), @arr)
+        @tr = @start_row(@chosen.toLowerCase(), @arr,"", $( "#queryTableBody" ))
         @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).join("/")+"/"+@arr[2].id
         @filtering = @arr[3].text
         @entityName = @arr[2].text
@@ -854,6 +863,76 @@ class Membership
 
     # one-time first selection of top list.
     @$list_selector.change()
+
+    # send ajax request to list members
+    # `cb` is called with cb(error, member_list)
+  get_saved_queries: (cb)->
+    $.ajax
+      dataType: 'json'
+      url: @$savedQueriesEndpoint
+      data: rolename: 'instructor'
+      success: (data) => cb? null, data
+      error: std_ajax_err =>
+        `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
+        cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
+
+ # reload the list of members
+  load_saved_queries: ->
+    # @clear_rows()
+    @get_saved_queries (error, data) =>
+      # abort on error
+      return @show_errors error unless error is null
+      queries = data['queries']
+      id = data['course_id']
+      invisibleTable = $("#invisibleQueriesStorage")
+      # use _.each instead of 'for' so that member
+      # is bound in the button callback.
+      groups = new Set()
+      _.each queries, (query) =>
+        block_id = query['block_id']
+        block_type = query['block_type']
+        state_key = block_type+"/" +block_id
+        display_name = query['display_name']
+        display_entity = {'text':display_name, 'id':state_key}
+        filter_on = {'text':query['filter_on']}
+        inclusion = {'text':query['inclusion']}
+        created = query['created']
+        type = {'text':query['type']}
+        arr = [inclusion,type, display_entity, filter_on]
+        @tr = @start_row(inclusion['text'],arr,{'class':"saved"+query.group}, $( "#invisibleQueriesStorage" ))
+        @tr[0].setAttribute('created',created)
+        groups.add(query.group)
+      group_arr = []
+
+      iter = groups.values()
+      val = iter.next()
+      while (val['done']==false)
+        group_arr.push(val['value'])
+        val = iter.next()
+
+
+      group_arr.sort((a, b)=>return b-a)
+      for group in group_arr
+        query_string = ""
+        lookup = ".saved"+group
+        saved_qs = $(lookup)
+        qarr = []
+        types = []
+        names = []
+        time = ""
+        for q in saved_qs
+          cells = q.children
+          types.push(cells[0].innerText)
+          names.push(cells[2].innerText)
+          time = q.getAttribute('created')
+        display_st = ""
+        for i in [0..types.length-1]
+          display_st += types[i]
+          display_st +=" "
+          display_st += names[i]+" "
+        arr = [{"text":time}, {"text":display_st}]
+        @start_saved_row("and",arr, group, $( "#savedQueriesTable" ) )
+
 
   check_done: ->
     #check if all other queries have returned, if so can get total csv
@@ -874,16 +953,37 @@ class Membership
       @$email_csv_btn.removeClass("disabled")
       @$email_csv_btn[0].value = "Download CSV"
 
+  start_saved_row:(color, arr, id, table) ->
+    #find which row to insert in
+    rows = table[0].children
+    row = table[0].insertRow(rows);
+    row.setAttribute("groupQuery", id)
+    for num in [0..1]
+      cell = row.insertCell(num)
+      item = arr[num]
+      cell.innerHTML = item['text']
+      if item.hasOwnProperty('id')
+        cell.id = item['id']
+    $delete_btn = $ _.template('<div class="deleteSaved"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Delete"}),
+      class: 'deleteSaved'
+    lastcell =row.insertCell(2)
+    lastcell.innerHTML = $delete_btn[0].outerHTML
+    $('.deleteSaved').click =>
+      event.target.parentNode.parentNode.remove()
+      @check_done()
+    return $(row)
 
-  start_row:(color, arr) ->
-    $table = $( "#queryTableBody" )
+
+
+  start_row:(color, arr, rowIdClass, table) ->
+
     #find which row to insert in
     idx =0
     orIdx = 0
     andIdx = 0
     notIdx = 0
     useIdx = 0
-    rows = $("#queryTableBody" )[0].children
+    rows = table[0].children
     #figuring out where to place the new row
     #we want the group order to be and, or, not
     for curRow in rows
@@ -901,14 +1001,18 @@ class Membership
       useIdx =notIdx
     if color=="not" and useIdx==0
       useIdx =andIdx
-    row = $table[0].insertRow(useIdx);
+    row = table[0].insertRow(useIdx);
+    if rowIdClass.hasOwnProperty('id')
+      row.id = rowIdClass['id']
+    if rowIdClass.hasOwnProperty('class')
+      row.classList.add(rowIdClass['class'])
     row.classList.add(color)
     for num in [0..3]
       cell = row.insertCell(num)
       item = arr[num]
-      cell.innerHTML = item.text
-      if item.id !=""
-        cell.id = item.id
+      cell.innerHTML = item['text']
+      if item['id'] !=""
+        cell.id = item['id']
     $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"}),
       class: 'remove'
     lastcell =row.insertCell(4)

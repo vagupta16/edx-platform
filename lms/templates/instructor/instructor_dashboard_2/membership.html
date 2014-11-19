@@ -322,8 +322,12 @@
               <td class="label"> Delete </td>
           </tr>
         </thead>
-        <tbody id="emailTable"></tbody>
+        <tbody id="savedQueriesTable" data-endpoint="${ section_data['get_saved_queries'] }"></tbody>
+
       </table>
+        <table>
+            <tbody id="invisibleQueriesStorage" data-endpoint="${ section_data['get_saved_queries'] }"></tbody>
+        </table>
        <br/>
 
 

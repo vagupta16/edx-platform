@@ -8,6 +8,7 @@ from data_access_constants import *
 from django.db.models import Q
 from collections import defaultdict
 import time
+import datetime
 
 
 def saveQuery(course_id, queries):
@@ -19,7 +20,8 @@ def saveQuery(course_id, queries):
                                  course_id=course_id,
                                  module_state_key=tempQuery.module_state_key,
                                  filter_on=tempQuery.filter_on,
-                                 entity_name=tempQuery.entity_name)
+                                 entity_name=tempQuery.entity_name,
+                                 type=tempQuery.type)
         permQuery.save()
         relation = GroupedQueriesSubqueries(grouped=group,
                                             query=permQuery)
@@ -32,9 +34,9 @@ def retrieveSavedQueries(course_id):
     queries = QueriesSaved.objects.filter(id__in=relation.values_list('query'))
 
     if len(group)>0:
-        return group[0].created, queries
+        return (group, queries, relation)
     else:
-        return 0, []
+        return ([], [], [])
 
 
 
@@ -46,7 +48,8 @@ def make_single_query(course_id, query):
                          course_id = course_id,
                          module_state_key=query.id,
                          filter_on=query.filter,
-                         entity_name=query.entityName)
+                         entity_name=query.entityName,
+                         type=query.type)
     q.save()
 
     if query.type==QUERY_TYPE.SECTION:

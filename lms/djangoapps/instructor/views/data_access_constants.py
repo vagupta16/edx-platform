@@ -53,16 +53,21 @@ INCLUSION_MAP = {INCLUSION.AND : 'A',
                  INCLUSION.NOT : 'N',
                  INCLUSION.FILTER:'F'}
 
+REVERSE_INCLUSION_MAP = {'A' : INCLUSION.AND,
+                         'O' : INCLUSION.OR,
+                         'N' : INCLUSION.NOT,
+                         'F' : INCLUSION.FILTER}
+
 class SECTION_FILTERS:
-    OPENED="OPENED"
-    COMPLETED="COMPLETED"
+    OPENED="Opened"
+    COMPLETED="Completed"
 
 class PROBLEM_FILTERS:
     OPENED= SECTION_FILTERS.OPENED
-    COMPLETED="COMPLETED"
-    SCORE="SCORE"
-    NUMBER_PEER_GRADED="NUMBER_PEER_GRADED"
+    COMPLETED="Completed"
+    SCORE="Score"
+    NUMBER_PEER_GRADED="Number peer graded"
 
 class QUERY_TYPE:
-    SECTION="SECTION"
-    PROBLEM="PROBLEM"
+    SECTION="Section"
+    PROBLEM="Problem"

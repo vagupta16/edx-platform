@@ -729,7 +729,15 @@ section.instructor-dashboard-content-2 {
          button:disabled;
        }
 
-        }
+       #savedQueriesTable{
+         background-color:darkorange;
+
+       }
+
+       #invisibleQueriesStorage{
+         display:block;
+       }
+     }
 
 }
 

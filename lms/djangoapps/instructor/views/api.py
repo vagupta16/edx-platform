@@ -85,7 +85,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys import InvalidKeyError
 import data_access
-from data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query
+from data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query, REVERSE_INCLUSION_MAP
 
 log = logging.getLogger(__name__)
 
@@ -685,21 +685,31 @@ def get_saved_queries(request, course_id):
     rolename = request.GET.get('rolename')
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     #it should be clean when we get it. this is just in case
-    created, queries = data_access.retrieveSavedQueries(course_id)
-    formatted_created = created.strftime("%m-%d-%y %H:%M")
+    groups, queries, relations = data_access.retrieveSavedQueries(course_id)
     cleaned_queries = []
+    relationMap = {}
+    createdMap = {}
+    for relation in relations:
+        relationMap[relation.query_id] = relation.grouped_id
+    for group in groups:
+        createdMap[group.id]= group.created.strftime("%m-%d-%y %H:%M")
+
+
     for query in queries:
-        cleaned_queries.append({'inclusion':query.inclusion,
+        groupId = relationMap[query.id]
+        cleaned_queries.append({'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
                                 'block_type': query.module_state_key.block_type,
                                 'block_id':query.module_state_key.block_id,
                                 'filter_on' : query.filter_on,
-                                'display_name':query.entity_name
+                                'display_name':query.entity_name,
+                                'type':query.type,
+                                'group': groupId,
+                                'created': createdMap[groupId]
                                 })
 
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
-        'created': formatted_created,
         'queries':cleaned_queries
     }
     return  JsonResponse(response_payload)
