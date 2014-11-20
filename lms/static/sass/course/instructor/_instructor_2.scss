@@ -637,11 +637,11 @@ section.instructor-dashboard-content-2 {
           }
 
           .and{
-             background-color: $blue;
+             background-color: darkseagreen;
           }
 
           .not{
-             background-color: mediumvioletred;
+             background-color: palevioletred;
           }
 
           .problem_specific,.section_specific{
@@ -652,11 +652,15 @@ section.instructor-dashboard-content-2 {
             display: table-cell;
           }
 
+          .addingQuery{
+            text-align: right;
+          }
+
           #addQuery {
             @include idashbutton($blue);
-            position: relative;
-            right: $baseline;
             font-size: 12px;
+            position:relative;
+            right: $baseline;
           }
 
           #incompleteMessage{
@@ -664,23 +668,52 @@ section.instructor-dashboard-content-2 {
             color: mediumvioletred;
           }
 
-         .remove {
-          color: white;
+         .remove{
+           color:white
+         }
+
+         .remove,.deleteSaved,{
           cursor: pointer;
+          text-align: center;
 
           &:hover, &:focus {
             color: $alert-color;
           }
          }
-          td {
-            @extend %t-copy-sub1;
-            vertical-align: middle;
-            word-wrap: break-word;
-            padding: ($baseline/2) ($baseline/4);
-            border-left:  1px solid $light-gray;
-            border-right: 1px solid $light-gray;
-            color: white;
+
+         .deleteSaved{
+           color:black
+         }
+
+
+         .loadQuery{
+          color: black;
+          cursor: pointer;
+          text-align: center;
+
+          &:hover, &:focus {
+            color: $blue;
           }
+         }
+       .tableCaption{
+         text-align: left;
+         padding:10px;
+         padding-left:5px;
+         padding-bottom: 10px;
+         font-weight: bold;
+       }
+
+        thead{
+          color:white;
+        }
+        td {
+          @extend %t-copy-sub1;
+          vertical-align: middle;
+          word-wrap: break-word;
+          padding: ($baseline/2) ($baseline/4);
+          border-left:  1px solid $light-gray;
+          border-right: 1px solid $light-gray;
+        }
 
 
          #estimated{
@@ -729,13 +762,18 @@ section.instructor-dashboard-content-2 {
          button:disabled;
        }
 
+       #queryTableBody{
+         color:white;
+       }
+
        #savedQueriesTable{
-         background-color:darkorange;
+         background-color:linen;
+         color:black;
 
        }
 
        #invisibleQueriesStorage{
-         display:block;
+         display:none;
        }
      }
 

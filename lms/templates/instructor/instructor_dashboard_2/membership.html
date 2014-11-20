@@ -231,7 +231,8 @@
 </div>
 
  <div class="email-lists-management" data-query-endpoint="${ section_data['get_single_query'] }"
-                                     data-total-endpoint="${ section_data['get_total_students'] }" >
+                                     data-total-endpoint="${ section_data['get_total_students'] }"
+                                     data-delete-saved-endpoint="${ section_data['delete_saved_query'] }"  >
 
     <div class="email-widget">
     <div class="header">
@@ -282,7 +283,7 @@
           </div>
         </span>
     </div>
-        <div align="right">
+        <div class="addingQuery">
             <span id="incompleteMessage"></span>
             <input type="button" name="addQuery" id="addQuery" value="Add Query" align="right">
          </div>
@@ -291,6 +292,7 @@
     <div class="email-list-widget">
     <div class="email-list">
       <table id="queryTable">
+          <caption class="tableCaption">Active Queries</caption>
         <thead>
           <tr>
               <td class="label"> Inclusion</td>
@@ -309,17 +311,19 @@
           <!--input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['get_saved_queries'] }" data-csv="true"-->
 
           <div id="estimated">0 students selected</div>
-          <input type="button" name="getest" id="getest" value="Update Estimate" data-endpoint="${ section_data['get_total_students'] }" >
+          <input type="button" name="getest" id="getest" value="Update Students Selected Estimate" data-endpoint="${ section_data['get_total_students'] }" >
+          <input type="button" name="startover" id="startover" value="Clear Active Queries">
 
       </div>
 
       <table>
+          <caption class="tableCaption">Saved Queries</caption>
         <thead>
           <tr>
               <td class="label"> Date Saved</td>
               <td class="label"> Query </td>
-              <td class="label"> Load </td>
-              <td class="label"> Delete </td>
+              <td class="label">  </td>
+              <td class="label">  </td>
           </tr>
         </thead>
         <tbody id="savedQueriesTable" data-endpoint="${ section_data['get_saved_queries'] }"></tbody>

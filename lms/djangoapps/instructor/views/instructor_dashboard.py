@@ -259,6 +259,7 @@ def _section_membership(course_key, access):
         'get_single_query': reverse('get_single_query' ,kwargs={'course_id': course_key.to_deprecated_string()}),
         'save_query': reverse('save_query' ,kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_saved_queries': reverse('get_saved_queries' ,kwargs={'course_id': course_key.to_deprecated_string()}),
+        "delete_saved_query" : reverse("delete_saved_query", kwargs={'course_id': course_key.to_deprecated_string()}),
     }
     return section_data
 

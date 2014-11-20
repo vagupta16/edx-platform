@@ -2,13 +2,23 @@ from courseware.models import StudentModule
 from courseware.models import GroupedQueries, GroupedQueriesStudents, GroupedQueriesSubqueries
 from courseware.models import QueriesSaved, QueriesStudents, QueriesTemporary
 from bulk_email.models import Optout
+from student.models import CourseEnrollment
 #todo: specific imports
 from django.contrib.auth.models import User
 from data_access_constants import *
 from django.db.models import Q
 from collections import defaultdict
 import time
-import datetime
+
+def deleteSavedQuery(queryToDelete):
+    groupedQ = GroupedQueries.objects.filter(id=queryToDelete)
+    subqueriesToDelete = GroupedQueriesSubqueries.objects.filter(grouped_id=queryToDelete)
+    queriesSaved = QueriesSaved.objects.filter(id__in=subqueriesToDelete.values_list("query_id"))
+    #needs to be in this specific order
+    queriesSaved.delete()
+    subqueriesToDelete.delete()
+    groupedQ.delete()
+
 
 
 def saveQuery(course_id, queries):
@@ -129,7 +139,11 @@ def open_query(course_id, query):
     return processResults(course_id, query, queryset)
 
 def filter_out_students(course_id,  queryset):
-    return queryset.exclude(id__in = Optout.objects.all().values_list('user_id'))
+    #first exclude students who have opted out of emails
+    withoutOptOut = queryset.exclude(id__in = Optout.objects.all().values_list('user_id'))
+    withoutNotEnrolled = withoutOptOut.exclude(id__in=
+                              CourseEnrollment.objects.filter(course_id=course_id, is_active=0).values_list('user_id'))
+    return withoutNotEnrolled
     """
     filterOut = Optout.objects.filter(course_id=course_id)
     filterout_ids = set([result.user.id for result in filterOut])

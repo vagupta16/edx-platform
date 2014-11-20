@@ -585,44 +585,6 @@ def list_course_tree(request, course_id):
     }
     return JsonResponse(response_payload)
 
-def processQuery(courseId, query):
-    queryIncl = query[0]
-    if queryIncl=="and":
-        queryIncl = INCLUSION.AND
-    elif queryIncl=="not":
-        queryIncl = INCLUSION.NOT
-    else:
-        queryIncl = INCLUSION.OR
-    queryProps = query[1]
-    queryType = queryProps[1]['text'].lower().strip()
-    queryId = queryProps[2]['id']
-    blocks = queryId.split("/")
-    if len(blocks) !=2:
-        return
-    else:
-        block_type, block_id = blocks
-    queryId = courseId.make_usage_key(block_type, block_id)
-    queryFiltering = queryProps[3]['text'].lower().strip()
-
-    if queryType=="section":
-        queryType = QUERY_TYPE.SECTION
-        if queryFiltering =="has student opened":
-            queryFiltering=SECTION_FILTERS.OPENED
-        elif queryFiltering == "has student completed":
-            queryFiltering = SECTION_FILTERS.COMPLETED
-    else:
-        queryType = QUERY_TYPE.PROBLEM
-        if queryFiltering =="has student opened":
-            queryFiltering=PROBLEM_FILTERS.OPENED
-        elif queryFiltering == "has student completed":
-            queryFiltering = PROBLEM_FILTERS.COMPLETED
-        elif queryFiltering== "score":
-            queryFiltering = PROBLEM_FILTERS.SCORE
-        elif queryFiltering == "number of peer responses graded":
-            queryFiltering = PROBLEM_FILTERS.NUMBER_PEER_GRADED
-
-
-    return Query(queryType, queryIncl, queryId, queryFiltering)
 
 def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, entityName):
     blocks = queryId.split("/")
@@ -638,15 +600,15 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, ent
     queryType = queryType.lower().strip()
     if queryType=="section":
         queryType = QUERY_TYPE.SECTION
-        if queryFiltering =="has student opened":
+        if queryFiltering =="has student opened" or queryFiltering==SECTION_FILTERS.OPENED.lower():
             queryFiltering=SECTION_FILTERS.OPENED
-        elif queryFiltering == "has student completed":
+        elif queryFiltering == "has student completed" or queryFiltering==SECTION_FILTERS.COMPLETED.lower():
             queryFiltering = SECTION_FILTERS.COMPLETED
     else:
         queryType = QUERY_TYPE.PROBLEM
-        if queryFiltering =="has student opened":
+        if queryFiltering =="has student opened" or queryFiltering==PROBLEM_FILTERS.OPENED.lower():
             queryFiltering=PROBLEM_FILTERS.OPENED
-        elif queryFiltering == "has student completed":
+        elif queryFiltering == "has student completed" or queryFiltering==PROBLEM_FILTERS.COMPLETED.lower():
             queryFiltering = PROBLEM_FILTERS.COMPLETED
         elif queryFiltering== "score":
             queryFiltering = PROBLEM_FILTERS.SCORE
@@ -654,6 +616,45 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, ent
             queryFiltering = PROBLEM_FILTERS.NUMBER_PEER_GRADED
 
     return Query(queryType, queryIncl, queryId, queryFiltering, entityName)
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+def delete_saved_query(request, course_id, queryToDelete):
+    rolename = request.GET.get('rolename')
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    #it should be clean when we get it. this is just in case
+    data_access.deleteSavedQuery(queryToDelete)
+    """
+    groups, queries, relations = data_access.retrieveSavedQueries(course_id)
+    cleaned_queries = []
+    relationMap = {}
+    createdMap = {}
+    for relation in relations:
+        relationMap[relation.query_id] = relation.grouped_id
+    for group in groups:
+        createdMap[group.id]= group.created.strftime("%m-%d-%y %H:%M")
+
+
+    for query in queries:
+        groupId = relationMap[query.id]
+        cleaned_queries.append({'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
+                                'block_type': query.module_state_key.block_type,
+                                'block_id':query.module_state_key.block_id,
+                                'filter_on' : query.filter_on,
+                                'display_name':query.entity_name,
+                                'type':query.type,
+                                'group': groupId,
+                                'created': createdMap[groupId]
+                                })
+
+
+    """
+    response_payload = {
+        'success':True
+    }
+
+    return  JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
