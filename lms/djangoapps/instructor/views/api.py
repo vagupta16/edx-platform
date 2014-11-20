@@ -600,16 +600,22 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, ent
     queryType = queryType.lower().strip()
     if queryType=="section":
         queryType = QUERY_TYPE.SECTION
-        if queryFiltering =="has student opened" or queryFiltering==SECTION_FILTERS.OPENED.lower():
+        if queryFiltering==SECTION_FILTERS.OPENED.lower():
             queryFiltering=SECTION_FILTERS.OPENED
-        elif queryFiltering == "has student completed" or queryFiltering==SECTION_FILTERS.COMPLETED.lower():
+        elif queryFiltering==SECTION_FILTERS.NOT_OPENED.lower():
+            queryFiltering = SECTION_FILTERS.NOT_OPENED
+        elif queryFiltering==SECTION_FILTERS.COMPLETED.lower():
             queryFiltering = SECTION_FILTERS.COMPLETED
     else:
         queryType = QUERY_TYPE.PROBLEM
-        if queryFiltering =="has student opened" or queryFiltering==PROBLEM_FILTERS.OPENED.lower():
+        if queryFiltering==PROBLEM_FILTERS.OPENED.lower():
             queryFiltering=PROBLEM_FILTERS.OPENED
-        elif queryFiltering == "has student completed" or queryFiltering==PROBLEM_FILTERS.COMPLETED.lower():
+        elif  queryFiltering==PROBLEM_FILTERS.NOT_OPENED.lower():
+            queryFiltering = PROBLEM_FILTERS.NOT_OPENED
+        elif  queryFiltering==PROBLEM_FILTERS.COMPLETED.lower():
             queryFiltering = PROBLEM_FILTERS.COMPLETED
+        elif  queryFiltering==PROBLEM_FILTERS.NOT_COMPLETED.lower():
+            queryFiltering = PROBLEM_FILTERS.NOT_COMPLETED
         elif queryFiltering== "score":
             queryFiltering = PROBLEM_FILTERS.SCORE
         elif queryFiltering == "number of peer responses graded":

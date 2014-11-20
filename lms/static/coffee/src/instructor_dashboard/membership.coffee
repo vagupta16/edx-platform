@@ -761,6 +761,8 @@ class Membership
     @$startover_btn = @$section.find("input[name='startover']'")
     @$startover_btn.click (e) =>
       $("#queryTableBody tr").remove()
+      @reload_estimated()
+
       #$number_students = students_list.length
       #$("#estimated")[0].innerHTML= $number_students+" students selected"
       #$("#estimated").addClass(query_id.toString())
@@ -1056,7 +1058,7 @@ class Membership
         useIdx = idx
 
     if color=="or" and useIdx==0
-      useIdx =notIdx
+      useIdx =Math.max(notIdx, andIdx)
     if color=="not" and useIdx==0
       useIdx =andIdx
     row = table[0].insertRow(useIdx);

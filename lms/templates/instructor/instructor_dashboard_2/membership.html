@@ -239,7 +239,8 @@
         <h2 class="title"> ${_("Email Distribution")} </h2>
     </div>
     <label for="beginning_specific">
-    Select criteria on which to generate a list of student emails
+    Select criteria on which to generate a list of student emails. Please clear the active queries or load your saved work
+        if you are inactive for more than 15 minutes to start over otherwise queries might be inaccurate.
     </label>
     <br/>
 
@@ -263,8 +264,10 @@
         <div class="problem_specific">
             <div class="email-list-container"
              data-label ="Filter On"
-             data-selections="Has student opened <>
-                              Has student completed ">
+             data-selections="Opened <>
+                              Completed <>
+                              Not Opened <>
+                              Not Completed">
             </div>
         </div>
 
@@ -279,7 +282,8 @@
         <div class="section_specific">
           <div class="email-list-container"
                data-label ="Filter On"
-               data-selections="Has student opened">
+               data-selections="Opened <>
+                                Not Opened">
           </div>
         </span>
     </div>
@@ -311,7 +315,7 @@
           <!--input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['get_saved_queries'] }" data-csv="true"-->
 
           <div id="estimated">0 students selected</div>
-          <input type="button" name="getest" id="getest" value="Update Students Selected Estimate" data-endpoint="${ section_data['get_total_students'] }" >
+          <input type="button" name="getest" id="getest" value="Update Students Estimate" data-endpoint="${ section_data['get_total_students'] }" >
           <input type="button" name="startover" id="startover" value="Clear Active Queries">
 
       </div>
@@ -338,14 +342,15 @@
         <br/>
         <div>
         <h3>Example:</h3>
-        <div> AND, Problem 1, OPENED </div>
-        <div> NOT, Problem 1, COMPLETED</div>
-        <div> OR, Problem 2, OPENED</div>
+        <div> AND, Problem 1, Opened </div>
+        <div> NOT, Problem 1, Completed</div>
+        <div> OR, Problem 2, Not Opened</div>
         <br/>
         <div>Returns: Students who have opened but not completed problem 1 and
-            students who have opened problem 2. <br/><br/>
-            <i>AND</i> queries are grouped together and the intersection of the results is taken.<br/>
-            <i>NOT</i> and </i><i>OR</i> queries are grouped together and the union of the results is taken. <br/>
+            students who have not opened problem 2<br/><br/>
+            The intersection of <i>AND</i> queries is taken.<br/>
+            The union of  <i>NOT</i> queries is taken <br/>
+            The union of  <i>OR</i> queries is taken <br/>
             The final result is ((<i>AND</i>)-(<i>NOT</i>))+(<i>OR</i>)
         </div>
         </div>

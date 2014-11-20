@@ -60,11 +60,15 @@ REVERSE_INCLUSION_MAP = {'A' : INCLUSION.AND,
 
 class SECTION_FILTERS:
     OPENED="Opened"
+    NOT_OPENED = "Not Opened"
     COMPLETED="Completed"
+
 
 class PROBLEM_FILTERS:
     OPENED= SECTION_FILTERS.OPENED
+    NOT_OPENED = SECTION_FILTERS.NOT_OPENED
     COMPLETED="Completed"
+    NOT_COMPLETED = "Not Completed"
     SCORE="Score"
     NUMBER_PEER_GRADED="Number peer graded"
 

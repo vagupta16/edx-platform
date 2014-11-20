@@ -9,6 +9,8 @@ from data_access_constants import *
 from django.db.models import Q
 from collections import defaultdict
 import time
+import random
+import datetime
 
 def deleteSavedQuery(queryToDelete):
     groupedQ = GroupedQueries.objects.filter(id=queryToDelete)
@@ -36,7 +38,9 @@ def saveQuery(course_id, queries):
         relation = GroupedQueriesSubqueries(grouped=group,
                                             query=permQuery)
         relation.save()
+
     return True
+
 
 def retrieveSavedQueries(course_id):
     group = GroupedQueries.objects.filter(course_id = course_id)
@@ -71,14 +75,26 @@ def make_single_query(course_id, query):
         row = QueriesStudents(query=q, inclusion=INCLUSION_MAP[query.inclusion], student=User.objects.filter(id=studentid)[0])
         row.save()
 
+    #on every 10th query, purge the temporary database
+    rand = random.random()
+    if rand>.9:
+        purgeTemporaryQueries()
     return {q.id:students}
+
+def purgeTemporaryQueries():
+    minutes15ago = datetime.datetime.now()-datetime.timedelta(minutes=15)
+    oldQueries = QueriesTemporary.objects.filter(created__lt=minutes15ago)
+    savedStudents = QueriesStudents.objects.filter(query_id__in=oldQueries.values_list("id"))
+    savedStudents.delete()
+    oldQueries.delete()
+
+
 
 def make_total_query(course_id, existing_queries):
     querySpecific = set()
     if len(existing_queries) !=0:
-        queryset= make_existing(existing_queries).values_list('student_id','student__email').distinct()
+        queryset= make_existing(existing_queries).values_list('id','email').distinct()
         for row in queryset:
-            #querySpecific.add((student.id, student.email))
             querySpecific.add((row[0], row[1]))
 
     return {0:querySpecific}
@@ -93,11 +109,15 @@ def get_problem_users_s(course_id, query):
     return results
 
 def get_section_users_s(course_id, query):
-    return open_query(course_id, query)
+    if query.filter == SECTION_FILTERS.OPENED:
+        results =  open_query(course_id, query)
+    elif query.filter == SECTION_FILTERS.NOT_OPENED:
+        results = not_open_query(course_id, query)
+    return results
 
 
 def make_existing(existing_queries):
-    query = StudentModule.objects
+    query = User.objects
     if existing_queries==None:
         return query
 
@@ -111,34 +131,51 @@ def make_existing(existing_queries):
             queryDct[inclusionType[0].inclusion].append(result)
 
     for notquery in queryDct[INCLUSION_MAP.get(INCLUSION.NOT)]:
-        query = query.exclude(student_id__in=notquery)
+        query = query.exclude(id__in=notquery)
 
     for andquery in queryDct[INCLUSION_MAP.get(INCLUSION.AND)]:
-        query = query.filter(student_id__in=andquery)
+        query = query.filter(id__in=andquery)
 
 
 
-    orQuery = StudentModule.objects
+    orQuery = User.objects
     qobjs = Q()
     for orq in queryDct[INCLUSION_MAP.get(INCLUSION.OR)]:
-        qobjs = qobjs |(Q(student_id__in=orq))
+        qobjs = qobjs |(Q(id__in=orq))
 
 
     return query | orQuery.filter(qobjs)
 
 
+
+def not_open_query(course_id, query):
+    #starting = make_existing(existing_queries)
+    idsInCourse = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).values_list('user_id')
+    totalStudents = User.objects.filter(id__in=idsInCourse)
+    withoutOpen = totalStudents.exclude(id__in=StudentModule.objects.filter(module_state_key=query.id,
+                                                                            course_id = course_id).values_list("student_id"))
+
+    return processResults_negative(course_id, query, withoutOpen)
+
+def not_completed_query(course_id, query):
+    idsInCourse = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).values_list('user_id')
+    totalStudents = User.objects.filter(id__in=idsInCourse)
+
+    withoutCompleted = totalStudents.exclude(id__in= StudentModule.objects.filter(module_state_key=query.id, course_id = course_id).filter(~Q(grade=None)).values_list("student_id"))
+
+    return processResults_negative(course_id, query, withoutCompleted)
+
 def completed_query(course_id, query):
     #starting = make_existing(existing_queries)
     querySet = StudentModule.objects.filter(module_state_key=query.id, course_id = course_id).filter(~Q(grade=None))
-    return processResults(course_id, query, querySet)
-
+    return processResults_positive(course_id, query, querySet)
 
 def open_query(course_id, query):
     #starting = make_existing(existing_queries)
     queryset = StudentModule.objects.filter(module_state_key=query.id, course_id = course_id)
-    return processResults(course_id, query, queryset)
+    return processResults_positive(course_id, query, queryset)
 
-def filter_out_students(course_id,  queryset):
+def filter_out_students_negative(course_id,  queryset):
     #first exclude students who have opted out of emails
     withoutOptOut = queryset.exclude(id__in = Optout.objects.all().values_list('user_id'))
     withoutNotEnrolled = withoutOptOut.exclude(id__in=
@@ -151,54 +188,25 @@ def filter_out_students(course_id,  queryset):
     """
 
 
-def processResults(course_id, query, queryset):
-    filteredQuery = filter_out_students(course_id, queryset)
-    values = filteredQuery.values_list('student_id','student__email').distinct()
+def processResults_negative(course_id, query, queryset):
+    filteredQuery = filter_out_students_negative(course_id, queryset)
+    values = filteredQuery.values_list('id','email').distinct()
     return values
 
+def filter_out_students_positive(course_id,  queryset):
+    #first exclude students who have opted out of emails
+    withoutOptOut = queryset.exclude(student_id__in = Optout.objects.all().values_list('user_id'))
+    withoutNotEnrolled = withoutOptOut.exclude(student_id__in=
+                              CourseEnrollment.objects.filter(course_id=course_id, is_active=0).values_list('user_id'))
+    return withoutNotEnrolled
+    """
+    filterOut = Optout.objects.filter(course_id=course_id)
+    filterout_ids = set([result.user.id for result in filterOut])
+    return filterout_ids
+    """
 
 
-"""
-def get_users(course_id, queries):
-    splitted = {QUERY_TYPE.SECTION:[],
-                QUERY_TYPE.PROBLEM:[]
-    }
-
-    for query in queries:
-        if query.type==QUERY_TYPE.SECTION:
-            splitted[QUERY_TYPE.SECTION].append(query)
-        else:
-            splitted[QUERY_TYPE.PROBLEM].append(query)
-
-    sectionResults = get_section_users(course_id, splitted[QUERY_TYPE.SECTION])
-    problemResults = get_problem_users(course_id, splitted[QUERY_TYPE.PROBLEM])
-
-    #merge
-    sectionResults.mergeIn(problemResults)
-    return sectionResults.getResults()
-
-
-
-def get_section_users(course_id, queries):
-    results = QueryResults()
-    for query in queries:
-        querySpecific = set()
-        #query for people that have interacted with the section
-        qresults = open_query(course_id, query)
-        results.mergeIn(qresults)
-    return results
-
-def get_problem_users(course_id, queries, existing_queries):
-    results = QueryResults()
-    for query in queries:
-        qresults = None
-        querySpecific = set()
-        #query for people that have interacted with the section
-        if query.filter==PROBLEM_FILTERS.OPENED:
-            qresults = open_query(course_id, query)
-        elif query.filter==PROBLEM_FILTERS.COMPLETED:
-            qresults = completed_query(course_id, query)
-        if qresults:
-            results.mergeIn(qresults)
-    return results
-"""
+def processResults_positive(course_id, query, queryset):
+    filteredQuery = filter_out_students_positive(course_id, queryset)
+    values = filteredQuery.values_list('student_id','student__email').distinct()
+    return values
