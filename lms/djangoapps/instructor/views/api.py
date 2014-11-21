@@ -82,7 +82,6 @@ from .tools import (
     add_block_ids,
 )
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys import InvalidKeyError
 import data_access
 from data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query, REVERSE_INCLUSION_MAP
@@ -542,7 +541,7 @@ def list_course_role_members(request, course_id):
     }
     return JsonResponse(response_payload)
 
-
+#recursively builds a course tree given the root node to a course
 def buildCourseTree(course):
     courseTree = []
     idx = 0
@@ -556,36 +555,23 @@ def buildCourseTree(course):
         idx+=1
     return courseTree
 
-#TODO: think about caching this
+
+#returns a tree representing the substructures in a course
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_tree(request, course_id):
-    """
-    List course tree
-    Requires instructor access.
-    """
-    rolename = request.GET.get('rolename')
-
-    if not rolename in ['instructor', 'staff', 'beta']:
-        return HttpResponseBadRequest()
-
-
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(
-        request.user, 'instructor', course_id, depth=None
-    )
-
+    course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
     courseTree = buildCourseTree(course)
-
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
         'data': courseTree
     }
     return JsonResponse(response_payload)
 
-
+#takes a query and bundles it up
 def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, entityName):
     blocks = queryId.split("/")
     if len(blocks) !=2:
@@ -623,46 +609,18 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, ent
 
     return Query(queryType, queryIncl, queryId, queryFiltering, entityName)
 
+#deletes a grouped query that the user has saved along with the corresponding subqueries
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 def delete_saved_query(request, course_id, queryToDelete):
-    rolename = request.GET.get('rolename')
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    #it should be clean when we get it. this is just in case
     data_access.deleteSavedQuery(queryToDelete)
-    """
-    groups, queries, relations = data_access.retrieveSavedQueries(course_id)
-    cleaned_queries = []
-    relationMap = {}
-    createdMap = {}
-    for relation in relations:
-        relationMap[relation.query_id] = relation.grouped_id
-    for group in groups:
-        createdMap[group.id]= group.created.strftime("%m-%d-%y %H:%M")
-
-
-    for query in queries:
-        groupId = relationMap[query.id]
-        cleaned_queries.append({'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
-                                'block_type': query.module_state_key.block_type,
-                                'block_id':query.module_state_key.block_id,
-                                'filter_on' : query.filter_on,
-                                'display_name':query.entity_name,
-                                'type':query.type,
-                                'group': groupId,
-                                'created': createdMap[groupId]
-                                })
-
-
-    """
     response_payload = {
         'success':True
     }
+    return JsonResponse(response_payload)
 
-    return  JsonResponse(response_payload)
-
-
+#saves a group of queries and assigns them the same group ID
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -672,9 +630,7 @@ def save_query(request, course_id):
         existing_queries = existing.split(',')
     else:
         existing_queries = []
-    rolename = request.GET.get('rolename')
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    #it should be clean when we get it. this is just in case
     clean_existing = [query for query in existing_queries if (query !="working" and query!="")]
     success = data_access.saveQuery(course_id,clean_existing)
 
@@ -684,14 +640,12 @@ def save_query(request, course_id):
     }
     return JsonResponse(response_payload)
 
-
+#returns allthe user-saved queries per course
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 def get_saved_queries(request, course_id):
-    rolename = request.GET.get('rolename')
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    #it should be clean when we get it. this is just in case
     groups, queries, relations = data_access.retrieveSavedQueries(course_id)
     cleaned_queries = []
     relationMap = {}
@@ -700,8 +654,6 @@ def get_saved_queries(request, course_id):
         relationMap[relation.query_id] = relation.grouped_id
     for group in groups:
         createdMap[group.id]= group.created.strftime("%m-%d-%y %H:%M")
-
-
     for query in queries:
         groupId = relationMap[query.id]
         cleaned_queries.append({'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
@@ -713,18 +665,13 @@ def get_saved_queries(request, course_id):
                                 'group': groupId,
                                 'created': createdMap[groupId]
                                 })
-
-
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
         'queries':cleaned_queries
     }
     return  JsonResponse(response_payload)
 
-
-
-
-
+#returns the students for a given set of queries
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -734,11 +681,9 @@ def get_total_students(request, course_id, csv=False):
         existing_queries = existing.split(',')
     else:
         existing_queries = []
-    rolename = request.GET.get('rolename')
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
     clean_existing = [query for query in existing_queries if (query !="working" and query!="")]
-    data = data_access.make_total_query(course_id,clean_existing)
+    data = data_access.make_total_query(clean_existing)
     results = data[data.keys()[0]]
     emails = [pair[1] for pair in results]
 
@@ -749,21 +694,18 @@ def get_total_students(request, course_id, csv=False):
         }
         return  JsonResponse(response_payload)
     else:
-        filename =  time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
+        filename = time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
         return instructor_analytics.csvs.create_csv_response(filename, ["emails"], [[item] for item in emails])
 
 
-
+#makes and saves a single query
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def get_single_query(request, course_id, inclusion, queryType, stateType, stateId, csv=False):
+def get_single_query(request, course_id, inclusion, queryType, stateType, stateId):
     filter = request.GET.get('filter')
     entity_name = request.GET.get('entityName')
-    rolename = request.GET.get('rolename')
-
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
     processed = processNewQuery(course_id, inclusion, queryType, stateType+"/"+stateId, filter, entity_name)
     if processed !=None:
         data = data_access.make_single_query(course_id, processed)
@@ -771,21 +713,16 @@ def get_single_query(request, course_id, inclusion, queryType, stateType, stateI
         emails = [pair[1] for pair in results]
     else:
         emails = []
-
     id = data.keys()[0]
-
-    if not csv:
-        response_payload = {
-            'course_id': course_id.to_deprecated_string(),
-            'query_id': id,
-            'data': emails
-        }
-        return  JsonResponse(response_payload)
-    else:
-        filename =  time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
-        return instructor_analytics.csvs.create_csv_response(filename, ["emails"], [[item] for item in emails])
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'query_id': id,
+        'data': emails
+    }
+    return JsonResponse(response_payload)
 
 
+#helper functions for displaying problems and sections
 def pruneCourseTree(courseTree, includePattern):
     newTree = []
     for child in courseTree:
@@ -794,9 +731,7 @@ def pruneCourseTree(courseTree, includePattern):
             newTree.append(child)
     return newTree
 
-
-#just get the top two parents
-#todo: feels hacky
+#Returns the 2 topmost parents of a node for displaying purposes
 def selectCourseTree(courseTree, includePattern):
     return selectCourseTree_r(courseTree, includePattern, [], topMost=True)
 def selectCourseTree_r(courseTree, includePattern, returnContainer = None, parents = None, topMost = False):
@@ -816,28 +751,14 @@ def selectCourseTree_r(courseTree, includePattern, returnContainer = None, paren
         selectCourseTree_r(subtree, includePattern, returnContainer, parents)
     return returnContainer
 
-
+#returns a tree structure consisting only of sections and subsections
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_sections(request, course_id):
-    """
-    List instructors and staff.
-    Requires instructor access.
-
-    rolename is one of ['instructor', 'staff', 'beta']
-
-    """
-    rolename = request.GET.get('rolename')
-
-    if not rolename in ['instructor', 'staff', 'beta']:
-        return HttpResponseBadRequest()
-
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(
-        request.user, 'instructor', course_id, depth=None
-    )
+    course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
 
     courseTree = buildCourseTree(course)
     includePattern = re.compile('chapter|sequential')
@@ -849,41 +770,22 @@ def list_course_sections(request, course_id):
     }
     return JsonResponse(response_payload)
 
-
+#returns a tree structure consisting only of problems
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_problems(request, course_id):
-    """
-    List instructors and staff.
-    Requires instructor access.
-
-    rolename is one of ['instructor', 'staff', 'beta']
-
-    """
-    rolename = request.GET.get('rolename')
-
-    if not rolename in ['instructor', 'staff', 'beta']:
-        return HttpResponseBadRequest()
-
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(
-        request.user, 'instructor', course_id, depth=None
-    )
-
+    course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
     courseTree = buildCourseTree(course)
     includePattern = re.compile('problem')
     problemList = selectCourseTree(courseTree, includePattern)
-
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
         'data': problemList
     }
     return JsonResponse(response_payload)
-
-
-
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
