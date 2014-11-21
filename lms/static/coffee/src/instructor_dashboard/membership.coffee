@@ -1073,9 +1073,13 @@ class Membership
       cell.innerHTML = item['text']
       if item.hasOwnProperty('id') and item['id'] !=""
         cell.id = item['id']
-    $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"}),
-      class: 'remove'
-    lastcell =row.insertCell(4)
+
+    progressCell = row.insertCell(4)
+    $progress_icon = $ _.template('<div class="loading"><i class="icon-spinner"></i> <%= label %></div>', {label: "Loading"})
+    progressCell.innerHTML = $progress_icon[0].outerHTML
+
+    $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"})
+    lastcell =row.insertCell(5)
     lastcell.innerHTML = $revoke_btn[0].outerHTML
     $('.remove').click =>
       targ = event.target
@@ -1104,6 +1108,10 @@ class Membership
         #$number_students = students_list.length
         #$("#estimated")[0].innerHTML= $number_students+" students selected"
         tr.removeClass('working')
+        $done_icon = $ _.template('<div class="done"><i class="icon-check"></i> <%= label %></div>', {label: "Done"})
+        tr.children()[4].innerHTML = $done_icon[0].outerHTML
+
+
         tr.addClass(query_id.toString())
         @check_done()
 
