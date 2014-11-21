@@ -174,7 +174,7 @@ class @Problem
     @$timer.show()
 
     # Clear old timers, eg. if we press the submit button
-    if @timer_id 
+    if @timer_id
       clearInterval(@timer_id)
 
     # Sync every second
@@ -187,7 +187,7 @@ class @Problem
   # TODO check cases and sync clock periodically
   syncTimer: =>
     @seconds_left -= 1
-    if @seconds_left < @seconds_before_warning 
+    if @seconds_left < @seconds_before_warning
       @showTimerWarning()
 
     if @submitted_before_time_expired
@@ -388,7 +388,7 @@ class @Problem
 
     # For timed exams, check that we've submitted before
     # time has expired, and then tick down timer to 0
-    if @seconds_left > 0 
+    if @seconds_left > 0
       @submitted_before_time_expired = true
 
   reset: =>

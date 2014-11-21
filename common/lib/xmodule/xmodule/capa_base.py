@@ -379,16 +379,20 @@ class CapaMixin(CapaFields):
         """
         self.last_submission_time = datetime.datetime.now(UTC())
 
+    def get_timed_attempt_entry(self, start_time, end_time):
+        return "{start_time}{delim}{end_time}".format(
+            start_time=start_time
+            delim="|",
+            end_time=end_time
+        )
+
     def record_timed_attempt(self):
         """
         If the problem is timed and multiple attempts are allowed,
         records the start and end times of the attempt
         """
-        entry = "{start_time}{delim}{end_time}".format(
-            start_time=self.time_started,
-            delim="|",
-            end_time=datetime.datetime.now(UTC())
-        )
+        now = datetime.datetime.now(UTC())
+        entry = self.get_timed_attempt_entry(self.time_started, now)
         self.timed_attempts.append(entry)
 
     def get_score(self):

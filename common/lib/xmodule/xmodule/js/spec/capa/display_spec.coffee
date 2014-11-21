@@ -125,6 +125,19 @@ describe 'Problem', ->
       it 're-bind the content', ->
         expect(@problem.bind).toHaveBeenCalled()
 
+    describe 'with timed exam', ->
+      beforeAll ->
+        @problem.el.html.append '''
+          <div class="problem-timer" data-seconds-left="120" data-minutes-before-warning="1">
+            You have <span class="minutes-left"></span> minutes left to complete these questions.
+          </div>
+        '''
+        spyOn @problem, 'setupTimer'
+        @problem.render()
+
+      it 'should set up a timer', ->
+        expect(@problem.setupTimer).toHaveBeenCalled()
+
   describe 'check_fd', ->
     beforeEach ->
       # Insert an input of type file outside of the problem.
@@ -200,6 +213,11 @@ describe 'Problem', ->
           callback(success: 'Number Only!')
         @problem.check()
         expect(window.alert).toHaveBeenCalledWith 'Number Only!'
+
+    describe 'marks the user as having submitted before time expired', ->
+      @problem.seconds_left = 30
+      @problem.check()
+      expect(@problem..submitted_before_time_expired).toBe(true)
 
   describe 'reset', ->
     beforeEach ->
@@ -615,3 +633,124 @@ describe 'Problem', ->
     it 'check_save_waitfor should return false', ->
       $(@problem.inputs[0]).data('waitfor', ->)
       expect(@problem.check_save_waitfor()).toEqual(false)
+
+  describe 'getDisplayText', ->
+    beforeAll ->
+      @problem = new Problem($('.xblock-student_view'))
+
+    it 'should show 0 seconds as `0:00`', ->
+      @problem.seconds_left = 0
+      expect(@problem.getDisplayText()).toEqual("0:00")
+
+    it 'should show 30 seconds as `0:30`', ->
+      @problem.seconds_left = 30
+      expect(@problem.getDisplayText()).toEqual("0:30")
+
+    it 'should show 60 seconds as `1:00`', ->
+      @problem.seconds_left = 60
+      expect(@problem.getDisplayText()).toEqual("1:00")
+
+    it 'should show 89 seconds as `1:29`', ->
+      @problem.seconds_left = 89
+      expect(@problem.getDisplayText()).toEqual("1:29")
+
+    it 'should show 601 seconds as `10:01`', ->
+      @problem.seconds_left = 601
+      expect(@problem.getDisplayText()).toEqual("10:01")
+
+  describe 'setupTimer', ->
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+      @problem.el.html '''
+        <textarea class="CodeMirror" />
+        <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
+        <input id="input_1_2" name="input_1_2" value="two" />
+        <input id="input_bogus_3" name="input_bogus_3" value="three" />
+        <div class="problem-timer" data-seconds-left="120" data-minutes-before-warning="1">
+          You have <span class="minutes-left"></span> minutes left to complete these questions.
+        </div>
+      '''
+      spyOn @problem, 'setupTimer'
+      spyOn @problem, 'showTimerWarning'
+      spyOn(@problem, 'syncTimer').and.callThrough()
+      @problem.render()
+
+    it 'correctly initializes the timer', ->
+      expect(@problem.el.find(".problem-timer").length).not.toEqual(0)
+      expect(@problem.el.find(".minutes-left").length).not.toEqual(0)
+      expect(@problem.$timer).toBeDefined()
+      expect(@problem.$display).toBeDefined()
+      expect(@problem.timer_id).toBeDefined()
+      expect(@problem.seconds_left).toEqual(120)
+      expect(@problem.seconds_before_warning).toEqual(60)
+      expect(@problem.submitted_before_time_expired).toBe(false)
+      expect(@problem.$display.text()).toContain("2:00")
+      expect(@problem.$display.hasClass('danger')).toBe(false)
+      expect(@problem.syncTimer).toHaveBeenCalled()
+
+    it 'initializes the timer with warning if begin time is low', ->
+      @problem.seconds_left = 120
+      @problem.seconds_before_warning = 120
+      @problem.setupTimer()
+      expect(@problem.$display.hasClass('.danger')).toBe(true)
+
+  describe 'syncTimer', ->
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+      @problem.el.html '''
+        <textarea class="CodeMirror" />
+        <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
+        <input id="input_1_2" name="input_1_2" value="two" />
+        <input id="input_bogus_3" name="input_bogus_3" value="three" />
+        <div class="problem-timer" data-seconds-left="120" data-minutes-before-warning="1">
+          You have <span class="minutes-left"></span> minutes left to complete these questions.
+        </div>
+      '''
+      spyOn(@problem, 'syncTimer').and.callThrough()
+      @problem.render()
+      jasmine.clock().install()
+
+    it 'should call syncTimer after a few seconds', ->
+      jasmine.clock().tick(1 * 1000)
+      expect(@problem.syncTimer).toHaveBeenCalled()
+
+    it 'should show a warning when showTimerWarning has been reached', ->
+      jasmine.clock().tick(61 * 1000)
+      expect(@problem.syncTimer).toHaveBeenCalled()
+      expect(@problem.showTimerWarning).toHaveBeenCalled()
+      expect(@problem.seconds_left).toEqual(120-62)
+      expect(@problem.$display.text()).toContain("0:58")
+
+    it 'should remove the danger class if a problem was submitted before timed expired', ->
+      @problem.submitted_before_time_expired = true
+      @problem.syncTimer()
+      expect(@problem.$timer.hasClass('danger')).toBe(false)
+
+    afterEach ->
+      jasmine.clock().uninstall()
+    
+  describe 'showTimerWarning', ->
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+      @problem.el.html '''
+        <textarea class="CodeMirror" />
+        <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
+        <input id="input_1_2" name="input_1_2" value="two" />
+        <input id="input_bogus_3" name="input_bogus_3" value="three" />
+        '''
+      @problem.el.html.after '''
+          <div class="problem-timer" data-seconds-left="120" data-minutes-before-warning="120">
+            You have <span class="minutes-left"></span> minutes left to complete these questions.
+          </div>
+        '''
+      spyOn @problem, 'showTimerWarning'
+      @problem.render()
+      jasmine.clock().install()
+
+    it 'should show a timer warning in the html', ->
+      expect(@problem.showTimerWarning).toHaveBeenCalled()
+      expect(@problem.$timer.length).toEqual(2)
+      expect(@problem.$timer.hasClass('danger')).toBe(true)
+
+    afterEach ->
+      jasmine.clock().uninstall()

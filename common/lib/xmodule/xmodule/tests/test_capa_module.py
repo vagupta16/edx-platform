@@ -11,6 +11,7 @@ import datetime
 import json
 import random
 import os
+import re
 import textwrap
 import unittest
 import ddt
@@ -123,6 +124,8 @@ class CapaFactory(object):
             # converting to int here because I keep putting "0" and "1" in the tests
             # since everything else is a string.
             field_data['attempts'] = int(attempts)
+        if 'minutes_allowed' in field_data:
+            field_data['minutes_allowed'] = int(field_data['minutes_allowed'])
 
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
@@ -387,7 +390,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # _can_ see because attempts left and right
         correct_ans = CapaFactory.create(showanswer='finished',
-                                         max_attempts="1",
+                           attempts, problem_state, correct, xml, **override_get_score              max_attempts="1",
                                          attempts="0",
                                          due=self.tomorrow_str,
                                          correct=True)
@@ -1268,6 +1271,202 @@ class CapaModuleTest(unittest.TestCase):
 
         # Assert that the encapsulated html contains the original html
         self.assertTrue(html in html_encapsulated)
+
+    def test_get_problem_html_flash_message(self):
+        """
+        Test flashing messages through get_problem_html. Used by
+        timed exams feature to give helpful messages to the student
+        """
+        module = CapaFactory.create()
+
+        # Message to the user
+        message = "Hi, this is a test message."
+
+        # We expect the message to be rendered as such:
+        expected_html = """<div class="capa_alert" style="opacity: 1;">{message}</div>""".format(message=message)
+
+        # Patch the capa problem's HTML rendering
+        with patch('capa.capa_problem.LoncapaProblem.get_html') as mock_html:
+            mock_html.return_value = """
+                % if flash_message:
+                  <div class="capa_alert" style="opacity: 1;">${flash_message}</div>
+                % endif
+            """
+
+            # Render the problem HTML
+            html = module.get_problem_html(encapsulate=False, flash_message=message)
+
+        # Expect that we get the rendered template back
+        self.assertEqual(html.strip(), expected_html)
+
+    def test_timed_problem_setup(self):
+        """
+        Test that timed problems that are within grace period / time limit
+        are set up appropriately
+        """
+        module = CapaFactory.create(minutes_allowed=5)
+
+        # Check that we're in the correct problem state
+        self.assertTrue(module.is_timed_problem())
+        self.assertFalse(module.exceeded_time_limit())
+        self.assertFalse(module.is_past_due())
+        self.assertFalse(module.closed())
+
+        # Check that for single-attempt timed questions,
+        # we show the check / save buttons
+        self.assertTrue(module.should_show_check_button())
+        self.assertTrue(module.should_show_save_button())
+        self.assertFalse(module.should_show_reset_button())
+
+        # Start the timer
+        module.set_time_started()
+
+        # Test that timer div is rendered in html
+        # Don't strictly match end bracket on starting tag
+        # because we have a potential match on the regexes
+        timer_html_regex = '<div class="problem-timer"(?>)(.+)</div>'
+        minutes_left_regex = '<div class="minutes-left"(?>)(.+)</div>'
+
+        with patch('capa.capa_problem.LoncapaProblem.get_html') as mock_html:
+            mock_html.return_value = """
+                % if flash_message:
+                  <div class="capa_alert" style="opacity: 1;">${flash_message}</div>
+                % endif
+            """
+            html = module.get_problem_html(encapsulate=False)
+
+        timer_match = re.search(timer_html_regex, html)
+        self.assertIsNotNone(timer_match)
+
+        timer_html = timer_match.group(0)
+        minutes_left_match = re.search(minutes_left_regex, timer_html)
+        self.assertIsNotNone(minutes_left_match)
+
+    def test_timed_problem_submitted(self):
+        """
+        Test that timed problems that are submitted within the grace
+        period are not marked as expired
+        """
+        module = CapaFactory.create(minutes_allowed=5)
+        module.set_time_started()
+
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            mock_is_correct.return_value = True
+
+            # Check the problem
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+            result = module.check_problem(get_request_dict)
+
+        # Expect that the problem is marked correct
+        self.assertEqual(result['success'], 'correct')
+
+        # For single attempt problems, don't show any
+        # buttons post-submit
+        self.assertFalse(module.should_show_check_button())
+        self.assertFalse(module.should_show_reset_button())
+        self.assertFalse(module.should_show_save_button())
+
+    def test_timed_problem_expired(self):
+        """
+        Test that problems that have expired cannot be resubmitted.
+        If an answer was saved, the last saved answer is used when
+        grading.
+        """
+        module = CapaFactory.create(minutes_allowed=5,
+                                    graceperiod='0',
+                                    max_attempts=1)
+        get_request_dict = {CapaFactory.input_key(): '2.00'}
+
+        # Start and attempt problem
+        module.set_time_started()
+        module.save_problem(get_request_dict)
+
+        # Expire the problem, can't submit anymore.
+        module.time_started = datetime.datetime.now(UTC) - datetime.timedelta(hours=3)
+        result = module.save_problem(get_request_dict)
+        self.assertFalse(result['success'])
+
+        # Test expired state
+        self.assertTrue(module.closed())
+        self.assertTrue(module.is_submitted())
+        self.assertTrue(module.attempts_still_available())
+
+        # Stub out html rendering, but let check_problem do the
+        # actual problem checking logic
+        correct_request_dict = {CapaFactory.input_key(): '3.14'}
+        result = module.check_problem(correct_request_dict)
+
+        # Test that we use the last submission when checking the problem
+        self.assertEqual(result['success'], 'correct')
+
+        # Test that we flash an error message
+        self.assertEqual(result['html'].contains("last saved answers"))
+
+    def test_timed_problem_multiple_attempts(self):
+        """
+        When timed problems have multiple attempts, test that the user
+        can reset until number of attempts run out
+        """
+        module = CapaFactory.create(minutes_allowed=5,
+                                    graceperiod='0')
+        get_request_dict = {CapaFactory.input_key(): '0'}
+
+        # First attempt: expire the timer
+        module.set_time_started()
+        module.check_problem(get_request_dict)
+        self.assertTrue(module.attempts_still_available())
+
+        # Expire problem
+        module.time_started = datetime.datetime.now(UTC) - datetime.timedelta(hours=3)
+
+        # Reset problem
+        result = module.reset_problem({})
+        self.assertTrue(result['success'])
+        self.assertFalse(module.closed())
+        self.assertTrue(module.attempts_still_available())
+
+        # Second attempt: check that we can submit the correct answer
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            mock_is_correct.return_value = True
+            correct_request_dict = {CapaFactory.input_key(): '3.14'}
+            result = module.check_problem(correct_request_dict)
+
+        self.assertEqual(result['success'], 'correct')
+
+    def test_timed_problem_attempts_tracked(self):
+        """
+        Test that for timed problems with multiple submissions,
+        attempts are tracked by time
+        """
+        max_attempts = 5
+        module = CapaFactory.create(minutes_allowed=5,
+                                    graceperiod='0',
+                                    max_attempts=max_attempts)
+        get_request_dict = {CapaFactory.input_key(): '0'}
+        module.set_time_started()
+
+        start_time = module.time_started()
+        expected_timed_attempts = []
+
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct, \
+            patch('xmodule.capa_module.CapaModule.get_timed_attempt_entry') as mock_timed_entry:
+            for i in range(max_attempts):
+                entry = "{start_time}{delim}{end_time}".format(
+                    start_time=start_time + timedelta(minutes=i)
+                    delim="|",
+                    end_time=datetime.datetime.now(UTC())
+                )
+                expected_timed_attempts.append(entry)
+                mock_timed_entry.return_value = entry
+
+                result = module.check_problem(get_request_dict)
+                self.assertEqual(result['success'], 'incorrect')
+                result = module.reset_problem({})
+                self.assertTrue(result['success'])
+
+        self.assertEqual(len(module.timed_attempts), max_attempts)
+        for attempt in module.get_timed_attempts():
+            self.assertTrue(attempt in expected_timed_attempts)
 
     def test_input_state_consistency(self):
         module1 = CapaFactory.create()
