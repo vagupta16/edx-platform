@@ -691,15 +691,15 @@ def get_course_display_price(course, registration_price):
     Return Course Price as a string preceded by correct currency, or 'Free'
     """
     currency_symbol = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
-    
+
     price = course.display_price
     if registration_price > 0:
         price = registration_price
-    
+
     if price:
         return "{}{}".format(currency_symbol, price)
     else:
-        return  _('Free')
+        return _('Free')
 
 
 @ensure_csrf_cookie
@@ -738,7 +738,7 @@ def course_about(request, course_id):
     in_cart = False
     reg_then_add_to_cart_link = ""
     if (settings.FEATURES.get('ENABLE_SHOPPING_CART') and
-        settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
+            settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
         registration_price = CourseMode.min_course_price_for_currency(course_key,
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
@@ -1100,7 +1100,6 @@ def get_course_lti_endpoints(request, course_id):
     return HttpResponse(json.dumps(endpoints), content_type='application/json')
 
 
-@require_GET
 def get_analytics_answer_dist(request):
     """
     Calls the the analytics answer distribution api. Retrieves answer distribution data for the in-line analytics display.
@@ -1112,8 +1111,12 @@ def get_analytics_answer_dist(request):
         (django response object):  JSON response.  404 if api url is not found, 500 if server error, otherwise 200 with JSON body.
     """
 
-    # Construct api request
-    module_id = request.GET['module_id']
+    all_data = json.loads(request.POST['data'])
+    module_id = all_data['module_id']
+    question_types_by_part = all_data['question_types_by_part']
+    num_options_by_part = all_data['num_options_by_part']
+
+    # Contruct API call
     url = getattr(settings, 'ANALYTICS_ANSWER_DIST_URL')
     if url:
         url = url.format(module_id=module_id)
@@ -1141,15 +1144,18 @@ def get_analytics_answer_dist(request):
     except urllib2.URLError, error:
         log.warning('Analytics API error: ' + str(error))
         return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url="<a href=\"https://stanfordonline.zendesk.com/hc/en-us/requests/new\">here</a>"))
-    return process_analytics_answer_dist(data)
+
+    return process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
 
 
-def process_analytics_answer_dist(data):
+def process_analytics_answer_dist(data, question_types_by_part, num_options_by_part):
     """
     Aggregates the analytics answer dist data. From the data, gets the date/time the data was last updated and reformats to the client TZ.
 
     Arguments:
         data: response from the analytics api
+        question_types_by_part: dict of question types
+        num_options_by_part: dict of number of options by question
 
     Returns:
         A json payload of:
@@ -1164,8 +1170,20 @@ def process_analytics_answer_dist(data):
     # Each element in data_by_part is an array of dicts of {value_id, correct, count}
     data_by_part = {}
 
+    # For errors discovered during analytics data processing use message_by_part
+    message_by_part = {}
+
+    # Count rows returned for each part for integrity check
+    num_rows_by_part = {}
+
     for item in data:
         part_id = item['part_id']
+
+        num_rows_by_part[part_id] = num_rows_by_part.get(part_id, 0) + 1
+
+        # If we detect an issue with the data, set error message and continue
+        if issue_with_data(item, part_id, message_by_part, question_types_by_part, num_options_by_part, num_rows_by_part):
+            continue
 
         # Add count to appropriate aggregates
         count_dict = count_by_part.get(part_id, {
@@ -1198,7 +1216,43 @@ def process_analytics_answer_dist(data):
     response_payload = {
         'data_by_part': data_by_part,
         'count_by_part': count_by_part,
+        'message_by_part': message_by_part,
         'last_update_date': formatted_date_string,
     }
 
     return JsonResponse(response_payload)
+
+
+def issue_with_data(item, part_id, message_by_part, question_types_by_part, num_options_by_part, num_rows_by_part):
+    """
+    A function where issues with the data returned by the analytics API are detected
+    and an appropriate message formulated.
+
+    Arguments:
+        item: current row returned by the analytics API
+        part_id: the part_id of the current row
+        message_by_part: dictionary for storing error messages for parts
+        question_types_by_part: dict of question types
+        num_options_by_part: dict of number of options by question
+        num_rows_by_part: dict of count of rows returned by API
+
+    Returns:
+        True: if an error was detected
+        False: if no error was detected
+    """
+    # Check variant (randomization) and if set, generate an error message
+    if item['variant']:
+        message_by_part[part_id] = "The analytics cannot be displayed for this question as randomization was set at one time."
+        return True
+
+    # Check number of rows returned for radio question is consistent with definition
+    if question_types_by_part[part_id] == 'radio' and num_rows_by_part[part_id] > num_options_by_part[part_id]:
+        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+        return True
+
+    # Check number of rows returned for checkbox question is consistent with definition
+    if question_types_by_part[part_id] == 'checkbox' and num_rows_by_part[part_id] > pow(2, num_options_by_part[part_id]):
+        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+        return True
+
+    return False
