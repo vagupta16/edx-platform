@@ -364,15 +364,6 @@ class QueriesStudents(models.Model):
                                                              self.get_inclusion_display())
 
 
-class GroupedQueriesStudents(models.Model):
-    grouped = models.ForeignKey('GroupedQueries')
-    student = models.ForeignKey(User, db_index=True)
-
-    def __unicode__(self):
-        return "[GroupedQueriesStudents] Query %d has %s" % (self.grouped.id,
-                                                                 self.student)
-
-
 
 class GroupedQueriesSubqueries(models.Model):
     """

@@ -1075,7 +1075,7 @@ class Membership
         cell.id = item['id']
 
     progressCell = row.insertCell(4)
-    $progress_icon = $ _.template('<div class="loading"><i class="icon-spinner"></i> <%= label %></div>', {label: "Loading"})
+    $progress_icon = $ _.template('<div class="Working"><i class="icon-spinner"></i> <%= label %></div>', {label: "Working"})
     progressCell.innerHTML = $progress_icon[0].outerHTML
 
     $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"})

@@ -697,7 +697,6 @@ def get_total_students(request, course_id, csv=False):
         filename = time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
         return instructor_analytics.csvs.create_csv_response(filename, ["emails"], [[item] for item in emails])
 
-
 #makes and saves a single query
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
