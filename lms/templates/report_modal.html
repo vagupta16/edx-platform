@@ -34,7 +34,7 @@
       <input name="subject" type="text" id="report-form-subject" aria-required="true">
       <label data-field="details" for="report-form-details">${_('Details of the problem you are encountering')}*</label>
       <textarea name="details" id="report-form-details" aria-required="true" placeholder="Include error messages, steps which lead to the issue, etc."></textarea>
-      <input name="issue_type" type="hidden" value="problem">
+      <input name="issue_type" type="hidden" value="problem_report_modal">
       <input name="course_id" type="hidden" value="${course.id.to_deprecated_string() | h}">
       <div class="submit">
         <input name="submit" type="submit" value="${_('Submit Problem Report')}" id="report-submit">
