@@ -746,7 +746,8 @@ class Membership
 
     @$query_endpoint = $(".email-lists-management").data('query-endpoint')
     @$total_endpoint = $(".email-lists-management").data('total-endpoint')
-    @$delete_endpoint = $(".email-lists-management").data('delete-saved-endpoint')
+    @$delete_saved_endpoint = $(".email-lists-management").data('delete-saved-endpoint')
+    @$delete_temp_endpoint = $(".email-lists-management").data('delete-temp-endpoint')
     for email_list in @email_lists
       email_list.$container.addClass 'active'
 
@@ -760,6 +761,9 @@ class Membership
 
     @$startover_btn = @$section.find("input[name='startover']'")
     @$startover_btn.click (e) =>
+      #@$('table tbody').empty()
+      _.each $("#queryTableBody tr"), (row) =>
+        @delete_temp_query(row.getAttribute('query'))
       $("#queryTableBody tr").remove()
       @reload_estimated()
 
@@ -781,8 +785,7 @@ class Membership
       tab = $("#queryTableBody")
       rows = tab.find("tr")
       _.each rows, (row) =>
-        for i in [1..row.classList.length-1] by 1
-                b.push(row.classList[i])
+        b.push(row.getAttribute('query'))
 
       send_data = b.join(',')
       url = @$email_csv_btn.data 'endpoint'
@@ -932,8 +935,8 @@ class Membership
     tab = $("#queryTableBody")
     rows = tab.find("tr")
     _.each rows, (row) =>
-      for i in [1..row.classList.length-1] by 1
-              b.push(row.classList[i])
+      b.push(row.getAttribute('query'))
+
 
     allGood = true
     _.each b, (status) =>
@@ -1029,14 +1032,19 @@ class Membership
         `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
         cb? gettext("Error fetching list for role") + " '#{@$rolename}'"
 
+  delete_temp_query: (queryId)->
+    send_url = @$delete_temp_endpoint+"/"+queryId
+    $.ajax
+      dataType: 'json'
+      url: send_url
+
   delete_saved_query: (queryId)->
-    send_url = @$delete_endpoint+"/"+queryId
+    send_url = @$delete_saved_endpoint+"/"+queryId
     $.ajax
       dataType: 'json'
       url: send_url
 
   start_row:(color, arr, rowIdClass, table) ->
-
     #find which row to insert in
     idx =0
     orIdx = 0
@@ -1085,7 +1093,10 @@ class Membership
       targ = event.target
       while (!targ.classList.contains('remove'))
         targ = targ.parentNode
-      targ.parentNode.parentNode.remove()
+      curRow = targ.parentNode.parentNode
+      curRow.remove()
+      queryToDelete = curRow.getAttribute('query')
+      @delete_temp_query(queryToDelete)
       @check_done()
     return $(row)
 
@@ -1110,9 +1121,8 @@ class Membership
         tr.removeClass('working')
         $done_icon = $ _.template('<div class="done"><i class="icon-check"></i> <%= label %></div>', {label: "Done"})
         tr.children()[4].innerHTML = $done_icon[0].outerHTML
-
-
-        tr.addClass(query_id.toString())
+        tr[0].setAttribute("query", query_id.toString())
+        #tr.addClass(query_id.toString())
         @check_done()
 
         #$("#estimated").addClass(query_id.toString())
@@ -1122,8 +1132,7 @@ class Membership
     tab = $("#queryTableBody")
     rows = tab.find("tr")
     _.each rows, (row) =>
-      for i in [1..row.classList.length-1] by 1
-              b.push(row.classList[i])
+      b.push(row.getAttribute('query'))
 
     #url = @$save_query_btn.data 'endpoint'
 
@@ -1150,8 +1159,7 @@ class Membership
       tab = $("#queryTableBody")
       rows = tab.find("tr")
       _.each rows, (row) =>
-        for i in [1..row.classList.length-1] by 1
-                b.push(row.classList[i])
+        b.push(row.getAttribute('query'))
       send_data =
         existing: b.join(',')
       $.ajax

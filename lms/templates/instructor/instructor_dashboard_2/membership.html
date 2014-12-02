@@ -232,18 +232,17 @@
 
  <div class="email-lists-management" data-query-endpoint="${ section_data['get_single_query'] }"
                                      data-total-endpoint="${ section_data['get_total_students'] }"
-                                     data-delete-saved-endpoint="${ section_data['delete_saved_query'] }"  >
-
+                                     data-delete-saved-endpoint="${ section_data['delete_saved_query'] }"
+                                     data-delete-temp-endpoint="${ section_data['delete_temp_query'] }"  >
     <div class="email-widget">
     <div class="header">
-        <h2 class="title"> ${_("Email Distribution")} </h2>
+        <h2 class="title"> "Email Distribution" </h2>
     </div>
     <label for="beginning_specific">
     Select criteria on which to generate a list of student emails. Please clear the active queries or load your saved work
-        if you are inactive for more than 15 minutes to start over otherwise queries might be inaccurate.
+        if you are inactive for more than 15 minutes, otherwise queries might be inaccurate.
     </label>
     <br/>
-
     <div class="email-list">
         <div class="email-list-container"
              data-label ="Inclusion"
@@ -270,7 +269,6 @@
                               Not Completed">
             </div>
         </div>
-
         <div class="section_specific">
              <div class="email-list-container"
                  data-rolename="staff"
@@ -292,7 +290,6 @@
             <input type="button" name="addQuery" id="addQuery" value="Add Query" align="right">
          </div>
     </div>
-
     <div class="email-list-widget">
     <div class="email-list">
       <table id="queryTable">
@@ -313,14 +310,11 @@
       <div class="bottom-email">
           <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_total_students'] }" data-csv="true" class="disabled">
           <input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['save_query'] }" data-csv="true" class="disabled">
-          <!--input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['get_saved_queries'] }" data-csv="true"-->
-
           <div id="estimated">0 students selected</div>
           <input type="button" name="getest" id="getest" value="Update Students Estimate" data-endpoint="${ section_data['get_total_students'] }" >
           <input type="button" name="startover" id="startover" value="Clear Active Queries">
 
       </div>
-
       <table>
           <caption class="tableCaption">Saved Queries</caption>
         <thead>
@@ -338,28 +332,24 @@
             <tbody id="invisibleQueriesStorage" data-endpoint="${ section_data['get_saved_queries'] }"></tbody>
         </table>
        <br/>
-
-
         <br/>
         <div>
         <h3>Example:</h3>
         <div> AND, Problem 1, Opened </div>
-        <div> NOT, Problem 1, Completed</div>
+        <div> AND, Problem 2, Not Completed</div>
+        <div> NOT, Problem 3, Opened</div>
         <div> OR, Problem 2, Not Opened</div>
         <br/>
-        <div>Returns: Students who have opened but not completed problem 1 and
-            students who have not opened problem 2<br/><br/>
+        <div>Returns: Students who have opened Problem 1 and not completed Problem 2, but have not opened Problem 3 in
+            addition to students who have not opened Problem 4<br/><br/>
             The intersection of <i>AND</i> queries is taken.<br/>
             The union of  <i>NOT</i> queries is taken <br/>
             The union of  <i>OR</i> queries is taken <br/>
             The final result is ((<i>AND</i>)-(<i>NOT</i>))+(<i>OR</i>)
         </div>
         </div>
-
-
     </div>
   </div>
-
  </div>
 
 

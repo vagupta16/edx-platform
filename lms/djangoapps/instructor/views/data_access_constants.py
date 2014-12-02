@@ -49,4 +49,6 @@ class DATABASE_FIELDS:
     QUERY = "query"
     USER_ID = "user_id"
 
-WORKING ="working"
+class QUERYSTATUS:
+    WORKING ="working"
+    COMPLETED = "completed"

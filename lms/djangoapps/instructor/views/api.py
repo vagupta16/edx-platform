@@ -609,6 +609,18 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, ent
 
     return Query(queryType, queryIncl, queryId, queryFiltering, entityName)
 
+#deletes a temporary query that the user has entered along with the corresponding students
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+def delete_temp_query(request, course_id, queryToDelete):
+    data_access.deleteTemporaryQuery(queryToDelete)
+    response_payload = {
+        'success':True
+    }
+    return JsonResponse(response_payload)
+
+
 #deletes a grouped query that the user has saved along with the corresponding subqueries
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -683,8 +695,7 @@ def get_total_students(request, course_id, csv=False):
         existing_queries = []
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     clean_existing = [query for query in existing_queries if (query !="working" and query!="")]
-    data = data_access.make_total_query(clean_existing)
-    results = data[data.keys()[0]]
+    results = data_access.make_total_query(clean_existing)
     emails = [pair[1] for pair in results]
 
     if not csv:
