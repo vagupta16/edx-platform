@@ -2,6 +2,7 @@ from courseware.models import StudentModule
 from courseware.models import GroupedQueries, GroupedQueriesSubqueries
 from courseware.models import QueriesSaved, QueriesStudents, QueriesTemporary
 from bulk_email.models import Optout
+from student.models import UserProfile
 from student.models import CourseEnrollment
 from django.contrib.auth.models import User
 from data_access_constants import INCLUSION_MAP,QUERY_TYPE, PROBLEM_FILTERS, SECTION_FILTERS, INCLUSION, QUERYSTATUS
@@ -102,9 +103,8 @@ def purgeTemporaryQueries():
     """
     Delete queries made more than 15 minutes ago along with the saved students from those queries
     """
-
-    minutes15ago = datetime.datetime.now()-datetime.timedelta(minutes=15)
-    oldQueries = QueriesTemporary.objects.filter(created__lt=minutes15ago)
+    minutes30ago = datetime.datetime.now()-datetime.timedelta(minutes=30)
+    oldQueries = QueriesTemporary.objects.filter(created__lt=minutes30ago)
     savedStudents = QueriesStudents.objects.filter(query_id__in=oldQueries.values_list(DATABASE_FIELDS.ID))
     savedStudents.delete()
     oldQueries.delete()
@@ -112,9 +112,11 @@ def purgeTemporaryQueries():
 def make_total_query(existing_queries):
     aggregateExisting = set()
     if len(existing_queries) !=0:
-        queryset= make_existing_query(existing_queries).values_list(DATABASE_FIELDS.ID,DATABASE_FIELDS.EMAIL).distinct()
+        queryset= make_existing_query(existing_queries).values_list(DATABASE_FIELDS.ID,
+                                                                    DATABASE_FIELDS.EMAIL,
+                                                                    DATABASE_FIELDS.PROFILE_NAME).distinct()
         for row in queryset:
-            aggregateExisting.add((row[0], row[1]))
+            aggregateExisting.add((row[0], row[1], row[2]))
     return aggregateExisting
 
 def get_problem_users(course_id, query):
@@ -167,7 +169,10 @@ def make_existing_query(existing_queries):
     qobjs = Q()
     for orq in queryDct[INCLUSION_MAP.get(INCLUSION.OR)]:
         qobjs = qobjs |(Q(id__in=orq))
-    return query | orQuery.filter(qobjs)
+    if len(queryDct[INCLUSION_MAP.get(INCLUSION.NOT)])==0 and len(queryDct[INCLUSION_MAP.get(INCLUSION.AND)])==0:
+        return orQuery.filter(qobjs)
+    else:
+        return query | orQuery.filter(qobjs)
 
 
 

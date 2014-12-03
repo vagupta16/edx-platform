@@ -85,6 +85,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 import data_access
 from data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query, REVERSE_INCLUSION_MAP
+from student.models import UserProfile
 
 log = logging.getLogger(__name__)
 
@@ -739,7 +740,7 @@ def get_total_students(request, course_id, csv=False):
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     clean_existing = [query for query in existing_queries if (query !="working" and query!="")]
     results = data_access.make_total_query(clean_existing)
-    emails = [pair[1] for pair in results]
+    emails = [(pair[0],pair[1],pair[2]) for pair in results]
 
     if not csv:
         response_payload = {
@@ -749,7 +750,7 @@ def get_total_students(request, course_id, csv=False):
         return  JsonResponse(response_payload)
     else:
         filename = time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
-        return instructor_analytics.csvs.create_csv_response(filename, ["emails"], [[item] for item in emails])
+        return instructor_analytics.csvs.create_csv_response(filename, ["email, name"], [[item[1], item[2]] for item in emails])
 
 
 #makes and saves a single query

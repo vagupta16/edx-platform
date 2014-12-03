@@ -48,6 +48,7 @@ class DATABASE_FIELDS:
     QUERY_ID = "query_id"
     QUERY = "query"
     USER_ID = "user_id"
+    PROFILE_NAME = "profile__name"
 
 class QUERYSTATUS:
     WORKING ="working"

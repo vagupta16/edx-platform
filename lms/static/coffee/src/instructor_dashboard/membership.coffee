@@ -818,6 +818,7 @@ class Membership
         type = {'text':query['type']}
         arr = [inclusion,type, display_entity, filter_on, done]
         @tr = @start_row(inclusion['text'],arr,{'class':["working"],'query':query_id},  $( "#queryTableBody" ))
+        @check_done()
 
 
   get_saved_queries: (cb)->
@@ -949,9 +950,7 @@ class Membership
     $td.append $load_btn
     row.appendChild $td[0]
     $delete_btn = $ _.template('<div class="deleteSaved"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Delete"})
-    delete_cell =row.insertCell(3)
-    delete_cell.innerHTML = $delete_btn[0].outerHTML
-    $('.deleteSaved').click =>
+    $delete_btn.click =>
       targ = event.target
       while (!targ.classList.contains('deleteSaved'))
         targ = targ.parentNode
@@ -959,6 +958,9 @@ class Membership
       curRow.remove()
       queryToDelete = curRow.getAttribute('groupquery')
       @delete_saved_query(queryToDelete)
+    $td = $ '<td>'
+    $td.append $delete_btn
+    row.appendChild $td[0]
     return $(row)
 
   get_students: (cb)->
@@ -1066,10 +1068,9 @@ class Membership
       else
         progressCell.innerHTML = $progress_icon[0].outerHTML
 
-    $revoke_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"})
-    lastcell =row.insertCell(5)
-    lastcell.innerHTML = $revoke_btn[0].outerHTML
-    $('.remove').click =>
+    $remove_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"})
+
+    $remove_btn.click =>
       targ = event.target
       while (!targ.classList.contains('remove'))
         targ = targ.parentNode
@@ -1079,6 +1080,9 @@ class Membership
         queryToDelete = curRow.getAttribute('query')
         @delete_temp_query(queryToDelete)
       @check_done()
+    $td = $ '<td>'
+    $td.append $remove_btn
+    row.appendChild $td[0]
     return $(row)
 
   reload_students: (tr) ->
