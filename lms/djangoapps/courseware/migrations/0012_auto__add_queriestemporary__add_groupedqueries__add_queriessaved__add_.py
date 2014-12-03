@@ -18,9 +18,18 @@ class Migration(SchemaMigration):
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
             ('entity_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('done', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('done', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
         ))
         db.send_create_signal('courseware', ['QueriesTemporary'])
+
+        # Adding model 'GroupedQueries'
+        db.create_table('courseware_groupedqueries', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
+        ))
+        db.send_create_signal('courseware', ['GroupedQueries'])
 
         # Adding model 'QueriesSaved'
         db.create_table('courseware_queriessaved', (
@@ -51,15 +60,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('courseware', ['GroupedQueriesSubqueries'])
 
-        # Adding model 'GroupedQueries'
-        db.create_table('courseware_groupedqueries', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
-        ))
-        db.send_create_signal('courseware', ['GroupedQueries'])
-
 
         # Changing field 'OfflineComputedGrade.course_id'
         db.alter_column('courseware_offlinecomputedgrade', 'course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255))
@@ -83,6 +83,9 @@ class Migration(SchemaMigration):
         # Deleting model 'QueriesTemporary'
         db.delete_table('courseware_queriestemporary')
 
+        # Deleting model 'GroupedQueries'
+        db.delete_table('courseware_groupedqueries')
+
         # Deleting model 'QueriesSaved'
         db.delete_table('courseware_queriessaved')
 
@@ -91,9 +94,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'GroupedQueriesSubqueries'
         db.delete_table('courseware_groupedqueriessubqueries')
-
-        # Deleting model 'GroupedQueries'
-        db.delete_table('courseware_groupedqueries')
 
 
         # Changing field 'OfflineComputedGrade.course_id'
@@ -209,7 +209,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'QueriesTemporary'},
             'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'done': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'done': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'entity_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'filter_on': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

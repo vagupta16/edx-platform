@@ -613,6 +613,24 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, ent
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
+def delete_bulk_temp_query(request, course_id):
+    existing = request.GET.get('existing')
+    if (existing !=None and existing !=""):
+        existing_queries = existing.split(',')
+    else:
+        existing_queries = []
+    cleaned_queries = [query.strip() for query in existing_queries]
+    if len(cleaned_queries) >0:
+        data_access.deleteBulkTemporaryQuery(cleaned_queries)
+    response_payload = {
+        'success':True
+    }
+    return JsonResponse(response_payload)
+
+#deletes a temporary query that the user has entered along with the corresponding students
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
 def delete_temp_query(request, course_id, queryToDelete):
     data_access.deleteTemporaryQuery(queryToDelete)
     response_payload = {
@@ -652,7 +670,32 @@ def save_query(request, course_id):
     }
     return JsonResponse(response_payload)
 
-#returns allthe user-saved queries per course
+#returns the temporary user queries per course
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+def get_temp_queries(request, course_id):
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    savedTemp = data_access.retrieveTempQueries(course_id)
+    cleaned_queries = []
+    for query in savedTemp:
+        cleaned_queries.append({'id': query.id,
+                                'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
+                                'block_type': query.module_state_key.block_type,
+                                'block_id':query.module_state_key.block_id,
+                                'filter_on' : query.filter_on,
+                                'display_name':query.entity_name,
+                                'type':query.type,
+                                'done':query.done,
+                                })
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'queries':cleaned_queries
+    }
+    return  JsonResponse(response_payload)
+
+
+#returns all the user-saved queries per course
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -708,6 +751,7 @@ def get_total_students(request, course_id, csv=False):
         filename = time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
         return instructor_analytics.csvs.create_csv_response(filename, ["emails"], [[item] for item in emails])
 
+
 #makes and saves a single query
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -718,12 +762,13 @@ def get_single_query(request, course_id, inclusion, queryType, stateType, stateI
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     processed = processNewQuery(course_id, inclusion, queryType, stateType+"/"+stateId, filter, entity_name)
     if processed !=None:
-        data = data_access.make_single_query(course_id, processed)
-        results = data[data.keys()[0]]
-        emails = [pair[1] for pair in results]
+        data = data_access.make_single_query.apply_async(args=(course_id, processed))
+        results =  data.wait()
+        pairs = results[results.keys()[0]]
+        emails = [pair[1] for pair in pairs]
     else:
         emails = []
-    id = data.keys()[0]
+    id = results.keys()[0]
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
         'query_id': id,

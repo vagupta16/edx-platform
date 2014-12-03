@@ -337,7 +337,7 @@ class QueriesTemporary(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     entity_name = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
-    done = models.BooleanField()
+    done = models.NullBooleanField()
 
     def __unicode__(self):
         return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,

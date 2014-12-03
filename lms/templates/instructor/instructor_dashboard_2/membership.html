@@ -230,10 +230,12 @@
  </div>
 </div>
 
- <div class="email-lists-management" data-query-endpoint="${ section_data['get_single_query'] }"
-                                     data-total-endpoint="${ section_data['get_total_students'] }"
-                                     data-delete-saved-endpoint="${ section_data['delete_saved_query'] }"
-                                     data-delete-temp-endpoint="${ section_data['delete_temp_query'] }"  >
+ <div class="email-lists-management" data-query-endpoint="${ section_data['get_single_query']}"
+                                     data-total-endpoint="${ section_data['get_total_students']}"
+                                     data-temp-queries-endpoint="${ section_data['get_temp_queries']}"
+                                     data-delete-bulk-temp-endpoint="${ section_data['delete_bulk_temp_query']}"
+                                     data-delete-saved-endpoint="${ section_data['delete_saved_query']}"
+                                     data-delete-temp-endpoint="${ section_data['delete_temp_query']}"  >
     <div class="email-widget">
     <div class="header">
         <h2 class="title"> "Email Distribution" </h2>
@@ -310,7 +312,7 @@
       <div class="bottom-email">
           <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_total_students'] }" data-csv="true" class="disabled">
           <input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['save_query'] }" data-csv="true" class="disabled">
-          <div id="estimated">0 students selected</div>
+          <div id="estimated"> Approx 0 students selected</div>
           <input type="button" name="getest" id="getest" value="Update Students Estimate" data-endpoint="${ section_data['get_total_students'] }" >
           <input type="button" name="startover" id="startover" value="Clear Active Queries">
 
