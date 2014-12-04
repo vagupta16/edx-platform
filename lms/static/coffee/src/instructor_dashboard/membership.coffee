@@ -699,6 +699,8 @@ class EmailWidget
 
     @load_saved_queries()
     @load_saved_temp_queries()
+
+    #poll for query status every 15 seconds
     POLL_INTERVAL = 1000 * 15  # 15 seconds in ms
     @poller = new window.InstructorDashboard.util.IntervalManager(
       POLL_INTERVAL, => @load_saved_temp_queries()
@@ -747,6 +749,7 @@ class EmailWidget
       error: std_ajax_err =>
         cb? gettext("Error getting saved temp queries")
 
+  #get a user's in-progress queries and load them into active queries
   load_saved_temp_queries: ->
     @get_saved_temp_queries (error, data) =>
       # abort on error
@@ -767,7 +770,7 @@ class EmailWidget
         done = query['done']
         type = {'text':query['type']}
         arr = [inclusion,type, display_entity, filter_on, done]
-        @tr = @start_row(inclusion['text'],arr,{'class':["working"],'query':query_id},  $( "#queryTableBody" ))
+        @tr = @start_row(inclusion['text'].toLowerCase(),arr,{'class':["working"],'query':query_id},  $( "#queryTableBody" ))
         @check_done()
 
 
@@ -780,6 +783,7 @@ class EmailWidget
       error: std_ajax_err =>
         cb? gettext("Error getting saved queries")
 
+  #get a user's saved queries and load them into saved queries
   load_saved_queries: ->
     $("#savedQueriesTable tr").remove()
     $("#invisibleQueriesStorage tr").remove()
@@ -829,6 +833,7 @@ class EmailWidget
         arr = [{"text":time}, {"text":display_st}]
         @start_saved_row("and",arr, group, $( "#savedQueriesTable" ) )
 
+  #if each individual query is processed, allow the user to download the csv and save the query
   check_done: ->
     #check if all other queries have returned, if so can get total csv
     b = []
@@ -845,6 +850,7 @@ class EmailWidget
       @$email_csv_btn.removeClass("disabled")
       @$email_csv_btn[0].value = "Download CSV"
 
+  #deletes an active query from the table and the db
   delete_temporary:->
     queriesToDelete = []
     _.each $("#queryTableBody tr"), (row) =>
@@ -854,6 +860,7 @@ class EmailWidget
     @delete_bulk_temp_query(queriesToDelete)
     $("#queryTableBody tr").remove()
 
+  #adds a row to saved queries
   start_saved_row:(color, arr, id, table) ->
     #find which row to insert in
     rows = table[0].children
@@ -936,6 +943,19 @@ class EmailWidget
       error: std_ajax_err =>
         cb? gettext("Error getting students")
 
+  #make a single query to the backend. doesn't wait for query completion as that can take awhile
+  reload_students: (tr) ->
+      @$save_query_btn.addClass("disabled")
+      @$email_csv_btn.addClass("disabled")
+      @$email_csv_btn[0].value = "Aggregating Queries"
+      tr.addClass("working")
+      @get_students (error, students) =>
+        if error
+           $broken_icon = $ _.template('<div class="done"><i class="icon-warning-sign"></i> <%= label %></div>',
+             {label: "Sorry, we're having a problem with this query. Please delete this row and try again."})
+           tr.children()[4].innerHTML = $broken_icon[0].outerHTML
+        return @show_errors error unless error is null
+
   #we don't care if these calls succeed or not so no wrapped callback
   delete_temp_query: (queryId)->
     send_url = @$delete_temp_endpoint+"/"+queryId
@@ -958,6 +978,7 @@ class EmailWidget
       dataType: 'json'
       url: send_url
 
+  #adds a row to active queries
   start_row:(color, arr, rowIdClass, table) ->
     #find which row to insert in
     idx =0
@@ -992,7 +1013,6 @@ class EmailWidget
     if rowIdClass.hasOwnProperty('class')
       _.each rowIdClass['class'], (addingClass) =>
          row.classList.add(addingClass.toLowerCase())
-
     for num in [0..3]
       cell = row.insertCell(num)
       item = arr[num]
@@ -1014,9 +1034,7 @@ class EmailWidget
         row.classList.remove('working')
       else
         progressCell.innerHTML = $progress_icon[0].outerHTML
-
     $remove_btn = $ _.template('<div class="remove"><i class="icon-remove-sign"></i> <%= label %></div>', {label: "Remove"})
-
     $remove_btn.click =>
       targ = event.target
       while (!targ.classList.contains('remove'))
@@ -1032,25 +1050,12 @@ class EmailWidget
     row.appendChild $td[0]
     return $(row)
 
-  reload_students: (tr) ->
-      @$save_query_btn.addClass("disabled")
-      @$email_csv_btn.addClass("disabled")
-      @$email_csv_btn[0].value = "Aggregating Queries"
-      tr.addClass("working")
-      @get_students (error, students) =>
-        if error
-           $broken_icon = $ _.template('<div class="done"><i class="icon-warning-sign"></i> <%= label %></div>',
-             {label: "Sorry, we're having a problem with this query. Please delete this row and try again."})
-           tr.children()[4].innerHTML = $broken_icon[0].outerHTML
-        return @show_errors error unless error is null
-
   save_query: (cb)->
     b = []
     tab = $("#queryTableBody")
     rows = tab.find("tr")
     _.each rows, (row) =>
       b.push(row.getAttribute('query'))
-
     send_data =
       existing: b.join(',')
     $.ajax
@@ -1061,6 +1066,7 @@ class EmailWidget
       error: std_ajax_err =>
         cb? gettext("Error saving query")
 
+  #save queries in active queries
   send_save_query: ->
     @save_query (error, students) =>
       return @show_errors error unless error is null
