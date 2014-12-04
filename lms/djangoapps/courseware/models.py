@@ -339,6 +339,7 @@ class QueriesTemporary(models.Model):
     type = models.CharField(max_length=255)
     done = models.NullBooleanField()
 
+
     def __unicode__(self):
         return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,
                                                              self.course_id,
@@ -361,6 +362,19 @@ class QueriesStudents(models.Model):
         return "[QueriesStudents] Query %d for %s, %s" % (self.query.id,
                                                              self.student,
                                                              self.get_inclusion_display())
+
+class GroupedTempQueriesSubqueries(models.Model):
+    """
+    Saved queries by instructors per course
+    """
+    grouped = models.ForeignKey('GroupedQueries')
+    query = models.ForeignKey('QueriesTemporary')
+
+    def __unicode__(self):
+        return "[GroupedQueriesSubqueries] Group %d has Query %d" % (self.grouped.id, self.query.id)
+
+
+
 
 class GroupedQueriesSubqueries(models.Model):
     """

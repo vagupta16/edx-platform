@@ -1,8 +1,8 @@
 class Query:
-    def __init__(self, type, inclusion, id, filter, entityName):
+    def __init__(self, type, inclusion, entityId, filter, entityName):
         self.type= type
         self.inclusion= inclusion
-        self.id = id
+        self.entityId = entityId
         self.filter = filter
         self.entityName = entityName
 

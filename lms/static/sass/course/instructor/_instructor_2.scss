@@ -549,23 +549,6 @@ section.instructor-dashboard-content-2 {
       padding: ($baseline/4);
     }
 
-    .triple-email-selector{
-       width: 30%;
-       display: None;
-       margin: ($baseline/4) 0;
-       padding: ($baseline/4);
-    }
-
-    #triple-email-selection-label{
-      display: None;
-    }
-
-    .email-lists-selector {
-      display: block;
-      margin: ($baseline/4) 0;
-      padding: ($baseline/4);
-    }
-
     .email-list-container {
       margin-bottom: ($baseline*1.5);
 
@@ -599,17 +582,6 @@ section.instructor-dashboard-content-2 {
           color: $lighter-base-font-color;
           line-height: 1.3em;
           font-size: .85em;
-        }
-
-        .first_selector {
-          @include box-sizing(border-box);
-          @include border-bottom-radius(3);
-          position: relative;
-          padding: ($baseline/2);
-          margin-top: -1px;
-          border: 1px solid $light-gray;
-          background-color: #efefef;
-          box-shadow: inset #bbb 0px 1px 1px 0px;
         }
       }
       }
@@ -668,115 +640,110 @@ section.instructor-dashboard-content-2 {
             color: mediumvioletred;
           }
 
-         .remove{
+          .remove{
            color:white
-         }
+          }
 
-         .remove,.deleteSaved,{
-          cursor: pointer;
-          text-align: center;
-
-          &:hover, &:focus {
+          .remove,.deleteSaved,{
+            cursor: pointer;
+            text-align: center;
+            &:hover, &:focus {
             color: $alert-color;
+            }
           }
-         }
 
-         .deleteSaved{
-           color:black
-         }
-
-
-         .loadQuery{
-          color: black;
-          cursor: pointer;
-          text-align: center;
-
-          &:hover, &:focus {
-            color: $blue;
+          .deleteSaved{
+            color:black
           }
-         }
-       .tableCaption{
-         text-align: left;
-         padding:10px;
-         padding-left:5px;
-         padding-bottom: 10px;
-         font-weight: bold;
-       }
-
-        thead{
-          color:white;
-        }
-        td {
-          @extend %t-copy-sub1;
-          vertical-align: middle;
-          word-wrap: break-word;
-          padding: ($baseline/2) ($baseline/4);
-          border-left:  1px solid $light-gray;
-          border-right: 1px solid $light-gray;
-        }
 
 
-         #estimated{
-           color:dodgerblue;
-           font-size: 20px;
-           padding-bottom:10px;
-         }
+          .loadQuery{
+            color: black;
+            cursor: pointer;
+            text-align: center;
 
-         .subsection{
+            &:hover, &:focus {
+              color: $blue;
+            }
+          }
+
+          .tableCaption{
+            text-align: left;
+            padding:10px;
+            padding-left:5px;
+            padding-bottom: 10px;
+            font-weight: bold;
+          }
+
+          thead{
+            color:white;
+          }
+
+          td {
+            @extend %t-copy-sub1;
+            vertical-align: middle;
+            word-wrap: break-word;
+            padding: ($baseline/2) ($baseline/4);
+            border-left:  1px solid $light-gray;
+            border-right: 1px solid $light-gray;
+          }
+
+          #estimated{
+            color:dodgerblue;
+            font-size: 20px;
+            padding-bottom:10px;
+          }
+
+          .subsection{
             text-indent: 10px;
-         }
+          }
 
+          .working{
+            color:black;
+          }
 
-        // .add-field
-         .working{
-           color:black;
-         }
+          .bottom-email {
+            @include box-sizing(border-box);
+            @include border-bottom-radius(3);
+            position: relative;
+            padding: ($baseline/2*2);
+            margin-top: -1px;
+            border: 1px solid $light-gray;
+            background-color: #efefef;
+            box-shadow: inset #bbb 0px 1px 1px 0px;
+          }
 
+          input[type="button"]#savequery {
+            @include idashbutton($red);
+            float:right;
+            right: $baseline;
+            font-size: 15px;
+          }
 
-        .bottom-email {
-          @include box-sizing(border-box);
-          @include border-bottom-radius(3);
-          position: relative;
-          padding: ($baseline/2*2);
-          margin-top: -1px;
-          border: 1px solid $light-gray;
-          background-color: #efefef;
-          box-shadow: inset #bbb 0px 1px 1px 0px;
-        }
+          input[type="button"]#getcsv {
+            @include idashbutton($blue);
+            float:right;
+            right: $baseline;
+            font-size: 15px;
+          }
 
-       input[type="button"]#savequery {
-          @include idashbutton($red);
-          float:right;
-          right: $baseline;
-          font-size: 15px;
-        }
+          .disabled{
+            button:disabled;
+          }
 
-       input[type="button"]#getcsv {
-          @include idashbutton($blue);
-          float:right;
-          right: $baseline;
-          font-size: 15px;
-        }
+          #queryTableBody{
+            color:white;
+          }
 
-       .disabled{
-         button:disabled;
-       }
+          #savedQueriesTable{
+            background-color:linen;
+            color:black;
+          }
 
-       #queryTableBody{
-         color:white;
-       }
-
-       #savedQueriesTable{
-         background-color:linen;
-         color:black;
-
-       }
-
-       #invisibleQueriesStorage{
-         display:none;
-       }
+          #invisibleQueriesStorage{
+            display:none;
+          }
      }
-
 }
 
 

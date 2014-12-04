@@ -84,8 +84,7 @@ from .tools import (
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 import data_access
-from data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query, REVERSE_INCLUSION_MAP
-from student.models import UserProfile
+from data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query, REVERSE_INCLUSION_MAP, DATABASE_FIELDS
 
 log = logging.getLogger(__name__)
 
@@ -607,7 +606,6 @@ def processNewQuery(courseId, queryIncl, queryType, queryId, queryFiltering, ent
             queryFiltering = PROBLEM_FILTERS.SCORE
         elif queryFiltering == "number of peer responses graded":
             queryFiltering = PROBLEM_FILTERS.NUMBER_PEER_GRADED
-
     return Query(queryType, queryIncl, queryId, queryFiltering, entityName)
 
 #deletes a temporary query that the user has entered along with the corresponding students
@@ -695,7 +693,6 @@ def get_temp_queries(request, course_id):
     }
     return  JsonResponse(response_payload)
 
-
 #returns all the user-saved queries per course
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -740,8 +737,8 @@ def get_total_students(request, course_id, csv=False):
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     clean_existing = [query for query in existing_queries if (query !="working" and query!="")]
     results = data_access.make_total_query(clean_existing)
-    emails = [(pair[0],pair[1],pair[2]) for pair in results]
-
+    #emails = [(pair[0],pair[1],pair[2]) for pair in results]
+    emails = [{"id":pair[0],"email":pair[1],"profileName":pair[2]} for pair in results]
     if not csv:
         response_payload = {
             'course_id': course_id.to_deprecated_string(),
@@ -750,8 +747,7 @@ def get_total_students(request, course_id, csv=False):
         return  JsonResponse(response_payload)
     else:
         filename = time.strftime("%Y%m%d%H%M")+"emailSelection.csv"
-        return instructor_analytics.csvs.create_csv_response(filename, ["email, name"], [[item[1], item[2]] for item in emails])
-
+        return instructor_analytics.csvs.create_csv_response(filename, ["email, name"], [[item['email'], item['profileName']] for item in emails])
 
 #makes and saves a single query
 @ensure_csrf_cookie
@@ -763,17 +759,9 @@ def get_single_query(request, course_id, inclusion, queryType, stateType, stateI
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     processed = processNewQuery(course_id, inclusion, queryType, stateType+"/"+stateId, filter, entity_name)
     if processed !=None:
-        data = data_access.make_single_query.apply_async(args=(course_id, processed))
-        results =  data.wait()
-        pairs = results[results.keys()[0]]
-        emails = [pair[1] for pair in pairs]
-    else:
-        emails = []
-    id = results.keys()[0]
-    response_payload = {
-        'course_id': course_id.to_deprecated_string(),
-        'query_id': id,
-        'data': emails
+        data_access.make_single_query.apply_async(args=(course_id, processed))
+    response_payload = {'course_id': course_id.to_deprecated_string(),
+                        'success': True
     }
     return JsonResponse(response_payload)
 

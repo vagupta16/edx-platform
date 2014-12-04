@@ -22,15 +22,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('courseware', ['QueriesTemporary'])
 
-        # Adding model 'GroupedQueries'
-        db.create_table('courseware_groupedqueries', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
-        ))
-        db.send_create_signal('courseware', ['GroupedQueries'])
-
         # Adding model 'QueriesSaved'
         db.create_table('courseware_queriessaved', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -42,6 +33,14 @@ class Migration(SchemaMigration):
             ('type', self.gf('django.db.models.fields.CharField')(max_length=255)),
         ))
         db.send_create_signal('courseware', ['QueriesSaved'])
+
+        # Adding model 'GroupedTempQueriesSubqueries'
+        db.create_table('courseware_groupedtempqueriessubqueries', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('grouped', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['courseware.GroupedQueries'])),
+            ('query', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['courseware.QueriesTemporary'])),
+        ))
+        db.send_create_signal('courseware', ['GroupedTempQueriesSubqueries'])
 
         # Adding model 'QueriesStudents'
         db.create_table('courseware_queriesstudents', (
@@ -59,6 +58,15 @@ class Migration(SchemaMigration):
             ('query', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['courseware.QueriesSaved'])),
         ))
         db.send_create_signal('courseware', ['GroupedQueriesSubqueries'])
+
+        # Adding model 'GroupedQueries'
+        db.create_table('courseware_groupedqueries', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
+        ))
+        db.send_create_signal('courseware', ['GroupedQueries'])
 
 
         # Changing field 'OfflineComputedGrade.course_id'
@@ -83,17 +91,20 @@ class Migration(SchemaMigration):
         # Deleting model 'QueriesTemporary'
         db.delete_table('courseware_queriestemporary')
 
-        # Deleting model 'GroupedQueries'
-        db.delete_table('courseware_groupedqueries')
-
         # Deleting model 'QueriesSaved'
         db.delete_table('courseware_queriessaved')
+
+        # Deleting model 'GroupedTempQueriesSubqueries'
+        db.delete_table('courseware_groupedtempqueriessubqueries')
 
         # Deleting model 'QueriesStudents'
         db.delete_table('courseware_queriesstudents')
 
         # Deleting model 'GroupedQueriesSubqueries'
         db.delete_table('courseware_groupedqueriessubqueries')
+
+        # Deleting model 'GroupedQueries'
+        db.delete_table('courseware_groupedqueries')
 
 
         # Changing field 'OfflineComputedGrade.course_id'
@@ -170,6 +181,12 @@ class Migration(SchemaMigration):
             'grouped': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['courseware.GroupedQueries']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'query': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['courseware.QueriesSaved']"})
+        },
+        'courseware.groupedtempqueriessubqueries': {
+            'Meta': {'object_name': 'GroupedTempQueriesSubqueries'},
+            'grouped': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['courseware.GroupedQueries']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'query': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['courseware.QueriesTemporary']"})
         },
         'courseware.offlinecomputedgrade': {
             'Meta': {'unique_together': "(('user', 'course_id'),)", 'object_name': 'OfflineComputedGrade'},
