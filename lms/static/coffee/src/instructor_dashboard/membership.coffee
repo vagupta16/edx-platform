@@ -568,7 +568,7 @@ class AuthList
       success: (data) -> cb?(data)
       error: std_ajax_err => @$request_response_error.text gettext "Error changing user's permissions."
 
-class EmailWidget
+class EmailSelectors
   constructor: (@$container, @$section, params={}) ->
     params = _.defaults params,
       label : $container.data 'label'
@@ -577,7 +577,6 @@ class EmailWidget
     @$container.html Mustache.render template_html, params
     @cur_column = 0
     @$table = $( "#queryTableBody" )
-
     @labelArray = ($container.data 'selections').split '<>'
     @$list_selector = @$container.find 'select.single-email-selector'
     # populate selectors
@@ -586,9 +585,9 @@ class EmailWidget
     @$rolename = $container.data 'rolename'
     @$list_selector.append $ '<option/>'
     if this.$container.attr('data-label')=='Select Section'
-      @reload_list()
+      @load_list()
     else if this.$container.attr('data-label')=='Select Problem'
-      @reload_list()
+      @load_list()
     else
       for label in @labelArray
           @$list_selector.append $ '<option/>',
@@ -621,8 +620,8 @@ class EmailWidget
       error: std_ajax_err =>
         cb? gettext("Error fetching problem or section data")
 
- # reload the list of members
-  reload_list: ->
+  # load section/problem data
+  load_list: ->
     @get_list (error, section_list) =>
       # abort on error
       return @show_errors error unless error is null
@@ -637,7 +636,7 @@ class EmailWidget
     @toDisplay = node.display_name
     if node.parents
       @toDisplay = [node.parents,@toDisplay].join("<>")
-    #hacky, but can't style select tags
+    #indenting subsections for readability
     if useClass=="subsection"
       @toDisplay = "---"+@toDisplay
     if @toDisplay.length>50
@@ -686,12 +685,11 @@ class Membership
 
     @$email_list_containers = @$section.find '.email-list-container'
     @email_lists = _.map (@$email_list_containers), (email_list_container) =>
-      new EmailWidget $(email_list_container), @$section
+      new EmailSelectors $(email_list_container), @$section
 
     @$query_endpoint = $(".email-lists-management").data('query-endpoint')
     @$total_endpoint = $(".email-lists-management").data('total-endpoint')
     @$temp_queries_endpoint = $(".email-lists-management").data('temp-queries-endpoint')
-
     @$delete_saved_endpoint = $(".email-lists-management").data('delete-saved-endpoint')
     @$delete_temp_endpoint = $(".email-lists-management").data('delete-temp-endpoint')
     @$delete_bulk_temp_endpoint = $(".email-lists-management").data('delete-bulk-temp-endpoint')
@@ -731,6 +729,11 @@ class Membership
 
     @load_saved_queries()
     @load_saved_temp_queries()
+    POLL_INTERVAL = 1000 * 15  # 15 seconds in ms
+    @poller = new window.InstructorDashboard.util.IntervalManager(
+      POLL_INTERVAL, => @load_saved_temp_queries()
+    )
+    @poller.start()
 
 
 
@@ -802,6 +805,7 @@ class Membership
     @get_saved_temp_queries (error, data) =>
       # abort on error
       return @show_errors error unless error is null
+      $("#queryTableBody tr").remove()
       queries = data['queries']
       # use _.each instead of 'for' so that member
       # is bound in the button callback.
@@ -1096,15 +1100,6 @@ class Membership
              {label: "Sorry, we're having a problem with this query. Please delete this row and try again."})
            tr.children()[4].innerHTML = $broken_icon[0].outerHTML
         return @show_errors error unless error is null
-        query_id = students['query_id']
-        # abort on error
-        tr.removeClass('working')
-        $done_icon = $ _.template('<div class="done"><i class="icon-check"></i> <%= label %></div>', {label: "Done"})
-        tr.children()[4].innerHTML = $done_icon[0].outerHTML
-        tr[0].setAttribute("query", query_id.toString())
-        @check_done()
-
-
 
   save_query: (cb)->
     b = []
