@@ -655,38 +655,8 @@ class EmailSelectors
       if cellid !=""
         cell.id = cellid
 
-
-# Membership Section
-class Membership
-  # enable subsections.
-  constructor: (@$section) ->
-    # attach self to html
-    # so that instructor_dashboard.coffee can find this object
-    # to call event handlers like 'onClickTitle'
-    @$section.data 'wrapper', @
-
-    # isolate # initialize BatchEnrollment subsection
-    plantTimeout 0, => new BatchEnrollment @$section.find '.batch-enrollment'
-    
-    # initialize BetaTesterBulkAddition subsection
-    plantTimeout 0, => new BetaTesterBulkAddition @$section.find '.batch-beta-testers'
-
-    # gather elements
-    @$list_selector = @$section.find 'select#member-lists-selector'
-    @$auth_list_containers = @$section.find '.auth-list-container'
-    @$auth_list_errors = @$section.find '.member-lists-management .request-response-error'
-
-    # initialize & store AuthList subsections
-    # one for each .auth-list-container in the section.
-    @auth_lists = _.map (@$auth_list_containers), (auth_list_container) =>
-      rolename = $(auth_list_container).data 'rolename'
-      new AuthListWidget $(auth_list_container), rolename, @$auth_list_errors
-
-
-    @$email_list_containers = @$section.find '.email-list-container'
-    @email_lists = _.map (@$email_list_containers), (email_list_container) =>
-      new EmailSelectors $(email_list_container), @$section
-
+class EmailWidget
+  constructor:  (@email_lists, @$section, @$email_list_containers)  ->
     @$query_endpoint = $(".email-lists-management").data('query-endpoint')
     @$total_endpoint = $(".email-lists-management").data('total-endpoint')
     @$temp_queries_endpoint = $(".email-lists-management").data('temp-queries-endpoint')
@@ -735,28 +705,7 @@ class Membership
     )
     @poller.start()
 
-
-
-    # populate selector
-    @$list_selector.empty()
-    for auth_list in @auth_lists
-      @$list_selector.append $ '<option/>',
-        text: auth_list.$container.data 'display-name'
-        data:
-          auth_list: auth_list
-    if @auth_lists.length is 0
-      @$list_selector.hide()
-
-    @$list_selector.change =>
-      $opt = @$list_selector.children('option:selected')
-      return unless $opt.length > 0
-      for auth_list in @auth_lists
-        auth_list.$container.removeClass 'active'
-      auth_list = $opt.data('auth_list')
-      auth_list.$container.addClass 'active'
-      auth_list.re_view()
-
-      $('#addQuery').click =>
+    $('#addQuery').click =>
         selected = @$email_list_containers.find('select.single-email-selector').children('option:selected')
         #check to see if stuff has been filled out
         if selected[1].text=="Section"
@@ -788,9 +737,6 @@ class Membership
         @$email_list_containers.find('select.single-email-selector').prop('selectedIndex',0);
         $(".problem_specific").removeClass('active')
         $(".section_specific").removeClass('active')
-
-    # one-time first selection of top list.
-    @$list_selector.change()
 
   get_saved_temp_queries: (cb)->
     $.ajax
@@ -841,8 +787,6 @@ class Membership
       # abort on error
       return @show_errors error unless error is null
       queries = data['queries']
-      # use _.each instead of 'for' so that member
-      # is bound in the button callback.
       groups = new Set()
       _.each queries, (query) =>
         block_id = query['block_id']
@@ -901,7 +845,6 @@ class Membership
       @$email_csv_btn.removeClass("disabled")
       @$email_csv_btn[0].value = "Download CSV"
 
-
   delete_temporary:->
     queriesToDelete = []
     _.each $("#queryTableBody tr"), (row) =>
@@ -943,6 +886,7 @@ class Membership
 
         @arr_text = [cells[0].innerText, cells[1].innerText, cells[2].innerText, cells[3].innerText]
         @tr = @start_row(cells[0].innerText.toLowerCase(), @arr,"", $( "#queryTableBody" ))
+        #todo:this feels too hacky. suggestions?
         @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).join("/")+"/"+@arr[2].id
         @filtering = @arr[3].text
         @entityName = @arr[2].text
@@ -992,12 +936,12 @@ class Membership
       error: std_ajax_err =>
         cb? gettext("Error getting students")
 
+  #we don't care if these calls succeed or not so no wrapped callback
   delete_temp_query: (queryId)->
     send_url = @$delete_temp_endpoint+"/"+queryId
     $.ajax
       dataType: 'json'
       url: send_url
-
 
   delete_bulk_temp_query: (queryIds)->
     send_url = @$delete_bulk_temp_endpoint
@@ -1007,7 +951,6 @@ class Membership
       dataType: 'json'
       url: send_url
       data: send_data
-
 
   delete_saved_query: (queryId)->
     send_url = @$delete_saved_endpoint+"/"+queryId
@@ -1108,8 +1051,6 @@ class Membership
     _.each rows, (row) =>
       b.push(row.getAttribute('query'))
 
-    #url = @$save_query_btn.data 'endpoint'
-
     send_data =
       existing: b.join(',')
     $.ajax
@@ -1119,7 +1060,6 @@ class Membership
       success: (data) => cb? null, data
       error: std_ajax_err =>
         cb? gettext("Error saving query")
-
 
   send_save_query: ->
     @save_query (error, students) =>
@@ -1142,10 +1082,8 @@ class Membership
         error: std_ajax_err =>
           cb? gettext("Error getting estimated")
 
-  # reload the list of members
-
+  #estimate the students selected
   reload_estimated: ->
-      # @clear_rows()
       $("#estimated")[0].innerHTML= "Calculating"
       @get_estimated (error, students) =>
         students_list = students['data']
@@ -1156,6 +1094,62 @@ class Membership
         $("#estimated")[0].innerHTML="approx " + $number_students+" students selected"
   # set error display
   show_errors: (msg) -> @$error_section?.text msg
+
+# Membership Section
+class Membership
+  # enable subsections.
+  constructor: (@$section) ->
+    # attach self to html
+    # so that instructor_dashboard.coffee can find this object
+    # to call event handlers like 'onClickTitle'
+    @$section.data 'wrapper', @
+
+    # isolate # initialize BatchEnrollment subsection
+    plantTimeout 0, => new BatchEnrollment @$section.find '.batch-enrollment'
+    
+    # initialize BetaTesterBulkAddition subsection
+    plantTimeout 0, => new BetaTesterBulkAddition @$section.find '.batch-beta-testers'
+
+    # gather elements
+    @$list_selector = @$section.find 'select#member-lists-selector'
+    @$auth_list_containers = @$section.find '.auth-list-container'
+    @$auth_list_errors = @$section.find '.member-lists-management .request-response-error'
+
+    # initialize & store AuthList subsections
+    # one for each .auth-list-container in the section.
+    @auth_lists = _.map (@$auth_list_containers), (auth_list_container) =>
+      rolename = $(auth_list_container).data 'rolename'
+      new AuthListWidget $(auth_list_container), rolename, @$auth_list_errors
+
+    #initialize email widget selectors
+    @$email_list_containers = @$section.find '.email-list-container'
+    @email_lists = _.map (@$email_list_containers), (email_list_container) =>
+      new EmailSelectors $(email_list_container), @$section
+
+    #initialize email widget
+    new EmailWidget @email_lists, @$section, @$email_list_containers
+    # populate selector
+    @$list_selector.empty()
+    for auth_list in @auth_lists
+      @$list_selector.append $ '<option/>',
+        text: auth_list.$container.data 'display-name'
+        data:
+          auth_list: auth_list
+    if @auth_lists.length is 0
+      @$list_selector.hide()
+
+    @$list_selector.change =>
+      $opt = @$list_selector.children('option:selected')
+      return unless $opt.length > 0
+      for auth_list in @auth_lists
+        auth_list.$container.removeClass 'active'
+      auth_list = $opt.data('auth_list')
+      auth_list.$container.addClass 'active'
+      auth_list.re_view()
+    # one-time first selection of top list.
+    @$list_selector.change()
+
+
 
   # handler for when the section title is clicked.
   onClickTitle: ->
