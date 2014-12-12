@@ -68,7 +68,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('courseware', ['GroupedQueries'])
 
-
         # Changing field 'OfflineComputedGrade.course_id'
         db.alter_column('courseware_offlinecomputedgrade', 'course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255))
 
@@ -105,7 +104,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'GroupedQueries'
         db.delete_table('courseware_groupedqueries')
-
 
         # Changing field 'OfflineComputedGrade.course_id'
         db.alter_column('courseware_offlinecomputedgrade', 'course_id', self.gf('django.db.models.fields.CharField')(max_length=255))

@@ -255,14 +255,14 @@ def _section_membership(course_key, access):
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_course_sections': reverse('list_course_sections', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_course_problems': reverse('list_course_problems', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_total_students': reverse('get_total_students' ,kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_single_query': reverse('get_single_query' ,kwargs={'course_id': course_key.to_deprecated_string()}),
-        'save_query': reverse('save_query' ,kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_saved_queries': reverse('get_saved_queries' ,kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_temp_queries': reverse('get_temp_queries' ,kwargs={'course_id': course_key.to_deprecated_string()}),
-        "delete_saved_query" : reverse("delete_saved_query", kwargs={'course_id': course_key.to_deprecated_string()}),
-        "delete_temp_query" : reverse("delete_temp_query", kwargs={'course_id': course_key.to_deprecated_string()}),
-        "delete_bulk_temp_query" : reverse("delete_bulk_temp_query", kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_total_students': reverse('get_total_students', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_single_query': reverse('get_single_query', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'save_query': reverse('save_query', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_saved_queries': reverse('get_saved_queries', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_temp_queries': reverse('get_temp_queries', kwargs={'course_id': course_key.to_deprecated_string()}),
+        "delete_saved_query": reverse("delete_saved_query", kwargs={'course_id': course_key.to_deprecated_string()}),
+        "delete_temp_query": reverse("delete_temp_query", kwargs={'course_id': course_key.to_deprecated_string()}),
+        "delete_bulk_temp_query": reverse("delete_bulk_temp_query", kwargs={'course_id': course_key.to_deprecated_string()}),
     }
     return section_data
 

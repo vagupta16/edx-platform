@@ -26,8 +26,6 @@
   </div>
 </script>
 
-
-
 <script type="text/template" id="email-list-widget-template">
     <div class="wrapper-email-select">
         <div class="email-selection-label">{{label}}</div>
@@ -36,8 +34,6 @@
         </select>
     </div>
 </script>
-
-
 
 <div class="vert-left">
 <div class="batch-enrollment">
@@ -73,6 +69,7 @@
       </p>
     </div>
   </div>
+
   <div>
     <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" data-action="enroll" >
     <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" data-action="unenroll" >
@@ -227,23 +224,28 @@
       data-add-button-label="${_("Add Community TA")}"
     ></div>
   %endif
- </div>
+</div>
 </div>
 
- <div class="email-lists-management" data-query-endpoint="${ section_data['get_single_query']}"
-                                     data-total-endpoint="${ section_data['get_total_students']}"
-                                     data-temp-queries-endpoint="${ section_data['get_temp_queries']}"
-                                     data-delete-bulk-temp-endpoint="${ section_data['delete_bulk_temp_query']}"
-                                     data-delete-saved-endpoint="${ section_data['delete_saved_query']}"
-                                     data-delete-temp-endpoint="${ section_data['delete_temp_query']}"  >
+<div
+    class="email-lists-management"
+    data-query-endpoint="${ section_data['get_single_query']}"
+    data-total-endpoint="${ section_data['get_total_students']}"
+    data-temp-queries-endpoint="${ section_data['get_temp_queries']}"
+    data-delete-bulk-temp-endpoint="${ section_data['delete_bulk_temp_query']}"
+    data-delete-saved-endpoint="${ section_data['delete_saved_query']}"
+    data-delete-temp-endpoint="${ section_data['delete_temp_query']}"
+>
     <div class="email-widget">
     <div class="header">
-        <h2 class="title"> Email Distribution </h2>
+        <h2 class="title">Email Distribution</h2>
     </div>
     <label for="beginning_specific">
-    Select criteria on which to generate a list of student emails. Please clear the active queries or load your saved work
-        if you are inactive for more than 30 minutes, otherwise queries might be inaccurate. If the status gets stuck at
-        "working" for a long time, you may come back to the page later.
+        Select criteria on which to generate a list of student emails.
+        Please clear the active queries or load your saved work if you
+        are inactive for more than 30 minutes, otherwise queries might
+        be inaccurate. If the status gets stuck at "working" for a long
+        time, you may come back to the page later.
     </label>
     <br/>
     <div class="email-list">

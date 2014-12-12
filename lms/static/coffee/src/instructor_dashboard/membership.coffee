@@ -1020,7 +1020,7 @@ class EmailWidget
       if item.hasOwnProperty('id') and item['id'] !=""
         cell.id = item['id']
     progressCell = row.insertCell(4)
-    $progress_icon = $ _.template('<div class="Working"><i class="icon-spinner"></i> <%= label %></div>', {label: "Working"})
+    $progress_icon = $ _.template('<div class="Working"><i class="icon-spinner icon-spin"></i> <%= label %></div>', {label: "Working"})
     $done_icon = $ _.template('<div class="done"><i class="icon-check"></i> <%= label %></div>', {label: "Done"})
     $broken_icon = $ _.template('<div class="done"><i class="icon-warning-sign"></i> <%= label %></div>',
       {label: "Sorry, we're having a problem with this query. Please delete this row and try again."})

@@ -17,7 +17,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from instructor.views.data_access_constants import INCLUSION, SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query
+from instructor.views.data_access_constants import INCLUSION
 
 
 from xmodule_django.models import CourseKeyField, LocationKeyField
@@ -292,76 +292,87 @@ class CoursePreference(models.Model):
 
 
 class GroupedQueries(models.Model):
-    title=models.CharField(max_length=255)
+    """
+    Individual queries are associated with a grouped query
+    """
+    title = models.CharField(max_length=255)
     course_id = CourseKeyField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     def __unicode__(self):
-        return "[GroupedQueries] Query %d for Course %s, %s" % (self.id,
-                                                                self.course_id,
-                                                                self.title)
+        return "[GroupedQueries] Query {} for Course {}, {}".format(
+            self.id,
+            self.course_id,
+            self.title,
+        )
+
+INCLUSIONS = (
+    ('A', INCLUSION.AND),
+    ('N', INCLUSION.NOT),
+    ('O', INCLUSION.OR),
+)
 
 
 class QueriesSaved(models.Model):
-    inclusions = (
-        ('A', INCLUSION.AND),
-        ('N', INCLUSION.NOT),
-        ('O', INCLUSION.OR),
-    )
-
+    """
+    Individual queries that are saved because they are associated with a grouped query
+    """
     course_id = CourseKeyField(max_length=255, db_index=True)
     module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
-    inclusion = models.CharField(max_length=1, choices=inclusions)
+    inclusion = models.CharField(max_length=1, choices=INCLUSIONS)
     filter_on = models.CharField(max_length=255)
     entity_name = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
+
     def __unicode__(self):
-        return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,
-                                                             self.course_id,
-                                                             self.module_state_key,
-                                                             self.get_inclusion_display(),
-                                                             self.filter_on)
+        return "[QueriesSaved] Query {} for {}/{}, {} {}".format(
+            self.id,
+            self.course_id,
+            self.module_state_key,
+            self.get_inclusion_display(),
+            self.filter_on
+        )
 
 
 class QueriesTemporary(models.Model):
-    inclusions = (
-        ('A', INCLUSION.AND),
-        ('N', INCLUSION.NOT),
-        ('O', INCLUSION.OR),
-    )
-
+    """
+    Stores individual queries. This table is purged periodically
+    """
     course_id = CourseKeyField(max_length=255, db_index=True)
     module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
-    inclusion = models.CharField(max_length=1, choices=inclusions)
+    inclusion = models.CharField(max_length=1, choices=INCLUSIONS)
     filter_on = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     entity_name = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
     done = models.NullBooleanField()
 
-
     def __unicode__(self):
-        return "[QueriesSaved] Query %d for %s/%s, %s %s" % (self.id,
-                                                             self.course_id,
-                                                             self.module_state_key,
-                                                             self.get_inclusion_display(),
-                                                             self.filter_on)
+        return "[QueriesSaved] Query {} for {}/{}, {} {}".format(
+            self.id,
+            self.course_id,
+            self.module_state_key,
+            self.get_inclusion_display(),
+            self.filter_on
+        )
+
 
 class QueriesStudents(models.Model):
-    inclusions = (
-        ('A', INCLUSION.AND),
-        ('N', INCLUSION.NOT),
-        ('O', INCLUSION.OR),
-    )
-
+    """
+    Students saved as part of a query. This will get purged periodically so do not query this
+    directly (instead use one of functions that actively makes a query and then returns students)
+    """
     query = models.ForeignKey('QueriesTemporary')
     student = models.ForeignKey(User, db_index=True)
-    inclusion = models.CharField(max_length=1, choices=inclusions)
+    inclusion = models.CharField(max_length=1, choices=INCLUSIONS)
 
     def __unicode__(self):
-        return "[QueriesStudents] Query %d for %s, %s" % (self.query.id,
-                                                             self.student,
-                                                             self.get_inclusion_display())
+        return "[QueriesStudents] Query {query_id} for {student}, {inclusion}".format(
+            self.query.id,
+            self.student,
+            self.get_inclusion_display()
+        )
+
 
 class GroupedTempQueriesSubqueries(models.Model):
     """
@@ -371,9 +382,10 @@ class GroupedTempQueriesSubqueries(models.Model):
     query = models.ForeignKey('QueriesTemporary')
 
     def __unicode__(self):
-        return "[GroupedQueriesSubqueries] Group %d has Query %d" % (self.grouped.id, self.query.id)
-
-
+        return "[GroupedQueriesSubqueries] Group {grouped_id} has Query {query_id}".format(
+            self.grouped.id,
+            self.query.id
+        )
 
 
 class GroupedQueriesSubqueries(models.Model):
@@ -384,7 +396,7 @@ class GroupedQueriesSubqueries(models.Model):
     query = models.ForeignKey('QueriesSaved')
 
     def __unicode__(self):
-        return "[GroupedQueriesSubqueries] Group %d has Query %d" % (self.grouped.id, self.query.id)
-
-
-
+        return "[GroupedQueriesSubqueries] Group {grouped_id} has Query {query_id}".format(
+            self.grouped.id,
+            self.query.id
+        )
