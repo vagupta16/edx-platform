@@ -65,11 +65,11 @@ def save_query(course_id, queries):
     group.save()
     for temp_query in temp_queries:
         perm_query = QueriesSaved(inclusion=temp_query.inclusion,
-                                  course_id=course_id,
-                                  module_state_key=temp_query.module_state_key,
-                                  filter_on=temp_query.filter_on,
-                                  entity_name=temp_query.entity_name,
-                                  type=temp_query.type)
+            course_id=course_id,
+            module_state_key=temp_query.module_state_key,
+            filter_on=temp_query.filter_on,
+            entity_name=temp_query.entity_name,
+            type=temp_query.type)
         perm_query.save()
         relation = GroupedQueriesSubqueries(grouped=group,
                                             query=perm_query)
@@ -84,7 +84,7 @@ def get_group_query_students(course_id, group_id):
     """
     _group, queries, _relation = get_saved_queries(course_id, group_id)
     chained_students = (make_subqueries.si(course_id, group_id, queries) |
-                        retrieve_grouped_query.si(course_id, group_id))().get()
+        retrieve_grouped_query.si(course_id, group_id))().get()
     return chained_students
 
 
@@ -99,8 +99,8 @@ def retrieve_grouped_query(_course_id, group_id):
         existing.append(sub.query_id)
         student_info = make_existing_query(existing).\
             values_list(DATABASE_FIELDS.ID,
-                        DATABASE_FIELDS.EMAIL,
-                        DATABASE_FIELDS.PROFILE_NAME).distinct()
+                DATABASE_FIELDS.EMAIL,
+                DATABASE_FIELDS.PROFILE_NAME).distinct()
     students = [{"id": triple[0], "email": triple[1], "profileName": triple[2]} for triple in student_info]
     subqueries.delete()
     return students
@@ -113,10 +113,10 @@ def make_subqueries(course_id, group_id, queries):
     """
     for query in queries:
         query = Query(query.type,
-                      REVERSE_INCLUSION_MAP[query.inclusion],
-                      '/'.join([query.module_state_key.block_type, query.module_state_key.block_id]),
-                      query.filter_on,
-                      query.entity_name)
+            REVERSE_INCLUSION_MAP[query.inclusion],
+            '/'.join([query.module_state_key.block_type, query.module_state_key.block_id]),
+            query.filter_on,
+            query.entity_name)
         make_single_query.apply_async(args=(course_id, query, group_id))
 
 
@@ -145,17 +145,17 @@ def get_temp_queries(course_id):
 
 
 @task  # pylint: disable=E1102
-def make_single_query(course_id, query, associateGroup=None):
+def make_single_query(course_id, query, associate_group=None):
     """
     Make a single query for student information
     """
     temp_query = QueriesTemporary(inclusion=INCLUSION_MAP.get(query.inclusion),
-                                  course_id=course_id,
-                                  module_state_key=query.entity_id,
-                                  filter_on=query.filter,
-                                  entity_name=query.entity_name,
-                                  type=query.type,
-                                  done=False)
+        course_id=course_id,
+        module_state_key=query.entity_id,
+        filter_on=query.filter,
+        entity_name=query.entity_name,
+        type=query.type,
+        done=False)
     temp_query.save()
     try:
         if query.type == QUERY_TYPE.SECTION:
@@ -164,24 +164,25 @@ def make_single_query(course_id, query, associateGroup=None):
             students = get_problem_users(course_id, query)
 
         bulk_queries = []
-        for student_id, student_email in students:
+        for student_id, student_email in students:  # pylint: disable=unused-variable
             row = QueriesStudents(query=temp_query, inclusion=INCLUSION_MAP[query.inclusion], student=User.objects.filter(id=student_id)[0])
             bulk_queries.append(row)
         QueriesStudents.objects.bulk_create(bulk_queries)
-        QueriesTemporary.objects.filter(id=temp_query.id).update(done=True)
-        if associateGroup is not None:
-            grouped_temp = GroupedTempQueriesSubqueries(grouped_id=associateGroup, query_id=temp_query.id)
+        QueriesTemporary.objects.filter(id=temp_query.id).update(done=True)  # pylint: disable=no-member
+        if associate_group is not None:
+            grouped_temp = GroupedTempQueriesSubqueries(grouped_id=associate_group,
+                query_id=temp_query.id)  # pylint: disable=no-member
             grouped_temp.save()
 
     except Exception as ex:
-        QueriesTemporary.objects.filter(id=temp_query.id).update(done=None)
+        QueriesTemporary.objects.filter(id=temp_query.id).update(done=None)  # pylint: disable=no-member
         raise(ex)
 
     #on every 10th query, purge the temporary queries
     rand = random.random()
     if rand > .9:
         purge_temporary_queries()
-    return {temp_query.id: students}
+    return {temp_query.id: students}  # pylint: disable=no-member
 
 
 def purge_temporary_queries():
@@ -197,11 +198,14 @@ def purge_temporary_queries():
 
 @task  # pylint: disable=E1102
 def make_total_query(existing_queries):
+    """
+    Given individual queries that have already been made , aggregate students associated with those queries
+    """
     aggregate_existing = set()
     if len(existing_queries) != 0:
         queryset = make_existing_query(existing_queries).values_list(DATABASE_FIELDS.ID,
-                                                                     DATABASE_FIELDS.EMAIL,
-                                                                     DATABASE_FIELDS.PROFILE_NAME).distinct()
+            DATABASE_FIELDS.EMAIL,
+            DATABASE_FIELDS.PROFILE_NAME).distinct()
         for row in queryset:
             aggregate_existing.add((row[0], row[1], row[2]))
     return aggregate_existing
@@ -274,10 +278,10 @@ def not_open_query(course_id, query):
     ids_in_course = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).values_list(DATABASE_FIELDS.USER_ID)
     total_students = User.objects.filter(id__in=ids_in_course)
     without_open = total_students.exclude(id__in=
-                                          StudentModule.objects.filter(
-                                              module_state_key=query.entity_id,
-                                              course_id=course_id).values_list(DATABASE_FIELDS.STUDENT_ID)
-                                          )
+    StudentModule.objects.filter(
+        module_state_key=query.entity_id,
+        course_id=course_id).values_list(DATABASE_FIELDS.STUDENT_ID)
+    )
     return process_results(course_id, without_open, DATABASE_FIELDS.ID, DATABASE_FIELDS.EMAIL)
 
 
@@ -288,11 +292,10 @@ def not_completed_query(course_id, query):
     ids_in_course = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).values_list(DATABASE_FIELDS.USER_ID)
     total_students = User.objects.filter(id__in=ids_in_course)
     without_completed = total_students.exclude(id__in=
-                                               StudentModule.objects.filter(
-                                                   module_state_key=query.entity_id,
-                                                   course_id=course_id)
-                                               .filter(~Q(grade=None)).values_list(DATABASE_FIELDS.STUDENT_ID)
-                                               )
+    StudentModule.objects.filter(
+        module_state_key=query.entity_id,
+        course_id=course_id).filter(~Q(grade=None)).values_list(DATABASE_FIELDS.STUDENT_ID)
+    )
     return process_results(course_id, query, without_completed, DATABASE_FIELDS.ID, DATABASE_FIELDS.EMAIL)
 
 
@@ -328,8 +331,8 @@ def filter_out_students_negative(course_id, queryset):
     """
     without_opt_out = queryset.exclude(id__in=Optout.objects.all().values_list(DATABASE_FIELDS.USER_ID))
     without_not_enrolled = without_opt_out.exclude(id__in=
-                                                   CourseEnrollment.objects.filter(course_id=course_id, is_active=0).
-                                                   values_list(DATABASE_FIELDS.USER_ID))
+        CourseEnrollment.objects.filter(course_id=course_id, is_active=0).
+        values_list(DATABASE_FIELDS.USER_ID))
     return without_not_enrolled
 
 
@@ -340,6 +343,6 @@ def filter_out_students_positive(course_id, queryset):
     """
     without_opt_out = queryset.exclude(student_id__in=Optout.objects.all().values_list(DATABASE_FIELDS.USER_ID))
     without_not_enrolled = without_opt_out.exclude(student_id__in=
-                                                   CourseEnrollment.objects.filter(course_id=course_id, is_active=0).
-                                                   values_list(DATABASE_FIELDS.USER_ID))
+        CourseEnrollment.objects.filter(course_id=course_id, is_active=0).
+        values_list(DATABASE_FIELDS.USER_ID))
     return without_not_enrolled

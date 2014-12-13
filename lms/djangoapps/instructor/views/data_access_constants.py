@@ -1,6 +1,8 @@
 """
 Constants and Query definition associated with data_access
 """
+
+
 class Query:
     """
     Encapsulates a query in the instructor dashboard email lists tool
@@ -35,7 +37,7 @@ REVERSE_INCLUSION_MAP = {'A': INCLUSION.AND,
                          'F': INCLUSION.FILTER}
 
 
-class SECTION_FILTERS:
+class SECTION_FILTERS:  # pylint: disable=invalid-name
     """
     Possible filters we may have for sections
     """
@@ -44,7 +46,7 @@ class SECTION_FILTERS:
     COMPLETED = "Completed"
 
 
-class PROBLEM_FILTERS:
+class PROBLEM_FILTERS:  # pylint: disable=invalid-name
     """
     Possible filters we may have for problems
     """
@@ -56,7 +58,7 @@ class PROBLEM_FILTERS:
     NUMBER_PEER_GRADED = "Number peer graded"
 
 
-class QUERY_TYPE:
+class QUERY_TYPE:  # pylint: disable=invalid-name
     """
     Types for queries
     """
@@ -64,7 +66,7 @@ class QUERY_TYPE:
     PROBLEM = "Problem"
 
 
-class DATABASE_FIELDS:
+class DATABASE_FIELDS:  # pylint: disable=invalid-name
     """
     Database columns
     """
@@ -78,7 +80,7 @@ class DATABASE_FIELDS:
     PROFILE_NAME = "profile__name"
 
 
-class QUERYSTATUS:
+class QUERYSTATUS:  # pylint: disable=invalid-name
     """
     Stores possible statuses for queries
     """

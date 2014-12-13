@@ -595,7 +595,7 @@ def process_new_query(course_id, query_incl, query_type, query_id, query_filteri
 
     query_type = query_type.lower().strip()
     if query_type == "section":
-        queryType = QUERY_TYPE.SECTION
+        query_type = QUERY_TYPE.SECTION
         if query_filtering == SECTION_FILTERS.OPENED.lower():
             query_filtering = SECTION_FILTERS.OPENED
         elif query_filtering == SECTION_FILTERS.NOT_OPENED.lower():
@@ -622,7 +622,7 @@ def process_new_query(course_id, query_incl, query_type, query_id, query_filteri
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def delete_bulk_temp_query(request, course_id):
+def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argument
     """
     Deletes a temporary query that the user has entered along with the corresponding students
     """
@@ -643,7 +643,7 @@ def delete_bulk_temp_query(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def delete_temp_query(_request, course_id, query_to_delete):
+def delete_temp_query(_request, course_id, query_to_delete):  # pylint: disable=unused-argument
     """
     Deletes a temporary query that the user has entered along with the corresponding students
     """
@@ -657,7 +657,7 @@ def delete_temp_query(_request, course_id, query_to_delete):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def delete_saved_query(_request, course_id, query_to_delete):
+def delete_saved_query(_request, course_id, query_to_delete):  # pylint: disable=unused-argument
     """
     Deletes a grouped query that the user has saved along with the corresponding subqueries
     """
@@ -780,7 +780,6 @@ def get_total_students(request, course_id, make_csv=False):
         return instructor_analytics.csvs.create_csv_response(filename, ["email, name"], [[item['email'], item['profileName']] for item in emails])
 
 
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -861,12 +860,14 @@ def list_course_sections(request, course_id):
     return JsonResponse(response_payload)
 
 
-#returns a tree structure consisting only of problems
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_problems(request, course_id):
+    """
+    Returns a tree structure consisting only of problems
+    """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
     course_tree = build_course_tree(course)
