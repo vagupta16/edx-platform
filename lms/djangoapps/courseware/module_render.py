@@ -7,7 +7,7 @@ import xblock.reference.plugins
 
 from functools import partial
 from requests.auth import HTTPBasicAuth
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from opaque_keys import InvalidKeyError
 
 from django.conf import settings
@@ -45,7 +45,8 @@ from xmodule_modifiers import (
     replace_static_urls,
     add_staff_markup,
     wrap_xblock,
-    request_token
+    request_token,
+    add_inline_analytics,
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
@@ -71,12 +72,6 @@ XQUEUE_INTERFACE = XQueueInterface(
 # TODO: course_id and course_key are used interchangeably in this file, which is wrong.
 # Some brave person should make the variable names consistently someday, but the code's
 # coupled enough that it's kind of tricky--you've been warned!
-
-class LmsModuleRenderError(Exception):
-    """
-    An exception class for exceptions thrown by module_render that don't fit well elsewhere
-    """
-    pass
 
 
 class LmsModuleRenderError(Exception):
@@ -122,35 +117,36 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     field_data_cache must include data from the course module and 2 levels of its descendents
     '''
 
-    course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
-    if course_module is None:
-        return None
+    with modulestore().bulk_operations(course.id):
+        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
+        if course_module is None:
+            return None
 
-    chapters = list()
-    for chapter in course_module.get_display_items():
-        if chapter.hide_from_toc:
-            continue
+        chapters = list()
+        for chapter in course_module.get_display_items():
+            if chapter.hide_from_toc:
+                continue
 
-        sections = list()
-        for section in chapter.get_display_items():
+            sections = list()
+            for section in chapter.get_display_items():
 
-            active = (chapter.url_name == active_chapter and
-                      section.url_name == active_section)
+                active = (chapter.url_name == active_chapter and
+                          section.url_name == active_section)
 
-            if not section.hide_from_toc:
-                sections.append({'display_name': section.display_name_with_default,
-                                 'url_name': section.url_name,
-                                 'format': section.format if section.format is not None else '',
-                                 'due': get_extended_due_date(section),
-                                 'active': active,
-                                 'graded': section.graded,
-                                 })
+                if not section.hide_from_toc:
+                    sections.append({'display_name': section.display_name_with_default,
+                                     'url_name': section.url_name,
+                                     'format': section.format if section.format is not None else '',
+                                     'due': get_extended_due_date(section),
+                                     'active': active,
+                                     'graded': section.graded,
+                                     })
 
-        chapters.append({'display_name': chapter.display_name_with_default,
-                         'url_name': chapter.url_name,
-                         'sections': sections,
-                         'active': chapter.url_name == active_chapter})
-    return chapters
+            chapters.append({'display_name': chapter.display_name_with_default,
+                             'url_name': chapter.url_name,
+                             'sections': sections,
+                             'active': chapter.url_name == active_chapter})
+        return chapters
 
 
 def get_module(user, request, usage_key, field_data_cache,
@@ -486,6 +482,12 @@ def get_module_system_for_user(user, field_data_cache,
         if has_access(user, 'staff', descriptor, course_id):
             has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
             block_wrappers.append(partial(add_staff_markup, user, has_instructor_access))
+
+    # Add button for in-line analytics answer distribution
+    if getattr(settings, 'ANALYTICS_ANSWER_DIST_URL'):
+        if has_access(user, 'staff', descriptor, course_id):
+            has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
+            block_wrappers.append(partial(add_inline_analytics, user, has_instructor_access))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with

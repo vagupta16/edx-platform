@@ -7,9 +7,11 @@ import json
 import logging
 import static_replace
 import uuid
+import markupsafe
 
 from django.conf import settings
 from django.utils.timezone import UTC
+from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_string
 from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
@@ -19,6 +21,7 @@ from xmodule.vertical_module import VerticalModule
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from courseware.inline_analytics_utils import get_responses_data
 
 log = logging.getLogger(__name__)
 
@@ -71,7 +74,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
 
     data = {}
     data.update(extra_data)
-    css_classes = ['xblock', 'xblock-{}'.format(view)]
+    css_classes = ['xblock', 'xblock-{}'.format(markupsafe.escape(view))]
 
     if isinstance(block, (XModule, XModuleDescriptor)):
         if view in PREVIEW_VIEWS:
@@ -81,7 +84,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
             # The block is acting as an XModuleDescriptor
             css_classes.append('xmodule_edit')
 
-        css_classes.append('xmodule_' + class_name)
+        css_classes.append('xmodule_' + markupsafe.escape(class_name))
         data['type'] = block.js_module_name
         shim_xmodule_js(frag)
 
@@ -93,11 +96,14 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
         data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
         data['request-token'] = request_token
 
+    if block.name:
+        data['name'] = block.name
+
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
         'display_name': block.display_name_with_default,
-        'data_attributes': u' '.join(u'data-{}="{}"'.format(key, value)
+        'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
                                      for key, value in data.iteritems()),
     }
 
@@ -269,3 +275,30 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
                      'has_instructor_access': has_instructor_access,
                      }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
+
+
+def add_inline_analytics(user, has_instructor_access, block, view, frag, context):  # pylint: disable=unused-argument
+    """
+    Adds a fragment for in-line analytics.
+
+    Fragment consists of a button and some placeholder divs.
+
+    Returns the wrapped fragment if the problem has a valid question (response). See get_responses_data function
+    for valid responses.
+
+    Otherwise, returns the fragment unchanged.
+    """
+    responses_data = get_responses_data(block)
+    if responses_data:
+        analytics_context = {
+            'block_content': frag.content,
+            'location': block.location.to_deprecated_string(),
+            'element_id': block.location.html_id().replace('-', '_'),
+            'answer_dist_url': reverse('get_analytics_answer_dist'),
+            'responses_data': responses_data,
+            'has_instructor_access': has_instructor_access,
+        }
+        return wrap_fragment(frag, render_to_string("inline_analytics.html", analytics_context))
+
+    else:
+        return frag

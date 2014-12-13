@@ -51,6 +51,8 @@ What is supported:
             GET / PUT / DELETE HTTP methods respectively
 """
 
+import datetime
+from django.utils.timezone import UTC
 import logging
 import oauthlib.oauth1
 from oauthlib.oauth1.rfc5849 import signature
@@ -245,6 +247,13 @@ class LTIFields(object):
         help=_(
             "Enter the text on the button used to launch the third party application."
         ),
+    )
+
+    accept_grades_past_due = Boolean(
+        display_name=_("Accept grades past deadline"),
+        help=_("Select True to allow third party systems to post grades past the deadline."),
+        default=False,
+        scope=Scope.settings
     )
 
 
@@ -442,7 +451,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             'ask_to_send_username': self.ask_to_send_username,
             'ask_to_send_email': self.ask_to_send_email,
             'button_text': self.button_text,
-
+            'accept_grades_past_due': self.accept_grades_past_due,
         }
 
     def get_html(self):
@@ -721,7 +730,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             'response': ''
         }
         # Returns if:
-        #   - score is out of range;
+        #   - past due grades are not accepted and grade is past due
+        #   - score is out of range
         #   - can't parse response from TP;
         #   - can't verify OAuth signing or OAuth signing is incorrect.
         failure_values = {
@@ -730,6 +740,10 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             'imsx_messageIdentifier': 'unknown',
             'response': ''
         }
+
+        if not self.accept_grades_past_due and self.is_past_due():
+            failure_values['imsx_description'] = "Grade is past due"
+            return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
         try:
             imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
@@ -771,7 +785,6 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         log.debug("[LTI]: Incorrect action.")
         return Response(response_xml_template.format(**unsupported_values), content_type='application/xml')
 
-
     @classmethod
     def parse_grade_xml_body(cls, body):
         """
@@ -793,7 +806,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text or ''
         sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
         score = root.xpath("//def:textString", namespaces=namespaces)[0].text
-        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+lti_spec_namespace+'}', '')
+        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{' + lti_spec_namespace + '}', '')
         # Raise exception if score is not float or not in range 0.0-1.0 regarding spec.
         score = float(score)
         if not 0 <= score <= 1:
@@ -860,6 +873,18 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             if lti_id == self.lti_id.strip():
                 return key, secret
         return '', ''
+
+    def is_past_due(self):
+        """
+        Is it now past this problem's due date, including grace period?
+        """
+        due_date = self.due  # pylint: disable=no-member
+        if self.graceperiod is not None and due_date:  # pylint: disable=no-member
+            close_date = due_date + self.graceperiod  # pylint: disable=no-member
+        else:
+            close_date = due_date
+        return (close_date is not None and datetime.datetime.now(UTC()) > close_date)
+
 
 class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """
