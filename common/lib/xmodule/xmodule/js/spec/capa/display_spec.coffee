@@ -217,7 +217,7 @@ describe 'Problem', ->
     describe 'marks the user as having submitted before time expired', ->
       @problem.seconds_left = 30
       @problem.check()
-      expect(@problem..submitted_before_time_expired).toBe(true)
+      expect(@problem.submitted_before_time_expired).toBe(true)
 
   describe 'reset', ->
     beforeEach ->

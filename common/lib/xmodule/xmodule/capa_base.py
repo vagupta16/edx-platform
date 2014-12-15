@@ -381,7 +381,7 @@ class CapaMixin(CapaFields):
 
     def get_timed_attempt_entry(self, start_time, end_time):
         return "{start_time}{delim}{end_time}".format(
-            start_time=start_time
+            start_time=start_time,
             delim="|",
             end_time=end_time
         )
