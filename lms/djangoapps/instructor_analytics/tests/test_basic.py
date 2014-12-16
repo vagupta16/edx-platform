@@ -298,40 +298,6 @@ class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(header, [])
         self.assertEqual(datarows, [])
 
-    def test_unicode_submissions(self):
-        self.load_course('edX/graded/2012_Fall')
-        self.problem_location = Location("edX", "graded", "2012_Fall", "problem", "H1P2")
-
-        self.create_student()
-        StudentModuleFactory.create(
-            course_id=self.course.id,
-            module_state_key=self.problem_location,
-            student=self.student,
-            grade=0,
-            state=u'{"student_answers":{"fake-problem":"caf\xe9"}}'
-        )
-
-        header, datarows = student_submissions(self.course)
-        #One data row means the answer was successfully encoded and appended
-        self.assertEqual(len(datarows), 1)
-
-    def test_unicode_course(self):
-        self.load_course('edX/unicode_graded/2012_Fall')
-        self.problem_location = Location("edX", "unicode_graded", "2012_Fall", "problem", "H1P1")
-
-        self.create_student()
-        StudentModuleFactory.create(
-            course_id=self.course.id,
-            module_state_key=self.problem_location,
-            student=self.student,
-            grade=0,
-            state=u'{"student_answers":{"fake-problem":"No idea"}}'
-        )
-
-        header, datarows = student_submissions(self.course)
-        #One data row means the answer was successfully encoded and appended
-        self.assertEqual(len(datarows), 1)
-
     def test_invalid_module_state(self):
         self.load_course('edX/graded/2012_Fall')
         self.problem_location = Location("edX", "graded", "2012_Fall", "problem", "H1P2")

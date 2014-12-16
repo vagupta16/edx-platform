@@ -397,10 +397,10 @@ def student_submissions(course, all_students=False):
             for unit in subsection.get_children():
                 unit_name = unit.display_name_with_default
 
-                row = [section_name.encode('utf-8'), subsection_name.encode('utf-8'), unit_name.encode('utf-8'), '']
+                row = [section_name, subsection_name, unit_name, '']
                 for component in unit.get_children():
                     if component.category == 'problem':
-                        row[-1] = component.display_name_with_default.encode('utf-8')
+                        row[-1] = component.display_name_with_default
                         modules = StudentModule.objects.filter(course_id=course.id, grade__isnull=False, module_state_key=component.location)
                         if modules:
                             answers = [''] * len(students)
@@ -413,7 +413,7 @@ def student_submissions(course, all_students=False):
                                               "StudentModule id={}, course={}".format(module.id, course.id))
                                     continue
                                 pretty_answers = u', '.join(u"{problem}={answer}".format(problem=problem, answer=answer) for (problem, answer) in raw_answers.items())
-                                answers[student_cols[module.student.username]] = pretty_answers.encode('utf-8')
+                                answers[student_cols[module.student.username]] = pretty_answers
                             if any(answers):
                                 datarows.append(row + answers)
 
