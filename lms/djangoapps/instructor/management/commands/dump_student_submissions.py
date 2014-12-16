@@ -48,10 +48,14 @@ class Command(BaseCommand):
         header, datarows = student_submissions(course, options['all_students'])
         rows = [header] + datarows
 
+        def _utf8_encoded_rows(rows):
+            for row in rows:
+                yield [unicode(item).encode('utf-8') for item in row]
+
         if not options['filename']:
             csvwriter = csv.writer(self.stdout, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-            csvwriter.writerows(rows)
+            csvwriter.writerows(_utf8_encoded_rows(rows))
         else:
             with open(options['filename'], 'wb') as csvfile:
                 csvwriter = csv.writer(csvfile, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-                csvwriter.writerows(rows)
+                csvwriter.writerows(_utf8_encoded_rows(rows))
