@@ -17,6 +17,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from instructor.views.data_access_constants import INCLUSION
+
 
 from xmodule_django.models import CourseKeyField, LocationKeyField
 
@@ -287,3 +289,118 @@ class CoursePreference(models.Model):
 
     def __unicode__(self):
         return u"{} : {} : {}".format(self.course_id, self.pref_key, self.pref_value)
+
+
+class GroupedQueries(models.Model):
+    """
+    Email Distribution List: Individual queries are associated with a grouped query.
+    A grouped query has a creation time, associated course and a name
+    """
+    title = models.CharField(max_length=255)
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
+
+    def __unicode__(self):
+        return "[GroupedQueries] Query {} for Course {}, {}".format(
+            self.id,  # pylint: disable=no-member
+            self.course_id,
+            self.title,
+        )
+
+INCLUSIONS = (
+    ('A', INCLUSION.AND),
+    ('N', INCLUSION.NOT),
+    ('O', INCLUSION.OR),
+)
+
+
+class QueriesSaved(models.Model):
+    """
+    Email Distribution List: Individual queries are saved because they are associated with a grouped query
+    """
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
+    inclusion = models.CharField(max_length=1, choices=INCLUSIONS)
+    filter_on = models.CharField(max_length=255)
+    entity_name = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return "[QueriesSaved] Query {} for {}/{}, {} {}".format(
+            self.id,  # pylint: disable=no-member
+            self.course_id,
+            self.module_state_key,
+            self.get_inclusion_display(),  # pylint: disable=no-member
+            self.filter_on,
+        )
+
+
+class QueriesTemporary(models.Model):
+    """
+    Email Distribution List: Stores individual queries that are in progress. This table is purged periodically
+    """
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
+    inclusion = models.CharField(max_length=1, choices=INCLUSIONS)
+    filter_on = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
+    entity_name = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
+    done = models.NullBooleanField()
+
+    def __unicode__(self):
+        return "[QueriesSaved] Query {} for {}/{}, {} {}".format(
+            self.id,  # pylint: disable=no-member
+            self.course_id,
+            self.module_state_key,
+            self.get_inclusion_display(),  # pylint: disable=no-member
+            self.filter_on,
+        )
+
+
+class QueriesStudents(models.Model):
+    """
+    Email Distribution List: Students saved as part of a query. This will get purged periodically so do not query this
+    directly (instead use one of functions that actively makes a query and then returns students). Associate these
+    students with a query in QueriesTemporary
+    """
+    query = models.ForeignKey('QueriesTemporary')
+    student = models.ForeignKey(User, db_index=True)
+    inclusion = models.CharField(max_length=1, choices=INCLUSIONS)
+
+    def __unicode__(self):
+        return "[QueriesStudents] Query {} for {}, {}".format(
+            self.query.id,  # pylint: disable=no-member
+            self.student,
+            self.get_inclusion_display(),  # pylint: disable=no-member
+        )
+
+
+class GroupedTempQueriesSubqueries(models.Model):
+    """
+    Email Distribution List: Saved temporary queries associated with a group per course. Used when loading a
+    saved query and then executing it.
+    """
+    grouped = models.ForeignKey('GroupedQueries')
+    query = models.ForeignKey('QueriesTemporary')
+
+    def __unicode__(self):
+        return "[GroupedQueriesSubqueries] Group {} has Query {}".format(
+            self.grouped.id,  # pylint: disable=no-member
+            self.query.id,  # pylint: disable=no-member
+        )
+
+
+class GroupedQueriesSubqueries(models.Model):
+    """
+    Email Distribution List: Saved queries by instructors per course. Associates permanent queries in QueryiesSaved
+    into GroupedQueries
+    """
+    grouped = models.ForeignKey('GroupedQueries')
+    query = models.ForeignKey('QueriesSaved')
+
+    def __unicode__(self):
+        return "[GroupedQueriesSubqueries] Group {} has Query {}".format(
+            self.grouped.id,  # pylint: disable=no-member
+            self.query.id,  # pylint: disable=no-member
+        )
