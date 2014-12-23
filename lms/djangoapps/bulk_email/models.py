@@ -19,6 +19,7 @@ from django.db import models, transaction
 from html_to_text import html_to_text
 from mail_utils import wrap_message
 
+from courseware.models import GroupedQueries
 from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
@@ -63,7 +64,7 @@ class CourseEmail(Email):
     TO_OPTION_CHOICES = (
         (SEND_TO_MYSELF, 'Myself'),
         (SEND_TO_STAFF, 'Staff and instructors'),
-        (SEND_TO_ALL, 'All')
+        (SEND_TO_ALL, 'All (students, staff and instructors)')
     )
     course_id = CourseKeyField(max_length=255, db_index=True)
     to_option = models.CharField(max_length=64, choices=TO_OPTION_CHOICES, default=SEND_TO_MYSELF)
@@ -88,6 +89,10 @@ class CourseEmail(Email):
             text_message = html_to_text(html_message)
 
         # perform some validation here:
+        if to_option.isdigit() and not GroupedQueries.objects.filter(id=int(to_option)).exists():
+            fmt = 'Course email for "{course}" being sent to query id that does not exist: {query_id}, subject "{subject}"'
+            msg = fmt.format(course=course_id, query_id=to_option, subject=subject)
+            raise ValueError(msg)
         if to_option not in TO_OPTIONS:
             fmt = 'Course email being sent to unrecognized to_option: "{to_option}" for "{course}", subject "{subject}"'
             msg = fmt.format(to_option=to_option, course=course_id, subject=subject)

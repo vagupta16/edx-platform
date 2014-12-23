@@ -401,6 +401,6 @@ class GroupedQueriesSubqueries(models.Model):
 
     def __unicode__(self):
         return "[GroupedQueriesSubqueries] Group {grouped_id} has Query {query_id}".format(
-            self.grouped.id,  # pylint: disable=no-member
-            self.query.id,  # pylint: disable=no-member
+            grouped_id=self.grouped.id,  # pylint: disable=no-member
+            query_id=self.query.id,  # pylint: disable=no-member
         )

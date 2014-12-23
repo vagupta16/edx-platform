@@ -39,7 +39,7 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.delete_saved_query', name="delete_saved_query"),
     url(r'^delete_bulk_temp_query',
         'instructor.views.api.delete_bulk_temp_query', name="delete_bulk_temp_query"),
-    url(r'^delete_temp_query/(?P<queryToDelete>\d+)$',
+    url(r'^delete_temp_query/(?P<query_to_delete>\d+)$',
         'instructor.views.api.delete_temp_query', name="delete_temp_query"),
     url(r'^delete_temp_query',
         'instructor.views.api.delete_temp_query', name="delete_temp_query"),

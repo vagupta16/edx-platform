@@ -27,6 +27,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_cms_course_link
+from courseware.models import GroupedQueries
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
@@ -34,6 +35,7 @@ from shoppingcart.models import Coupon, PaidCourseRegistration
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole
 
+from bulk_email.models import CourseEmail
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
 from analyticsclient.client import Client
@@ -324,6 +326,10 @@ def _section_data_download(course_key, access):
 
 def _section_send_email(course_key, access, course):
     """ Provide data for the corresponding bulk email section """
+    to_options = CourseEmail.TO_OPTION_CHOICES
+    groups = GroupedQueries.objects.filter(course_id = course_key)
+    group_options = tuple((group.id, group.title if group.title else u'Query saved at ' + group.created.strftime("%m-%d-%y %H:%M")) for group in groups)
+
     # This HtmlDescriptor is only being used to generate a nice text editor.
     html_module = HtmlDescriptor(
         course.system,
@@ -344,6 +350,7 @@ def _section_send_email(course_key, access, course):
         'section_key': 'send_email',
         'section_display_name': _('Email'),
         'access': access,
+        'to_options': CourseEmail.TO_OPTION_CHOICES + group_options,
         'send_email': reverse('send_email', kwargs={'course_id': course_key.to_deprecated_string()}),
         'editor': email_editor,
         'list_instructor_tasks_url': reverse(

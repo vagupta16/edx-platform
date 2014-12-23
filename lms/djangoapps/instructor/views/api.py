@@ -728,15 +728,15 @@ def get_saved_queries(_request, course_id):
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     groups, queries, relations = data_access.get_saved_queries(course_id)
     cleaned_queries = []
-    relations = {}
+    relation_map = {}
     created = {}
     for relation in relations:
-        relations[relation.query_id] = relation.grouped_id
+        relation_map[relation.query_id] = relation.grouped_id
     for group in groups:
         created[group.id] = group.created.strftime("%m-%d-%y %H:%M")
     for query in queries:
-        if query.id in relations:
-            group_id = relations[query.id]
+        if query.id in relation_map:
+            group_id = relation_map[query.id]
             cleaned_queries.append({'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
                                     'block_type': query.module_state_key.block_type,
                                     'block_id': query.module_state_key.block_id,

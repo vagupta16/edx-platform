@@ -38,6 +38,7 @@ from bulk_email.models import (
 )
 from courseware.courses import get_course, course_image_url
 from student.roles import CourseStaffRole, CourseInstructorRole
+from instructor.views.data_access import get_group_query_students
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     SubtaskStatus,
@@ -100,11 +101,18 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
     Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
     will be properly deduped.
     """
+    if to_option.isdigit() and not GroupedQueries.objects.filter(id=int(to_option)).exists():
+        msg = "Bulk email TO_OPTION for query id {0} does not exist".format(to_option)
+        log.error(msg)
+        raise Exception(msg)
     if to_option not in TO_OPTIONS:
         log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
         raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
 
-    if to_option == SEND_TO_MYSELF:
+    if to_option.isdigit():
+        recipient_qset = get_group_query_students(course_id, int(to_option))
+        print recipient_qset
+    elif to_option == SEND_TO_MYSELF:
         recipient_qset = User.objects.filter(id=user_id)
     else:
         staff_qset = CourseStaffRole(course_id).users_with_role()
