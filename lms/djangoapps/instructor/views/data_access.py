@@ -2,15 +2,15 @@
 Methods associated with accessing models related to email list widget on instructor dashboard
 """
 from courseware.models import StudentModule
-from courseware.models import GroupedQueries, GroupedQueriesSubqueries, GroupedTempQueriesSubqueries
-from courseware.models import QueriesSaved, QueriesStudents, QueriesTemporary
+from instructor_email_widget.models import GroupedQuery, SubqueryForGroupedQuery, GroupedTempQueryForSubquery
+from instructor_email_widget.models import SavedQuery, StudentsForQuery, TemporaryQuery
 from bulk_email.models import Optout
 from student.models import CourseEnrollment
 from django.contrib.auth.models import User
 from instructor.views.data_access_constants import INCLUSION_MAP, QueryType, ProblemFilters, SectionFilters
 from instructor.views.data_access_constants import Inclusion, QueryStatus
 from instructor.views.data_access_constants import REVERSE_INCLUSION_MAP, Query
-from instructor.views.data_access_constants import DatabaseFields
+from instructor.views.data_access_constants import DatabaseFields, TEMPORARY_QUERY_LIFETIME
 from django.db.models import Q
 from collections import defaultdict
 import random
@@ -19,13 +19,13 @@ from celery import task
 from instructor_task.tasks_helper import EmailWidgetTask
 
 
-def delete_saved_query(query_to_delete):
+def delete_saved_query(query_id_to_delete):
     """
     Deletes a specified grouped query along with its saved queries
     """
-    grouped_query = GroupedQueries.objects.filter(id=query_to_delete)
-    subqueries_to_delete = GroupedQueriesSubqueries.objects.filter(grouped_id=query_to_delete)
-    queries_saved = QueriesSaved.objects.filter(id__in=subqueries_to_delete.values_list(DatabaseFields.QUERY_ID))
+    grouped_query = GroupedQuery.objects.filter(id=query_id_to_delete)
+    subqueries_to_delete = SubqueryForGroupedQuery.objects.filter(grouped_id=query_id_to_delete)
+    queries_saved = SavedQuery.objects.filter(id__in=subqueries_to_delete.values_list(DatabaseFields.QUERY_ID))
     #Needs to be in this specific order for deletion
     queries_saved.delete()
     subqueries_to_delete.delete()
@@ -36,8 +36,8 @@ def delete_temporary_query(query_to_delete):
     """
     Removes a single query from the temporary queries
     """
-    queries_to_delete = QueriesTemporary.objects.filter(id=query_to_delete)
-    saved_students = QueriesStudents.objects.filter(query_id=query_to_delete)
+    queries_to_delete = TemporaryQuery.objects.filter(id=query_to_delete)
+    saved_students = StudentsForQuery.objects.filter(query_id=query_to_delete)
     saved_students.delete()
     queries_to_delete.delete()
 
@@ -49,8 +49,8 @@ def delete_bulk_temporary_query(query_to_delete):
     if len(query_to_delete) == 0 or query_to_delete[0] == u'':
         return
     query_set = set(query_to_delete)
-    temp_query = QueriesTemporary.objects.filter(id__in=query_set)
-    saved_students = QueriesStudents.objects.filter(query_id__in=query_set)
+    temp_query = TemporaryQuery.objects.filter(id__in=query_set)
+    saved_students = StudentsForQuery.objects.filter(query_id__in=query_set)
     saved_students.delete()
     temp_query.delete()
 
@@ -59,20 +59,20 @@ def save_query(course_id, queries):
     """
     Makes a new grouped query by saving the individual subqueries and then associating them to a grouped query
     """
-    temp_queries = QueriesTemporary.objects.filter(id__in=queries)
-    group = GroupedQueries(course_id=course_id, title="")
+    temp_queries = TemporaryQuery.objects.filter(id__in=queries)
+    group = GroupedQuery(course_id=course_id, title="")
     group.save()
     for temp_query in temp_queries:
-        perm_query = QueriesSaved(
+        perm_query = SavedQuery(
             inclusion=temp_query.inclusion,
             course_id=course_id,
             module_state_key=temp_query.module_state_key,
             filter_on=temp_query.filter_on,
             entity_name=temp_query.entity_name,
-            type=temp_query.type,
+            query_type=temp_query.query_type,
         )
         perm_query.save()
-        relation = GroupedQueriesSubqueries(grouped=group, query=perm_query)
+        relation = SubqueryForGroupedQuery(grouped=group, query=perm_query)
         relation.save()
     return True
 
@@ -93,7 +93,7 @@ def retrieve_grouped_query(_course_id, group_id):
     """
     For a grouped query where its subqueries have already been executed, return the students associated
     """
-    subqueries = GroupedTempQueriesSubqueries.objects.filter(grouped_id=group_id).distinct()
+    subqueries = GroupedTempQueryForSubquery.objects.filter(grouped_id=group_id).distinct()
     existing = []
     for sub in subqueries:
         existing.append(sub.query_id)
@@ -119,7 +119,7 @@ def make_subqueries(course_id, group_id, queries):
     """
     for query in queries:
         query = Query(
-            query.type,
+            query.query_type,
             REVERSE_INCLUSION_MAP[query.inclusion],
             course_id.make_usage_key(query.module_state_key.block_type, query.module_state_key.block_id),
             query.filter_on,
@@ -133,13 +133,13 @@ def get_saved_queries(course_id, specific_group=None):
     Get existing saved queries associated with a given course
     """
     if specific_group:
-        group = GroupedQueries.objects.filter(course_id=course_id, id=specific_group)
+        group = GroupedQuery.objects.filter(course_id=course_id, id=specific_group)
     else:
-        group = GroupedQueries.objects.filter(course_id=course_id)
+        group = GroupedQuery.objects.filter(course_id=course_id)
     if len(group) == 0:
         return ([], [], [])
-    relation = GroupedQueriesSubqueries.objects.filter(grouped__in=group)
-    queries = QueriesSaved.objects.filter(id__in=relation.values_list(DatabaseFields.QUERY))
+    relation = SubqueryForGroupedQuery.objects.filter(grouped__in=group)
+    queries = SavedQuery.objects.filter(id__in=relation.values_list(DatabaseFields.QUERY))
     return (group, queries, relation)
 
 
@@ -147,7 +147,7 @@ def get_temp_queries(course_id):
     """
     Get temporary queries associated with a course
     """
-    queries_temp = QueriesTemporary.objects.filter(course_id=course_id)
+    queries_temp = TemporaryQuery.objects.filter(course_id=course_id)
     return queries_temp
 
 
@@ -156,39 +156,40 @@ def make_single_query(course_id, query, associate_group=None):
     """
     Make a single query for student information
     """
-    temp_query = QueriesTemporary(
+    temp_query = TemporaryQuery(
         inclusion=INCLUSION_MAP.get(query.inclusion),
         course_id=course_id,
         module_state_key=query.entity_id,
         filter_on=query.filter,
         entity_name=query.entity_name,
-        type=query.type,
+        query_type=query.query_type,
         done=False,
     )
     temp_query.save()
     try:
-        if query.type == QueryType.SECTION:
+        if query.query_type == QueryType.SECTION:
             students = get_section_users(course_id, query)
         else:
             students = get_problem_users(course_id, query)
         bulk_queries = []
         for student_id, dummy0 in students:
-            row = QueriesStudents(query=temp_query,
-                                  inclusion=INCLUSION_MAP[query.inclusion],
-                                  student=User.objects.filter(id=student_id)[0],
-                                  )
+            row = StudentsForQuery(
+                query=temp_query,
+                inclusion=INCLUSION_MAP[query.inclusion],
+                student=User.objects.filter(id=student_id)[0],
+            )
             bulk_queries.append(row)
-        QueriesStudents.objects.bulk_create(bulk_queries)
-        QueriesTemporary.objects.filter(id=temp_query.id).update(done=True)  # pylint: disable=no-member
+        StudentsForQuery.objects.bulk_create(bulk_queries)
+        TemporaryQuery.objects.filter(id=temp_query.id).update(done=True)  # pylint: disable=no-member
         if associate_group is not None:
-            grouped_temp = GroupedTempQueriesSubqueries(
+            grouped_temp = GroupedTempQueryForSubquery(
                 grouped_id=associate_group,
                 query_id=temp_query.id,   # pylint: disable=no-member
             )
             grouped_temp.save()
 
     except Exception as error:
-        QueriesTemporary.objects.filter(id=temp_query.id).update(done=None)  # pylint: disable=no-member
+        TemporaryQuery.objects.filter(id=temp_query.id).update(done=None)  # pylint: disable=no-member
         raise(error)
 
     #on roughly every 10th query, purge the temporary queries
@@ -202,9 +203,9 @@ def purge_temporary_queries():
     """
     Delete queries made more than 30 minutes ago along with the saved students from those queries
     """
-    minutes30ago = datetime.datetime.now() - datetime.timedelta(minutes=30)
-    old_queries = QueriesTemporary.objects.filter(created__lt=minutes30ago)
-    saved_students = QueriesStudents.objects.filter(query_id__in=old_queries.values_list(DatabaseFields.ID))
+    minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes=TEMPORARY_QUERY_LIFETIME)
+    old_queries = TemporaryQuery.objects.filter(created__lt=minutes_ago)
+    saved_students = StudentsForQuery.objects.filter(query_id__in=old_queries.values_list(DatabaseFields.ID))
     saved_students.delete()
     old_queries.delete()
 
@@ -266,10 +267,11 @@ def make_existing_query(existing_queries):
     for existing_query in existing_queries:
         if existing_query == "" or existing_query == QueryStatus.WORKING:
             continue
-        inclusion_type = QueriesTemporary.objects.filter(id=existing_query)
-        result = QueriesStudents.objects.filter(query_id=existing_query).values_list(DatabaseFields.STUDENT_ID,
-                                                                                     flat=True,
-                                                                                     )
+        inclusion_type = TemporaryQuery.objects.filter(id=existing_query)
+        result = StudentsForQuery.objects.filter(query_id=existing_query).values_list(
+            DatabaseFields.STUDENT_ID,
+            flat=True,
+        )
         if inclusion_type.exists():
             query_dct[inclusion_type[0].inclusion].append(result)
 
@@ -298,10 +300,10 @@ def not_open_query(course_id, query):
                                                     ).values_list(DatabaseFields.USER_ID)
     total_students = User.objects.filter(id__in=ids_in_course)
     without_open = total_students.exclude(id__in=
-    StudentModule.objects.filter(
-        module_state_key=query.entity_id,
-        course_id=course_id).values_list(DatabaseFields.STUDENT_ID),
-    )
+                                          StudentModule.objects.filter(
+                                              module_state_key=query.entity_id,
+                                              course_id=course_id).values_list(DatabaseFields.STUDENT_ID),
+                                          )
     return process_results(course_id, without_open, DatabaseFields.ID, DatabaseFields.EMAIL)
 
 
@@ -314,10 +316,11 @@ def not_completed_query(course_id, query):
                                                     ).values_list(DatabaseFields.USER_ID)
     total_students = User.objects.filter(id__in=ids_in_course)
     without_completed = total_students.exclude(id__in=
-    StudentModule.objects.filter(
-        module_state_key=query.entity_id,
-        course_id=course_id).filter(~Q(grade=None)).values_list(DatabaseFields.STUDENT_ID),
-    )
+                                               StudentModule.objects.filter(
+                                                   module_state_key=query.entity_id,
+                                                   course_id=course_id).filter(~Q(grade=None))
+                                               .values_list(DatabaseFields.STUDENT_ID),
+                                               )
     return process_results(course_id, without_completed, DatabaseFields.ID, DatabaseFields.EMAIL)
 
 

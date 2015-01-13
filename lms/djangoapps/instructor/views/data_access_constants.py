@@ -4,12 +4,12 @@ Constants and Query definition associated with data_access
 import re
 
 
-class Query:
+class Query(object):
     """
     Encapsulates a query in the instructor dashboard email lists tool
     """
     def __init__(self, query_type, inclusion, entity_id, filtering, entity_name):
-        self.type = query_type
+        self.query_type = query_type
         self.inclusion = inclusion
         self.entity_id = entity_id
         self.filter = filtering
@@ -39,6 +39,7 @@ REVERSE_INCLUSION_MAP = {'A': Inclusion.AND,
 
 INCLUDE_SECTION_PATTERN = re.compile('chapter|sequential')
 INCLUDE_PROBLEM_PATTERN = re.compile('problem')
+TEMPORARY_QUERY_LIFETIME = 30  # in minutes, how long a temporary query lives before it gets purged
 
 
 class SectionFilters:  # pylint: disable=invalid-name

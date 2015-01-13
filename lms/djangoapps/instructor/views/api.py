@@ -890,7 +890,7 @@ def save_query(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def get_temp_queries(request, course_id): # pylint: disable=unused-argument
+def get_temp_queries(request, course_id):  # pylint: disable=unused-argument
     """
     Returns the temporary user queries per course
     """
@@ -905,7 +905,7 @@ def get_temp_queries(request, course_id): # pylint: disable=unused-argument
             'block_id': query.module_state_key.block_id,
             'filter_on': query.filter_on,
             'display_name': query.entity_name,
-            'type': query.type,
+            'type': query.query_type,
             'done': query.done,
         })
     response_payload = {
@@ -918,7 +918,7 @@ def get_temp_queries(request, course_id): # pylint: disable=unused-argument
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def get_saved_queries(request, course_id): # pylint: disable=unused-argument
+def get_saved_queries(request, course_id):  # pylint: disable=unused-argument
     """
     Returns all the user-saved queries per course
     """
@@ -942,7 +942,7 @@ def get_saved_queries(request, course_id): # pylint: disable=unused-argument
                                     'block_id': query.module_state_key.block_id,
                                     'filter_on': query.filter_on,
                                     'display_name': query.entity_name,
-                                    'type': query.type,
+                                    'type': query.query_type,
                                     'group': group_id,
                                     'created': created[group_id]
                                     })
@@ -958,7 +958,7 @@ def get_saved_queries(request, course_id): # pylint: disable=unused-argument
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @require_query_params(existing="Ids of previously issued queries")
-def get_total_students(request, course_id, make_csv=False):
+def get_all_students(request, course_id, make_csv=False):
     """
     Returns the students for a given set of queries
     """
@@ -1013,11 +1013,19 @@ def get_single_query(request, course_id, inclusion, query_type, state_type, stat
         response_payload = {'course_id': course_id.to_deprecated_string(),
                             'success': True,
                             }
+        return JsonResponse(response_payload)
     else:
-        response_payload = {'course_id': course_id.to_deprecated_string(),
-                            'success': True,
-                            }
-    return JsonResponse(response_payload)
+       # 500 on all other unexpected status codes.
+        log.error(
+            "Error parsing query-course id:{}, inclusion:{}, query_type:{}, state_type_id:{}, filtering:{},"
+            "entity_name:{}".format(
+                course_id, inclusion, query_type, state_type_id, filtering, entity_name
+            )
+        )
+        return HttpResponse(
+            "Error in parsing query.",
+            status=500,
+        )
 
 
 def _prune_course_tree(course_tree, include_pattern):

@@ -39,9 +39,9 @@ from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
-from courseware.models import QueriesStudents, QueriesTemporary
+from instructor_email_widget.models import StudentsForQuery, TemporaryQuery
 from instructor.views.data_access import purge_temporary_queries, get_group_query_students
-
+from instructor.views.data_access_constants import TEMPORARY_QUERY_LIFETIME
 
 # modules which are mocked in test cases.
 import instructor_task.api
@@ -170,7 +170,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
                                      module_state_key=self.problem,
                                      grade=5,
                                      )
-        output = [ # pylint: disable=unused-variable
+        output = [  # pylint: disable=unused-variable
             CourseEnrollment.objects.create(
                 user=user,
                 course_id=self.course_key,
@@ -225,16 +225,16 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         prev_query_ids = self._get_temp_query_ids()
         if len(prev_query_ids) == 0:
             return None
-        get_total_url = reverse('get_total_students', kwargs={'course_id': self.course_key})
-        total_args = {
+        get_all_url = reverse('get_all_students', kwargs={'course_id': self.course_key})
+        all_args = {
             'existing': ','.join(prev_query_ids),
         }
         if csv:
-            get_total_url+="/csv"
-        total_response = self.client.get(get_total_url, total_args)
+            get_all_url += "/csv"
+        all_response = self.client.get(get_all_url, all_args)
         if csv:
-            return total_response.content
-        students = json.loads(total_response.content)['data']
+            return all_response.content
+        students = json.loads(all_response.content)['data']
         return prev_query_ids, students
 
     def _delete_temp_query(self, query_id):
@@ -253,10 +253,10 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
 
         delete_url = reverse('delete_bulk_temp_query', kwargs={'course_id': self.course_key})
-        total_args = {
+        delete_args = {
             'existing': ','.join(query_ids),
         }
-        response = self.client.get(delete_url, total_args)
+        response = self.client.get(delete_url, delete_args)
         return response
 
     def _check_against_students(self, students, correct_list):
@@ -306,7 +306,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(success, True)
         temp = self._get_temp_query_ids()
         self.assertEquals(len(temp), 0)
-        self.assertEquals(len(QueriesStudents.objects.all()), 0)
+        self.assertEquals(len(StudentsForQuery.objects.all()), 0)
         return query_id
 
     def _save_query(self, existing):
@@ -315,10 +315,10 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
 
         save_url = reverse('save_query', kwargs={'course_id': self.course_key})
-        total_args = {
+        save_args = {
             'existing': ','.join(existing),
         }
-        response = self.client.get(save_url, total_args)
+        response = self.client.get(save_url, save_args)
         return response
 
     def _delete_saved_query(self, query_id):
@@ -369,7 +369,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self._get_query_results(self.NOT_COMPLETED)
 
-    def test_make_total_query(self):
+    def test_make_all_query(self):
         """
         Ensures the logic is sound for aggregating students
         """
@@ -384,8 +384,9 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._make_query(self.OPEN, joining="AND")
         self._make_query(self.NOT_COMPLETED, joining="AND")
         queries2, students2 = self._get_query_students()
-        csvString = self._get_query_students(csv=True)
-        self.assertEquals('"email, name"\r\n"robot+test+32@edx.org","Robot32 Test"\r\n', csvString)
+        csv_string = self._get_query_students(csv=True)
+        to_match = '"email, name"\r\n"%s","%s"\r\n' % (self.open_user.email, self.open_user.profile.name)
+        self.assertEquals(to_match, csv_string)
         self._check_against_students(students2, [self.open_user])
         self._delete_bulk_temp_query(queries2)
 
@@ -446,16 +447,16 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self._make_query(self.OPEN)
         self._make_query(self.COMPLETED)
-        query_obj = QueriesTemporary.objects.all()
+        query_obj = TemporaryQuery.objects.all()
         self.assertNotEqual(len(query_obj), 0)
-        minutes60ago = datetime.datetime.now() - datetime.timedelta(minutes=60)
-        minutes15ago = datetime.datetime.now() - datetime.timedelta(minutes=15)
+        minutes60ago = datetime.datetime.now() - datetime.timedelta(minutes=TEMPORARY_QUERY_LIFETIME * 2)
+        minutes15ago = datetime.datetime.now() - datetime.timedelta(minutes=TEMPORARY_QUERY_LIFETIME / 2)
         query_obj[0].created = minutes60ago
         query_obj[1].created = minutes15ago
         query_obj[0].save()
         query_obj[1].save()
         purge_temporary_queries()
-        query_obj = QueriesTemporary.objects.all()
+        query_obj = TemporaryQuery.objects.all()
         self.assertEquals(len(query_obj), 1)
 
 
