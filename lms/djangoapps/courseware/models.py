@@ -17,8 +17,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from instructor.views.data_access_constants import INCLUSION
-
+from instructor.views.data_access_constants import Inclusion
 
 from xmodule_django.models import CourseKeyField, LocationKeyField
 
@@ -308,9 +307,9 @@ class GroupedQueries(models.Model):
         )
 
 INCLUSIONS = (
-    ('A', INCLUSION.AND),
-    ('N', INCLUSION.NOT),
-    ('O', INCLUSION.OR),
+    ('A', Inclusion.AND),
+    ('N', Inclusion.NOT),
+    ('O', Inclusion.OR),
 )
 
 

@@ -1,6 +1,7 @@
 """
 Constants and Query definition associated with data_access
 """
+import re
 
 
 class Query:
@@ -15,7 +16,7 @@ class Query:
         self.entity_name = entity_name
 
 
-class INCLUSION:
+class Inclusion:
     """
     Options for combining queries
     """
@@ -25,19 +26,22 @@ class INCLUSION:
     FILTER = "FILTER"
 
 
-INCLUSION_MAP = {INCLUSION.AND: 'A',
-                 INCLUSION.OR: 'O',
-                 INCLUSION.NOT: 'N',
-                 INCLUSION.FILTER: 'F'}
+INCLUSION_MAP = {Inclusion.AND: 'A',
+                 Inclusion.OR: 'O',
+                 Inclusion.NOT: 'N',
+                 Inclusion.FILTER: 'F'}
 
 
-REVERSE_INCLUSION_MAP = {'A': INCLUSION.AND,
-                         'O': INCLUSION.OR,
-                         'N': INCLUSION.NOT,
-                         'F': INCLUSION.FILTER}
+REVERSE_INCLUSION_MAP = {'A': Inclusion.AND,
+                         'O': Inclusion.OR,
+                         'N': Inclusion.NOT,
+                         'F': Inclusion.FILTER}
+
+INCLUDE_SECTION_PATTERN = re.compile('chapter|sequential')
+INCLUDE_PROBLEM_PATTERN = re.compile('problem')
 
 
-class SECTION_FILTERS:  # pylint: disable=invalid-name
+class SectionFilters:  # pylint: disable=invalid-name
     """
     Possible filters we may have for sections
     """
@@ -46,19 +50,19 @@ class SECTION_FILTERS:  # pylint: disable=invalid-name
     COMPLETED = "Completed"
 
 
-class PROBLEM_FILTERS:  # pylint: disable=invalid-name
+class ProblemFilters:  # pylint: disable=invalid-name
     """
     Possible filters we may have for problems
     """
-    OPENED = SECTION_FILTERS.OPENED
-    NOT_OPENED = SECTION_FILTERS.NOT_OPENED
+    OPENED = SectionFilters.OPENED
+    NOT_OPENED = SectionFilters.NOT_OPENED
     COMPLETED = "Completed"
     NOT_COMPLETED = "Not Completed"
     SCORE = "Score"
     NUMBER_PEER_GRADED = "Number peer graded"
 
 
-class QUERY_TYPE:  # pylint: disable=invalid-name
+class QueryType:  # pylint: disable=invalid-name
     """
     Types for queries
     """
@@ -66,7 +70,7 @@ class QUERY_TYPE:  # pylint: disable=invalid-name
     PROBLEM = "Problem"
 
 
-class DATABASE_FIELDS:  # pylint: disable=invalid-name
+class DatabaseFields:  # pylint: disable=invalid-name
     """
     Database columns
     """
@@ -80,7 +84,7 @@ class DATABASE_FIELDS:  # pylint: disable=invalid-name
     PROFILE_NAME = "profile__name"
 
 
-class QUERYSTATUS:  # pylint: disable=invalid-name
+class QueryStatus:  # pylint: disable=invalid-name
     """
     Stores possible statuses for queries
     """

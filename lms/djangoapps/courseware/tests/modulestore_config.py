@@ -15,6 +15,7 @@ TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 MAPPINGS = {
     'edX/simple/2012_Fall': 'xml',
     'edX/toy/2012_Fall': 'xml',
+    'edX/emailToy/2015_Winter': 'xml',
     'edX/toy/TT_2012_Fall': 'xml',
     'edX/test_end/2012_Fall': 'xml',
     'edX/test_about_blob_end_date/2012_Fall': 'xml',

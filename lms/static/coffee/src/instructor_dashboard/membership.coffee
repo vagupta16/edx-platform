@@ -678,7 +678,7 @@ class EmailSelectors
     template_html = $("#email-list-widget-template").html()
     @$container.html Mustache.render template_html, params
     @cur_column = 0
-    @$table = $( "#queryTableBody" )
+    @$table = $("#queryTableBody")
     @labelArray = ($container.data 'selections').split '<>'
     @$list_selector = @$container.find 'select.single-email-selector'
     # populate selectors
@@ -686,9 +686,9 @@ class EmailSelectors
     @$list_endpoint = $container.data 'list-endpoint'
     @$rolename = $container.data 'rolename'
     @$list_selector.append $ '<option/>'
-    if this.$container.attr('data-label')=='Select Section'
+    if this.$container.attr('data-label') =='Select Section'
       @load_list()
-    else if this.$container.attr('data-label')=='Select Problem'
+    else if this.$container.attr('data-label') =='Select Problem'
       @load_list()
     else
       for label in @labelArray
@@ -704,7 +704,7 @@ class EmailSelectors
       return unless $opt.length > 0
 
       @c = @parent.children()[@idx+1]
-      if this.$container.attr('data-label')=="Select a Type"
+      if this.$container.attr('data-label') == "Select a Type"
         @chosen_class = $opt.text().trim()
         if (@chosen_class == "Section")
           @$section.find('.problem_specific').removeClass("active")
@@ -739,7 +739,7 @@ class EmailSelectors
     if node.parents
       @toDisplay = [node.parents,@toDisplay].join("<>")
     #indenting subsections for readability
-    if useClass=="subsection"
+    if useClass == "subsection"
       @toDisplay = "---"+@toDisplay
     if @toDisplay.length>50
       #displaying the last n characters
@@ -819,7 +819,7 @@ class EmailWidget
       selected = @$email_list_containers.find('select.single-email-selector')
         .children('option:selected')
       #check to see if stuff has been filled out
-      if selected[1].text=="Section"
+      if selected[1].text == "Section"
         @arr = [{'text':selected[0].text, 'id':selected[0].id},
                 {'text':selected[1].text, 'id':selected[1].id},
                 {'text':selected[4].text, 'id':selected[4].id},
@@ -836,14 +836,14 @@ class EmailWidget
                      selected[2].text, selected[3].text]
 
       for thing in @arr
-        if thing['text']==""
+        if thing['text'] == ""
           $("#incompleteMessage")[0].innerHTML =
             "Query is incomplete. Please make all the selections."
           return
 
       $("#incompleteMessage")[0].innerHTML = ""
       @chosen = selected[0].text
-      @tr = @start_row(@chosen.toLowerCase(), @arr,"", $( "#queryTableBody" ))
+      @tr = @start_row(@chosen.toLowerCase(), @arr,"", $("#queryTableBody"))
       @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).
         join("/")+"/"+@arr[2].id
       @filtering = @arr[3].text
@@ -885,7 +885,7 @@ class EmailWidget
         type = {'text':query['type']}
         arr = [inclusion,type, display_entity, filter_on, done]
         @tr = @start_row(inclusion['text'].toLowerCase(),arr,
-          {'class':["working"],'query':query_id},  $( "#queryTableBody" ))
+          {'class':["working"],'query':query_id},  $("#queryTableBody"))
         @check_done()
 
 
@@ -926,7 +926,7 @@ class EmailWidget
       group_arr = []
       iter = groups.values()
       val = iter.next()
-      while (val['done']==false)
+      while (val['done'] == false)
         group_arr.push(val['value'])
         val = iter.next()
       group_arr.sort((a, b) ->return b-a)
@@ -960,7 +960,7 @@ class EmailWidget
       b.push(row.getAttribute('query'))
     allGood = true
     _.each b, (status) ->
-      if status=="working"
+      if status == "working"
         allGood = false
     if allGood
       @$save_query_btn.removeClass("disabled")
@@ -1012,7 +1012,7 @@ class EmailWidget
         @arr_text = [cells[0].innerText, cells[1].innerText,
                      cells[2].innerText, cells[3].innerText]
         @tr = @start_row(cells[0].innerText.toLowerCase(),
-          @arr,"", $( "#queryTableBody" ))
+          @arr,"", $("#queryTableBody"))
         #todo:this feels too hacky. suggestions?
         @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).
           join("/")+"/"+@arr[2].id
@@ -1125,9 +1125,9 @@ class EmailWidget
         notIdx = idx
       if curRow.classList.contains(color)
         useIdx = idx
-    if color=="or" and useIdx==0
+    if color == "or" and useIdx == 0
       useIdx =Math.max(notIdx, andIdx)
-    if color=="not" and useIdx==0
+    if color == "not" and useIdx == 0
       useIdx =andIdx
     row = table[0].insertRow(useIdx)
     if rowIdClass.hasOwnProperty('id')
@@ -1155,12 +1155,12 @@ class EmailWidget
       <i class="icon-warning-sign"></i> <%= label %></div>',
       {label: "Sorry, we're having a problem with this query.
         Please delete this row and try again."})
-    if arr.length==4
+    if arr.length == 4
       progressCell.innerHTML = $progress_icon[0].outerHTML
     else
-      if arr[4]==null
+      if arr[4] == null
         progressCell.innerHTML = $broken_icon[0].outerHTML
-      else if arr[4]==true
+      else if arr[4] == true
         progressCell.innerHTML = $done_icon[0].outerHTML
         row.classList.remove('working')
       else

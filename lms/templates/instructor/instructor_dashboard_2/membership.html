@@ -31,7 +31,7 @@
     <div class="wrapper-email-select">
         <div class="email-selection-label">{{label}}</div>
         <select class="single-email-selector">
-              <option> ${_("Loading problem list...")} </option>
+              <option> ${_("Loading problem list")} </option>
         </select>
     </div>
 </script>
@@ -327,12 +327,12 @@
           <caption class="tableCaption">Active Queries</caption>
         <thead>
           <tr>
-              <td class="label"> Inclusion</td>
-              <td class="label"> Type </td>
-              <td class="label"> Specification </td>
-              <td class="label"> Criteria </td>
-              <td class="label"> Status </td>
-              <td class="label"> </td>
+              <td class="label">Inclusion</td>
+              <td class="label">Type</td>
+              <td class="label">Specification</td>
+              <td class="label">Criteria</td>
+              <td class="label">Status</td>
+              <td class="label"></td>
           </tr>
         </thead>
         <tbody id="queryTableBody"></tbody>
@@ -341,7 +341,7 @@
       <div class="bottom-email">
           <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_total_students'] }" data-csv="true" class="disabled">
           <input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['save_query'] }" data-csv="true" class="disabled">
-          <div id="estimated"> Approx 0 students selected</div>
+          <div id="estimated">Approx 0 students selected</div>
           <input type="button" name="getest" id="getest" value="Update Students Estimate" data-endpoint="${ section_data['get_total_students'] }" >
           <input type="button" name="startover" id="startover" value="Clear Active Queries">
       </div>
@@ -349,10 +349,10 @@
           <caption class="tableCaption">Saved Queries</caption>
         <thead>
           <tr>
-              <td class="label"> Date Saved</td>
-              <td class="label"> Query </td>
-              <td class="label">  </td>
-              <td class="label">  </td>
+              <td class="label">Date Saved</td>
+              <td class="label">Query</td>
+              <td class="label"></td>
+              <td class="label"></td>
           </tr>
         </thead>
         <tbody id="savedQueriesTable" data-endpoint="${ section_data['get_saved_queries'] }"></tbody>
@@ -365,10 +365,10 @@
         <br/>
         <div>
         <h3>Example:</h3>
-        <div> AND, Problem 1, Opened </div>
-        <div> AND, Problem 2, Not Completed</div>
-        <div> NOT, Problem 3, Opened</div>
-        <div> OR, Problem 2, Not Opened</div>
+        <div>AND, Problem 1, Opened</div>
+        <div>AND, Problem 2, Not Completed</div>
+        <div>NOT, Problem 3, Opened</div>
+        <div>OR, Problem 2, Not Opened</div>
         <br/>
         <div>Returns: Students who have opened Problem 1 and not completed Problem 2, but have not opened Problem 3 in
             addition to students who have not opened Problem 4<br/><br/>

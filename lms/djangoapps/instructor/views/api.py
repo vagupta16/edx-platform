@@ -65,7 +65,6 @@ import instructor_analytics.csvs
 import csv
 from user_api.models import UserPreference
 from instructor.views import INVOICE_KEY
-from instructor.utils import collect_ora2_data
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
@@ -89,7 +88,9 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from student.models import UserProfile, Registration
 import instructor.views.data_access as data_access
-from instructor.views.data_access_constants import SECTION_FILTERS, PROBLEM_FILTERS, QUERY_TYPE, Query, REVERSE_INCLUSION_MAP
+from instructor.views.data_access_constants import SectionFilters, ProblemFilters, QueryType, Query
+from instructor.views.data_access_constants import REVERSE_INCLUSION_MAP, INCLUDE_SECTION_PATTERN
+from instructor.views.data_access_constants import INCLUDE_PROBLEM_PATTERN
 
 log = logging.getLogger(__name__)
 
@@ -728,10 +729,10 @@ def list_course_role_members(request, course_id):
     return JsonResponse(response_payload)
 
 
-def build_course_tree(course):
+def _build_course_tree(course):
     """
     Recursively builds a course tree given the root node to a course
-    :param course tree root:
+    :param course tree root
     :return list of dictionaries that represent the tree:
     """
     course_tree = []
@@ -739,10 +740,12 @@ def build_course_tree(course):
     for child in course.get_children():
         if not child.hide_from_toc:
             using = course.children[idx]
-            course_tree.append({'display_name': child.display_name_with_default,
-                               'block_id': using.block_id,
-                               'block_type': using.block_type,
-                               'sub': build_course_tree(child)})
+            course_tree.append({
+                'display_name': child.display_name_with_default,
+                'block_id': using.block_id,
+                'block_type': using.block_type,
+                'sub': _build_course_tree(child),
+            })
         idx += 1
     return course_tree
 
@@ -750,78 +753,79 @@ def build_course_tree(course):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-@require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_tree(request, course_id):
     """
     Returns a tree representing the substructures in a course
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
-    course_tree = build_course_tree(course)
+    course_tree = _build_course_tree(course)
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
-        'data': course_tree
+        'data': course_tree,
     }
     return JsonResponse(response_payload)
 
 
-def process_new_query(course_id, query_incl, query_type, query_id, query_filtering, entity_name):
+def _process_new_query(course_id, query_incl, query_type, query_id, query_filtering, entity_name):
     """
     Takes a query and bundles it up into a query object
     """
+    if query_filtering is None:
+        return None
     blocks = query_id.split("/")
     if len(blocks) != 2:
-        return
+        return None
     else:
         block_type, block_id = blocks
     query_id = course_id.make_usage_key(block_type, block_id)
-    if query_filtering is None:
-        return None
     query_filtering = query_filtering.lower().strip()
+    query_filtering_matched = None
 
     query_type = query_type.lower().strip()
     if query_type == "section":
-        query_type = QUERY_TYPE.SECTION
-        if query_filtering == SECTION_FILTERS.OPENED.lower():
-            query_filtering = SECTION_FILTERS.OPENED
-        elif query_filtering == SECTION_FILTERS.NOT_OPENED.lower():
-            query_filtering = SECTION_FILTERS.NOT_OPENED
-        elif query_filtering == SECTION_FILTERS.COMPLETED.lower():
-            query_filtering = SECTION_FILTERS.COMPLETED
+        query_type = QueryType.SECTION
+        if query_filtering == SectionFilters.OPENED.lower():
+            query_filtering_matched = SectionFilters.OPENED
+        elif query_filtering == SectionFilters.NOT_OPENED.lower():
+            query_filtering_matched = SectionFilters.NOT_OPENED
+        elif query_filtering == SectionFilters.COMPLETED.lower():
+            query_filtering_matched = SectionFilters.COMPLETED
     else:
-        query_type = QUERY_TYPE.PROBLEM
-        if query_filtering == PROBLEM_FILTERS.OPENED.lower():
-            query_filtering = PROBLEM_FILTERS.OPENED
-        elif query_filtering == PROBLEM_FILTERS.NOT_OPENED.lower():
-            query_filtering = PROBLEM_FILTERS.NOT_OPENED
-        elif query_filtering == PROBLEM_FILTERS.COMPLETED.lower():
-            query_filtering = PROBLEM_FILTERS.COMPLETED
-        elif query_filtering == PROBLEM_FILTERS.NOT_COMPLETED.lower():
-            query_filtering = PROBLEM_FILTERS.NOT_COMPLETED
-        elif query_filtering == "score":
-            query_filtering = PROBLEM_FILTERS.SCORE
-        elif query_filtering == "number of peer responses graded":
-            query_filtering = PROBLEM_FILTERS.NUMBER_PEER_GRADED
-    return Query(query_type, query_incl, query_id, query_filtering, entity_name)
+        query_type = QueryType.PROBLEM
+        if query_filtering == ProblemFilters.OPENED.lower():
+            query_filtering_matched = ProblemFilters.OPENED
+        elif query_filtering == ProblemFilters.NOT_OPENED.lower():
+            query_filtering_matched = ProblemFilters.NOT_OPENED
+        elif query_filtering == ProblemFilters.COMPLETED.lower():
+            query_filtering_matched = ProblemFilters.COMPLETED
+        elif query_filtering == ProblemFilters.NOT_COMPLETED.lower():
+            query_filtering_matched = ProblemFilters.NOT_COMPLETED
+    if query_filtering_matched is None:
+        return None
+    else:
+        return Query(query_type, query_incl, query_id, query_filtering_matched, entity_name)
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
+@require_query_params(existing="Ids of previously issued queries")
 def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argument
     """
     Deletes a temporary query that the user has entered along with the corresponding students
     """
     existing = request.GET.get('existing')
-    if existing is not None and existing != "":
-        existing_queries = existing.split(',')
-    else:
-        existing_queries = []
+    existing_queries = existing.split(',')
+    if len(existing) == 0:
+        return JsonResponse({
+            'success': False,
+        })
     cleaned_queries = [query.strip() for query in existing_queries]
     if len(cleaned_queries) > 0:
         data_access.delete_bulk_temporary_query(cleaned_queries)
     response_payload = {
-        'success': True
+        'success': True,
     }
     return JsonResponse(response_payload)
 
@@ -829,7 +833,7 @@ def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argume
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def delete_temp_query(_request, course_id, query_to_delete):  # pylint: disable=unused-argument
+def delete_temp_query(request, course_id, query_to_delete):  # pylint: disable=unused-argument
     """
     Deletes a temporary query that the user has entered along with the corresponding students
     """
@@ -843,7 +847,7 @@ def delete_temp_query(_request, course_id, query_to_delete):  # pylint: disable=
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def delete_saved_query(_request, course_id, query_to_delete):  # pylint: disable=unused-argument
+def delete_saved_query(request, course_id, query_to_delete):  # pylint: disable=unused-argument
     """
     Deletes a grouped query that the user has saved along with the corresponding subqueries
     """
@@ -857,17 +861,23 @@ def delete_saved_query(_request, course_id, query_to_delete):  # pylint: disable
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
+@require_query_params(existing="Ids of previously issued queries")
 def save_query(request, course_id):
     """
     Saves a group of queries and assigns them the same group ID
     """
     existing = request.GET.get('existing')
-    if existing is not None and existing != "":
-        existing_queries = existing.split(',')
-    else:
-        existing_queries = []
+    existing_queries = existing.split(',')
+    if len(existing) == 0:
+        return JsonResponse({
+            'success': False,
+        })
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    clean_existing = [query for query in existing_queries if (query != "working" and query != "")]
+    clean_existing = [
+        query
+        for query in existing_queries
+        if (query != "working" and query != "")
+    ]
     success = data_access.save_query(course_id, clean_existing)
 
     response_payload = {
@@ -880,7 +890,7 @@ def save_query(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def get_temp_queries(_request, course_id):
+def get_temp_queries(request, course_id): # pylint: disable=unused-argument
     """
     Returns the temporary user queries per course
     """
@@ -888,15 +898,16 @@ def get_temp_queries(_request, course_id):
     saved_temp = data_access.get_temp_queries(course_id)
     cleaned_queries = []
     for query in saved_temp:
-        cleaned_queries.append({'id': query.id,
-                                'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
-                                'block_type': query.module_state_key.block_type,
-                                'block_id': query.module_state_key.block_id,
-                                'filter_on': query.filter_on,
-                                'display_name': query.entity_name,
-                                'type': query.type,
-                                'done': query.done,
-                                })
+        cleaned_queries.append({
+            'id': query.id,
+            'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
+            'block_type': query.module_state_key.block_type,
+            'block_id': query.module_state_key.block_id,
+            'filter_on': query.filter_on,
+            'display_name': query.entity_name,
+            'type': query.type,
+            'done': query.done,
+        })
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
         'queries': cleaned_queries
@@ -907,15 +918,18 @@ def get_temp_queries(_request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-def get_saved_queries(_request, course_id):
+def get_saved_queries(request, course_id): # pylint: disable=unused-argument
     """
     Returns all the user-saved queries per course
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     groups, queries, relations = data_access.get_saved_queries(course_id)
     cleaned_queries = []
-    relation_map = {}
     created = {}
+    relation_map = {
+        relation.query_id: relation.grouped_id
+        for relation in relations
+    }
     for relation in relations:
         relation_map[relation.query_id] = relation.grouped_id
     for group in groups:
@@ -934,7 +948,8 @@ def get_saved_queries(_request, course_id):
                                     })
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
-        'queries': cleaned_queries
+        'queries': cleaned_queries,
+        'success': True,
     }
     return JsonResponse(response_payload)
 
@@ -942,15 +957,17 @@ def get_saved_queries(_request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
+@require_query_params(existing="Ids of previously issued queries")
 def get_total_students(request, course_id, make_csv=False):
     """
     Returns the students for a given set of queries
     """
     existing = request.GET.get('existing')
-    if existing is not None and existing != "":
-        existing_queries = existing.split(',')
-    else:
-        existing_queries = []
+    existing_queries = existing.split(',')
+    if len(existing) == 0:
+        return JsonResponse({
+            'success': False,
+        })
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     clean_existing = [query for query in existing_queries if (query != "working" and query != "")]
     results = data_access.make_total_query(clean_existing)
@@ -958,55 +975,77 @@ def get_total_students(request, course_id, make_csv=False):
     if not make_csv:
         response_payload = {
             'course_id': course_id.to_deprecated_string(),
-            'data': emails
+            'data': emails,
+            'success': True,
         }
         return JsonResponse(response_payload)
     else:
         filename = time.strftime("%Y%m%d%H%M") + "emailSelection.csv"
-        return instructor_analytics.csvs.create_csv_response(filename, ["email, name"], [[item['email'], item['profileName']] for item in emails])
+        email_pairs = [
+            [item['email'], item['profileName']]
+            for item in emails]
+        return instructor_analytics.csvs.create_csv_response(filename, ["email, name"], email_pairs)
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
+@require_query_params(
+    filter="Type of filter",
+    entityName="Human readable name of entity"
+)
 def get_single_query(request, course_id, inclusion, query_type, state_type, state_id):
     """
     Makes and saves a single query
     """
+    if inclusion is None or query_type is None or state_type is None or state_id is None:
+        return JsonResponse({
+            'success': False,
+        })
+
     filtering = request.GET.get('filter')
     entity_name = request.GET.get('entityName')
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    processed = process_new_query(course_id, inclusion, query_type, state_type + "/" + state_id, filtering, entity_name)
-    if processed is not None:
+    state_type_id = state_type + "/" + state_id
+    processed = _process_new_query(course_id, inclusion, query_type, state_type_id, filtering, entity_name)
+    if processed:
         data_access.make_single_query.apply_async(args=(course_id, processed))
-    response_payload = {'course_id': course_id.to_deprecated_string(),
-                        'success': True
-                        }
+        response_payload = {'course_id': course_id.to_deprecated_string(),
+                            'success': True,
+                            }
+    else:
+        response_payload = {'course_id': course_id.to_deprecated_string(),
+                            'success': True,
+                            }
     return JsonResponse(response_payload)
 
 
-def prune_course_tree(course_tree, include_pattern):
+def _prune_course_tree(course_tree, include_pattern):
     """
     Helper functions for displaying problems and sections
     """
     new_tree = []
     for child in course_tree:
         if include_pattern.match(child['block_type']):
-            child['sub'] = prune_course_tree(child['sub'], include_pattern)
+            child['sub'] = _prune_course_tree(child['sub'], include_pattern)
             new_tree.append(child)
     return new_tree
 
 
-def select_course_tree(course_tree, include_pattern):
+def _select_course_tree(course_tree, include_pattern):
     """
     Returns the 2 topmost parents of a node for displaying purposes
     """
-    return select_course_tree_r(course_tree, include_pattern, [], top_most=True)
+    return _select_course_tree_recursive(course_tree, include_pattern, top_most=True)
 
 
-def select_course_tree_r(course_tree, include_pattern, return_container=None, parents=None, top_most=False):
+def _select_course_tree_recursive(course_tree,  # pylint: disable=dangerous-default-value
+                                  include_pattern,
+                                  return_container=[],
+                                  parents=None,
+                                  top_most=False):
     """
-    Helper for select_course_tree
+    Helper for select_course_tree. Do not call this directly!
     """
     if return_container is None:
         return_container = []
@@ -1020,14 +1059,13 @@ def select_course_tree_r(course_tree, include_pattern, return_container=None, pa
             return_container.append(child)
         if len(parents) < 2:
             parents.append(child['display_name'])
-        select_course_tree_r(sub_tree, include_pattern, return_container, parents)
+        _select_course_tree_recursive(sub_tree, include_pattern, return_container, parents=parents)
     return return_container
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-@require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_sections(request, course_id):
     """
     Returns a tree structure consisting only of sections and subsections
@@ -1035,13 +1073,13 @@ def list_course_sections(request, course_id):
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
 
-    course_tree = build_course_tree(course)
-    include_pattern = re.compile('chapter|sequential')
-    section_tree = prune_course_tree(course_tree, include_pattern)
+    course_tree = _build_course_tree(course)
+    section_tree = _prune_course_tree(course_tree, INCLUDE_SECTION_PATTERN)
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
-        'data': section_tree
+        'data': section_tree,
+        'success': True,
     }
     return JsonResponse(response_payload)
 
@@ -1049,19 +1087,18 @@ def list_course_sections(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
-@require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_problems(request, course_id):
     """
     Returns a tree structure consisting only of problems
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
-    course_tree = build_course_tree(course)
-    include_pattern = re.compile('problem')
-    problem_list = select_course_tree(course_tree, include_pattern)
+    course_tree = _build_course_tree(course)
+    problem_list = _select_course_tree(course_tree, INCLUDE_PROBLEM_PATTERN)
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
-        'data': problem_list
+        'data': problem_list,
+        'success': True,
     }
     return JsonResponse(response_payload)
 
@@ -1903,7 +1940,7 @@ def list_instructor_tasks(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def list_report_downloads(_request, course_id):
+def list_report_downloads(request, course_id):  # pylint: disable=unused-argument
     """
     List grade CSV files that are available for download for this course.
     """
