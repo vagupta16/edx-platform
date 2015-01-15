@@ -170,14 +170,12 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
                                      module_state_key=self.problem,
                                      grade=5,
                                      )
-        output = [  # pylint: disable=unused-variable
+        for user in [self.open_user, self.completed_user, self.not_opened_user]:
             CourseEnrollment.objects.create(
                 user=user,
                 course_id=self.course_key,
                 is_active=True,
             )
-            for user in [self.open_user, self.completed_user, self.not_opened_user]
-        ]
 
         CourseEnrollment.objects.create(
             user=self.inactive_user,

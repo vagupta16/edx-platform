@@ -956,23 +956,24 @@ section.instructor-dashboard-content-2 {
     }
 
     thead {
-      background-color: dimgrey;
+      background-color: #696969;
     }
 
     tr {
       border-bottom: 1px solid $light-gray;
+      text-transform: capitalize;
     }
 
     .or {
-      background-color: lightslategrey;
+      background-color: #778899;
     }
 
     .and {
-      background-color: darkseagreen;
+      background-color: #8FBC8F;
     }
 
     .not {
-      background-color: palevioletred;
+      background-color: #DB7093;
     }
 
     .problem_specific, .section_specific {
@@ -996,11 +997,11 @@ section.instructor-dashboard-content-2 {
 
     #incompleteMessage {
       padding-right: 40px;
-      color: mediumvioletred;
+      color: #C71585;
     }
 
     .remove {
-      color: white
+      color: $white
     }
 
     .remove, .deleteSaved {
@@ -1012,12 +1013,12 @@ section.instructor-dashboard-content-2 {
     }
 
     .deleteSaved {
-      color: black
+      color: $black
     }
 
 
     .loadQuery {
-      color: black;
+      color: $black;
       cursor: pointer;
       text-align: center;
 
@@ -1048,7 +1049,7 @@ section.instructor-dashboard-content-2 {
     }
 
     #estimated {
-      color: dodgerblue;
+      color: #1E90FF;
       font-size: 20px;
       padding-bottom: 10px;
     }
@@ -1058,7 +1059,7 @@ section.instructor-dashboard-content-2 {
     }
 
     .working {
-      color: black;
+      color: $black;
     }
 
     .bottom-email {
@@ -1069,17 +1070,17 @@ section.instructor-dashboard-content-2 {
       margin-top: -1px;
       border: 1px solid $light-gray;
       background-color: #efefef;
-      box-shadow: inset #bbb 0px 1px 1px 0px;
+      box-shadow: inset #bbb 0 1 1 0;
     }
 
-    input[type="button"]#savequery {
+    #savequery {
       @include idashbutton($red);
       float: right;
       right: $baseline;
       font-size: 15px;
     }
 
-    input[type="button"]#getcsv {
+    #getcsv {
       @include idashbutton($blue);
       float: right;
       right: $baseline;
@@ -1091,12 +1092,12 @@ section.instructor-dashboard-content-2 {
     }
 
     #queryTableBody {
-      color: white;
+      color: $white;
     }
 
     #savedQueriesTable {
-      background-color: linen;
-      color: black;
+      background-color: #FAF0E6;
+      color: $black;
     }
 
     #invisibleQueriesStorage {

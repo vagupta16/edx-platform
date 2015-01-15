@@ -265,7 +265,7 @@ class AutoEnrollmentViaCsv
         if student_result.is_general_error
           response_message =  student_result.response
         else
-          response_message = student_result.username + '  ('+ student_result.email + '):  ' + '   (' + student_result.response + ')'
+          response_message = student_result.username + '  (' + student_result.email + '):  ' + '   (' + student_result.response + ')'
         messages_summary.append $ '<li/>', class: 'summary-item', text: response_message
 
       @$results.append task_res_section
@@ -686,24 +686,19 @@ class EmailSelectors
     @$list_endpoint = $container.data 'list-endpoint'
     @$rolename = $container.data 'rolename'
     @$list_selector.append $ '<option/>'
-    if this.$container.attr('data-label') =='Select Section'
+    if this.$container.attr('data-label') == 'Select Section'
       @load_list()
-    else if this.$container.attr('data-label') =='Select Problem'
+    else if this.$container.attr('data-label') == 'Select Problem'
       @load_list()
     else
       for label in @labelArray
         @$list_selector.append $ '<option/>',
           text: label
 
-    @parent = @$container.parent()
-    @idx = @$container.prevAll().length
-    @c = @$section.find('.section_specific').get(0).children[0]
-
     @$list_selector.change =>
       $opt = @$list_selector.children('option:selected')
       return unless $opt.length > 0
 
-      @c = @parent.children()[@idx+1]
       if this.$container.attr('data-label') == "Select a Type"
         @chosen_class = $opt.text().trim()
         if (@chosen_class == "Section")
@@ -728,7 +723,7 @@ class EmailSelectors
       # abort on error
       return @show_errors error unless error is null
       _.each section_list, (section) =>
-        @add_row( section, "section")
+        @add_row(section, "section")
         _.each section.sub, (subsection) =>
           @add_row(subsection , "subsection")
 
@@ -738,24 +733,23 @@ class EmailSelectors
     @toDisplay = node.display_name
     if node.parents
       @toDisplay = [node.parents,@toDisplay].join("<>")
-    #indenting subsections for readability
+    #indenting subsections with dashes for readability
     if useClass == "subsection"
-      @toDisplay = "---"+@toDisplay
-    if @toDisplay.length>50
+      @toDisplay = "---" + @toDisplay
+    if @toDisplay.length > 50
       #displaying the last n characters
-      @toDisplay = "..."+@toDisplay.substring(@toDisplay.length-60,
-        @toDisplay.length)
+      @toDisplay = "..." + @toDisplay.substring(@toDisplay.length-60, @toDisplay.length)
     @$list_selector.append $ '<option/>',
             text: @toDisplay
             class: useClass
             id : @idSt
 
-  set_cell: (text, colNumber,cellid) ->
+  set_cell: (text, colNumber, cellid) ->
     rows = $("#queryTableBody")[0].rows
-    cell = rows[rows.length-1].children[colNumber]
+    cell = rows[rows.length - 1].children[colNumber]
     if cell
       cell.innerHTML = text
-      if cellid !=""
+      if cellid != ""
         cell.id = cellid
 
 class EmailWidget
@@ -790,19 +784,19 @@ class EmailWidget
 
     @$email_csv_btn = @$section.find("input[name='getcsv']'")
     @$email_csv_btn.click () =>
-      b = []
+      sending_query = []
       tab = $("#queryTableBody")
       rows = tab.find("tr")
       _.each rows, (row) ->
-        b.push(row.getAttribute('query'))
+        sending_query.push(row.getAttribute('query'))
 
-      send_data = b.join(',')
+      send_data = sending_query.join(',')
       url = @$email_csv_btn.data 'endpoint'
       # handle csv special case
       # redirect the document to the csv file.
       url += '/csv'
       url += "?rolename=instructor"
-      url += "&existing="+ encodeURIComponent(send_data)
+      url += "&existing=" + encodeURIComponent(send_data)
       location.href = url
 
     @load_saved_queries()
@@ -843,14 +837,14 @@ class EmailWidget
 
       $("#incompleteMessage")[0].innerHTML = ""
       @chosen = selected[0].text
-      @tr = @start_row(@chosen.toLowerCase(), @arr,"", $("#queryTableBody"))
-      @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).
-        join("/")+"/"+@arr[2].id
+      @tr = @start_row(@chosen.toLowerCase(), @arr, "", $("#queryTableBody"))
+      @use_query_endpoint = @$query_endpoint + "/" + @arr_text.slice(0,2).
+        join("/") + "/" + @arr[2].id
       @filtering = @arr[3].text
       @entityName = @arr[2].text
       @reload_students(@tr)
       @$email_list_containers.find('select.single-email-selector').
-        prop('selectedIndex',0)
+        prop('selectedIndex', 0)
       $(".problem_specific").removeClass('active')
       $(".section_specific").removeClass('active')
 
@@ -876,14 +870,14 @@ class EmailWidget
         query_id = query['id']
         block_id = query['block_id']
         block_type = query['block_type']
-        state_key = block_type+"/" +block_id
+        state_key = block_type + "/" + block_id
         display_name = query['display_name']
         display_entity = {'text':display_name, 'id':state_key}
         filter_on = {'text':query['filter_on']}
         inclusion = {'text':query['inclusion']}
         done = query['done']
         type = {'text':query['type']}
-        arr = [inclusion,type, display_entity, filter_on, done]
+        arr = [inclusion, type, display_entity, filter_on, done]
         @tr = @start_row(inclusion['text'].toLowerCase(),arr,
           {'class':["working"],'query':query_id},  $("#queryTableBody"))
         @check_done()
@@ -910,7 +904,7 @@ class EmailWidget
       _.each queries, (query) =>
         block_id = query['block_id']
         block_type = query['block_type']
-        state_key = block_type+"/" +block_id
+        state_key = block_type + "/" + block_id
         display_name = query['display_name']
         display_entity = {'text':display_name, 'id':state_key}
         filter_on = {'text':query['filter_on']}
@@ -920,7 +914,7 @@ class EmailWidget
         arr = [inclusion,type, display_entity, filter_on]
         invisibleTable = $("#invisibleQueriesStorage")
         @tr = @start_row(inclusion['text'],arr,
-          {'class':["saved"+query.group]}, invisibleTable)
+          {'class':["saved" + query.group]}, invisibleTable)
         @tr[0].setAttribute('created',created)
         groups.add(query.group)
       group_arr = []
@@ -931,35 +925,35 @@ class EmailWidget
         val = iter.next()
       group_arr.sort((a, b) ->return b-a)
       for group in group_arr
-        lookup = ".saved"+group
+        lookup = ".saved" + group
         saved_qs = $(lookup)
         types = []
         names = []
         time = ""
-        for q in saved_qs
-          cells = q.children
+        for query in saved_qs
+          cells = query.children
           types.push(cells[0].innerText)
           names.push(cells[2].innerText)
-          time = q.getAttribute('created')
+          time = query.getAttribute('created')
         display_st = ""
         for i in [0..types.length-1]
           display_st += types[i]
-          display_st +=" "
-          display_st += names[i]+" "
-        arr = [{"text":time}, {"text":display_st}]
-        @start_saved_row("and",arr, group, $( "#savedQueriesTable" ) )
+          display_st += " "
+          display_st += names[i] + " "
+        arr = [{"text": time}, {"text": display_st}]
+        @start_saved_row("and",arr, group, $("#savedQueriesTable") )
 
   #if each individual query is processed, allow the user
   #to download the csv and save the query
   check_done: ->
     #check if all other queries have returned, if so can get total csv
-    b = []
+    row_arr = []
     tab = $("#queryTableBody")
     rows = tab.find("tr")
     _.each rows, (row) ->
-      b.push(row.getAttribute('query'))
+      row_arr.push(row.getAttribute('query'))
     allGood = true
-    _.each b, (status) ->
+    _.each row_arr, (status) ->
       if status == "working"
         allGood = false
     if allGood
@@ -1001,7 +995,7 @@ class EmailWidget
       groupedQueryId = curRow.getAttribute('groupQuery')
       @$email_csv_btn[0].value = "Aggregating Queries"
       $("#incompleteMessage")[0].innerHTML = ""
-      rowsToAdd = $(".saved"+groupedQueryId)
+      rowsToAdd = $(".saved" + groupedQueryId)
       for row in rowsToAdd
         cells = row.children
         @arr = [{'text':cells[0].innerText},
@@ -1014,8 +1008,8 @@ class EmailWidget
         @tr = @start_row(cells[0].innerText.toLowerCase(),
           @arr,"", $("#queryTableBody"))
         #todo:this feels too hacky. suggestions?
-        @use_query_endpoint =@$query_endpoint+"/"+@arr_text.slice(0,2).
-          join("/")+"/"+@arr[2].id
+        @use_query_endpoint =@$query_endpoint + "/" + @arr_text.slice(0,2).
+          join("/") + "/" + @arr[2].id
         @filtering = @arr[3].text
         @entityName = @arr[2].text
         @reload_students(@tr)
@@ -1043,7 +1037,6 @@ class EmailWidget
 
   get_students: (cb)->
     tab = $("#queryTableBody")
-    b = []
     rows = tab.find("tr")
     _.each rows, (row) ->
       type = row.classList[0]
@@ -1054,7 +1047,6 @@ class EmailWidget
         html = child.innerHTML
         problems.push({"id":id, "text":html})
       problems = problems.slice(0,-1)
-      b.push([type, problems])
     send_data =
       filter: @filtering
       entityName: @entityName
@@ -1084,7 +1076,7 @@ class EmailWidget
 
   #we don't care if these calls succeed or not so no wrapped callback
   delete_temp_query: (queryId)->
-    send_url = @$delete_temp_endpoint+"/"+queryId
+    send_url = @$delete_temp_endpoint + "/" + queryId
     $.ajax
       dataType: 'json'
       url: send_url
@@ -1099,7 +1091,7 @@ class EmailWidget
       data: send_data
 
   delete_saved_query: (queryId)->
-    send_url = @$delete_saved_endpoint+"/"+queryId
+    send_url = @$delete_saved_endpoint + "/" + queryId
     $.ajax
       dataType: 'json'
       url: send_url
@@ -1116,7 +1108,7 @@ class EmailWidget
     #figuring out where to place the new row
     #we want the group order to be and, or, not
     for curRow in rows
-      idx +=1
+      idx += 1
       if curRow.classList.contains("or")
         orIdx = idx
       if curRow.classList.contains("and")
@@ -1126,7 +1118,7 @@ class EmailWidget
       if curRow.classList.contains(color)
         useIdx = idx
     if color == "or" and useIdx == 0
-      useIdx =Math.max(notIdx, andIdx)
+      useIdx = Math.max(notIdx, andIdx)
     if color == "not" and useIdx == 0
       useIdx =andIdx
     row = table[0].insertRow(useIdx)
@@ -1183,13 +1175,13 @@ class EmailWidget
     return $(row)
 
   save_query: (cb)->
-    b = []
+    cur_queries = []
     tab = $("#queryTableBody")
     rows = tab.find("tr")
     _.each rows, (row) ->
-      b.push(row.getAttribute('query'))
+      cur_queries.push(row.getAttribute('query'))
     send_data =
-      existing: b.join(',')
+      existing: cur_queries.join(',')
     $.ajax
       dataType: 'json'
       url: @$save_query_btn.data 'endpoint'
@@ -1205,13 +1197,13 @@ class EmailWidget
       @load_saved_queries()
 
   get_estimated: (cb)->
-    b = []
+    cur_queries = []
     tab = $("#queryTableBody")
     rows = tab.find("tr")
     _.each rows, (row) ->
-      b.push(row.getAttribute('query'))
+      cur_queries.push(row.getAttribute('query'))
     send_data =
-      existing: b.join(',')
+      existing: cur_queries.join(',')
     $.ajax
       dataType: 'json'
       url: @$total_endpoint
@@ -1224,13 +1216,16 @@ class EmailWidget
   reload_estimated: ->
     $("#estimated")[0].innerHTML= "Calculating"
     @get_estimated (error, students) =>
+      if students['success'] == false
+        $("#estimated")[0].innerHTML = '0 students selected'
+        return
       students_list = students['data']
       query_id = students['query_id']
       # abort on error
       return @show_errors error unless error is null
       $number_students = students_list.length
-      $("#estimated")[0].innerHTML=
-        "approx " + $number_students+" students selected"
+      $("#estimated")[0].innerHTML =
+        "approx " + $number_students + " students selected"
   # set error display
   show_errors: (msg) -> @$error_section?.text msg
 

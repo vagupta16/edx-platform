@@ -42,28 +42,41 @@ INCLUDE_PROBLEM_PATTERN = re.compile('problem')
 TEMPORARY_QUERY_LIFETIME = 30  # in minutes, how long a temporary query lives before it gets purged
 
 
-class SectionFilters:  # pylint: disable=invalid-name
+class SectionFilters:
     """
     Possible filters we may have for sections
     """
-    OPENED = "Opened"
-    NOT_OPENED = "Not Opened"
-    COMPLETED = "Completed"
+    OPENED = "opened"
+    NOT_OPENED = "not opened"
+    COMPLETED = "completed"
 
 
-class ProblemFilters:  # pylint: disable=invalid-name
+class ProblemFilters:
     """
     Possible filters we may have for problems
     """
     OPENED = SectionFilters.OPENED
     NOT_OPENED = SectionFilters.NOT_OPENED
-    COMPLETED = "Completed"
-    NOT_COMPLETED = "Not Completed"
-    SCORE = "Score"
-    NUMBER_PEER_GRADED = "Number peer graded"
+    COMPLETED = "completed"
+    NOT_COMPLETED = "not completed"
+    SCORE = "score"
+    NUMBER_PEER_GRADED = "number peer graded"
+
+ALL_SECTION_FILTERS = {filter for filter in [SectionFilters.OPENED,
+                                             SectionFilters.NOT_OPENED,
+                                             SectionFilters.COMPLETED,
+                                             ]}
+
+ALL_PROBLEM_FILTERS = {filter for filter in [ProblemFilters.OPENED,
+                                             ProblemFilters.NOT_OPENED,
+                                             ProblemFilters.COMPLETED,
+                                             ProblemFilters.NOT_COMPLETED,
+                                             ProblemFilters.SCORE,
+                                             ProblemFilters.NUMBER_PEER_GRADED,
+                                             ]}
 
 
-class QueryType:  # pylint: disable=invalid-name
+class QueryType:
     """
     Types for queries
     """
@@ -71,7 +84,7 @@ class QueryType:  # pylint: disable=invalid-name
     PROBLEM = "Problem"
 
 
-class DatabaseFields:  # pylint: disable=invalid-name
+class DatabaseFields:
     """
     Database columns
     """
@@ -85,7 +98,7 @@ class DatabaseFields:  # pylint: disable=invalid-name
     PROFILE_NAME = "profile__name"
 
 
-class QueryStatus:  # pylint: disable=invalid-name
+class QueryStatus:
     """
     Stores possible statuses for queries
     """

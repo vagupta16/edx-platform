@@ -88,9 +88,9 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from student.models import UserProfile, Registration
 import instructor.views.data_access as data_access
-from instructor.views.data_access_constants import SectionFilters, ProblemFilters, QueryType, Query
+from instructor.views.data_access_constants import QueryType, Query
 from instructor.views.data_access_constants import REVERSE_INCLUSION_MAP, INCLUDE_SECTION_PATTERN
-from instructor.views.data_access_constants import INCLUDE_PROBLEM_PATTERN
+from instructor.views.data_access_constants import INCLUDE_PROBLEM_PATTERN, ALL_PROBLEM_FILTERS, ALL_SECTION_FILTERS
 
 log = logging.getLogger(__name__)
 
@@ -780,32 +780,21 @@ def _process_new_query(course_id, query_incl, query_type, query_id, query_filter
         block_type, block_id = blocks
     query_id = course_id.make_usage_key(block_type, block_id)
     query_filtering = query_filtering.lower().strip()
-    query_filtering_matched = None
-
+    query_filtering_matched = False
     query_type = query_type.lower().strip()
     if query_type == "section":
         query_type = QueryType.SECTION
-        if query_filtering == SectionFilters.OPENED.lower():
-            query_filtering_matched = SectionFilters.OPENED
-        elif query_filtering == SectionFilters.NOT_OPENED.lower():
-            query_filtering_matched = SectionFilters.NOT_OPENED
-        elif query_filtering == SectionFilters.COMPLETED.lower():
-            query_filtering_matched = SectionFilters.COMPLETED
+        if query_filtering in ALL_SECTION_FILTERS:
+            query_filtering_matched = True
+
     else:
         query_type = QueryType.PROBLEM
-        if query_filtering == ProblemFilters.OPENED.lower():
-            query_filtering_matched = ProblemFilters.OPENED
-        elif query_filtering == ProblemFilters.NOT_OPENED.lower():
-            query_filtering_matched = ProblemFilters.NOT_OPENED
-        elif query_filtering == ProblemFilters.COMPLETED.lower():
-            query_filtering_matched = ProblemFilters.COMPLETED
-        elif query_filtering == ProblemFilters.NOT_COMPLETED.lower():
-            query_filtering_matched = ProblemFilters.NOT_COMPLETED
-    if query_filtering_matched is None:
+        if query_filtering in ALL_PROBLEM_FILTERS:
+            query_filtering_matched = True
+    if query_filtering_matched is False:
         return None
     else:
-        return Query(query_type, query_incl, query_id, query_filtering_matched, entity_name)
-
+        return Query(query_type, query_incl, query_id, query_filtering, entity_name)
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -1109,6 +1098,7 @@ def list_course_problems(request, course_id):
         'success': True,
     }
     return JsonResponse(response_payload)
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
