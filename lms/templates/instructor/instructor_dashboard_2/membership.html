@@ -273,7 +273,6 @@
         be inaccurate. If the status gets stuck at "working" for a long
         time, you may come back to the page later.
     </label>
-    <br/>
     <div class="email-list">
         <div class="email-list-container"
              data-label="Inclusion"
@@ -337,7 +336,6 @@
         </thead>
         <tbody id="queryTableBody"></tbody>
       </table>
-      <br/>
       <div class="bottom-email">
           <input type="button" name="getcsv" id="getcsv" value="Get CSV" data-endpoint="${ section_data['get_all_students'] }" data-csv="true" class="disabled">
           <input type="button" name="savequery" id="savequery" value="Save Query" data-endpoint="${ section_data['save_query'] }" data-csv="true" class="disabled">
@@ -361,15 +359,12 @@
         <table>
             <tbody id="invisibleQueriesStorage" data-endpoint="${ section_data['get_saved_queries'] }"></tbody>
         </table>
-       <br/>
-        <br/>
-        <div>
+        <div id="emailHelp">
         <h3>Example:</h3>
         <div>AND, Problem 1, Opened</div>
         <div>AND, Problem 2, Not Completed</div>
         <div>NOT, Problem 3, Opened</div>
         <div>OR, Problem 2, Not Opened</div>
-        <br/>
         <div>Returns: Students who have opened Problem 1 and not completed Problem 2, but have not opened Problem 3 in
             addition to students who have not opened Problem 4<br/><br/>
             The intersection of <i>AND</i> queries is taken.<br/>
