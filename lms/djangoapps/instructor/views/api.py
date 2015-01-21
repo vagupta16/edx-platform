@@ -926,15 +926,16 @@ def get_saved_queries(request, course_id):  # pylint: disable=unused-argument
     for query in queries:
         if query.id in relation_map:
             group_id = relation_map[query.id]
-            cleaned_queries.append({'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
-                                    'block_type': query.module_state_key.block_type,
-                                    'block_id': query.module_state_key.block_id,
-                                    'filter_on': query.filter_on,
-                                    'display_name': query.entity_name,
-                                    'type': query.query_type,
-                                    'group': group_id,
-                                    'created': created[group_id]
-                                    })
+            cleaned_queries.append({
+                'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
+                'block_type': query.module_state_key.block_type,
+                'block_id': query.module_state_key.block_id,
+                'filter_on': query.filter_on,
+                'display_name': query.entity_name,
+                'type': query.query_type,
+                'group': group_id,
+                'created': created[group_id]
+            })
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
         'queries': cleaned_queries,
@@ -960,7 +961,11 @@ def get_all_students(request, course_id, make_csv=False):
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     clean_existing = [query for query in existing_queries if (query != "working" and query != "")]
     results = data_access.make_total_query(clean_existing)
-    emails = [{"id": pair[0], "email":pair[1], "profileName":pair[2]} for pair in results]
+    emails = [{
+                  "id": pair[0],
+                  "email":pair[1],
+                  "profileName":pair[2]
+              } for pair in results]
     if not make_csv:
         response_payload = {
             'course_id': course_id.to_deprecated_string(),
@@ -999,9 +1004,10 @@ def get_single_query(request, course_id, inclusion, query_type, state_type, stat
     processed = _process_new_query(course_id, inclusion, query_type, state_type_id, filtering, entity_name)
     if processed:
         data_access.make_single_query.apply_async(args=(course_id, processed))
-        response_payload = {'course_id': course_id.to_deprecated_string(),
-                            'success': True,
-                            }
+        response_payload = {
+            'course_id': course_id.to_deprecated_string(),
+            'success': True,
+        }
         return JsonResponse(response_payload)
     else:
        # 500 on all other unexpected status codes.

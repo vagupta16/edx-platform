@@ -93,7 +93,9 @@ class AuthListWidget extends MemberListWidget
     if input? and input isnt ''
       @modify_member_access input, 'allow', (error) =>
         # abort on error
-        return @show_errors error unless error is null
+        if error
+          return @show_errors error
+
         @clear_errors()
         @clear_input()
         @reload_list()
@@ -105,7 +107,8 @@ class AuthListWidget extends MemberListWidget
     # @clear_rows()
     @get_member_list (error, member_list) =>
       # abort on error
-      return @show_errors error unless error is null
+      if error
+        return @show_errors error
 
       # only show the list of there are members
       @clear_rows()
@@ -122,7 +125,8 @@ class AuthListWidget extends MemberListWidget
         $revoke_btn.click =>
             @modify_member_access member.email, 'revoke', (error) =>
               # abort on error
-              return @show_errors error unless error is null
+              if error
+                return @show_errors error
               @clear_errors()
               @reload_list()
         @add_row [member.username, member.email, $revoke_btn]
@@ -265,7 +269,7 @@ class AutoEnrollmentViaCsv
         if student_result.is_general_error
           response_message =  student_result.response
         else
-          response_message = student_result.username + '  (' + student_result.email + '):  ' + '   (' + student_result.response + ')'
+          response_message = student_result.username + '  ('+ student_result.email + '):  ' + '   (' + student_result.response + ')'
         messages_summary.append $ '<li/>', class: 'summary-item', text: response_message
 
       @$results.append task_res_section
@@ -671,358 +675,354 @@ class AuthList
       error: std_ajax_err => @$request_response_error.text gettext "Error changing user's permissions."
 
 class EmailSelectors
-  constructor: (@$container, @$section, params={}) ->
-    params = _.defaults params,
-      label : $container.data 'label'
+  DESCRIPTION_LIMIT : 50
+  TRUNCATION : 60
 
-    template_html = $("#email-list-widget-template").html()
-    @$container.html Mustache.render template_html, params
-    @cur_column = 0
-    @$table = $("#queryTableBody")
-    @labelArray = ($container.data 'selections').split '<>'
-    @$list_selector = @$container.find 'select.single-email-selector'
+  constructor: (@$container, $section, params={}) ->
+    params = _.defaults params,
+      label : @$container.data('label')
+
+    templateHtml = $('#email-list-widget-template').html()
+    @$container.html Mustache.render templateHtml, params
+    labelArray = (@$container.data('selections')).split '<>'
+    @$listSelector = @$container.find('select.single-email-selector')
     # populate selectors
-    @$list_selector.empty()
-    @$list_endpoint = $container.data 'list-endpoint'
-    @$rolename = $container.data 'rolename'
-    @$list_selector.append $ '<option/>'
-    if this.$container.attr('data-label') == 'Select Section'
+    @$listSelector.empty()
+    @listEndpoint = @$container.data('list-endpoint')
+    @$listSelector.append($('<option/>'))
+    if $container.attr('data-label') == 'Select Section'
       @load_list()
-    else if this.$container.attr('data-label') == 'Select Problem'
+    else if @$container.attr('data-label') == 'Select Problem'
       @load_list()
     else
-      for label in @labelArray
-        @$list_selector.append $ '<option/>',
+      for label in labelArray
+        @$listSelector.append($('<option/>',
           text: label
+          )
+        )
 
-    @$list_selector.change =>
-      $opt = @$list_selector.children('option:selected')
-      return unless $opt.length > 0
+    @$listSelector.change =>
+      $opt = @$listSelector.children('option:selected')
+      if (!$opt.length)
+        return
+      if @$container.attr('data-label') == 'Select a Type'
+        chosenClass = $opt.text().trim()
+        if (chosenClass == 'Section')
+          $section.find('.problem_specific').removeClass('active')
+          $section.find('.section_specific').addClass('active')
+        else if (chosenClass == 'Problem')
+          $section.find('.section_specific').removeClass('active')
+          $section.find('.problem_specific').addClass('active')
 
-      if this.$container.attr('data-label') == "Select a Type"
-        @chosen_class = $opt.text().trim()
-        if (@chosen_class == "Section")
-          @$section.find('.problem_specific').removeClass("active")
-          @$section.find('.section_specific').addClass("active")
-        else if (@chosen_class == "Problem")
-          @$section.find('.section_specific').removeClass("active")
-          @$section.find('.problem_specific').addClass("active")
-
-  get_list: (cb)->
-    $.ajax
+  get_list: (cb) ->
+    $.ajax(
       dataType: 'json'
-      url: @$list_endpoint
-      data: rolename: 'instructor'
+      url: @listEndpoint
       success: (data) -> cb? null, data['data']
       error: std_ajax_err ->
-        cb? gettext("Error fetching problem or section data")
+        cb? gettext('Error fetching problem or section data')
+    )
 
   # load section/problem data
   load_list: ->
     @get_list (error, section_list) =>
       # abort on error
-      return @show_errors error unless error is null
+      if error
+        return @show_errors error
       _.each section_list, (section) =>
-        @add_row(section, "section")
+        @add_row(section, 'section')
         _.each section.sub, (subsection) =>
-          @add_row(subsection , "subsection")
+          @add_row(subsection , 'subsection')
 
-  add_row: (node, useClass) ->
-    @idArr = [node.block_type, node.block_id]
-    @idSt = @idArr.join("/")
-    @toDisplay = node.display_name
+  add_row: (node, sectionOrSubsection) ->
+    idArr = [node.block_type, node.block_id]
+    idSt = idArr.join('/')
+    toDisplay = node.display_name
     if node.parents
-      @toDisplay = [node.parents,@toDisplay].join("<>")
-    #indenting subsections with dashes for readability
-    if useClass == "subsection"
-      @toDisplay = "---" + @toDisplay
-    if @toDisplay.length > 50
-      #displaying the last n characters
-      @toDisplay = "..." + @toDisplay.substring(@toDisplay.length-60, @toDisplay.length)
-    @$list_selector.append $ '<option/>',
-            text: @toDisplay
-            class: useClass
-            id : @idSt
-
-  set_cell: (text, colNumber, cellid) ->
-    rows = $("#queryTableBody")[0].rows
-    cell = rows[rows.length - 1].children[colNumber]
-    if cell
-      cell.innerHTML = text
-      if cellid != ""
-        cell.id = cellid
+      toDisplay = [node.parents, toDisplay].join('<>')
+    # indenting subsections with dashes for readability
+    if sectionOrSubsection == 'subsection'
+      toDisplay = '---' + toDisplay
+    if toDisplay.length > @DESCRIPTION_LIMIT
+      # displaying the last n characters
+      toDisplay = '...' + toDisplay.substring(Math.max(0,toDisplay.length - @TRUNCATION), toDisplay.length)
+    @$listSelector.append($('<option/>',
+            text: toDisplay
+            class: sectionOrSubsection
+            id: idSt
+      ))
 
 class EmailWidget
-  constructor:  (@email_lists, @$section, @$email_list_containers)  ->
-    @$query_endpoint = $(".email-lists-management").data('query-endpoint')
-    @$total_endpoint = $(".email-lists-management")
+  constructor:  (emailLists, $section, @$emailListContainers)  ->
+    @$queryEndpoint = $('.email-lists-management').data('query-endpoint')
+    @$totalEndpoint = $('.email-lists-management')
       .data('total-endpoint')
-    @$temp_queries_endpoint = $(".email-lists-management")
+    @$tempQueriesEndpoint = $('.email-lists-management')
       .data('temp-queries-endpoint')
-    @$delete_saved_endpoint = $(".email-lists-management")
+    @$deleteSavedEndpoint = $('.email-lists-management')
       .data('delete-saved-endpoint')
-    @$delete_temp_endpoint = $(".email-lists-management")
+    @$deleteTempEndpoint = $('.email-lists-management')
       .data('delete-temp-endpoint')
-    @$delete_bulk_temp_endpoint = $(".email-lists-management")
+    @$deleteBulkTempEndpoint = $('.email-lists-management')
       .data('delete-bulk-temp-endpoint')
-    for email_list in @email_lists
-      email_list.$container.addClass 'active'
+    for emailList in emailLists
+      emailList.$container.addClass('active')
 
-    @$get_est_btn = @$section.find("input[name='getest']'")
-    @$get_est_btn.click () =>
+    @$getEstBtn = $section.find("input[name='getest']'")
+    @$getEstBtn.click () =>
       @reload_estimated()
 
-    @$startover_btn = @$section.find("input[name='startover']'")
-    @$startover_btn.click () =>
+    @$startoverBtn = $section.find("input[name='startover']'")
+    @$startoverBtn.click () =>
       @delete_temporary()
-      $("#queryTableBody tr").remove()
+      $('#queryTableBody tr').remove()
       @reload_estimated()
 
-    @$save_query_btn = @$section.find("input[name='savequery']'")
-    @$save_query_btn.click () =>
+    @$saveQueryBtn = $section.find("input[name='savequery']'")
+    @$saveQueryBtn.click () =>
       @send_save_query()
 
-    @$email_csv_btn = @$section.find("input[name='getcsv']'")
-    @$email_csv_btn.click () =>
-      sending_query = []
-      tab = $("#queryTableBody")
-      rows = tab.find("tr")
-      _.each rows, (row) ->
-        sending_query.push(row.getAttribute('query'))
-
-      send_data = sending_query.join(',')
-      url = @$email_csv_btn.data 'endpoint'
+    @$emailCsvBtn = $section.find("input[name='getcsv']'")
+    @$emailCsvBtn.click () =>
+      rows = $('#queryTableBody tr')
+      sendingQuery = _.map (rows), (row) =>
+          row.getAttribute('query')
+      sendData = sendingQuery.join(',')
+      url = @$emailCsvBtn.data('endpoint')
       # handle csv special case
       # redirect the document to the csv file.
       url += '/csv'
-      url += "?rolename=instructor"
-      url += "&existing=" + encodeURIComponent(send_data)
-      location.href = url
+      url += '?existing=' + window.encodeURIComponent(sendData)
+      window.location.href = url
 
     @load_saved_queries()
     @load_saved_temp_queries()
 
-    #poll for query status every 15 seconds
-    POLL_INTERVAL = 1000 * 15  # 15 seconds in ms
-    @poller = new window.InstructorDashboard.util.IntervalManager(
-      POLL_INTERVAL, => @load_saved_temp_queries()
+    # poll for query status every 15 seconds
+    POLL_INTERVAL_IN_MS = 15000 # 15 * 1000, 15 seconds in ms
+    poller = new window.InstructorDashboard.util.IntervalManager(
+      POLL_INTERVAL_IN_MS, => @load_saved_temp_queries()
     )
-    @poller.start()
+    poller.start()
 
     $('#addQuery').click =>
-      selected = @$email_list_containers.find('select.single-email-selector')
-        .children('option:selected')
-      #check to see if stuff has been filled out
-      if selected[1].text == "Section"
-        @arr = [{'text':selected[0].text, 'id':selected[0].id},
-                {'text':selected[1].text, 'id':selected[1].id},
-                {'text':selected[4].text, 'id':selected[4].id},
-                {'text':selected[5].text, 'id':selected[5].id}]
-        @arr_text = [selected[0].text, selected[1].text,
-                     selected[4].text, selected[5].text]
-
+      $selected = @$emailListContainers.find('select.single-email-selector option:selected')
+        #.children('option:selected')
+      # check to see if stuff has been filled out
+      if $selected[1].text == 'Section'
+        selectedOptions = [{'text':$selected[0].text, 'id':$selected[0].id},
+                {'text':$selected[1].text, 'id':$selected[1].id},
+                {'text':$selected[4].text, 'id':$selected[4].id},
+                {'text':$selected[5].text, 'id':$selected[5].id}]
+        selectedOptionsText = [$selected[0].text, $selected[1].text,
+                     $selected[4].text, $selected[5].text]
       else
-        @arr = [{'text':selected[0].text, 'id':selected[0].id},
-                {'text':selected[1].text, 'id':selected[1].id},
-                {'text':selected[2].text, 'id':selected[2].id},
-                {'text':selected[3].text, 'id':selected[3].id}]
-        @arr_text = [selected[0].text, selected[1].text,
-                     selected[2].text, selected[3].text]
+        selectedOptions = [{'text':$selected[0].text, 'id':$selected[0].id},
+                {'text':$selected[1].text, 'id':$selected[1].id},
+                {'text':$selected[2].text, 'id':$selected[2].id},
+                {'text':$selected[3].text, 'id':$selected[3].id}]
+        selectedOptionsText = [$selected[0].text, $selected[1].text,
+                     $selected[2].text, $selected[3].text]
 
-      for thing in @arr
-        if thing['text'] == ""
-          $("#incompleteMessage")[0].innerHTML =
-            "Query is incomplete. Please make all the selections."
+      for option in selectedOptions
+        if option['text'] == ''
+          $('#incompleteMessage').html('Query is incomplete. Please make all the selections.')
           return
 
-      $("#incompleteMessage")[0].innerHTML = ""
-      @chosen = selected[0].text
-      @tr = @start_row(@chosen.toLowerCase(), @arr, "", $("#queryTableBody"))
-      @use_query_endpoint = @$query_endpoint + "/" + @arr_text.slice(0,2).
-        join("/") + "/" + @arr[2].id
-      @filtering = @arr[3].text
-      @entityName = @arr[2].text
+      $('#incompleteMessage').html('')
+      @chosen = $selected[0].text
+      @tr = @start_row(@chosen.toLowerCase(), selectedOptions, '', $('#queryTableBody'))
+      @useQueryEndpoint = [
+          @$queryEndpoint,
+          selectedOptionsText.slice(0,2).join('/'),
+          selectedOptions[2].id
+      ].join('/')
+      @filtering = selectedOptions[3].text
+      @entityName = selectedOptions[2].text
       @reload_students(@tr)
-      @$email_list_containers.find('select.single-email-selector').
+      @$emailListContainers.find('select.single-email-selector').
         prop('selectedIndex', 0)
-      $(".problem_specific").removeClass('active')
-      $(".section_specific").removeClass('active')
+      $('.problem_specific').removeClass('active')
+      $('.section_specific').removeClass('active')
 
-  get_saved_temp_queries: (cb)->
-    $.ajax
+  get_saved_temp_queries: (cb) ->
+    $.ajax(
       dataType: 'json'
-      url: @$temp_queries_endpoint
-      data: rolename: 'instructor'
+      url: @$tempQueriesEndpoint
       success: (data) -> cb? null, data
       error: std_ajax_err ->
-        cb? gettext("Error getting saved temp queries")
+        cb? gettext('Error getting saved temp queries')
+    )
 
-  #get a user's in-progress queries and load them into active queries
+  # get a user's in-progress queries and load them into active queries
   load_saved_temp_queries: ->
     @get_saved_temp_queries (error, data) =>
       # abort on error
-      return @show_errors error unless error is null
-      $("#queryTableBody tr").remove()
+      if error
+        return @show_errors error
+      $('#queryTableBody tr').remove()
       queries = data['queries']
       # use _.each instead of 'for' so that member
       # is bound in the button callback.
       _.each queries, (query) =>
-        query_id = query['id']
-        block_id = query['block_id']
-        block_type = query['block_type']
-        state_key = block_type + "/" + block_id
-        display_name = query['display_name']
-        display_entity = {'text':display_name, 'id':state_key}
-        filter_on = {'text':query['filter_on']}
+        queryId = query['id']
+        blockId = query['block_id']
+        blockType = query['block_type']
+        stateKey = blockType + '/' + blockId
+        displayName = query['display_name']
+        displayEntity = {'text':displayName, 'id':stateKey}
+        filterOn = {'text':query['filter_on']}
         inclusion = {'text':query['inclusion']}
         done = query['done']
         type = {'text':query['type']}
-        arr = [inclusion, type, display_entity, filter_on, done]
+        arr = [inclusion, type, displayEntity, filterOn, done]
         @tr = @start_row(inclusion['text'].toLowerCase(),arr,
-          {'class':["working"],'query':query_id},  $("#queryTableBody"))
+          {'class':['working'],'query':queryId},  $('#queryTableBody'))
         @check_done()
 
-
-  get_saved_queries: (cb)->
+  get_saved_queries: (cb) ->
     $.ajax
       dataType: 'json'
-      url: $("#savedQueriesTable").data 'endpoint'
-      data: rolename: 'instructor'
+      url: $('#savedQueriesTable').data('endpoint')
       success: (data) -> cb? null, data
       error: std_ajax_err ->
-        cb? gettext("Error getting saved queries")
+        cb? gettext('Error getting saved queries')
 
-  #get a user's saved queries and load them into saved queries
+  # get a user's saved queries and load them into saved queries
   load_saved_queries: ->
-    $("#savedQueriesTable tr").remove()
-    $("#invisibleQueriesStorage tr").remove()
+    $('#savedQueriesTable tr').remove()
+    $('#invisibleQueriesStorage tr').remove()
     @get_saved_queries (error, data) =>
       # abort on error
-      return @show_errors error unless error is null
+      if error
+        return @show_errors error
       queries = data['queries']
       groups = new Set()
       _.each queries, (query) =>
-        block_id = query['block_id']
-        block_type = query['block_type']
-        state_key = block_type + "/" + block_id
-        display_name = query['display_name']
-        display_entity = {'text':display_name, 'id':state_key}
-        filter_on = {'text':query['filter_on']}
+        blockId = query['block_id']
+        blockType = query['block_type']
+        stateKey = blockType + '/' + blockId
+        displayName = query['display_name']
+        displayEntity = {'text':displayName, 'id':stateKey}
+        filterOn = {'text':query['filter_on']}
         inclusion = {'text':query['inclusion']}
         created = query['created']
         type = {'text':query['type']}
-        arr = [inclusion,type, display_entity, filter_on]
-        invisibleTable = $("#invisibleQueriesStorage")
-        @tr = @start_row(inclusion['text'],arr,
-          {'class':["saved" + query.group]}, invisibleTable)
+        queryVals = [inclusion, type, displayEntity, filterOn]
+        invisibleTable = $('#invisibleQueriesStorage')
+        @tr = @start_row(inclusion['text'], queryVals,
+          {'class':['saved' + query.group]}, invisibleTable)
         @tr[0].setAttribute('created',created)
         groups.add(query.group)
-      group_arr = []
+      savedGroup = []
       iter = groups.values()
       val = iter.next()
       while (val['done'] == false)
-        group_arr.push(val['value'])
+        savedGroup.push(val['value'])
         val = iter.next()
-      group_arr.sort((a, b) ->return b-a)
-      for group in group_arr
-        lookup = ".saved" + group
-        saved_qs = $(lookup)
+      savedGroup.sort((a, b) ->return b-a)
+      for group in savedGroup
+        lookup = '.saved' + group
+        savedQs = $(lookup)
         types = []
         names = []
-        time = ""
-        for query in saved_qs
+        time = ''
+        for query in savedQs
           cells = query.children
           types.push(cells[0].innerText)
           names.push(cells[2].innerText)
           time = query.getAttribute('created')
-        display_st = ""
+        savedQueryDisplayName = ''
         for i in [0..types.length-1]
-          display_st += types[i]
-          display_st += " "
-          display_st += names[i] + " "
-        arr = [{"text": time}, {"text": display_st}]
-        @start_saved_row("and",arr, group, $("#savedQueriesTable") )
+          savedQueryDisplayName += types[i]
+          savedQueryDisplayName += ' '
+          savedQueryDisplayName += names[i] + ' '
+        savedVals = [{'text': time}, {'text': savedQueryDisplayName}]
+        @start_saved_row('and', savedVals, group, $('#savedQueriesTable'))
 
-  #if each individual query is processed, allow the user
-  #to download the csv and save the query
+  # if each individual query is processed, allow the user
+  # to download the csv and save the query
   check_done: ->
-    #check if all other queries have returned, if so can get total csv
-    row_arr = []
-    tab = $("#queryTableBody")
-    rows = tab.find("tr")
+    # check if all other queries have returned, if so can get total csv
+    rowArr = []
+    tab = $('#queryTableBody')
+    rows = tab.find('tr')
     _.each rows, (row) ->
-      row_arr.push(row.getAttribute('query'))
+      rowArr.push(row.getAttribute('query'))
     allGood = true
-    _.each row_arr, (status) ->
-      if status == "working"
+    _.each (rowArr), (status) ->
+      if status == 'working'
         allGood = false
     if allGood
-      @$save_query_btn.removeClass("disabled")
-      @$email_csv_btn.removeClass("disabled")
-      @$email_csv_btn[0].value = "Download CSV"
+      @$saveQueryBtn.removeClass('disabled')
+      @$emailCsvBtn.removeClass('disabled')
+      @$emailCsvBtn[0].value = 'Download CSV'
 
-  #deletes an active query from the table and the db
+  # deletes an active query from the table and the db
   delete_temporary:->
     queriesToDelete = []
-    _.each $("#queryTableBody tr"), (row) ->
+    _.each $('#queryTableBody tr'), (row) ->
       if row.hasAttribute('query')
         queryToDelete = row.getAttribute('query')
         queriesToDelete.push(queryToDelete)
     @delete_bulk_temp_query(queriesToDelete)
-    $("#queryTableBody tr").remove()
+    $('#queryTableBody tr').remove()
 
-  #adds a row to saved queries
+  # adds a row to saved queries
   start_saved_row:(color, arr, id, table) ->
-    #find which row to insert in
+    # find which row to insert in
     rows = table[0].children
     row = table[0].insertRow(rows)
-    row.setAttribute("groupQuery", id)
+    row.setAttribute('groupQuery', id)
     for num in [0..1]
       cell = row.insertCell(num)
       item = arr[num]
       cell.innerHTML = item['text']
       if item.hasOwnProperty('id')
         cell.id = item['id']
-    $load_btn = $ _.template('<div class="loadQuery"><i class="icon-upload">
-      </i> <%= label %></div>', {label: "Load"})
-    $load_btn.click =>
+    $loadBtn = $ _.template('<div class="loadQuery"><i class="icon-upload">
+      </i> <%= label %></div>', {label: 'Load'})
+    $loadBtn.click =>
       @delete_temporary()
-      $("#queryTableBody tr").remove()
+      $('#queryTableBody tr').remove()
       targ = event.target
       while (!targ.classList.contains('loadQuery'))
         targ = targ.parentNode
       curRow = targ.parentNode.parentNode
       groupedQueryId = curRow.getAttribute('groupQuery')
-      @$email_csv_btn[0].value = "Aggregating Queries"
-      $("#incompleteMessage")[0].innerHTML = ""
-      rowsToAdd = $(".saved" + groupedQueryId)
+      @$emailCsvBtn[0].value = 'Aggregating Queries'
+      $('#incompleteMessage').html('')
+      rowsToAdd = $('.saved' + groupedQueryId)
       for row in rowsToAdd
         cells = row.children
-        @arr = [{'text':cells[0].innerText},
+        savedQueryOptions = [{'text':cells[0].innerText},
                 {'text':cells[1].innerText},
                 {'text':cells[2].innerText, 'id':cells[2].id},
                 {'text':cells[3].innerText}]
 
-        @arr_text = [cells[0].innerText, cells[1].innerText,
+        savedQueryOptionsText = [cells[0].innerText, cells[1].innerText,
                      cells[2].innerText, cells[3].innerText]
         @tr = @start_row(cells[0].innerText.toLowerCase(),
-          @arr,"", $("#queryTableBody"))
-        #todo:this feels too hacky. suggestions?
-        @use_query_endpoint =@$query_endpoint + "/" + @arr_text.slice(0,2).
-          join("/") + "/" + @arr[2].id
-        @filtering = @arr[3].text
-        @entityName = @arr[2].text
+          savedQueryOptions,'', $('#queryTableBody'))
+        # todo:this feels too hacky. suggestions?
+        @useQueryEndpoint = [
+          @$queryEndpoint,
+          savedQueryOptionsText.slice(0,2).join('/'),
+          savedQueryOptions[2].id
+        ].join('/')
+        @filtering = savedQueryOptions[3].text
+        @entityName = savedQueryOptions[2].text
         @reload_students(@tr)
-        @$email_list_containers.find('select.single-email-selector').
+        @$emailListContainers.find('select.single-email-selector').
           prop('selectedIndex',0)
-        $(".problem_specific").removeClass('active')
-        $(".section_specific").removeClass('active')
-    $td = $ '<td>'
-    $td.append $load_btn
-    row.appendChild $td[0]
-    $delete_btn = $ _.template('<div class="deleteSaved">
-      <i class="icon-remove-sign"></i> <%= label %></div>', {label: "Delete"})
-    $delete_btn.click =>
+        $('.problem_specific').removeClass('active')
+        $('.section_specific').removeClass('active')
+    $td = $('<td>')
+    $td.append($loadBtn)
+    row.appendChild($td[0])
+    $deleteBtn = $(_.template('<div class="deleteSaved">
+      <i class="icon-remove-sign"></i> <%= label %></div>', {label: 'Delete'}))
+    $deleteBtn.click =>
       targ = event.target
       while (!targ.classList.contains('deleteSaved'))
         targ = targ.parentNode
@@ -1030,41 +1030,40 @@ class EmailWidget
       curRow.remove()
       queryToDelete = curRow.getAttribute('groupquery')
       @delete_saved_query(queryToDelete)
-    $td = $ '<td>'
-    $td.append $delete_btn
-    row.appendChild $td[0]
+    $td = $('<td>')
+    $td.append($deleteBtn)
+    row.appendChild($td[0])
     return $(row)
 
-  get_students: (cb)->
-    tab = $("#queryTableBody")
-    rows = tab.find("tr")
+  get_students: (cb) ->
+    tab = $('#queryTableBody')
+    rows = tab.find('tr')
     _.each rows, (row) ->
       type = row.classList[0]
       problems = []
-      children = row.children
-      _.each children, (child) ->
+      _.each row.children, (child) ->
         id = child.id
         html = child.innerHTML
-        problems.push({"id":id, "text":html})
-      problems = problems.slice(0,-1)
+        problems.push({'id': id, 'text': html})
+      problems = problems.slice(0, -1)
     send_data =
       filter: @filtering
       entityName: @entityName
     $.ajax
       dataType: 'json'
-      url: @use_query_endpoint
+      url: @useQueryEndpoint
       data: send_data
       success: (data) -> cb? null, data
       error: std_ajax_err ->
-        cb? gettext("Error getting students")
+        cb? gettext('Error getting students')
 
-  #make a single query to the backend. doesn't wait for
-  #query completion as that can take awhile
+  # make a single query to the backend. doesn't wait for
+  # query completion as that can take awhile
   reload_students: (tr) ->
-    @$save_query_btn.addClass("disabled")
-    @$email_csv_btn.addClass("disabled")
-    @$email_csv_btn[0].value = "Aggregating Queries"
-    tr.addClass("working")
+    @$saveQueryBtn.addClass('disabled')
+    @$emailCsvBtn.addClass('disabled')
+    @$emailCsvBtn[0].value = 'Aggregating Queries'
+    tr.addClass('working')
     @get_students (error, students) =>
       if error
         $broken_icon = $ _.template('<div class="done">
@@ -1072,54 +1071,58 @@ class EmailWidget
           {label: "Sorry, we're having a problem with this query.
             Please delete this row and try again."})
         tr.children()[4].innerHTML = $broken_icon[0].outerHTML
-      return @show_errors error unless error is null
+      if error
+        return @show_errors error
 
-  #we don't care if these calls succeed or not so no wrapped callback
-  delete_temp_query: (queryId)->
-    send_url = @$delete_temp_endpoint + "/" + queryId
-    $.ajax
+  # we don't care if these calls succeed or not so no wrapped callback
+  delete_temp_query: (queryId) ->
+    send_url = @$deleteTempEndpoint + '/' + queryId
+    $.ajax(
       dataType: 'json'
       url: send_url
+    )
 
-  delete_bulk_temp_query: (queryIds)->
-    send_url = @$delete_bulk_temp_endpoint
-    send_data =
+  delete_bulk_temp_query: (queryIds) ->
+    sendUrl = @$deleteBulkTempEndpoint
+    sendData =
       existing: queryIds.join(',')
-    $.ajax
+    $.ajax(
       dataType: 'json'
-      url: send_url
-      data: send_data
+      url: sendUrl
+      data: sendData
+    )
 
-  delete_saved_query: (queryId)->
-    send_url = @$delete_saved_endpoint + "/" + queryId
-    $.ajax
+  delete_saved_query: (queryId) ->
+    sendUrl = @$deleteSavedEndpoint + '/' + queryId
+    $.ajax(
       dataType: 'json'
-      url: send_url
+      url: sendUrl
+    )
 
-  #adds a row to active queries
+  # adds a row to active queries
   start_row:(color, arr, rowIdClass, table) ->
-    #find which row to insert in
+    # find which row to insert in
     idx =0
     orIdx = 0
     andIdx = 0
     notIdx = 0
     useIdx = 0
     rows = table[0].children
-    #figuring out where to place the new row
-    #we want the group order to be and, or, not
+    # figuring out where to place the new row
+    # we want the group order to be and, or, not
     for curRow in rows
       idx += 1
-      if curRow.classList.contains("or")
+      if curRow.classList.contains('or')
         orIdx = idx
-      if curRow.classList.contains("and")
+      if curRow.classList.contains('and')
         andIdx = idx
-      if curRow.classList.contains("not")
+      if curRow.classList.contains('not')
         notIdx = idx
       if curRow.classList.contains(color)
         useIdx = idx
-    if color == "or" and useIdx == 0
+    if color == 'or' and useIdx == 0
       useIdx = Math.max(notIdx, andIdx)
-    if color == "not" and useIdx == 0
+    if color == 'not' and useIdx == 0
       useIdx =andIdx
     row = table[0].insertRow(useIdx)
     if rowIdClass.hasOwnProperty('id')
@@ -1135,14 +1138,14 @@ class EmailWidget
       cell = row.insertCell(num)
       item = arr[num]
       cell.innerHTML = item['text']
-      if item.hasOwnProperty('id') and item['id'] !=""
+      if item.hasOwnProperty('id') and item['id'] !=''
         cell.id = item['id']
     progressCell = row.insertCell(4)
     $progress_icon = $ _.template('<div class="Working">
       <i class="icon-spinner icon-spin"></i><%= label %></div>',
-      {label: "Working"})
+      {label: 'Working'})
     $done_icon = $ _.template('<div class="done"><i class="icon-check">
-      </i> <%= label %></div>', {label: "Done"})
+      </i> <%= label %></div>', {label: 'Done'})
     $broken_icon = $ _.template('<div class="done">
       <i class="icon-warning-sign"></i> <%= label %></div>',
       {label: "Sorry, we're having a problem with this query.
@@ -1157,9 +1160,9 @@ class EmailWidget
         row.classList.remove('working')
       else
         progressCell.innerHTML = $progress_icon[0].outerHTML
-    $remove_btn = $ _.template('<div class="remove"><i class="icon-remove-sign">
-      </i> <%= label %></div>', {label: "Remove"})
-    $remove_btn.click =>
+    $removeBtn = $(_.template('<div class="remove"><i class="icon-remove-sign">
+      </i> <%= label %></div>', {label: 'Remove'}))
+    $removeBtn.click =>
       targ = event.target
       while (!targ.classList.contains('remove'))
         targ = targ.parentNode
@@ -1170,62 +1173,63 @@ class EmailWidget
         @delete_temp_query(queryToDelete)
       @check_done()
     $td = $ '<td>'
-    $td.append $remove_btn
-    row.appendChild $td[0]
+    $td.append($removeBtn)
+    row.appendChild($td[0])
     return $(row)
 
   save_query: (cb)->
     cur_queries = []
-    tab = $("#queryTableBody")
-    rows = tab.find("tr")
+    tab = $('#queryTableBody')
+    rows = tab.find('tr')
     _.each rows, (row) ->
       cur_queries.push(row.getAttribute('query'))
     send_data =
       existing: cur_queries.join(',')
     $.ajax
       dataType: 'json'
-      url: @$save_query_btn.data 'endpoint'
+      url: @$saveQueryBtn.data('endpoint')
       data: send_data
       success: (data) -> cb? null, data
       error: std_ajax_err ->
-        cb? gettext("Error saving query")
+        cb? gettext('Error saving query')
 
-  #save queries in active queries
+  # save queries in active queries
   send_save_query: ->
     @save_query (error, students) =>
-      return @show_errors error unless error is null
+      if error
+        return @show_errors error
       @load_saved_queries()
 
   get_estimated: (cb)->
-    cur_queries = []
-    tab = $("#queryTableBody")
-    rows = tab.find("tr")
+    curQueries = []
+    tab = $('#queryTableBody')
+    rows = tab.find('tr')
     _.each rows, (row) ->
-      cur_queries.push(row.getAttribute('query'))
+      curQueries.push(row.getAttribute('query'))
     send_data =
-      existing: cur_queries.join(',')
+      existing: curQueries.join(',')
     $.ajax
       dataType: 'json'
-      url: @$total_endpoint
+      url: @$totalEndpoint
       data: send_data
       success: (data) -> cb? null, data
       error: std_ajax_err ->
-        cb? gettext("Error getting estimated")
+        cb? gettext('Error getting estimated')
 
-  #estimate the students selected
+  # estimate the students selected
   reload_estimated: ->
-    $("#estimated")[0].innerHTML= "Calculating"
+    $('#estimated').html('Calculating')
     @get_estimated (error, students) =>
       if students['success'] == false
-        $("#estimated")[0].innerHTML = '0 students selected'
+        $('#estimated').html('0 students selected')
         return
-      students_list = students['data']
-      query_id = students['query_id']
+      studentsList = students['data']
+      queryId = students['query_id']
       # abort on error
-      return @show_errors error unless error is null
-      $number_students = students_list.length
-      $("#estimated")[0].innerHTML =
-        "approx " + $number_students + " students selected"
+      if error
+        return @show_errors error
+      $numberStudents = studentsList.length
+      $('#estimated').html('approx ' + $numberStudents + ' students selected')
   # set error display
   show_errors: (msg) -> @$error_section?.text msg
 
@@ -1248,7 +1252,7 @@ class Membership
     plantTimeout 0, => new BetaTesterBulkAddition @$section.find '.batch-beta-testers'
 
     # gather elements
-    @$list_selector = @$section.find 'select#member-lists-selector'
+    @$listSelector = @$section.find 'select#member-lists-selector'
     @$auth_list_containers = @$section.find '.auth-list-container'
     @$auth_list_errors = @$section.find '.member-lists-management .request-response-error'
 
@@ -1259,25 +1263,28 @@ class Membership
       new AuthListWidget $(auth_list_container), rolename, @$auth_list_errors
 
     #initialize email widget selectors
-    @$email_list_containers = @$section.find '.email-list-container'
-    @email_lists = _.map (@$email_list_containers), (email_list_container) =>
+    @$emailListContainers = @$section.find('.email-list-container')
+    @emailLists = _.map (@$emailListContainers), (email_list_container) =>
       new EmailSelectors $(email_list_container), @$section
 
     #initialize email widget
-    new EmailWidget @email_lists, @$section, @$email_list_containers
+    new EmailWidget(@emailLists, @$section, @$emailListContainers)
     # populate selector
-    @$list_selector.empty()
+    @$listSelector.empty()
     for auth_list in @auth_lists
-      @$list_selector.append $ '<option/>',
-        text: auth_list.$container.data 'display-name'
+      @$listSelector.append($('<option/>',
+        text: auth_list.$container.data('display-name')
         data:
           auth_list: auth_list
+        ))
     if @auth_lists.length is 0
-      @$list_selector.hide()
+      @$listSelector.hide()
 
-    @$list_selector.change =>
-      $opt = @$list_selector.children('option:selected')
-      return unless $opt.length > 0
+    @$listSelector.change =>
+      $opt = @$listSelector.children('option:selected')
+      if (!$opt.length)
+        return
+
       for auth_list in @auth_lists
         auth_list.$container.removeClass 'active'
       auth_list = $opt.data('auth_list')
@@ -1285,7 +1292,7 @@ class Membership
       auth_list.re_view()
 
     # one-time first selection of top list.
-    @$list_selector.change()
+    @$listSelector.change()
 
   # handler for when the section title is clicked.
   onClickTitle: ->
