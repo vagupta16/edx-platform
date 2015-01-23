@@ -131,6 +131,8 @@ class EmailWidgetTask(Task):     # pylint: disable=abstract-method
     """
     Base task class for use with EmailWidgetTask models.
     """
+    abstract = True
+    serializer = 'pickle'
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         """
