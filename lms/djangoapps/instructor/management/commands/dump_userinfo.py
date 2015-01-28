@@ -88,6 +88,14 @@ class Command(BaseCommand):
             help='The course id (e.g., CME/001/2013-2015) to select from.',
         ),
         make_option(
+            '-d',
+            '--code',
+            metavar='COURSE_CODE',
+            dest='code',
+            default=False,
+            help='The course code (e.g., 40490) that accreditors expect.',
+        ),
+        make_option(
             '-o',
             '--outfile',
             metavar='OUTFILE',
@@ -99,6 +107,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         course_id = options['course']
+        course_code = options['code']
         outfile_name = options['outfile']
         verbose = int(options['verbosity']) > 1
 
@@ -168,6 +177,8 @@ class Command(BaseCommand):
                     student_dict['Payment Type'] = 'MC'
 
             certificate = self.add_fields_to(student_dict, CERTIFICATE_FIELDS, certificate_table, user_id)
+
+            student_dict['System ID'] = course_code
 
             for item in student_dict:
                 student_dict[item] = self.preprocess(student_dict[item])
