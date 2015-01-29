@@ -10,8 +10,6 @@ from requests.exceptions import RequestException
 
 from django.contrib.auth.models import User
 
-from opaque_keys.edx.keys import CourseKey
-from courseware.courses import get_course_by_id
 from student.models import anonymous_id_for_user
 from track.backends import BaseBackend
 
@@ -24,11 +22,28 @@ class OLIAnalyticsBackend(BaseBackend):
     def __init__(self, **kwargs):
         super(OLIAnalyticsBackend, self).__init__(**kwargs)
 
+        # the oli analytics service endpoint will be at
+        # "{}{}".format(oli_analytics_service_url, path)
+        self.oli_analytics_service_url = kwargs.get('oli_analytics_service_url', '')
         self.path = kwargs.get('path', '')
 
-    def send(self, event):
-        """Forward the event to the OLI analytics server"""
+        # shared secret for OLI analytics service
+        self.secret = kwargs.get('secret', '')
 
+        # timeout for synchronous PUT attempt
+        self.timeout_in_secs = kwargs.get('timeout_in_secs', 1.0)
+
+        # only courses with id in this set will have their data sent
+        self.course_id_set = set(kwargs.get('course_ids', []))
+
+    def send(self, event):
+        """
+        Forward the event to the OLI analytics server
+        """
+        if not self.oli_analytics_service_url or not self.secret:
+            return
+
+        # Only currently passing problem_check events, which are CAPA only
         if event.get('event_type', '') != 'problem_check':
             return
 
@@ -40,22 +55,11 @@ class OLIAnalyticsBackend(BaseBackend):
             return
 
         course_id = context.get('course_id')
-        if not course_id:
-            return
-
-        course_key = CourseKey.from_string(course_id)
-        course = get_course_by_id(course_key)
-
-        if not course or not course.oli_analytics_service_url or not course.oli_analytics_service_secret:
+        if not course_id or course_id not in self.course_id_set:
             return
 
         user_id = context.get('user_id')
         if not user_id:
-            return
-
-        try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
             return
 
         event_data = event.get('event', {})
@@ -72,26 +76,33 @@ class OLIAnalyticsBackend(BaseBackend):
 
         is_correct = success == 'correct'
 
+        # put the most expensive operation (DB access) at the end, to not do it needlessly
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return
+
         payload = {
             'course_id': course_id,
             'resource_id': problem_id,
             'student_id': self._get_student_id(user),
             'result': is_correct
         }
+
         headers = {
-            'Authorization': self._get_authorization_header(course.oli_analytics_service_secret)
+            'Authorization': self._get_authorization_header(self.secret)
         }
 
         request_payload_string = json.dumps({'payload': json.dumps(payload)})
         request_payload = {'request': request_payload_string}
-        endpoint = course.oli_analytics_service_url + self.path
+        endpoint = self.oli_analytics_service_url + self.path
         try:
             log.info(endpoint)
             log.info(request_payload_string)
             response = requests.put(
                 endpoint,
                 data=request_payload,
-                timeout=course.oli_analytics_service_timeout,
+                timeout=self.timeout_in_secs,
                 headers=headers
             )
             response.raise_for_status()
