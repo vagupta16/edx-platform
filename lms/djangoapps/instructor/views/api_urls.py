@@ -33,16 +33,19 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_temp_queries', name="get_temp_queries"),
     url(r'^get_single_query/(?P<inclusion>\S{2,3})/(?P<query_type>(Section|Problem))/(?P<state_type>\S+)/(?P<state_id>\S+)$',
         'instructor.views.api.get_single_query', name="get_single_query"),
+    # the parameter-less url is here as a convenience because we don't know the params at the time of calling 'reverse
     url(r'^get_single_query',
         'instructor.views.api.get_single_query', name="get_single_query"),
     url(r'^delete_saved_query/(?P<query_to_delete>\d+)$',
         'instructor.views.api.delete_saved_query', name="delete_saved_query"),
+    # the parameter-less url is here as a convenience because we don't know the params at the time of calling 'reverse
     url(r'^delete_saved_query',
         'instructor.views.api.delete_saved_query', name="delete_saved_query"),
     url(r'^delete_bulk_temp_query',
         'instructor.views.api.delete_bulk_temp_query', name="delete_bulk_temp_query"),
     url(r'^delete_temp_query/(?P<query_to_delete>\d+)$',
         'instructor.views.api.delete_temp_query', name="delete_temp_query"),
+    # the parameter-less url is here as a convenience because we don't know the params at the time of calling 'reverse
     url(r'^delete_temp_query',
         'instructor.views.api.delete_temp_query', name="delete_temp_query"),
     url(r'^get_students_features(?P<csv>/csv)?$',

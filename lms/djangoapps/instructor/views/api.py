@@ -88,7 +88,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from student.models import UserProfile, Registration
 import instructor.views.data_access as data_access
-from instructor.views.data_access_constants import QueryType, Query
+from instructor.views.data_access_constants import QueryType, StudentQuery
 from instructor.views.data_access_constants import REVERSE_INCLUSION_MAP, INCLUDE_SECTION_PATTERN
 from instructor.views.data_access_constants import INCLUDE_PROBLEM_PATTERN, ALL_PROBLEM_FILTERS, ALL_SECTION_FILTERS
 
@@ -736,29 +736,27 @@ def _build_course_tree(course):
     :return list of dictionaries that represent the tree:
     """
     course_tree = []
-    idx = 0
-    for child in course.get_children():
+    for index, child in enumerate(course.get_children()):
         if not child.hide_from_toc:
-            using = course.children[idx]
+            using = course.children[index]
             course_tree.append({
                 'display_name': child.display_name_with_default,
                 'block_id': using.block_id,
                 'block_type': using.block_type,
                 'sub': _build_course_tree(child),
             })
-        idx += 1
     return course_tree
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 def list_course_tree(request, course_id):
     """
     Returns a tree representing the substructures in a course
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
+    course = get_course_with_access(request.user, 'staff', course_id, depth=None)
     course_tree = _build_course_tree(course)
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
@@ -794,11 +792,11 @@ def _process_new_query(course_id, query_incl, query_type, query_id, query_filter
     if query_filtering_matched is False:
         return None
     else:
-        return Query(query_type, query_incl, query_id, query_filtering, entity_name)
+        return StudentQuery(query_type, query_incl, query_id, query_filtering, entity_name)
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 @require_query_params(existing="Ids of previously issued queries")
 def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argument
     """
@@ -812,7 +810,7 @@ def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argume
         })
     cleaned_queries = [query.strip() for query in existing_queries]
     if len(cleaned_queries) > 0:
-        data_access.delete_bulk_temporary_query(cleaned_queries)
+        data_access.delete_bulk_temporary_queries(cleaned_queries)
     response_payload = {
         'success': True,
     }
@@ -821,7 +819,7 @@ def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argume
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 def delete_temp_query(request, course_id, query_to_delete):  # pylint: disable=unused-argument
     """
     Deletes a temporary query that the user has entered along with the corresponding students
@@ -835,7 +833,7 @@ def delete_temp_query(request, course_id, query_to_delete):  # pylint: disable=u
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 def delete_saved_query(request, course_id, query_to_delete):  # pylint: disable=unused-argument
     """
     Deletes a grouped query that the user has saved along with the corresponding subqueries
@@ -849,7 +847,7 @@ def delete_saved_query(request, course_id, query_to_delete):  # pylint: disable=
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 @require_query_params(existing="Ids of previously issued queries")
 def save_query(request, course_id):
     """
@@ -878,7 +876,7 @@ def save_query(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 def get_temp_queries(request, course_id):  # pylint: disable=unused-argument
     """
     Returns the temporary user queries per course
@@ -906,7 +904,7 @@ def get_temp_queries(request, course_id):  # pylint: disable=unused-argument
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 def get_saved_queries(request, course_id):  # pylint: disable=unused-argument
     """
     Returns all the user-saved queries per course
@@ -946,7 +944,7 @@ def get_saved_queries(request, course_id):  # pylint: disable=unused-argument
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 @require_query_params(existing="Ids of previously issued queries")
 def get_all_students(request, course_id, make_csv=False):
     """
@@ -960,7 +958,7 @@ def get_all_students(request, course_id, make_csv=False):
         })
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     clean_existing = [query for query in existing_queries if (query != "working" and query != "")]
-    results = data_access.make_total_query(clean_existing)
+    results = data_access.make_total_query(course_id, clean_existing)
     emails = [{
                   "id": pair[0],
                   "email":pair[1],
@@ -978,12 +976,12 @@ def get_all_students(request, course_id, make_csv=False):
         email_pairs = [
             [item['email'], item['profileName']]
             for item in emails]
-        return instructor_analytics.csvs.create_csv_response(filename, ["email, name"], email_pairs)
+        return instructor_analytics.csvs.create_csv_response(filename, ['email', 'name'], email_pairs)
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 @require_query_params(
     filter="Type of filter",
     entityName="Human readable name of entity"
@@ -1039,12 +1037,12 @@ def _select_course_tree(course_tree, include_pattern):
     """
     Returns the 2 topmost parents of a node for displaying purposes
     """
-    return _select_course_tree_recursive(course_tree, include_pattern, top_most=True)
+    return _select_course_tree_recursive(course_tree, include_pattern, [], top_most=True)
 
 
-def _select_course_tree_recursive(course_tree,  # pylint: disable=dangerous-default-value
+def _select_course_tree_recursive(course_tree,
                                   include_pattern,
-                                  return_container=[],
+                                  return_container,
                                   parents=None,
                                   top_most=False):
     """
@@ -1068,13 +1066,13 @@ def _select_course_tree_recursive(course_tree,  # pylint: disable=dangerous-defa
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 def list_course_sections(request, course_id):
     """
     Returns a tree structure consisting only of sections and subsections
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
+    course = get_course_with_access(request.user, 'staff', course_id, depth=None)
 
     course_tree = _build_course_tree(course)
     section_tree = _prune_course_tree(course_tree, INCLUDE_SECTION_PATTERN)
@@ -1089,13 +1087,13 @@ def list_course_sections(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 def list_course_problems(request, course_id):
     """
     Returns a tree structure consisting only of problems
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'instructor', course_id, depth=None)
+    course = get_course_with_access(request.user, 'staff', course_id, depth=None)
     course_tree = _build_course_tree(course)
     problem_list = _select_course_tree(course_tree, INCLUDE_PROBLEM_PATTERN)
     response_payload = {

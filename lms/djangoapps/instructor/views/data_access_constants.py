@@ -4,7 +4,7 @@ Constants and Query definition associated with data_access
 import re
 
 
-class Query(object):
+class StudentQuery(object):
     """
     Encapsulates a query in the instructor dashboard email lists tool
     """

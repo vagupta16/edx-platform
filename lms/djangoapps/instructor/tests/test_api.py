@@ -151,7 +151,11 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     NOT_COMPLETED = "not completed"
 
     def setUp(self):
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            org="OpenEdX",
+            number="emailToy",
+            run="2015_Winter",
+        )
         course_id = 'edX/emailToy/2015_Winter'
         self.course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         self.instructor = InstructorFactory(course_key=self.course_key)
@@ -276,12 +280,12 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertSetEqual(student_names, check_names)
         self.assertSetEqual(student_mails, check_mails)
 
-    def _get_query_results(self, query_type):
+    def _get_query_results(self, query_type, joining="OR"):
         """
         Issues a query and checks to see if the outcome is as desired
         """
 
-        self._make_query(query_type)
+        self._make_query(query_type, joining=joining)
         query_ids, students = self._get_query_students()
         if len(query_ids) != 1:
             return None
@@ -344,13 +348,12 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Ensures the logic is sound for "opened" students
         """
 
-        self._get_query_results(self.OPEN)
+        self._get_query_results(self.OPEN, "AND")
 
     def test_make_closed_query(self):
         """
         Ensures the logic is sound for "completed" students
         """
-
         self._get_query_results(self.COMPLETED)
 
     def test_make_not_opened_query(self):
@@ -358,7 +361,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Ensures the logic is sound for "not opened" students
         """
 
-        self._get_query_results(self.NOT_OPEN)
+        self._get_query_results(self.NOT_OPEN, "AND")
 
     def test_make_not_completed_query(self):
         """
@@ -383,7 +386,10 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._make_query(self.NOT_COMPLETED, joining="AND")
         queries2, students2 = self._get_query_students()
         csv_string = self._get_query_students(csv=True)
-        to_match = '"email, name"\r\n"%s","%s"\r\n' % (self.open_user.email, self.open_user.profile.name)
+        to_match = '"email","name"\r\n"{email}","{name}"\r\n'.format(
+            email=self.open_user.email,
+            name=self.open_user.profile.name,
+        )
         self.assertEquals(to_match, csv_string)
         self._check_against_students(students2, [self.open_user])
         self._delete_bulk_temp_query(queries2)
@@ -480,15 +486,16 @@ class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('list_course_tree', kwargs={'course_id': self.course_key})
         stuff = self.client.get(url)
         response = json.loads(stuff.content)['data']
-        block_ids = set([u'8731f6563d4c4753932d6ad1a22d855a',
-                         u'8dbd29923f894b60b690e38d50807cde',
-                         u'4fa14bc2ac614ad6abb1344a0d5d472d',
-                         u'8c57d35bde2045a3aa86e4b3f8755714',
-                         u'cbfaa86087a440aaa7d204c1642fb1a1',
-                         u'4de35682712844c293e95fa20f8e8c4d',
-                         u'db4c2d50ffc94346b1b926b82425f5b4',
-                         u'5ac9e77281ed4eccbc52a1042afad8c8',
-                         ])
+        block_ids = {
+            u'8731f6563d4c4753932d6ad1a22d855a',
+            u'8dbd29923f894b60b690e38d50807cde',
+            u'4fa14bc2ac614ad6abb1344a0d5d472d',
+            u'8c57d35bde2045a3aa86e4b3f8755714',
+            u'cbfaa86087a440aaa7d204c1642fb1a1',
+            u'4de35682712844c293e95fa20f8e8c4d',
+            u'db4c2d50ffc94346b1b926b82425f5b4',
+            u'5ac9e77281ed4eccbc52a1042afad8c8',
+        }
         check_ids = set()
         for block in response:
             check_ids.add(block['block_id'])

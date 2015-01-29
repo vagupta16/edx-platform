@@ -9,7 +9,7 @@ from student.models import CourseEnrollment
 from django.contrib.auth.models import User
 from instructor.views.data_access_constants import INCLUSION_MAP, QueryType, ProblemFilters, SectionFilters
 from instructor.views.data_access_constants import Inclusion, QueryStatus
-from instructor.views.data_access_constants import REVERSE_INCLUSION_MAP, Query
+from instructor.views.data_access_constants import REVERSE_INCLUSION_MAP, StudentQuery
 from instructor.views.data_access_constants import DatabaseFields, TEMPORARY_QUERY_LIFETIME
 from django.db.models import Q
 from collections import defaultdict
@@ -42,7 +42,7 @@ def delete_temporary_query(query_to_delete):
     queries_to_delete.delete()
 
 
-def delete_bulk_temporary_query(query_to_delete):
+def delete_bulk_temporary_queries(query_to_delete):
     """
     Removes many queries from the temporary query table
     """
@@ -89,7 +89,7 @@ def get_group_query_students(course_id, group_id):
 
 
 @task(base=EmailWidgetTask)  # pylint: disable=not-callable
-def retrieve_grouped_query(_course_id, group_id):
+def retrieve_grouped_query(course_id, group_id):
     """
     For a grouped query where its subqueries have already been executed, return the students associated
     """
@@ -97,7 +97,9 @@ def retrieve_grouped_query(_course_id, group_id):
     existing = []
     for sub in subqueries:
         existing.append(sub.query_id)
-    student_info = make_existing_query(existing)
+    student_info = make_existing_query(course_id, existing)
+    if student_info is None:
+        return None
     projected_student_info = student_info.values_list(
         DatabaseFields.ID,
         DatabaseFields.EMAIL,
@@ -118,7 +120,7 @@ def make_subqueries(course_id, group_id, queries):
     Issues the subqueries associated with a group query
     """
     for query in queries:
-        query = Query(
+        query = StudentQuery(
             query.query_type,
             REVERSE_INCLUSION_MAP[query.inclusion],
             course_id.make_usage_key(query.module_state_key.block_type, query.module_state_key.block_id),
@@ -211,13 +213,13 @@ def purge_temporary_queries():
 
 
 @task(base=EmailWidgetTask)  # pylint: disable=not-callable
-def make_total_query(existing_queries):
+def make_total_query(course_id, existing_queries):
     """
     Given individual queries that have already been made , aggregate students associated with those queries
     """
     aggregate_existing = set()
     if len(existing_queries) != 0:
-        queryset = make_existing_query(existing_queries).values_list(
+        queryset = make_existing_query(course_id, existing_queries).values_list(
             DatabaseFields.ID,
             DatabaseFields.EMAIL,
             DatabaseFields.PROFILE_NAME,
@@ -254,26 +256,30 @@ def get_section_users(course_id, query):
     return results
 
 
-def make_existing_query(existing_queries):
+def make_existing_query(course_id, existing_queries):
     """
     Aggregates single queries in a group into one unified set of students
     """
-    query = User.objects
-    if existing_queries is None:
+
+    if existing_queries is None or len(existing_queries) == 0:
         return None
 
+    ids_in_course = CourseEnrollment.objects.filter(course_id=course_id,
+                                                    is_active=1,
+                                                    ).values_list(DatabaseFields.USER_ID)
+    query = User.objects.filter(id__in=ids_in_course)
     query_dct = defaultdict(list)
 
     for existing_query in existing_queries:
         if existing_query == "" or existing_query == QueryStatus.WORKING:
             continue
         inclusion_type = TemporaryQuery.objects.filter(id=existing_query)
-        result = StudentsForQuery.objects.filter(query_id=existing_query).values_list(
+        filtered_query = StudentsForQuery.objects.filter(query_id=existing_query).values_list(
             DatabaseFields.STUDENT_ID,
             flat=True,
         )
         if inclusion_type.exists():
-            query_dct[inclusion_type[0].inclusion].append(result)
+            query_dct[inclusion_type[0].inclusion].append(filtered_query)
 
     for not_query in query_dct[INCLUSION_MAP.get(Inclusion.NOT)]:
         query = query.exclude(id__in=not_query)
@@ -281,12 +287,17 @@ def make_existing_query(existing_queries):
     for and_query in query_dct[INCLUSION_MAP.get(Inclusion.AND)]:
         query = query.filter(id__in=and_query)
 
-    or_query = User.objects
+    or_query = User.objects.filter(id__in=ids_in_course)
     qobjs = Q()
     for orq in query_dct[INCLUSION_MAP.get(Inclusion.OR)]:
         qobjs = qobjs | (Q(id__in=orq))
+
+    # if there are only or queries, return the or_query
     if len(query_dct[INCLUSION_MAP.get(Inclusion.NOT)]) == 0 and len(query_dct[INCLUSION_MAP.get(Inclusion.AND)]) == 0:
         return or_query.filter(qobjs)
+    # if there is no or_query, do not include it as it contains all the students in the course
+    elif len(query_dct[INCLUSION_MAP.get(Inclusion.OR)]) == 0:
+        return query
     else:
         return query | or_query.filter(qobjs)
 
@@ -354,7 +365,8 @@ def process_results(course_id, queryset, id_field, email_field):
 def filter_out_students_negative(course_id, queryset):
     """
     Exclude students who have opted out of emails and exclude students who are not active in the class
-    Used specifically for positive queries i.e. have completed/opened because of query structure
+    Used specifically for positive queries i.e. have completed/opened because of query structure. The
+    negative case is different because we start with User.object vs StudentModule
     """
     without_opt_out = queryset.exclude(id__in=Optout.objects.all().values_list(DatabaseFields.USER_ID))
     without_not_enrolled = without_opt_out.exclude(
@@ -365,7 +377,8 @@ def filter_out_students_negative(course_id, queryset):
 def filter_out_students_positive(course_id, queryset):
     """
     Exclude students who have opted out of emails and exclude students who are not active in the class
-    Used specifically for negative queries i.e. not completed/not opened because of query structure
+    Used specifically for negative queries i.e. not completed/not opened because of query structure. The
+    positive case is different because we start with StudentModule vs User.object
     """
     without_opt_out = queryset.exclude(student_id__in=Optout.objects.all().values_list(DatabaseFields.USER_ID))
     without_not_enrolled = without_opt_out.exclude(
