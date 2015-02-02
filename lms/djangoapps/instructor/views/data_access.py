@@ -100,16 +100,7 @@ def retrieve_grouped_query(course_id, group_id):
     student_info = make_existing_query(course_id, existing)
     if student_info is None:
         return None
-    projected_student_info = student_info.values_list(
-        DatabaseFields.ID,
-        DatabaseFields.EMAIL,
-        DatabaseFields.PROFILE_NAME,
-    )
-    distinct_students = projected_student_info.distinct()
-    students = [
-        {"id": triple[0], "email": triple[1], "profileName": triple[2]}
-        for triple in distinct_students
-    ]
+    students = student_info.distinct()
     subqueries.delete()
     return students
 
