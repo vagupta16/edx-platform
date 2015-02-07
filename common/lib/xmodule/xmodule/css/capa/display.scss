@@ -39,6 +39,10 @@ div.problem-progress {
   font-size: em(16);
 }
 
+span.time-limit-emphasis {
+  color: $red;
+}
+
 div.problem-timer {
   display: none;
   background: $white;

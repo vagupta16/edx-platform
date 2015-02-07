@@ -14,13 +14,12 @@ from django.conf import settings
 % if problem_is_timed and not problem_has_finished:
   <div class="time_limit">
     <p>
-      ${_("You are about to start a timed problem. The allotted time for this problem is {minutes_allowed} minutes.").format(
-          minutes_allowed=minutes_allowed)}
+      ${_("You are about to start a timed problem.")}
       <br />
       <b>
-      ${_("At {end_time}, you must manually click the '{check_button}' button below.").format(
-          end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE),
-          check_button=check_button)}
+        ${_("You must click the '{check_button}' button within").format(check_button=check_button)}
+        <span class="time-limit-emphasis"> ${_(" {minutes_allowed} minutes").format(minutes_allowed=minutes_allowed)}</span>
+        ${_("of starting the timer.").format(end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE))}
       </b>
     </p>
   </div>
