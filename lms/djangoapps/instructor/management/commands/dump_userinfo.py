@@ -13,6 +13,7 @@ from pytz import UTC
 
 from certificates.models import GeneratedCertificate
 from cme_registration.models import CmeUserProfile
+from student.models import CourseEnrollment
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -21,36 +22,36 @@ from shoppingcart.models import PaidCourseRegistration
 from unidecode import unidecode
 
 PROFILE_FIELDS = [
-    ('last_name', 'Last Name'),
-    ('middle_initial', 'Middle Initial'),
-    ('first_name', 'First Name'),
+    ('user__profile__cmeuserprofile__last_name', 'Last Name'),
+    ('user__profile__cmeuserprofile__middle_initial', 'Middle Initial'),
+    ('user__profile__cmeuserprofile__first_name', 'First Name'),
     ('user__email', 'Email Address'),
-    ('birth_date', 'Birth Date'),
-    ('professional_designation', 'Professional Designation'),
-    ('license_number', 'Professional License Number'),
-    ('license_country', 'Professional License Country'),
-    ('license_state', 'Professional License State'),
-    ('physician_status', 'Physician Status'),
-    ('patient_population', 'Patient Population'),
-    ('specialty', 'Specialty'),
-    ('sub_specialty', 'Sub Specialty'),
-    ('affiliation', 'Stanford Medicine Affiliation'),
-    ('sub_affiliation', 'Stanford Sub Affiliation'),
-    ('stanford_department', 'Stanford Department'),
-    ('sunet_id', 'SUNet ID'),
-    ('other_affiliation', 'Other Affiliation'),
-    ('job_title_position_untracked', 'Job Title or Position'),
-    ('address_1', 'Address 1'),
-    ('address_2', 'Address 2'),
-    ('city_cme', 'City'),
-    ('state', 'State'),
-    ('postal_code', 'Postal Code'),
-    ('county_province', 'County/Province'),
-    ('country_cme', 'Country'),
-    ('phone_number_untracked', 'Phone Number'),
-    ('gender', 'Gender'),
-    ('marketing_opt_in_untracked', 'Marketing Opt-In'),
-    ('user_id', ''),
+    ('user__profile__cmeuserprofile__birth_date', 'Birth Date'),
+    ('user__profile__cmeuserprofile__professional_designation', 'Professional Designation'),
+    ('user__profile__cmeuserprofile__license_number', 'Professional License Number'),
+    ('user__profile__cmeuserprofile__license_country', 'Professional License Country'),
+    ('user__profile__cmeuserprofile__license_state', 'Professional License State'),
+    ('user__profile__cmeuserprofile__physician_status', 'Physician Status'),
+    ('user__profile__cmeuserprofile__patient_population', 'Patient Population'),
+    ('user__profile__cmeuserprofile__specialty', 'Specialty'),
+    ('user__profile__cmeuserprofile__sub_specialty', 'Sub Specialty'),
+    ('user__profile__cmeuserprofile__affiliation', 'Stanford Medicine Affiliation'),
+    ('user__profile__cmeuserprofile__sub_affiliation', 'Stanford Sub Affiliation'),
+    ('user__profile__cmeuserprofile__stanford_department', 'Stanford Department'),
+    ('user__profile__cmeuserprofile__sunet_id', 'SUNet ID'),
+    ('user__profile__cmeuserprofile__other_affiliation', 'Other Affiliation'),
+    ('user__profile__cmeuserprofile__job_title_position_untracked', 'Job Title or Position'),
+    ('user__profile__cmeuserprofile__address_1', 'Address 1'),
+    ('user__profile__cmeuserprofile__address_2', 'Address 2'),
+    ('user__profile__cmeuserprofile__city_cme', 'City'),
+    ('user__profile__cmeuserprofile__state', 'State'),
+    ('user__profile__cmeuserprofile__postal_code', 'Postal Code'),
+    ('user__profile__cmeuserprofile__county_province', 'County/Province'),
+    ('user__profile__cmeuserprofile__country_cme', 'Country'),
+    ('user__profile__cmeuserprofile__phone_number_untracked', 'Phone Number'),
+    ('user__profile__cmeuserprofile__gender', 'Gender'),
+    ('user__profile__cmeuserprofile__marketing_opt_in_untracked', 'Marketing Opt-In'),
+    ('user__id', '')
 ]
 
 REGISTRATION_FIELDS = [
@@ -71,7 +72,7 @@ ORDER_FIELDS = [
 
 CERTIFICATE_FIELDS = [
     ('credits_special_case', 'Credits Issued'),
-    ('created_date', 'Credit Date'),
+    ('modified_date', 'Credit Date'),
     ('has_certificate_special_case', 'Certif'),
 ]
 
@@ -151,13 +152,12 @@ class Command(BaseCommand):
         sys.stdout.write("Processing users")
 
         for profile in profiles:
-            user_id = profile['user_id']
+            user_id = profile['user__id']
             self.print_progress(count, intervals, verbose)
 
             student_dict = {
-                'Credits Issued': 23.5, #XXX should be revisited when credit count functionality implemented
-                'Credit Date': None,
-                'Certif': True,
+                'Credits Issued': 0.0, #XXX should be revisited when credit count functionality implemented
+                'Certif': False,
             } 
 
             for field, label in PROFILE_FIELDS:
@@ -178,6 +178,11 @@ class Command(BaseCommand):
 
             certificate = self.add_fields_to(student_dict, CERTIFICATE_FIELDS, certificate_table, user_id)
 
+            # If the user has received a certificate, adjust their credits issued and course completion flag.
+            if student_dict['Credit Date']:
+                student_dict['Credits Issued'] = 23.5
+                student_dict['Certif'] = True
+
             student_dict['System ID'] = course_code
 
             for item in student_dict:
@@ -191,14 +196,12 @@ class Command(BaseCommand):
         sys.stdout.write("Data written to {name}\n".format(name=outfile_name))
 
     def query_database_for(self, course_id):
-        certificates = GeneratedCertificate.objects.filter(course_id=course_id, status__in=['downloadable', 'generating'])
+        cme_profiles = CourseEnrollment.objects.select_related('user__profile__cmeuserprofile').filter(course_id=course_id).values(
+            *[field for field, label in PROFILE_FIELDS if 'untracked' not in field]
+        ).order_by('user__username')
         
-        credited_user_ids = [getattr(certificate, 'user_id') for certificate in certificates]
-
-        cme_profiles = CmeUserProfile.objects.select_related('user').filter(user_id__in=credited_user_ids).values(
-            *[field for field, label in PROFILE_FIELDS if 'untracked' not in field]).order_by('user__username')
-
-        registrations = PaidCourseRegistration.objects.filter(course_id=course_id, status='purchased', user_id__in=credited_user_ids)
+        registrations = PaidCourseRegistration.objects.filter(status='purchased', course_id=course_id)
+        certificates = GeneratedCertificate.objects.filter(course_id=course_id)
 
         return certificates, cme_profiles, registrations
 
