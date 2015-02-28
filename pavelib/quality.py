@@ -202,14 +202,12 @@ def run_pep8(options):
     :raises BuildFailure: if any violations are found
     """
     print('DEPRECATED: `paver run_pep8` is deprecated in favor of `paver pep8`')
+    print('DEPRECATED: the `--system` flag will _not_ be available on `paver pep8`')
     pep8(options)
 
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
-@cmdopts([
-    ("system=", "s", "System to act on"),
-])
 def pep8(options=None):
     options = _parse(options)
     systems = ' '.join(options['systems'])
