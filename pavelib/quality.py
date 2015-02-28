@@ -198,27 +198,24 @@ def _count_pylint_violations(report_file):
 ])
 def run_pep8(options):
     """
-    Run pep8 on system code. When violations limit is passed in,
-    fail the task if too many violations are found.
+    Run PEP8 on system code
+
+    :raises BuildFailure: if any violations are found
     """
     options = _parse(options)
-    count = 0
-
-    for system in options['systems']:
-        report_dir = (Env.REPORT_DIR / system).makedirs_p()
-        sh('pep8 {system} | tee {report_dir}/pep8.report'.format(system=system, report_dir=report_dir))
-        count += _count_pep8_violations(
-            "{report_dir}/pep8.report".format(report_dir=report_dir)
-        )
-
-    print("Number of pep8 violations: {count}".format(count=count))
+    systems = ' '.join(options['systems'])
+    path_report_directory = Env.REPORT_DIR.makedirs_p()
+    path_report_file = "{path_report_directory}/pep8.report".format(
+        path_report_directory=path_report_directory,
+    )
+    sh("pep8 {systems} | tee {path_report_file}".format(
+        systems=systems,
+        path_report_file=path_report_file,
+    ))
+    count = sum(1 for line in open(path_report_file))
+    print("Number of PEP8 violations: {count}".format(count=count))
     if count:
-        raise Exception("Failed. Too many pep8 violations.")
-
-
-def _count_pep8_violations(report_file):
-    num_lines = sum(1 for line in open(report_file))
-    return num_lines
+        raise BuildFailure('Too many PEP8 violations')
 
 
 @task
