@@ -194,7 +194,6 @@ def _count_pylint_violations(report_file):
 @needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("system=", "s", "System to act on"),
-    ("limit=", "l", "limit for number of acceptable violations"),
 ])
 def run_pep8(options):
     """
