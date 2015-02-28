@@ -201,6 +201,10 @@ def run_pep8(options):
 
     :raises BuildFailure: if any violations are found
     """
+    pep8(options)
+
+
+def pep8(options=None):
     options = _parse(options)
     systems = ' '.join(options['systems'])
     path_report_directory = Env.REPORT_DIR.makedirs_p()
@@ -250,28 +254,10 @@ def run_quality(options):
     if diff_threshold > -1:
         percentage_string = '--fail-under={0}'.format(diff_threshold)
 
-    # Generate diff-quality html report for pep8, and print to console
-    # If pep8 reports exist, use those
-    # Otherwise, `diff-quality` will call pep8 itself
-
-    pep8_files = get_violations_reports("pep8")
-    pep8_reports = u' '.join(pep8_files)
-
     try:
-        sh(
-            "diff-quality --violations=pep8 {pep8_reports} {percentage_string} "
-            "{compare_branch_string} --html-report {dquality_dir}/diff_quality_pep8.html".format(
-                pep8_reports=pep8_reports,
-                percentage_string=percentage_string,
-                compare_branch_string=compare_branch_string,
-                dquality_dir=dquality_dir
-            )
-        )
-    except BuildFailure, error_message:
-        if is_percentage_failure(error_message):
-            diff_quality_percentage_failure = True
-        else:
-            raise BuildFailure(error_message)
+        pep8()
+    except BuildFailure:
+        diff_quality_percentage_failure = True
 
     # Generate diff-quality html report for pylint, and print to console
     # If pylint reports exist, use those
