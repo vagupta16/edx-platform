@@ -16,14 +16,11 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.utils.importlib import import_module
 from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
-<<<<<<< HEAD
-from external_auth.views import shib_login, course_specific_login, course_specific_register, _flatten_to_ascii, _safe_postlogin_redirect
-=======
+from external_auth.views import _safe_postlogin_redirect
 from external_auth.views import (
     shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 )
 from mock import patch
->>>>>>> edx/named-release/birch/rc
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.views import create_account, change_enrollment

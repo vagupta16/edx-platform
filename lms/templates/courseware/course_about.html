@@ -1,19 +1,12 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
-<<<<<<< HEAD
-  from django.core.urlresolvers import reverse
-  from courseware.courses import course_image_url, get_course_about_section
-  from django.conf import settings
-  from student.models import UserProfile
-  from edxmako.shortcuts import marketing_link
-=======
+from student.models import UserProfile
 from microsite_configuration import microsite
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
 from django.conf import settings
 from edxmako.shortcuts import marketing_link
->>>>>>> edx/named-release/birch/rc
 %>
 
 <%inherit file="../main.html" />
@@ -361,20 +354,18 @@ from edxmako.shortcuts import marketing_link
 
           ##<li class="important-dates-item"><i class="icon fa fa-clock-o"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
-<<<<<<< HEAD
-          <li>
-              <i class="icon icon-money"></i>
-              <p>${_("Price")}</p>
-              <span>${course_display_price}</span>
-          </li>
-
-=======
           %if is_shopping_cart_enabled and registration_price:
             <li class="important-dates-item">
               <i class="icon fa fa-money"></i>
               <p class="important-dates-item-title">${_("Price")}</p>
               <span class="important-dates-item-text">${_("{currency_symbol}{cost}").format(currency_symbol=currency_symbol, cost=registration_price)}</span>
             </li>
+          % elif course_display_price:
+              <li>
+                  <i class="icon icon-money"></i>
+                  <p>${_("Price")}</p>
+                  <span>${course_display_price}</span>
+              </li>
           % endif
 
           % if pre_requisite_courses:
@@ -386,7 +377,6 @@ from edxmako.shortcuts import marketing_link
             <p class="tip">${_("You must successfully complete {course} before you begin this course").format(course=pre_requisite_courses[0])}.</p>
           </li>
           % endif
->>>>>>> edx/named-release/birch/rc
           % if get_course_about_section(course, "prerequisites"):
             <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif

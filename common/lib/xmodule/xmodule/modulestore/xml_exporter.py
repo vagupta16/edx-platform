@@ -171,8 +171,6 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
                         if not hasattr(draft_node.module, 'xml_attributes'):
                             draft_node.module.xml_attributes = {}
 
-<<<<<<< HEAD
-=======
                         # Don't try to export orphaned items
                         # and their descendents
                         if draft_node.parent_location is None:
@@ -180,7 +178,6 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
 
                         logging.debug('parent_loc = {0}'.format(draft_node.parent_location))
 
->>>>>>> edx/named-release/birch/rc
                         draft_node.module.xml_attributes['parent_url'] = draft_node.parent_url
                         parent = modulestore.get_item(draft_node.parent_location)
                         index = parent.children.index(draft_node.module.location)

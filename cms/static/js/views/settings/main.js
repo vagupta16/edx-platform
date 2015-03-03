@@ -141,16 +141,13 @@ var DetailsView = ValidatingView.extend({
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
         'course_image_asset_path': 'course-image-url',
-<<<<<<< HEAD
         'enable_enrollment_email': 'enable-enrollment-email',
         'pre_enrollment_email_subject' :'pre-enrollment-email-subject',
         'post_enrollment_email_subject':'post-enrollment-email-subject',
-        'enable_default_enrollment_email':'enable-default-enrollment-email'
-=======
+        'enable_default_enrollment_email':'enable-default-enrollment-email',
         'pre_requisite_courses': 'pre-requisite-course',
         'entrance_exam_enabled': 'entrance-exam-enabled',
         'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-score-pct'
->>>>>>> edx/named-release/birch/rc
     },
 
     updateTime : function(e) {
@@ -226,13 +223,12 @@ var DetailsView = ValidatingView.extend({
         case 'course-effort':
             this.setField(event);
             break;
-<<<<<<< HEAD
         case 'pre-enrollment-email-subject':
             this.setField(event);
             break;
         case 'post-enrollment-email-subject':
             this.setField(event);
-=======
+            break;
         case 'entrance-exam-enabled':
             if($(event.currentTarget).is(":checked")){
                 this.$('.div-grade-requirements').show();
@@ -249,7 +245,6 @@ var DetailsView = ValidatingView.extend({
             else {
                 this.setField(event);
             }
->>>>>>> edx/named-release/birch/rc
             break;
         case 'course-short-description':
             this.setField(event);

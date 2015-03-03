@@ -25,6 +25,11 @@ ABOUT_ATTRIBUTES = [
     'entrance_exam_enabled',
     'entrance_exam_id',
     'entrance_exam_minimum_score_pct',
+    'about_sidebar_html',
+    'pre_enrollment_email',
+    'post_enrollment_email',
+    'pre_enrollment_email_subject',
+    'post_enrollment_email_subject',
 ]
 
 
@@ -50,9 +55,7 @@ class CourseDetails(object):
         self.effort = None  # int hours/week
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
-<<<<<<< HEAD
         self.enable_enrollment_email = False
-=======
         self.pre_requisite_courses = []  # pre-requisite courses
         self.entrance_exam_enabled = ""  # is entrance exam enabled
         self.entrance_exam_id = ""  # the content location for the entrance exam
@@ -72,7 +75,6 @@ class CourseDetails(object):
         except ItemNotFoundError:
             value = None
         return value
->>>>>>> edx/named-release/birch/rc
 
     @classmethod
     def fetch(cls, course_key):
@@ -96,61 +98,8 @@ class CourseDetails(object):
             if value is not None:
                 setattr(course_details, attribute, value)
 
-<<<<<<< HEAD
-        temploc = course_key.make_usage_key('about', 'short_description')
-        try:
-            course_details.short_description = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'overview')
-        try:
-            course_details.overview = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'about_sidebar_html')
-        try:
-            course_details.about_sidebar_html = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'pre_enrollment_email_subject')
-        try:
-            course_details.pre_enrollment_email_subject = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-        temploc = course_key.make_usage_key('about', 'post_enrollment_email_subject')
-        try:
-            course_details.post_enrollment_email_subject = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'pre_enrollment_email')
-        try:
-            course_details.pre_enrollment_email = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'post_enrollment_email')
-        try:
-            course_details.post_enrollment_email = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'effort')
-        try:
-            course_details.effort = modulestore().get_item(temploc).data
-        except ItemNotFoundError:
-            pass
-
-        temploc = course_key.make_usage_key('about', 'video')
-        try:
-            raw_video = modulestore().get_item(temploc).data
-=======
         raw_video = cls._fetch_about_attribute(course_key, 'video')
         if raw_video:
->>>>>>> edx/named-release/birch/rc
             course_details.intro_video = CourseDetails.parse_video_tag(raw_video)
 
         return course_details
@@ -247,16 +196,9 @@ class CourseDetails(object):
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
-<<<<<<< HEAD
-        for about_type in ['syllabus', 'overview', 'about_sidebar_html', 'effort', 'short_description', 
-                           'pre_enrollment_email', 'post_enrollment_email', 'pre_enrollment_email_subject', 
-                           'post_enrollment_email_subject']:
-            cls.update_about_item(course_key, about_type, jsondict[about_type], descriptor, user)
-=======
         for attribute in ABOUT_ATTRIBUTES:
             if attribute in jsondict:
                 cls.update_about_item(course_key, attribute, jsondict[attribute], descriptor, user)
->>>>>>> edx/named-release/birch/rc
 
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
         cls.update_about_item(course_key, 'video', recomposed_video_tag, descriptor, user)

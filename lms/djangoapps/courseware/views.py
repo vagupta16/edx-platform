@@ -6,12 +6,9 @@ import logging
 import urllib
 import urllib2
 import json
-<<<<<<< HEAD
 from util.json_request import JsonResponse
 from pytz import timezone
-=======
 import cgi
->>>>>>> edx/named-release/birch/rc
 
 from datetime import datetime
 from collections import defaultdict
@@ -786,17 +783,15 @@ def course_about(request, course_id):
         if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
             return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
-<<<<<<< HEAD
-    regularly_registered = (registered_for_course(course, request.user) and
-                            UserProfile.has_registered(request.user))
-    staff_access = has_access(request.user, 'staff', course)
-    studio_url = get_studio_url(course, 'settings/details')
-=======
+        regularly_registered = (
+            registered_for_course(course, request.user)
+            and
+            UserProfile.has_registered(request.user)
+        )
         registered = registered_for_course(course, request.user)
 
         staff_access = has_access(request.user, 'staff', course)
         studio_url = get_studio_url(course, 'settings/details')
->>>>>>> edx/named-release/birch/rc
 
         if has_access(request.user, 'load', course):
             course_target = reverse('info', args=[course.id.to_deprecated_string()])
@@ -811,72 +806,6 @@ def course_about(request, course_id):
             or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
         )
 
-<<<<<<< HEAD
-    # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
-    registration_price = 0
-    in_cart = False
-    reg_then_add_to_cart_link = ""
-
-    _is_shopping_cart_enabled = is_shopping_cart_enabled()
-    if (_is_shopping_cart_enabled):
-        registration_price = CourseMode.min_course_price_for_currency(course_key,
-                                                                      settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
-        if request.user.is_authenticated():
-            cart = shoppingcart.models.Order.get_cart_for_user(request.user)
-            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
-                shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
-
-        reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-            reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
-
-    course_display_price = get_course_display_price(course, registration_price)
-
-    # only allow course sneak peek if
-    # 1) within enrollment period
-    # 2) course specifies it's okay
-    # 3) request.user is not a registered user.
-    sneakpeek_allowed = (has_access(request.user, 'within_enrollment_period', course) and
-                         CoursePreference.course_allows_nonregistered_access(course_key) and
-                         not UserProfile.has_registered(request.user))
-
-    # Used to provide context to message to student if enrollment not allowed
-    can_enroll = has_access(request.user, 'enroll', course)
-    invitation_only = course.invitation_only
-    # see if we have already filled up all allowed enrollments
-    is_course_full = CourseEnrollment.is_course_full(course)
-
-    # Register button should be disabled if one of the following is true:
-    # - Student is already registered for course
-    # - Course is already full
-    # - Student cannot enroll in course
-    active_reg_button = not(regularly_registered or is_course_full or not can_enroll)
-
-    is_shib_course = uses_shib(course)
-
-    return render_to_response('courseware/course_about.html', {
-        'course': course,
-        'staff_access': staff_access,
-        'studio_url': studio_url,
-        'regularly_registered': regularly_registered,
-        'sneakpeek_allowed': sneakpeek_allowed,
-        'course_target': course_target,
-        'registration_price': registration_price,
-        'course_display_price': course_display_price,
-        'in_cart': in_cart,
-        'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
-        'show_courseware_link': show_courseware_link,
-        'is_course_full': is_course_full,
-        'can_enroll': can_enroll,
-        'invitation_only': invitation_only,
-        'active_reg_button': active_reg_button,
-        'is_shib_course': is_shib_course,
-         # We do not want to display the internal courseware header, which is used when the course is found in the
-         # context. This value is therefor explicitly set to render the appropriate header.
-        'disable_courseware_header': True,
-        'is_shopping_cart_enabled': _is_shopping_cart_enabled,
-        'cart_link': reverse('shoppingcart.views.show_cart'),
-    })
-=======
         # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
         registration_price = 0
         in_cart = False
@@ -899,11 +828,20 @@ def course_about(request, course_id):
         invitation_only = course.invitation_only
         is_course_full = CourseEnrollment.is_course_full(course)
 
+        course_display_price = get_course_display_price(course, registration_price)
+        # only allow course sneak peek if
+        # 1) within enrollment period
+        # 2) course specifies it's okay
+        # 3) request.user is not a registered user.
+        sneakpeek_allowed = (has_access(request.user, 'within_enrollment_period', course) and
+                             CoursePreference.course_allows_nonregistered_access(course_key) and
+                             not UserProfile.has_registered(request.user))
+
         # Register button should be disabled if one of the following is true:
         # - Student is already registered for course
         # - Course is already full
         # - Student cannot enroll in course
-        active_reg_button = not(registered or is_course_full or not can_enroll)
+        active_reg_button = not(regularly_registered or is_course_full or not can_enroll)
 
         is_shib_course = uses_shib(course)
 
@@ -915,8 +853,11 @@ def course_about(request, course_id):
             'staff_access': staff_access,
             'studio_url': studio_url,
             'registered': registered,
+            'regularly_registered': regularly_registered,
+            'sneakpeek_allowed': sneakpeek_allowed,
             'course_target': course_target,
             'registration_price': registration_price,
+            'course_display_price': course_display_price,
             'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
             'in_cart': in_cart,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
@@ -933,7 +874,6 @@ def course_about(request, course_id):
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses
         })
->>>>>>> edx/named-release/birch/rc
 
 
 @ensure_csrf_cookie

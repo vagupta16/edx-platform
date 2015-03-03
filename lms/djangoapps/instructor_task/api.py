@@ -20,7 +20,7 @@ from instructor_task.tasks import (
     send_bulk_course_email,
     calculate_grades_csv,
     calculate_students_features_csv,
-<<<<<<< HEAD
+    cohort_students,
     get_student_responses,
     get_ora2_responses,
 )
@@ -29,14 +29,10 @@ from instructor_task.api_helper import (
     encode_problem_and_student_input,
     submit_task,
 )
-=======
-    cohort_students,
-)
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
                                         encode_problem_and_student_input,
                                         submit_task)
->>>>>>> edx/named-release/birch/rc
 from bulk_email.models import CourseEmail
 
 

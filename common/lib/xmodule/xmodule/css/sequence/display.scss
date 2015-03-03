@@ -36,11 +36,8 @@ nav.sequence-nav {
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-<<<<<<< HEAD
-  margin: -4px 30px 30px 30px;
-=======
   margin: -4px 0 ($baseline*1.5);
->>>>>>> edx/named-release/birch/rc
+  margin: -4px 30px 30px 30px;
   position: relative;
   border-bottom: none;
 
@@ -74,14 +71,11 @@ nav.sequence-nav {
     position: relative;
     border: 1px solid $gray-l3;
     height: 44px;
-<<<<<<< HEAD
+    margin: 0 ($baseline*1.5);
+    box-shadow: 0 1px 3px $shadow-l1 inset;
     margin: 0;
     @include linear-gradient(top, #ddd, #eee);
     box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
-=======
-    margin: 0 ($baseline*1.5);
-    box-shadow: 0 1px 3px $shadow-l1 inset;
->>>>>>> edx/named-release/birch/rc
   }
 
   ol {

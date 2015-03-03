@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 p.unauth-warning {
   padding: 10px;
   text-align: center;
@@ -13,12 +12,8 @@ p.unauth-warning a {
   border-radius: 5px;
 }
 
-nav.course-material {
-  @include clearfix;
-=======
 .wrapper-course-material {
   @include clearfix();
->>>>>>> edx/named-release/birch/rc
   @include box-sizing(border-box);
   border-bottom: none;
   margin: 0 auto 0;

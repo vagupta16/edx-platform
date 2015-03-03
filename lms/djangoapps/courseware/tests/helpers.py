@@ -27,12 +27,10 @@ class LoginEnrollmentTestCase(TestCase):
     Provides support for user creation,
     activation, login, and course enrollment.
     """
-<<<<<<< HEAD
+    user = None
+
     def setUp(self):
         from django.conf import settings
-=======
-    user = None
->>>>>>> edx/named-release/birch/rc
 
     def setup_user(self):
         """

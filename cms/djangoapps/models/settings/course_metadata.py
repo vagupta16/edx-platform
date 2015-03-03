@@ -17,26 +17,6 @@ class CourseMetadata(object):
     # The list of fields that wouldn't be shown in Advanced Settings.
     # Should not be used directly. Instead the filtered_list method should be used if the field needs to be filtered
     # depending on the feature flag.
-<<<<<<< HEAD
-    FILTERED_LIST = ['xml_attributes',
-                     'start',
-                     'end',
-                     'enrollment_start',
-                     'enrollment_end',
-                     'tabs',
-                     'graceperiod',
-                     'checklists',
-                     'show_timezone',
-                     'format',
-                     'graded',
-                     'hide_from_toc',
-                     'pdf_textbooks',
-                     'user_partitions',
-                     'name',  # from xblock
-                     'tags',  # from xblock
-                     'visible_to_staff_only',
-                     'enable_enrollment_email'
-=======
     FILTERED_LIST = [
         'xml_attributes',
         'start',
@@ -60,7 +40,7 @@ class CourseMetadata(object):
         'entrance_exam_enabled',
         'entrance_exam_minimum_score_pct',
         'entrance_exam_id',
->>>>>>> edx/named-release/birch/rc
+         'enable_enrollment_email'
     ]
 
     @classmethod

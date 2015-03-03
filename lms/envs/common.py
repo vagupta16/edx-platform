@@ -1641,13 +1641,10 @@ INSTALLED_APPS = (
     # Surveys
     'survey',
 
-<<<<<<< HEAD
     # Instructor email widget
     'instructor_email_widget',
 
-=======
     'lms.djangoapps.lms_xblock',
->>>>>>> edx/named-release/birch/rc
 )
 
 ######################### MARKETING SITE ###############################
@@ -1670,7 +1667,6 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
-<<<<<<< HEAD
 ######################### VISIBLE SETTINGS ###########################
 # These settings' values will be exposed to all templates
 TEMPLATE_VISIBLE_SETTINGS = [
@@ -1680,7 +1676,6 @@ TEMPLATE_VISIBLE_SETTINGS = [
 ############################### CHAT ################################
 JABBER = {}
 DATABASE_ROUTERS = []
-=======
 ################# Mobile URLS ##########################
 
 # These are URLs to the app store for mobile.
@@ -1688,7 +1683,6 @@ MOBILE_STORE_URLS = {
     'apple': '#',
     'google': '#'
 }
->>>>>>> edx/named-release/birch/rc
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
@@ -2074,7 +2068,6 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 # visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
-<<<<<<< HEAD
 # Metrics tab data source setting
 MAX_ENROLLEES_FOR_METRICS_USING_DB = 100
 
@@ -2086,7 +2079,6 @@ FORUM_MONGO_PARAMS = {
     'user': '',
     'database': 'forum',
 }
-=======
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
 
@@ -2110,4 +2102,3 @@ PDF_RECEIPT_LOGO_HEIGHT_MM = 12
 PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/default-theme/logo.png'
 # Height of the Co-brand Logo in mm
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
->>>>>>> edx/named-release/birch/rc

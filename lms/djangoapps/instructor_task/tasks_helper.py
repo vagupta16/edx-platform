@@ -22,11 +22,7 @@ from util.file import course_filename_prefix_generator, UniversalNewlineIterator
 from xmodule.modulestore.django import modulestore
 from xmodule.split_test_module import get_split_user_partitions
 
-<<<<<<< HEAD
-from courseware.courses import get_course
-=======
 from courseware.courses import get_course_by_id
->>>>>>> edx/named-release/birch/rc
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
@@ -657,7 +653,7 @@ def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _
     start_time = datetime.now(UTC)
 
     try:
-        course = get_course(course_id)
+        course = get_course_by_id(course_id)
     except ValueError as e:
         TASK_LOG.error(e.message)
         return "failed"

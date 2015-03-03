@@ -20,11 +20,8 @@ from django.utils.html import escape
 from django.http import Http404, HttpResponseServerError
 from django.conf import settings
 from util.json_request import JsonResponse
-<<<<<<< HEAD
 from util import keyword_substitution
-=======
 from mock import patch
->>>>>>> edx/named-release/birch/rc
 
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
@@ -276,7 +273,6 @@ def _section_membership(course, access):
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': unicode(course_key)}),
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
         'advanced_settings_url': get_studio_url(course, 'settings/advanced'),
-<<<<<<< HEAD
         'list_course_sections': reverse('list_course_sections', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_course_problems': reverse('list_course_problems', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_all_students': reverse('get_all_students', kwargs={'course_id': course_key.to_deprecated_string()}),
@@ -287,9 +283,7 @@ def _section_membership(course, access):
         "delete_saved_query": reverse("delete_saved_query", kwargs={'course_id': course_key.to_deprecated_string()}),
         "delete_temp_query": reverse("delete_temp_query", kwargs={'course_id': course_key.to_deprecated_string()}),
         "delete_bulk_temp_query": reverse("delete_bulk_temp_query", kwargs={'course_id': course_key.to_deprecated_string()}),
-=======
         'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': unicode(course_key)}),
->>>>>>> edx/named-release/birch/rc
     }
     return section_data
 
@@ -346,23 +340,14 @@ def _section_data_download(course, access):
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
         'access': access,
-<<<<<<< HEAD
-        'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_student_responses_url': reverse('get_student_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_ora2_responses_url': reverse('get_ora2_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
-=======
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': unicode(course_key)}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': unicode(course_key)}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': unicode(course_key)}),
->>>>>>> edx/named-release/birch/rc
+        'get_student_responses_url': reverse('get_student_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_ora2_responses_url': reverse('get_ora2_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
     return section_data
 

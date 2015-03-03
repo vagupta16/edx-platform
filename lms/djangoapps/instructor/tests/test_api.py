@@ -49,22 +49,11 @@ from student.tests.factories import UserFactory, CourseModeFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-<<<<<<< HEAD
-from student.tests.factories import UserFactory
-from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
-from student.roles import CourseBetaTesterRole
-from microsite_configuration import microsite
-from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
-
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from courseware.models import StudentModule
 from instructor_email_widget.models import StudentsForQuery, TemporaryQuery
 from instructor.views.data_access import purge_temporary_queries, get_group_query_students
 from instructor.views.data_access_constants import TEMPORARY_QUERY_LIFETIME
-=======
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
->>>>>>> edx/named-release/birch/rc
 
 import instructor_task.api
 import instructor.views.api
@@ -157,7 +146,6 @@ class TestCommonExceptions400(TestCase):
         self.assertIn("Task is already running", result["error"])
 
 
-<<<<<<< HEAD
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -643,11 +631,8 @@ class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertSetEqual(subsection_names, check_subsections)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-=======
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
->>>>>>> edx/named-release/birch/rc
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """

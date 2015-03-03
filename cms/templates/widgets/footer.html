@@ -25,11 +25,7 @@
         </li>
         % if settings.TENDER_DOMAIN and user.is_authenticated():
         <li class="nav-item nav-peripheral-feedback">
-<<<<<<< HEAD
-          <a href="mailto:courseops@class.stanford.edu" rel="external" title="${_('Use our Google Group to share your feedback')}">${_("Contact Us")}</a>
-=======
           <a data-rel="edx.org" href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
->>>>>>> edx/named-release/birch/rc
         </li>
         % endif
       </ol>

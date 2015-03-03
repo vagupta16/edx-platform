@@ -966,7 +966,33 @@
     }
   }
 
-<<<<<<< HEAD
+  .has-other-input-text { // Given to groups which have an 'other' input that appears when needed
+    display: inline-block;
+
+    label {
+      display: inline-block;
+    }
+
+    .input-group-other {
+      display: inline;
+      position: relative;
+      overflow: auto;
+      width: 100%;
+      height: auto;
+      margin: 0;
+      padding: inherit;
+      border: inherit;
+      clip: auto;
+
+      &.is-hidden {
+        display: none;
+      }
+
+      .input-cohort-group-association {
+        display: inline;
+      }
+    }
+  }
 
   .email-lists-management {
 
@@ -1008,37 +1034,10 @@
           line-height: 1.3em;
           font-size: .85em;
         }
-=======
-  .has-other-input-text { // Given to groups which have an 'other' input that appears when needed
-    display: inline-block;
-
-    label {
-      display: inline-block;
-    }
-
-    .input-group-other {
-      display: inline;
-      position: relative;
-      overflow: auto;
-      width: 100%;
-      height: auto;
-      margin: 0;
-      padding: inherit;
-      border: inherit;
-      clip: auto;
-
-      &.is-hidden {
-        display: none;
-      }
-
-      .input-cohort-group-association {
-        display: inline;
->>>>>>> edx/named-release/birch/rc
       }
     }
   }
 
-<<<<<<< HEAD
   .email-list {
     @include box-sizing(border-box);
     background-color: $light-gray;
@@ -1200,7 +1199,9 @@
 
     .emailHelp{
       padding: $baseline / 2;
-=======
+    }
+  }
+
   .cohort-management-nav {
     margin-bottom: $baseline;
   }
@@ -1315,7 +1316,6 @@
       .form-label {
         margin-top: $baseline;
       }
->>>>>>> edx/named-release/birch/rc
     }
   }
 }

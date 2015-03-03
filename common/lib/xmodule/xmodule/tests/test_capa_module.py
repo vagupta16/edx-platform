@@ -24,12 +24,8 @@ from capa import responsetypes
 from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
-<<<<<<< HEAD
-from xmodule.capa_module import CapaModule, ComplexEncoder
-from xmodule.exceptions import TimeExpiredError
-=======
 from xmodule.capa_module import CapaModule, CapaDescriptor, ComplexEncoder
->>>>>>> edx/named-release/birch/rc
+from xmodule.exceptions import TimeExpiredError
 from opaque_keys.edx.locations import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds

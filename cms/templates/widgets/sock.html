@@ -29,7 +29,6 @@
             <a href="${get_online_help_info(online_help_token)['pdf_url']}" target="_blank" rel="external" class="action action-primary">${_("Building and Running an {platform_name} Course PDF").format(platform_name=settings.PLATFORM_NAME)}</a>
           </li>
 
-<<<<<<< HEAD
         <li class="action-item">
           <a href="http://edx.readthedocs.org/projects/ca/en/latest/" class="action action-primary">${_("Studio Documentation")}</a>
           <span class="tip">${_("How to use Studio to build your course")}</span>
@@ -38,7 +37,7 @@
           <a href="https://stanfordonline.zendesk.com/hc" rel="external" class="action action-primary">${_("Help Center")}</a>
           <span class="tip"><i class="ss-icon ss-symbolicons-block icon-help">&#xEE11;</i> ${_("Find answers in the FAQ or ask a new question.")}</span>
         </li>
-=======
+
         % if settings.TENDER_DOMAIN:
           <li class="action-item">
             <a href="http://${settings.TENDER_DOMAIN}" rel="external" class="action action-primary">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</a>
@@ -46,15 +45,12 @@
           </li>
         % endif
 
->>>>>>> edx/named-release/birch/rc
         <li class="action-item">
           <a href="https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about" rel="external" class="action action-primary">${_("Enroll in edX101")}</a>
           <span class="tip">${_("How to use {studio_name} to build your course").format(studio_name=settings.STUDIO_NAME)}</span>
         </li>
       </ul>
       </div>
-<<<<<<< HEAD
-=======
 
     % if settings.TENDER_DOMAIN:
       <div class="feedback">
@@ -72,7 +68,6 @@
         </ul>
       </div>
     % endif
->>>>>>> edx/named-release/birch/rc
     </section>
   </div>
 </div>

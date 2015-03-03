@@ -120,13 +120,11 @@ urlpatterns = patterns('',  # nopep8
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
 
-<<<<<<< HEAD
     # Collect ora2 data
     url(r'get_ora2_responses',
         'instructor.views.api.get_ora2_responses', name="get_ora2_responses"),
-=======
+
     # Cohort management
     url(r'add_users_to_cohorts$',
         'instructor.views.api.add_users_to_cohorts', name="add_users_to_cohorts"),
->>>>>>> edx/named-release/birch/rc
 )

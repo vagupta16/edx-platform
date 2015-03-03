@@ -2,13 +2,8 @@
 """
 Tests for course access
 """
-<<<<<<< HEAD
-import datetime
-from mock import MagicMock
-=======
 from django.conf import settings
 from django.test.utils import override_settings
->>>>>>> edx/named-release/birch/rc
 import mock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 

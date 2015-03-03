@@ -17,8 +17,10 @@ var CourseDetails = Backbone.Model.extend({
         effort: null,   // an int or null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
-<<<<<<< HEAD
-        enable_enrollment_email: false
+        enable_enrollment_email: false,
+        pre_requisite_courses: [],
+        entrance_exam_enabled : '',
+        entrance_exam_minimum_score_pct: '50'
     },
 
     // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
@@ -36,11 +38,6 @@ var CourseDetails = Backbone.Model.extend({
             attributes.enrollment_end = date.parse(attributes.enrollment_end);
         }
         return attributes;
-=======
-        pre_requisite_courses: [],
-        entrance_exam_enabled : '',
-        entrance_exam_minimum_score_pct: '50'
->>>>>>> edx/named-release/birch/rc
     },
 
     validate: function(newattrs) {

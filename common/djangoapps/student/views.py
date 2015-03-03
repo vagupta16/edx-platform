@@ -73,11 +73,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from collections import namedtuple
 
-<<<<<<< HEAD
-from courseware.courses import get_courses, sort_by_announcement, get_course_about_section
-=======
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
->>>>>>> edx/named-release/birch/rc
+from courseware.courses import get_course_about_section
 from courseware.access import has_access
 from courseware.models import CoursePreference
 
@@ -100,14 +97,10 @@ import dogstats_wrapper as dog_stats_api
 from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
-<<<<<<< HEAD
 from util.keyword_substitution import substitute_keywords_with_data
-
-=======
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
 )
->>>>>>> edx/named-release/birch/rc
 from microsite_configuration import microsite
 
 from util.password_policy_validators import (
@@ -945,16 +938,14 @@ def change_enrollment(request, check_access=True):
                         .format(user.username, course_id))
             return HttpResponseBadRequest(_("Course id is invalid"))
 
-<<<<<<< HEAD
         can_enroll, error_msg = _check_can_enroll_in_course(user, course_id)
 
         if not can_enroll:
             return HttpResponseBadRequest(error_msg)
-=======
+
         # Record the user's email opt-in preference
         if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
             _update_email_opt_in(request, user.username, course_id.org)
->>>>>>> edx/named-release/birch/rc
 
         available_modes = CourseMode.modes_for_course_dict(course_id)
 

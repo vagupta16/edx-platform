@@ -911,11 +911,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             close_date = due_date + self.graceperiod  # pylint: disable=no-member
         else:
             close_date = due_date
-<<<<<<< HEAD
-        return (close_date is not None and datetime.datetime.now(UTC()) > close_date)
-=======
         return close_date is not None and datetime.datetime.now(UTC()) > close_date
->>>>>>> edx/named-release/birch/rc
 
 
 class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):

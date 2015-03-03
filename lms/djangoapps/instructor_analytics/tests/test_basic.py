@@ -2,23 +2,15 @@
 Tests for instructor.basic
 """
 
-<<<<<<< HEAD
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
-
 from courseware.courses import get_course
-from courseware.tests.factories import StudentModuleFactory, InstructorFactory
+from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon, CourseRegCodeItem
+from opaque_keys.edx.locations import Location
 
-=======
 import json
 from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from mock import patch
 from student.roles import CourseSalesAdminRole
 from student.tests.factories import UserFactory, CourseModeFactory
@@ -28,16 +20,11 @@ from shoppingcart.models import (
     Invoice, Coupon, CourseRegCodeItem, CouponRedemption
 )
 from course_modes.models import CourseMode
->>>>>>> edx/named-release/birch/rc
 from instructor_analytics.basic import (
     sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
     coupon_codes_features, student_responses, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
 )
-<<<<<<< HEAD
-from course_groups.tests.helpers import CohortFactory
-=======
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
->>>>>>> edx/named-release/birch/rc
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 

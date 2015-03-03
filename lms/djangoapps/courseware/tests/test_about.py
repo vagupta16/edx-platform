@@ -388,8 +388,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.assertNotIn('<span class="important-dates-item-text">$10</span>', resp.content)
 
 
-<<<<<<< HEAD
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutSidebarHTMLTestCase(ModuleStoreTestCase):
     """
     This test case will check the About page for the content in the HTML sidebar.
@@ -415,9 +414,7 @@ class AboutSidebarHTMLTestCase(ModuleStoreTestCase):
         self.assertIn("About Sidebar HTML Heading", resp.content)
 
 
-=======
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
->>>>>>> edx/named-release/birch/rc
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class AboutPurchaseCourseTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):

@@ -144,7 +144,6 @@ def _has_access_course_desc(user, action, course):
             )
         )
 
-<<<<<<< HEAD
     def within_enrollment_period():
         """
         Just a time boundary check, handles if start or stop were set to None
@@ -154,7 +153,7 @@ def _has_access_course_desc(user, action, course):
         end = course.enrollment_end
 
         return (start is None or now > start) and (end is None or now < end)
-=======
+
     def can_load_mobile():
         """
         Can this user access this course from a mobile device?
@@ -180,7 +179,6 @@ def _has_access_course_desc(user, action, course):
             # check mobile_available flag
             is_mobile_available_for_user(user, course)
         )
->>>>>>> edx/named-release/birch/rc
 
     def can_enroll():
         """
@@ -330,7 +328,6 @@ def _has_access_error_desc(user, action, descriptor, course_key):
     return _dispatch(checkers, action, user, descriptor)
 
 
-<<<<<<< HEAD
 NONREGISTERED_CATEGORY_WHITELIST = [
     "about",
     "chapter",
@@ -371,7 +368,8 @@ NONREGISTERED_CATEGORY_WHITELIST = [
 
 def _can_load_descriptor_nonregistered(descriptor):
     return descriptor.category in NONREGISTERED_CATEGORY_WHITELIST
-=======
+
+
 def _has_group_access(descriptor, user, course_key):
     """
     This function returns a boolean indicating whether or not `user` has
@@ -435,7 +433,6 @@ def _has_group_access(descriptor, user, course_key):
 
     # all checks passed.
     return True
->>>>>>> edx/named-release/birch/rc
 
 
 def _has_access_descriptor(user, action, descriptor, course_key=None):

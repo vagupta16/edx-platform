@@ -232,15 +232,8 @@ class UserInfoHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler, Permis
 
 
 def _get_all_courses():
-<<<<<<< HEAD
-    """
-    Utitilty function to list all available courses.
-
-    """
-=======
     """ Utility function to list all available courses. """
 
->>>>>>> edx/named-release/birch/rc
     ms_courses = modulestore().get_courses()
     courses = [c for c in ms_courses if isinstance(c, CourseDescriptor)]
     return courses

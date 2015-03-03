@@ -23,17 +23,15 @@ def run():
 
     add_mimetypes()
 
-<<<<<<< HEAD
     # Monkey patch the keyword function map
     if keyword_substitution.keyword_function_map_is_empty():
         keyword_substitution.add_keyword_function_map(get_keyword_function_map())
         # Once keyword function map is set, make update function do nothing
         keyword_substitution.add_keyword_function_map = lambda x: None
-=======
+
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
 
->>>>>>> edx/named-release/birch/rc
 
 def add_mimetypes():
     """

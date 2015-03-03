@@ -1,15 +1,9 @@
 """
 Test for LMS instructor background task queue management
 """
-<<<<<<< HEAD
-
-from mock import MagicMock, patch
-from xmodule.modulestore.exceptions import ItemNotFoundError
-
-=======
 from mock import patch, Mock
+from mock import MagicMock
 from bulk_email.models import CourseEmail, SEND_TO_ALL
->>>>>>> edx/named-release/birch/rc
 from courseware.tests.factories import UserFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -216,7 +210,6 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         )
         self._test_resubmission(api_call)
 
-<<<<<<< HEAD
     def test_submit_ora2_request_task(self):
         request = self.create_task_request(self.instructor)
 
@@ -225,7 +218,6 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             submit_ora2_request_task(request, self.course.id)
 
             mock_submit_task.assert_called_once_with(request, 'ora2_responses', get_ora2_responses, self.course.id, {}, '')
-=======
     def test_submit_cohort_students(self):
         api_call = lambda: submit_cohort_students(
             self.create_task_request(self.instructor),
@@ -233,4 +225,3 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             file_name=u'filename.csv'
         )
         self._test_resubmission(api_call)
->>>>>>> edx/named-release/birch/rc

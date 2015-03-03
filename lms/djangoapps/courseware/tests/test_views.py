@@ -11,16 +11,10 @@ import ddt
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
-<<<<<<< HEAD
-
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, NonRegisteredUserFactory
-=======
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
->>>>>>> edx/named-release/birch/rc
 from edxmako.middleware import MakoMiddleware
 from edxmako.tests import mako_middleware_process_request
 from mock import MagicMock, patch, create_autospec
@@ -34,6 +28,7 @@ from course_modes.models import CourseMode
 import shoppingcart
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory
+from student.tests.factories import NonRegisteredUserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -586,7 +581,6 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
 
-<<<<<<< HEAD
 class TestNonRegisteredUser(TestCase):
     """
     Tests nonregistered (auto-created) users
@@ -605,10 +599,7 @@ class TestNonRegisteredUser(TestCase):
             req.user = self.user
             views.progress(req, self.course_id)
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-=======
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
->>>>>>> edx/named-release/birch/rc
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student

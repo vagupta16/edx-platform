@@ -16,22 +16,16 @@ from mock import Mock, patch
 import tempfile
 import unicodecsv
 
-<<<<<<< HEAD
-from django.test.testcases import TestCase
 from pytz import UTC
-
-from courseware.courses import get_course
+from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from instructor_task.tasks_helper import (
-    upload_grades_csv,
-    upload_students_csv,
     push_student_responses_to_s3,
     push_ora2_responses_to_s3,
     UPDATE_STATUS_FAILED,
@@ -41,8 +35,7 @@ from instructor_task.tasks_helper import (
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
-from instructor_task.models import ReportStore
-=======
+
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -54,7 +47,7 @@ import openedx.core.djangoapps.user_api.api.course_tag as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv
->>>>>>> edx/named-release/birch/rc
+
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
 from django.conf import settings
 from django.test.utils import override_settings
@@ -337,7 +330,6 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
 
-<<<<<<< HEAD
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
@@ -345,7 +337,7 @@ class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
     def test_unicode(self):
         course_key = CourseKey.from_string('edX/unicode_graded/2012_Fall')
-        self.course = get_course(course_key)
+        self.course = get_course_by_id(course_key)
         self.problem_location = Location("edX", "unicode_graded", "2012_Fall", "problem", "H1P1")
 
         self.student = UserFactory(username=u'student\xec')
@@ -411,7 +403,8 @@ class TestInstructorOra2Report(TestReportMixin, InstructorTaskCourseTestCase):
 
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
                     mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
-=======
+
+
 class MockDefaultStorage(object):
     """Mock django's DefaultStorage"""
     def __init__(self):
@@ -644,4 +637,3 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ],
             verify_order=False
         )
->>>>>>> edx/named-release/birch/rc

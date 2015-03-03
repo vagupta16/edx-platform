@@ -12,11 +12,8 @@ from lxml import html, etree
 
 from django.conf import settings
 from django.utils.timezone import UTC
-<<<<<<< HEAD
 from django.core.urlresolvers import reverse
-=======
 from django.utils.html import escape
->>>>>>> edx/named-release/birch/rc
 from edxmako.shortcuts import render_to_string
 from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
@@ -287,7 +284,6 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 
 
-<<<<<<< HEAD
 def add_inline_analytics(user, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Adds a fragment for in-line analytics.
@@ -313,7 +309,7 @@ def add_inline_analytics(user, block, view, frag, context):  # pylint: disable=u
 
     else:
         return frag
-=======
+
 def get_course_update_items(course_updates, provided_index=0):
     """
     Returns list of course_updates data dictionaries either from new format if available or
@@ -372,4 +368,3 @@ def get_course_update_items(course_updates, provided_index=0):
                         return payload
 
     return course_update_items
->>>>>>> edx/named-release/birch/rc

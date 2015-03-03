@@ -1507,12 +1507,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         # now reset the time to 10 mins from now in future in order to unblock
         reset_time = datetime.now(UTC) + timedelta(seconds=600)
         with freeze_time(reset_time):
-<<<<<<< HEAD
-            response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
-            print(response)
-=======
             response = self.client.post(url)
->>>>>>> edx/named-release/birch/rc
             self.assertEquals(response.status_code, 404)
 
         cache.clear()

@@ -12,16 +12,11 @@ def url_class(is_active):
     return "active"
   return ""
 %>
-<<<<<<< HEAD
 <%! from xmodule.tabs import CourseTabList %>
 <%! from courseware.access import has_access %>
 <%! from student.models import UserProfile %>
 <%! from django.conf import settings %>
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
-=======
 <%! from courseware.tabs import get_course_tab_list %>
->>>>>>> edx/named-release/birch/rc
 <%! from courseware.views import notification_image_for_tab %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition %>
@@ -33,7 +28,6 @@ def url_class(is_active):
   masquerade_group_id = masquerade.group_id if masquerade else None
 %>
 
-<<<<<<< HEAD
 % if course and user.is_authenticated() and not UserProfile.has_registered(user):
   <p class="unauth-warning">
   <%
@@ -47,7 +41,8 @@ def url_class(is_active):
              tag_start="<a href='{}'>".format(reg_url),
              tag_end="</a>")}
   </p>
-=======
+% endif
+
 % if show_preview_menu:
     <nav class="wrapper-preview-menu">
         <div class="preview-menu">
@@ -72,18 +67,13 @@ def url_class(is_active):
             </ol>
         </div>
     </nav>
->>>>>>> edx/named-release/birch/rc
 % endif
 
 % if disable_tabs is UNDEFINED or not disable_tabs:
 <nav class="${active_page} wrapper-course-material">
   <div class="course-material">
     <ol class="course-tabs">
-<<<<<<< HEAD
       % for tab in CourseTabList.iterate_displayable(course, settings, user.is_authenticated(), has_access(user, 'staff', course, course.id), user_is_enrolled, not UserProfile.has_registered(user)):
-=======
-      % for tab in get_course_tab_list(course, user):
->>>>>>> edx/named-release/birch/rc
         <%
             tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
             tab_image = notification_image_for_tab(tab, user, course)

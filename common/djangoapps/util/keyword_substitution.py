@@ -5,19 +5,12 @@ Contains utility functions to help substitute keywords in a text body with
 the appropriate user / course data.
 
 Supported:
-<<<<<<< HEAD
     LMS and CMS (email on enrollment):
         - %%USER_ID%% => anonymous user id
         - %%USER_FULLNAME%% => User's full name
         - %%COURSE_DISPLAY_NAME%% => display name of the course
         - %%COURSE_ID%% => course identifier
         - %%COURSE_START_DATE%% => start date of the course
-=======
-    LMS:
-        - %%USER_ID%% => anonymous user id
-        - %%USER_FULLNAME%% => User's full name
-        - %%COURSE_DISPLAY_NAME%% => display name of the course
->>>>>>> edx/named-release/birch/rc
         - %%COURSE_END_DATE%% => end date of the course
 
 Usage:
@@ -25,7 +18,6 @@ Usage:
     above other modules in the dependency tree and acts like a global var.
     Then we can call substitute_keywords_with_data where substitution is
     needed. Currently called in:
-<<<<<<< HEAD
         - LMS:
             - Bulk email
             - emails on enrollment
@@ -41,15 +33,6 @@ from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
 
 Keyword = namedtuple('Keyword', 'func desc')
-=======
-        - LMS: Announcements + Bulk emails
-        - CMS: Not called
-"""
-
-from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
-
->>>>>>> edx/named-release/birch/rc
 KEYWORD_FUNCTION_MAP = {}
 
 
@@ -84,15 +67,9 @@ def substitute_keywords(string, user=None, course=None):
         # Cannot proceed without course and user information
         return string
 
-<<<<<<< HEAD
     for key, value in KEYWORD_FUNCTION_MAP.iteritems():
         if key in string:
             substitutor = value.func(user, course)
-=======
-    for key, func in KEYWORD_FUNCTION_MAP.iteritems():
-        if key in string:
-            substitutor = func(user, course)
->>>>>>> edx/named-release/birch/rc
             string = string.replace(key, substitutor)
 
     return string

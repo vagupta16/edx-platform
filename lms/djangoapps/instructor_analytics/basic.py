@@ -3,14 +3,9 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
-<<<<<<< HEAD
 from itertools import chain
-import json
 import logging
-
-=======
 import json
->>>>>>> edx/named-release/birch/rc
 from shoppingcart.models import (
     PaidCourseRegistration, CouponRedemption, Invoice, CourseRegCodeItem,
     OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode

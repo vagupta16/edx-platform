@@ -50,13 +50,8 @@ class KeywordSubTest(ModuleStoreTestCase):
             return course.display_name
 
         return {
-<<<<<<< HEAD
             '%%USER_FULLNAME%%': Ks.Keyword(user_fullname_sub, 'user profile name'),
             '%%COURSE_DISPLAY_NAME%%': Ks.Keyword(course_display_name_sub, 'display name of the course'),
-=======
-            '%%USER_FULLNAME%%': user_fullname_sub,
-            '%%COURSE_DISPLAY_NAME%%': course_display_name_sub,
->>>>>>> edx/named-release/birch/rc
         }
 
     @file_data('fixtures/test_keyword_coursename_sub.json')
@@ -72,11 +67,7 @@ class KeywordSubTest(ModuleStoreTestCase):
     def test_anonymous_id_subs(self, test_info):
         """ Tests subbing anon user id in various scenarios """
         anon_id = '123456789'
-<<<<<<< HEAD
         with patch.dict(Ks.KEYWORD_FUNCTION_MAP, {'%%USER_ID%%': Ks.Keyword(lambda x, y: anon_id, 'anonymous_user_id (for use in survey links)')}):
-=======
-        with patch.dict(Ks.KEYWORD_FUNCTION_MAP, {'%%USER_ID%%': lambda x, y: anon_id}):
->>>>>>> edx/named-release/birch/rc
             result = Ks.substitute_keywords_with_data(test_info['test_string'], self.user.id, self.course.id)
 
             self.assertIn(anon_id, result)
@@ -109,7 +100,6 @@ class KeywordSubTest(ModuleStoreTestCase):
         self.assertEquals(test_string, result)
 
     @file_data('fixtures/test_keywordsub_multiple_tags.json')
-<<<<<<< HEAD
     def test_sub_multiple_tags(self, test_info):
         """ Test that subbing works with multiple subtags """
         anon_id = '123456789'
@@ -118,16 +108,6 @@ class KeywordSubTest(ModuleStoreTestCase):
             '%%USER_FULLNAME%%': Ks.Keyword(lambda x, y: self.user.profile.name, 'user profile name'),
             '%%COURSE_DISPLAY_NAME': Ks.Keyword(lambda x, y: self.course.display_name, 'display name of the course'),
             '%%COURSE_END_DATE': Ks.Keyword(lambda x, y: get_default_time_display(self.course.end), 'end date of the course')
-=======
-    def test_sub_mutiltple_tags(self, test_info):
-        """ Test that subbing works with multiple subtags """
-        anon_id = '123456789'
-        patched_dict = {
-            '%%USER_ID%%': lambda x, y: anon_id,
-            '%%USER_FULLNAME%%': lambda x, y: self.user.profile.name,
-            '%%COURSE_DISPLAY_NAME': lambda x, y: self.course.display_name,
-            '%%COURSE_END_DATE': lambda x, y: get_default_time_display(self.course.end)
->>>>>>> edx/named-release/birch/rc
         }
 
         with patch.dict(Ks.KEYWORD_FUNCTION_MAP, patched_dict):

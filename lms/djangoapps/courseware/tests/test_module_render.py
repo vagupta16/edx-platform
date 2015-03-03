@@ -1195,7 +1195,6 @@ class TestRebindModule(TestSubmittingProblems):
         self.assertFalse(psycho_handler.called)
 
 
-<<<<<<< HEAD
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(ANALYTICS_ANSWER_DIST_URL=True)
 class TestInlineAnalytics(ModuleStoreTestCase):
@@ -1360,7 +1359,8 @@ class TestInlineAnalytics(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertNotIn('Staff Analytics Info', result_fragment.content)
-=======
+
+
 @ddt.ddt
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -1435,4 +1435,3 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
         )
         service = runtime.service(descriptor, expected_service)
         self.assertIsNotNone(service)
->>>>>>> edx/named-release/birch/rc

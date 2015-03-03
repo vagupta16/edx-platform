@@ -613,7 +613,6 @@ YOUTUBE = {
     },
 }
 
-<<<<<<< HEAD
 ############################## Utilities ##########################################
 
 # Todo: add aws entries for this
@@ -633,7 +632,6 @@ COURSE_UTILITIES = [
           ]
     }
 ]
-=======
 ############################# VIDEO UPLOAD PIPELINE #############################
 
 VIDEO_UPLOAD_PIPELINE = {
@@ -641,7 +639,6 @@ VIDEO_UPLOAD_PIPELINE = {
     'ROOT_PATH': '',
     'CONCURRENT_UPLOAD_LIMIT': 4,
 }
->>>>>>> edx/named-release/birch/rc
 
 ############################ APPS #####################################
 
@@ -816,13 +813,11 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
-<<<<<<< HEAD
 ### SHIB
 # For SHIB backup register and login URLs
 SHIB_ONLY_SITE = False
 SHIB_REDIRECT_DOMAIN_WHITELIST = {}
 
-=======
 ### Size of chunks into which asset uploads will be divided
 UPLOAD_CHUNK_SIZE_IN_MB = 10
 
@@ -835,7 +830,6 @@ MAX_ASSET_UPLOAD_FILE_SIZE_URL = ""
 
 ### Default value for entrance exam minimum score
 ENTRANCE_EXAM_MIN_SCORE_PCT = 50
->>>>>>> edx/named-release/birch/rc
 
 ################ ADVANCED_COMPONENT_TYPES ###############
 
@@ -866,15 +860,12 @@ ADVANCED_COMPONENT_TYPES = [
     'schoolyourself_lesson',
 ]
 
-<<<<<<< HEAD
 # XBlock types listed here will _always_ be selectable as Studio components
 XBLOCKS_ALWAYS_IN_STUDIO = [
 ]
-=======
 # Adding components in this list will disable the creation of new problem for those
 # compoenents in studio. Existing problems will work fine and one can edit them in studio
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
->>>>>>> edx/named-release/birch/rc
 
 # Specify xblocks that should be treated as advanced problems. Each entry is a tuple
 # specifying the xblock name and an optional YAML template to be used.

@@ -177,7 +177,6 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             return false;
         };
 
-<<<<<<< HEAD
         var keywordValidator = (function () {
             var regexp = /%%[^%\s]+%%/g;
             var keywordsSupported = [
@@ -209,7 +208,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 'validateString': validate
             };
         }());
-=======
+
         /**
          * Helper method for course/library creation - verifies a required field is not blank.
          */
@@ -258,7 +257,6 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 $(selectors.errorWrapper).removeClass(classes.shown).addClass(classes.hiding);
             }
         };
->>>>>>> edx/named-release/birch/rc
 
         return {
             'toggleExpandCollapse': toggleExpandCollapse,
@@ -273,15 +271,12 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             'setScrollOffset': setScrollOffset,
             'redirect': redirect,
             'reload': reload,
-<<<<<<< HEAD
             'keywordValidator': keywordValidator,
-            'hasChangedAttributes': hasChangedAttributes
-=======
+            'hasChangedAttributes': hasChangedAttributes,
             'hasChangedAttributes': hasChangedAttributes,
             'validateRequiredField': validateRequiredField,
             'validateURLItemEncoding': validateURLItemEncoding,
             'validateTotalKeyLength': validateTotalKeyLength,
             'checkTotalKeyLengthViolations': checkTotalKeyLengthViolations
->>>>>>> edx/named-release/birch/rc
         };
     });
