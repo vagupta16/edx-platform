@@ -23,7 +23,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     TEST_DATA_MOCK_MODULESTORE,
-    TEST_DATA_MONGO_MODULESTORE
 )
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
 
@@ -293,7 +292,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
 
 @ddt.ddt
 @patch('requests.request')
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
     """
     Ensures the number of modulestore queries is deterministic based on the

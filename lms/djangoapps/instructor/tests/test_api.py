@@ -146,7 +146,7 @@ class TestCommonExceptions400(TestCase):
         self.assertIn("Task is already running", result["error"])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensures the backend logic is sound for instructor email widget
@@ -511,7 +511,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse(result2)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure appropriate access and format of course information

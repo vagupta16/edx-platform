@@ -1195,7 +1195,7 @@ class TestRebindModule(TestSubmittingProblems):
         self.assertFalse(psycho_handler.called)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @override_settings(ANALYTICS_ANSWER_DIST_URL=True)
 class TestInlineAnalytics(ModuleStoreTestCase):
     """Tests to verify that Inline Analytics fragment is generated correctly"""

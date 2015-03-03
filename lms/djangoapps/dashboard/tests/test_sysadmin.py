@@ -36,7 +36,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from instructor_task.tests.factories import InstructorTaskFactory
 from xmodule.modulestore.tests.django_utils import xml_store_config
-TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, ['empty'])
 from xmodule.modulestore.xml import XMLModuleStore
 
 

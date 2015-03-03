@@ -10,7 +10,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
 from django.utils.importlib import import_module
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.models import CourseEnrollment, UserProfile
 from courseware.models import CoursePreference
 from student.tests.factories import UserFactory
@@ -30,7 +30,7 @@ NO_SNEAKPEEK_PATHS = [
 
 
 @ddt
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class SneakPeekDeeplinkMiddlewareTests(ModuleStoreTestCase):
     """
     Tests of Sneakpek deeplink middleware
