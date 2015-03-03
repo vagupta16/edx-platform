@@ -14,7 +14,7 @@ from contentstore.utils import BulkSettingsUtil
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
-from ..access import has_course_access
+from student.auth import has_course_author_access
 
 log = logging.getLogger(__name__)
 
@@ -71,7 +71,7 @@ def _get_course_module(course_key, user, depth=0):
     Safety-check if the given user has permissions to access the course module.
     """
 
-    if not has_course_access(user, course_key):
+    if not has_course_author_access(user, course_key):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth = depth)
     return course_module
