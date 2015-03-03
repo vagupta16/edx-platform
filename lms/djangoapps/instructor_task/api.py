@@ -20,6 +20,7 @@ from instructor_task.tasks import (
     send_bulk_course_email,
     calculate_grades_csv,
     calculate_students_features_csv,
+<<<<<<< HEAD
     get_student_responses,
     get_ora2_responses,
 )
@@ -28,6 +29,14 @@ from instructor_task.api_helper import (
     encode_problem_and_student_input,
     submit_task,
 )
+=======
+    cohort_students,
+)
+
+from instructor_task.api_helper import (check_arguments_for_rescoring,
+                                        encode_problem_and_student_input,
+                                        submit_task)
+>>>>>>> edx/named-release/birch/rc
 from bulk_email.models import CourseEmail
 
 
@@ -260,6 +269,20 @@ def submit_calculate_students_features_csv(request, course_key, features):
     task_type = 'profile_info_csv'
     task_class = calculate_students_features_csv
     task_input = {'features': features}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_cohort_students(request, course_key, file_name):
+    """
+    Request to have students cohorted in bulk.
+
+    Raises AlreadyRunningError if students are currently being cohorted.
+    """
+    task_type = 'cohort_students'
+    task_class = cohort_students
+    task_input = {'file_name': file_name}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

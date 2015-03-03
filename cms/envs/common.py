@@ -22,7 +22,12 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0611, W0614
+# pylint: disable=wildcard-import, unused-import, unused-wildcard-import
+
+# Pylint gets confused by path.py instances, which report themselves as class
+# objects. As a result, pylint applies the wrong regex in validating names,
+# and throws spurious errors. Therefore, we disable invalid-name checking.
+# pylint: disable=invalid-name
 
 import imp
 import os
@@ -31,17 +36,19 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
-    update_module_store_settings, ASSET_IGNORE_REGEX
+    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR
 )
 from path import path
 from warnings import simplefilter
 
-from lms.lib.xblock.mixin import LmsBlockMixin
-from dealer.git import git
+from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+from cms.lib.xblock.authoring_mixin import AuthoringMixin
+import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
 
 ############################ FEATURE CONFIGURATION #############################
-
+STUDIO_NAME = "Studio"
+STUDIO_SHORT_NAME = "Studio"
 FEATURES = {
     'USE_DJANGO_PIPELINE': True,
 
@@ -107,7 +114,40 @@ FEATURES = {
 
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': None,
+
+    # Turn off Video Upload Pipeline through Studio, by default
+    'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
+
+
+    # Is this an edX-owned domain? (edx.org)
+    # for consistency in user-experience, keep the value of this feature flag
+    # in sync with the one in lms/envs/common.py
+    'IS_EDX_DOMAIN': False,
+
+    # let students save and manage their annotations
+    # for consistency in user-experience, keep the value of this feature flag
+    # in sync with the one in lms/envs/common.py
+    'ENABLE_EDXNOTES': False,
+
+    # Enable support for content libraries. Note that content libraries are
+    # only supported in courses using split mongo. Change the setting
+    # DEFAULT_STORE_FOR_NEW_COURSE to be 'split' to have future courses
+    # and libraries created with split.
+    'ENABLE_CONTENT_LIBRARIES': False,
+
+    # Milestones application flag
+    'MILESTONES_APP': False,
+
+    # Prerequisite courses feature flag
+    'ENABLE_PREREQUISITE_COURSES': False,
+
+    # Toggle course milestones app/feature
+    'MILESTONES_APP': False,
+
+    # Toggle course entrance exams feature
+    'ENTRANCE_EXAMS': False,
 }
+
 ENABLE_JASMINE = False
 
 
@@ -258,7 +298,13 @@ from xmodule.x_module import XModuleMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
+XBLOCK_MIXINS = (
+    LmsBlockMixin,
+    InheritanceMixin,
+    XModuleMixin,
+    EditInfoMixin,
+    AuthoringMixin,
+)
 
 # Allow any XBlock in Studio
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
@@ -293,9 +339,19 @@ SERVER_EMAIL = 'devops@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
+EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
+
+if not EDX_PLATFORM_REVISION:
+    try:
+        # Get git revision of the current file
+        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
+    except TypeError:
+        # Not a git repository
+        EDX_PLATFORM_REVISION = 'unknown'
+
 # Static content
-STATIC_URL = '/static/' + git.revision + "/"
-STATIC_ROOT = ENV_ROOT / "staticfiles" / git.revision
+STATIC_URL = '/static/' + EDX_PLATFORM_REVISION + "/"
+STATIC_ROOT = ENV_ROOT / "staticfiles" / EDX_PLATFORM_REVISION
 
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
@@ -486,6 +542,11 @@ REQUIRE_EXCLUDE = ("build.txt",)
 # It can also be a path to a custom class that subclasses require.environments.Environment and defines some "args" function that returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
 
+# If you want to enable Tender integration (http://tenderapp.com/),
+# put in the domain where Tender hosts tender_widget.js. For example,
+# TENDER_DOMAIN = "example.tenderapp.com"
+TENDER_DOMAIN = None
+
 ################################# CELERY ######################################
 
 # Message configuration
@@ -552,6 +613,7 @@ YOUTUBE = {
     },
 }
 
+<<<<<<< HEAD
 ############################## Utilities ##########################################
 
 # Todo: add aws entries for this
@@ -571,6 +633,15 @@ COURSE_UTILITIES = [
           ]
     }
 ]
+=======
+############################# VIDEO UPLOAD PIPELINE #############################
+
+VIDEO_UPLOAD_PIPELINE = {
+    'BUCKET': '',
+    'ROOT_PATH': '',
+    'CONCURRENT_UPLOAD_LIMIT': 4,
+}
+>>>>>>> edx/named-release/birch/rc
 
 ############################ APPS #####################################
 
@@ -598,7 +669,8 @@ INSTALLED_APPS = (
     'contentstore',
     'course_creators',
     'student',  # misleading name due to sharing with lms
-    'course_groups',  # not used in cms (yet), but tests run
+    'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
+    'xblock_config',
 
     # Tracking
     'track',
@@ -630,7 +702,7 @@ INSTALLED_APPS = (
     'reverification',
 
     # User preferences
-    'user_api',
+    'openedx.core.djangoapps.user_api',
     'django_openid_auth',
 
     'embargo',
@@ -716,7 +788,10 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+
+    # milestones
+    'milestones',
 )
 
 
@@ -741,11 +816,26 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
+<<<<<<< HEAD
 ### SHIB
 # For SHIB backup register and login URLs
 SHIB_ONLY_SITE = False
 SHIB_REDIRECT_DOMAIN_WHITELIST = {}
 
+=======
+### Size of chunks into which asset uploads will be divided
+UPLOAD_CHUNK_SIZE_IN_MB = 10
+
+### Max size of asset uploads to GridFS
+MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 10
+
+# FAQ url to direct users to if they upload
+# a file that exceeds the above size
+MAX_ASSET_UPLOAD_FILE_SIZE_URL = ""
+
+### Default value for entrance exam minimum score
+ENTRANCE_EXAM_MIN_SCORE_PCT = 50
+>>>>>>> edx/named-release/birch/rc
 
 ################ ADVANCED_COMPONENT_TYPES ###############
 
@@ -757,6 +847,7 @@ ADVANCED_COMPONENT_TYPES = [
     'word_cloud',
     'graphical_slider_tool',
     'lti',
+    'library_content',
     # XBlocks from pmitros repos are prototypes. They should not be used
     # except for edX Learning Sciences experiments on edge.edx.org without
     # further work to make them robust, maintainable, finalize data formats,
@@ -766,15 +857,24 @@ ADVANCED_COMPONENT_TYPES = [
     'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
     'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
     'profile',  # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
+
     'split_test',
     'combinedopenended',
     'peergrading',
     'notes',
+    'schoolyourself_review',
+    'schoolyourself_lesson',
 ]
 
+<<<<<<< HEAD
 # XBlock types listed here will _always_ be selectable as Studio components
 XBLOCKS_ALWAYS_IN_STUDIO = [
 ]
+=======
+# Adding components in this list will disable the creation of new problem for those
+# compoenents in studio. Existing problems will work fine and one can edit them in studio
+DEPRECATED_ADVANCED_COMPONENT_TYPES = []
+>>>>>>> edx/named-release/birch/rc
 
 # Specify xblocks that should be treated as advanced problems. Each entry is a tuple
 # specifying the xblock name and an optional YAML template to be used.
@@ -784,3 +884,26 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+
+#date format the api will be formatting the datetime values
+API_DATE_FORMAT = '%Y-%m-%d'
+
+# Files and Uploads type filter values
+
+FILES_AND_UPLOAD_TYPE_FILTERS = {
+    "Images": ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff', 'image/tif', 'image/x-icon'],
+    "Documents": [
+        'application/pdf',
+        'text/plain',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+        'application/vnd.openxmlformats-officedocument.presentationml.template',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+        'application/msword',
+        'application/vnd.ms-excel',
+        'application/vnd.ms-powerpoint',
+    ],
+}

@@ -33,12 +33,13 @@ from instructor_task.tasks_helper import (
     push_student_responses_to_s3,
     push_ora2_responses_to_s3,
     upload_grades_csv,
-    upload_students_csv
+    upload_students_csv,
+    cohort_students_and_upload
 )
 from bulk_email.tasks import perform_delegate_email_batches
 
 
-@task(base=BaseInstructorTask)  # pylint: disable=E1102
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def rescore_problem(entry_id, xmodule_instance_args):
     """Rescores a problem in a course, for all students or one specific student.
 
@@ -69,7 +70,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)  # pylint: disable=E1102
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def reset_problem_attempts(entry_id, xmodule_instance_args):
     """Resets problem attempts to zero for a particular problem for all students in a course.
 
@@ -91,7 +92,7 @@ def reset_problem_attempts(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)  # pylint: disable=E1102
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def delete_problem_state(entry_id, xmodule_instance_args):
     """Deletes problem state entirely for all students on a particular problem in a course.
 
@@ -113,7 +114,11 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
+<<<<<<< HEAD
 @task(base=BaseInstructorTask, routing_key=settings.BULK_EMAIL_ROUTING_KEY)  # pylint: disable=E1102
+=======
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
+>>>>>>> edx/named-release/birch/rc
 def send_bulk_course_email(entry_id, _xmodule_instance_args):
     """Sends emails to recipients enrolled in a course.
 
@@ -134,7 +139,7 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Grade a course and push the results to an S3 bucket for download.
@@ -145,7 +150,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_students_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
@@ -157,6 +162,7 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
+<<<<<<< HEAD
 @task(base=BaseInstructorTask, routing_key=settings.STUDENT_RESPONSES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
 def get_student_responses(entry_id, xmodule_instance_args):
     """
@@ -175,4 +181,15 @@ def get_ora2_responses(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_ora2_responses_to_s3, xmodule_instance_args)
+=======
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
+def cohort_students(entry_id, xmodule_instance_args):
+    """
+    Cohort students in bulk, and upload the results.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
+    action_name = ugettext_noop('cohorted')
+    task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
+>>>>>>> edx/named-release/birch/rc
     return run_main_task(entry_id, task_fn, action_name)

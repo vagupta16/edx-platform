@@ -84,7 +84,7 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
             targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
             // push change to display, hide the editor, submit the change
             var saving = new NotificationView.Mini({
-                title: gettext('Saving&hellip;')
+                title: gettext('Saving')
             });
             saving.show();
             var ele = this.modelDom(event);
@@ -152,7 +152,7 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                             });
                             self.modelDom(event).remove();
                             var deleting = new NotificationView.Mini({
-                                title: gettext('Deleting&hellip;')
+                                title: gettext('Deleting')
                             });
                             deleting.show();
                             targetModel.destroy({

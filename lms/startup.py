@@ -7,7 +7,7 @@ Module for code that should run during LMS startup
 from django.conf import settings
 
 # Force settings to run so that the python path is modified
-settings.INSTALLED_APPS  # pylint: disable=W0104
+settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from django_startup import autostartup
 import edxmako
@@ -166,7 +166,10 @@ def get_keyword_function_map():
 
     from student.models import anonymous_id_for_user
     from util.date_utils import get_default_time_display
+<<<<<<< HEAD
     from util.keyword_substitution import Keyword
+=======
+>>>>>>> edx/named-release/birch/rc
 
     def user_id_sub(user, course):
         """
@@ -184,6 +187,7 @@ def get_keyword_function_map():
         """ Returns the course's display name """
         return course.display_name
 
+<<<<<<< HEAD
     def get_course_id_string(user, course):
         """ Returns the serialized course id """
         return unicode(course.id)
@@ -192,6 +196,8 @@ def get_keyword_function_map():
         """ Returns the course start date in the default display """
         return get_default_time_display(course.start)
 
+=======
+>>>>>>> edx/named-release/birch/rc
     def course_end_date_sub(user, course):
         """ Returns the course end date in the default display """
         return get_default_time_display(course.end)
@@ -199,12 +205,19 @@ def get_keyword_function_map():
     # Define keyword -> function map
     # Take care that none of these functions return %% encoded keywords
     kf_map = {
+<<<<<<< HEAD
         '%%USER_ID%%': Keyword(user_id_sub, 'anonymous_user_id (for use in survey links)'),
         '%%USER_FULLNAME%%': Keyword(user_fullname_sub, 'user profile name'),
         '%%COURSE_DISPLAY_NAME%%': Keyword(course_display_name_sub, 'display name of the course'),
         '%%COURSE_ID%%': Keyword(get_course_id_string, 'course identifier'),
         '%%COURSE_START_DATE%%': Keyword(course_start_date_sub, 'start date of the course'),
         '%%COURSE_END_DATE%%': Keyword(course_end_date_sub, 'end date of the course'),
+=======
+        '%%USER_ID%%': user_id_sub,
+        '%%USER_FULLNAME%%': user_fullname_sub,
+        '%%COURSE_DISPLAY_NAME%%': course_display_name_sub,
+        '%%COURSE_END_DATE%%': course_end_date_sub
+>>>>>>> edx/named-release/birch/rc
     }
 
     return kf_map
