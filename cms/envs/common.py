@@ -136,7 +136,7 @@ FEATURES = {
     'ENABLE_CONTENT_LIBRARIES': False,
 
     # Prerequisite courses feature flag
-    'ENABLE_PREREQUISITE_COURSES': False,
+    'ENABLE_PREREQUISITE_COURSES': True,
 
     # Toggle course milestones app/feature
     'MILESTONES_APP': True,
