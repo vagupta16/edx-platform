@@ -139,7 +139,7 @@ FEATURES = {
     'ENABLE_PREREQUISITE_COURSES': False,
 
     # Toggle course milestones app/feature
-    'MILESTONES_APP': False,
+    'MILESTONES_APP': True,
 
     # Toggle course entrance exams feature
     'ENTRANCE_EXAMS': False,
