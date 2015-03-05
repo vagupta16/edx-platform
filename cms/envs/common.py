@@ -135,9 +135,6 @@ FEATURES = {
     # and libraries created with split.
     'ENABLE_CONTENT_LIBRARIES': False,
 
-    # Milestones application flag
-    'MILESTONES_APP': False,
-
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
 
