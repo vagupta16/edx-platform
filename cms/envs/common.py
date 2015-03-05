@@ -141,8 +141,8 @@ FEATURES = {
     # Toggle course milestones app/feature
     'MILESTONES_APP': True,
 
-    # Toggle course entrance exams feature
-    'ENTRANCE_EXAMS': False,
+    # Entrance exams feature flag
+    'ENABLE_ENTRANCE_EXAMS': True,
 }
 
 ENABLE_JASMINE = False

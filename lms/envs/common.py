@@ -339,6 +339,9 @@ FEATURES = {
     # Milestones application flag
     'MILESTONES_APP': True,
 
+    # Entrance exams feature flag
+    'ENABLE_ENTRANCE_EXAMS': True,
+
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': True,
 
