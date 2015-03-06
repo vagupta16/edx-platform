@@ -361,11 +361,11 @@ from edxmako.shortcuts import marketing_link
               <span class="important-dates-item-text">${_("{currency_symbol}{cost}").format(currency_symbol=currency_symbol, cost=registration_price)}</span>
             </li>
           % elif course_display_price:
-              <li>
-                  <i class="icon icon-money"></i>
-                  <p>${_("Price")}</p>
-                  <span>${course_display_price}</span>
-              </li>
+            <li class="important-dates-item">
+              <i class="icon fa fa-money"></i>
+              <p class="important-dates-item-title">${_("Price")}</p>
+              <span class="important-dates-item-text">${course_display_price}</span>
+            </li>
           % endif
 
           % if pre_requisite_courses:
