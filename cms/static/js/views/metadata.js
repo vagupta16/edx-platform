@@ -34,7 +34,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
                             'Integer': 'Number'
                         },
                         type = model.getType();
-                        var options = model.get("options");
+                        var options = model.get("options") || {};
 
                     if (conversions[type]) {
                         type = conversions[type];
