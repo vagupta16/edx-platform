@@ -23,23 +23,6 @@ var CourseDetails = Backbone.Model.extend({
         entrance_exam_minimum_score_pct: '50'
     },
 
-    // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
-    parse: function(attributes) {
-        if (attributes['start_date']) {
-            attributes.start_date = date.parse(attributes.start_date);
-        }
-        if (attributes['end_date']) {
-            attributes.end_date = date.parse(attributes.end_date);
-        }
-        if (attributes['enrollment_start']) {
-            attributes.enrollment_start = date.parse(attributes.enrollment_start);
-        }
-        if (attributes['enrollment_end']) {
-            attributes.enrollment_end = date.parse(attributes.enrollment_end);
-        }
-        return attributes;
-    },
-
     validate: function(newattrs) {
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
