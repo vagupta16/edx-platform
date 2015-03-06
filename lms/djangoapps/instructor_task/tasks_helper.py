@@ -718,7 +718,7 @@ def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _tas
         return UPDATE_STATUS_FAILED
 
     timestamp_str = start_time.strftime('%Y-%m-%d-%H%M')
-    course_id_string = urllib.quote(course_id.to_deprecated_string().replace('/', '_'))
+    course_id_string = course_filename_prefix_generator(course_id)
 
     curr_step = "Uploading CSV"
     update_task_progress()
