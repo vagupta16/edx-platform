@@ -143,6 +143,9 @@ FEATURES = {
 
     # Entrance exams feature flag
     'ENABLE_ENTRANCE_EXAMS': True,
+
+    # Enable course reruns
+    'ALLOW_COURSE_RERUNS': True,
 }
 
 ENABLE_JASMINE = False
