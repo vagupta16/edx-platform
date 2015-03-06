@@ -73,7 +73,7 @@ def url_class(is_active):
 <nav class="${active_page} wrapper-course-material">
   <div class="course-material">
     <ol class="course-tabs">
-      % for tab in CourseTabList.iterate_displayable(course, settings, user.is_authenticated(), has_access(user, 'staff', course, course.id), user_is_enrolled, not UserProfile.has_registered(user)):
+      % for tab in get_course_tab_list(course, user):
         <%
             tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
             tab_image = notification_image_for_tab(tab, user, course)

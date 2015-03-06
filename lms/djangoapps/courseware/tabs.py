@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 
 from courseware.access import has_access
 from student.models import CourseEnrollment
+from student.models import UserProfile
 from xmodule.tabs import CourseTabList
 
 if settings.FEATURES.get('MILESTONES_APP', False):
@@ -24,7 +25,8 @@ def get_course_tab_list(course, user):
         settings,
         user.is_authenticated(),
         has_access(user, 'staff', course, course.id),
-        user_is_enrolled
+        user_is_enrolled,
+        not UserProfile.has_registered(user),
     )
 
     # Entrance Exams Feature
