@@ -261,7 +261,7 @@ class EmbargoMiddlewareTests(ModuleStoreTestCase):
         profile.save()
 
         # Warm the cache
-        with self.assertNumQueries(16):
+        with self.assertNumQueries(15):
             self.client.get(self.embargoed_page)
 
         # Access the page multiple times, but expect that we hit
