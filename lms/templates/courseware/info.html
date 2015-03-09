@@ -47,7 +47,7 @@ $(document).ready(function(){
   <div class="info-wrapper">
     % if user.is_authenticated():
     <section class="updates">
-      % if studio_url is not None and masquerade and masquerade.role == 'staff':
+      % if studio_url is not None and (masquerade and masquerade.role == 'staff' or staff_access):
         <div class="wrap-instructor-info studio-view">
           <a class="instructor-info-action" href="${studio_url}">${_("View Updates in Studio")}</a>
         </div>
