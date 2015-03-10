@@ -4,7 +4,6 @@ Tests for instructor.basic
 
 from courseware.courses import get_course
 from courseware.tests.factories import StudentModuleFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from opaque_keys.edx.locations import Location
 
 import json
