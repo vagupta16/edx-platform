@@ -30,7 +30,7 @@ def get_responses_data(block):
        - FormulaResponse
 
     Problems with randomize are not currently supported for in-line analytics.
-    If settings.ANALYTICS_ANSWER_DIST_URL is unset then returns None
+    If settings.ANALYTICS_DATA_URL is unset then returns None
     """
     responses_data = []
     valid_group_nodes = []

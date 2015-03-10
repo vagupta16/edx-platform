@@ -1106,7 +1106,7 @@ class TestRebindModule(TestSubmittingProblems):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-@override_settings(ANALYTICS_ANSWER_DIST_URL=True)
+@override_settings(ANALYTICS_DATA_URL=True)
 class TestInlineAnalytics(ModuleStoreTestCase):
     """Tests to verify that Inline Analytics fragment is generated correctly"""
 

@@ -59,6 +59,8 @@ from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor.enrollment import uses_shib
 from util.date_utils import get_time_display
+from analyticsclient.client import Client
+from analyticsclient.exceptions import NotFoundError, InvalidRequestError, TimeoutError
 
 from util.db import commit_on_success_with_read_committed
 
@@ -1138,57 +1140,48 @@ def get_course_lti_endpoints(request, course_id):
 
 def get_analytics_answer_dist(request):
     """
-    Calls the the analytics answer distribution api. Retrieves answer distribution data for the in-line analytics display.
+    Calls the the analytics answer distribution api client. Retrieves answer distribution data for the in-line analytics display.
 
     Arguments:
         request (django request object):  the HTTP request object that triggered this view function
 
     Returns:
-        (django response object):  JSON response.  404 if api url is not found, 500 if server error, otherwise 200 with JSON body.
+        (django response object):  JSON response. 500 if error occurred, 404 if api client returns no data, otherwise 200 with JSON body.
     """
 
     all_data = json.loads(request.POST['data'])
     module_id = all_data['module_id']
     question_types_by_part = all_data['question_types_by_part']
     num_options_by_part = all_data['num_options_by_part']
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(all_data['course_id'])
+    course_key = SlashSeparatedCourseKey.from_string(all_data['course_id'])
+
+    zendesk_base_url = getattr(settings, 'ZENDESK_URL')
+    zendesk_url_str = "<a href=\"" + zendesk_base_url + "/hc/en-us/requests/new\">here</a>"
 
     # Check user is enrolled as a staff member of this course
     try:
         course = get_course_with_access(request.user, 'staff', course_key, depth=None)
     except Http404:
-        return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
+        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url=zendesk_url_str))
 
     having_access = has_access(request.user, 'staff', course)
-
-    # Contruct API call
-    url = getattr(settings, 'ANALYTICS_ANSWER_DIST_URL')
-    if url:
-        url = url.format(module_id=module_id)
+    url = getattr(settings, 'ANALYTICS_DATA_URL')
+    auth_token = getattr(settings, 'ANALYTICS_DATA_TOKEN')
 
     if not having_access or not url:
-        return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
+        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url=zendesk_url_str))
 
-    api_secret = getattr(settings, 'ANALYTICS_DATA_TOKEN')
-    token = 'Token %s' % api_secret
-
-    analytics_req = urllib2.Request(url)
-    analytics_req.add_header('Authorization', token)
+    client = Client(base_url=url, auth_token=auth_token)
+    module = client.modules(course.id, module_id)
 
     try:
-        response = urllib2.urlopen(analytics_req)
-        data = json.loads(response.read())
-
-    except urllib2.HTTPError, error:
-        log.warning('Analytics API error: ' + str(error))
-        if error.code == 404:
-            return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
-        else:
-            return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url="<a href=\"https://stanfordonline.zendesk.com/hc/en-us/requests/new\">here</a>"))
-
-    except urllib2.URLError, error:
-        log.warning('Analytics API error: ' + str(error))
-        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url="<a href=\"https://stanfordonline.zendesk.com/hc/en-us/requests/new\">here</a>"))
+        data = module.answer_distribution()
+    except NotFoundError:
+        return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
+    except InvalidRequestError:
+        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url=zendesk_url_str))
+    except TimeoutError:
+        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url=zendesk_url_str))
 
     return process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
 
@@ -1204,15 +1197,12 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
 
     Returns:
         A json payload of:
-          - data by part: an array of dicts of {value_id, correct, count} for each part_id
-          - count by part: an array of dicts of {totalAttemptCount, totalCorrectCount, TotalIncorrectCount} for each part_id
+          - data by part: an array of dicts of {value_id, correct, first_count, last_count} for each part_id
+          - count by part: an array of dicts of {totalFirstAttemptCount, totalFirstCorrectCount, TotalFirstIncorrectCount,
+          -                                      totalLastAttemptCount, totalLastCorrectCount, TotalLastIncorrectCount} for each part_id
           - last updated: string
      """
-
-    # Each element in count_by_part is a dict of totalAttemptCount, totalCorrectCount, totalIncorrectCount
     count_by_part = {}
-
-    # Each element in data_by_part is an array of dicts of {value_id, correct, count}
     data_by_part = {}
 
     # For errors discovered during analytics data processing use message_by_part
@@ -1239,15 +1229,21 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
 
         # Add count to appropriate aggregates
         count_dict = count_by_part.get(part_id, {
-            'totalAttemptCount': 0,
-            'totalCorrectCount': 0,
-            'totalIncorrectCount': 0,
+            'totalFirstAttemptCount': 0,
+            'totalFirstCorrectCount': 0,
+            'totalFirstIncorrectCount': 0,
+            'totalLastAttemptCount': 0,
+            'totalLastCorrectCount': 0,
+            'totalLastIncorrectCount': 0,
         })
-        count_dict['totalAttemptCount'] = count_dict.get('totalAttemptCount') + item['count']
+        count_dict['totalFirstAttemptCount'] = count_dict.get('totalFirstAttemptCount') + item['first_response_count']
+        count_dict['totalLastAttemptCount'] = count_dict.get('totalLastAttemptCount') + item['final_response_count']
         if item['correct']:
-            count_dict['totalCorrectCount'] = count_dict.get('totalCorrectCount') + item['count']
+            count_dict['totalFirstCorrectCount'] = count_dict.get('totalFirstCorrectCount') + item['first_response_count']
+            count_dict['totalLastCorrectCount'] = count_dict.get('totalLastCorrectCount') + item['final_response_count']
         else:
-            count_dict['totalIncorrectCount'] = count_dict.get('totalIncorrectCount') + item['count']
+            count_dict['totalFirstIncorrectCount'] = count_dict.get('totalFirstIncorrectCount') + item['first_response_count']
+            count_dict['totalLastIncorrectCount'] = count_dict.get('totalLastIncorrectCount') + item['final_response_count']
 
         count_by_part[part_id] = count_dict
 
@@ -1255,7 +1251,8 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
         part_dict = {}
         part_dict['value_id'] = item['value_id']
         part_dict['correct'] = item['correct']
-        part_dict['count'] = item['count']
+        part_dict['first_count'] = item['first_response_count']
+        part_dict['last_count'] = item['final_response_count']
 
         data_by_part[part_id] = data_by_part.get(part_id, []) + [part_dict]
 

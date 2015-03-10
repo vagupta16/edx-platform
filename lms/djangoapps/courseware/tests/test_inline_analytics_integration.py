@@ -1,7 +1,7 @@
 """Inline Analytics integration tests"""
 
 import json
-from mock import patch, MagicMock
+from mock import patch
 
 from django.test import RequestFactory
 from django.test.utils import override_settings
@@ -35,32 +35,35 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         json_analytics_data = json.dumps(analytics_data)
         self.data = {"data": json_analytics_data}
 
-    @override_settings(ANALYTICS_ANSWER_DIST_URL='dummy_url')
+    @override_settings(ANALYTICS_DATA_URL='dummy_url')
+    @override_settings(ZENDESK_URL='https://stanfordonline.zendesk.com')
     def test_regular_user(self):
 
         request = self.factory.post('', self.data)
         request.user = self.user
 
         response = get_analytics_answer_dist(request)
-        self.assertEquals(response.content, 'A problem has occurred retrieving the data, please report the problem.')
+        self.assertEquals(response.content, 'A problem has occurred retrieving the data, to report the problem click <a href="https://stanfordonline.zendesk.com/hc/en-us/requests/new">here</a>')
 
+    @override_settings(ZENDESK_URL='https://stanfordonline.zendesk.com')
     def test_no_url(self):
 
         request = self.factory.post('', self.data)
         request.user = self.instructor
 
         response = get_analytics_answer_dist(request)
-        self.assertEquals(response.content, 'A problem has occurred retrieving the data, please report the problem.')
+        self.assertEquals(response.content, 'A problem has occurred retrieving the data, to report the problem click <a href="https://stanfordonline.zendesk.com/hc/en-us/requests/new">here</a>')
 
-    @override_settings(ANALYTICS_ANSWER_DIST_URL='dummy_url')
-    @patch('urllib2.urlopen')
+    @override_settings(ANALYTICS_DATA_URL='dummy_url')
+    @override_settings(ZENDESK_URL='https://stanfordonline.zendesk.com')
     @patch('courseware.views.process_analytics_answer_dist')
-    def test_staff_and_url(self, mock_process_analytics, mock_requests):
+    @patch('courseware.views.Client')
+    def test_staff_and_url(self, mock_client, mock_process_analytics):
 
-        mock_resp = MagicMock()
-        mock_read = MagicMock(return_value="{}")
-        mock_resp.read = mock_read
-        mock_requests.return_value = mock_resp
+        mock_client.return_value.modules.return_value.answer_distribution.return_value = [
+            {
+            },
+        ]
 
         factory = self.factory
         request = factory.post('', self.data)
@@ -70,15 +73,16 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         response = get_analytics_answer_dist(request)
         self.assertEquals(response, [{'dummy': 'dummy'}])
 
-    @override_settings(ANALYTICS_ANSWER_DIST_URL='dummy_url')
-    @patch('urllib2.urlopen')
+    @override_settings(ANALYTICS_DATA_URL='dummy_url')
+    @override_settings(ZENDESK_URL='https://stanfordonline.zendesk.com')
     @patch('courseware.views.process_analytics_answer_dist')
-    def test_instructor_and_url(self, mock_process_analytics, mock_requests):
+    @patch('courseware.views.Client')
+    def test_instructor_and_url(self, mock_client, mock_process_analytics):
 
-        mock_resp = MagicMock()
-        mock_read = MagicMock(return_value="{}")
-        mock_resp.read = mock_read
-        mock_requests.return_value = mock_resp
+        mock_client.return_value.modules.return_value.answer_distribution.return_value = [
+            {
+            },
+        ]
 
         factory = self.factory
         request = factory.post('', self.data)
@@ -96,7 +100,8 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
                 "correct": False,
-                "count": 7,
+                "first_response_count": 7,
+                "final_response_count": 2,
                 "value_id": "choice_0",
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
@@ -108,7 +113,8 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
                 "correct": True,
-                "count": 23,
+                "first_response_count": 23,
+                "final_response_count": 25,
                 "value_id": "choice_1",
                 "answer_value_text": "Option 2",
                 "answer_value_numeric": "null",
@@ -128,20 +134,25 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         processed_data = {
             "count_by_part": {
                 "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
-                    "totalIncorrectCount": 7,
-                    "totalAttemptCount": 30,
-                    "totalCorrectCount": 23,
+                    "totalFirstIncorrectCount": 7,
+                    "totalLastIncorrectCount": 2,
+                    "totalFirstAttemptCount": 30,
+                    "totalLastAttemptCount": 27,
+                    "totalFirstCorrectCount": 23,
+                    "totalLastCorrectCount": 25,
                 },
             },
             "data_by_part": {
                 "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
                     {
-                        "count": 7,
+                        "first_count": 7,
+                        "last_count": 2,
                         "value_id": "choice_0",
                         "correct": False,
                     },
                     {
-                        "count": 23,
+                        "first_count": 23,
+                        "last_count": 25,
                         "value_id": "choice_1",
                         "correct": True,
                     },
@@ -163,7 +174,8 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
                 "correct": False,
-                "count": 7,
+                "first_response_count": 1,
+                "final_response_count": 7,
                 "value_id": "choice_0",
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
@@ -183,15 +195,19 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         processed_data = {
             "count_by_part": {
                 "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
-                    "totalIncorrectCount": 7,
-                    "totalAttemptCount": 7,
-                    "totalCorrectCount": 0,
+                    "totalFirstIncorrectCount": 1,
+                    "totalLastIncorrectCount": 7,
+                    "totalFirstAttemptCount": 1,
+                    "totalLastAttemptCount": 7,
+                    "totalFirstCorrectCount": 0,
+                    "totalLastCorrectCount": 0,
                 },
             },
             "data_by_part": {
                 "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
                     {
-                        "count": 7,
+                        "first_count": 1,
+                        "last_count": 7,
                         "value_id": "choice_0",
                         "correct": False,
                     },
@@ -213,7 +229,8 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
                 "correct": False,
-                "count": 7,
+                "first_response_count": 7,
+                "final_response_count": 2,
                 "value_id": "choice_0",
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
@@ -225,7 +242,8 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
                 "correct": True,
-                "count": 23,
+                "first_response_count": 18,
+                "final_response_count": 23,
                 "value_id": "choice_1",
                 "answer_value_text": "Option 2",
                 "answer_value_numeric": "null",
@@ -245,15 +263,19 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         processed_data = {
             "count_by_part": {
                 "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
-                    "totalIncorrectCount": 0,
-                    "totalAttemptCount": 23,
-                    "totalCorrectCount": 23,
+                    "totalFirstIncorrectCount": 0,
+                    "totalLastIncorrectCount": 0,
+                    "totalFirstAttemptCount": 18,
+                    "totalLastAttemptCount": 23,
+                    "totalFirstCorrectCount": 18,
+                    "totalLastCorrectCount": 23,
                 },
             },
             "data_by_part": {
                 "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
                     {
-                        "count": 23,
+                        "first_count": 18,
+                        "last_count": 23,
                         "value_id": "choice_1",
                         "correct": True,
                     },

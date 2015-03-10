@@ -13,9 +13,12 @@ window.InlineAnalytics = (function() {
         var countByPart = response.count_by_part;
         var messageByPart = response.message_by_part;
         var lastUpdateDate = response.last_update_date;
-        var totalAttemptCount;
-        var totalCorrectCount;
-        var totalIncorrectCount;
+        var totalFirstAttemptCount;
+        var totalFirstCorrectCount;
+        var totalFirstIncorrectCount;
+        var totalLastAttemptCount;
+        var totalLastCorrectCount;
+        var totalLastIncorrectCount;
 
         var partId;
         var index;
@@ -33,22 +36,27 @@ window.InlineAnalytics = (function() {
             }
 
             if (countByPart[partId]) {
-                totalAttemptCount = countByPart[partId]['totalAttemptCount'];
-                totalCorrectCount = countByPart[partId]['totalCorrectCount'];
-                totalIncorrectCount = countByPart[partId]['totalIncorrectCount'];
+            	totalFirstAttemptCount = countByPart[partId]['totalFirstAttemptCount'];
+            	totalFirstCorrectCount = countByPart[partId]['totalFirstCorrectCount'];
+            	totalFirstIncorrectCount = countByPart[partId]['totalFirstIncorrectCount'];
+                totalLastAttemptCount = countByPart[partId]['totalLastAttemptCount'];
+                totalLastCorrectCount = countByPart[partId]['totalLastCorrectCount'];
+                totalLastIncorrectCount = countByPart[partId]['totalLastIncorrectCount'];
             } else {
-                totalAttemptCount = 0;
-                totalCorrectCount = 0;
-                totalIncorrectCount = 0;
+            	totalFirstAttemptCount = 0;
+            	totalFirstCorrectCount = 0;
+            	totalFirstIncorrectCount = 0;
+                totalLastAttemptCount = 0;
+                totalLastCorrectCount = 0;
+                totalLastIncorrectCount = 0;
             }
 
             if (questionTypesByPart[partId] === 'radio') {
                 renderRadioAnalytics(
                     dataByPart[partId],
                     partId,
-                    totalAttemptCount,
-                    totalCorrectCount,
-                    totalIncorrectCount,
+                    totalFirstAttemptCount,
+                    totalLastAttemptCount,
                     correctResponses[partId],
                     lastUpdateDate,
                     choiceNameListByPart[partId]);
@@ -56,23 +64,25 @@ window.InlineAnalytics = (function() {
                 renderCheckboxAnalytics(
                     dataByPart[partId],
                     partId,
-                    totalAttemptCount,
-                    totalCorrectCount,
-                    totalIncorrectCount,
+                    totalFirstAttemptCount,
+                    totalLastAttemptCount,
                     correctResponses[partId],
                     lastUpdateDate);
             } else {
                 // Just set the text on the div
                 setCountAndDate(
                     partId,
-                    totalAttemptCount,
+                    totalLastAttemptCount,
                     lastUpdateDate);
 
                 setAggregateCounts(
                     partId,
-                    totalAttemptCount,
-                    totalCorrectCount,
-                    totalIncorrectCount);
+                    totalFirstAttemptCount,
+                    totalFirstCorrectCount,
+                    totalFirstIncorrectCount,
+                    totalLastAttemptCount,
+                    totalLastCorrectCount,
+                    totalLastIncorrectCount);
             }
         }
     }
@@ -81,9 +91,8 @@ window.InlineAnalytics = (function() {
     function renderRadioAnalytics(
         result,
         partId,
-        totalAttemptCount,
-        totalCorrectCount,
-        totalIncorrectCount,
+        totalFirstAttemptCount,
+        totalLastAttemptCount,
         correctResponse,
         lastUpdateDate,
         choiceNameString) {
@@ -93,19 +102,23 @@ window.InlineAnalytics = (function() {
         var valueIndex;
         var lastIndex;
         var correct;
-        var count;
-        var percent;
+        var firstCount;
+        var lastCount;
+        var firstPercent;
+        var lastPercent;
         var answerClass;
         var index;
         var tr;
         var tdChoice;
         var tdDot;
-        var tdCount;
-        var tdPercent;
+        var tdFirstCount;
+        var tdLastCount;
+        var tdFirstPercent;
+        var tdLastPercent;
         var trs = [];
         var valueIdArray;
         var arrayLength;
-        var lastRow = $('#' + partId + '_table tr:last');
+        var lastTableRow = $('#' + partId + '_table tr:last');
         var currentResult;
 
         // Build the array of choice texts
@@ -136,8 +149,10 @@ window.InlineAnalytics = (function() {
                 } else {
                     currentResult = result[valueIdArray.indexOf(choiceNameArray[index])]
                     correct = currentResult['correct'];
-                    count = currentResult['count'];
-                    percent = Math.round(count * 1000 / (totalAttemptCount * 10));
+                    firstCount = currentResult['first_count'];
+                    lastCount = currentResult['last_count'];
+                    firstPercent = Math.round(firstCount * 1000 / (totalFirstAttemptCount * 10));
+                    lastPercent = Math.round(lastCount * 1000 / (totalLastAttemptCount * 10));
 
                     if (correct) {
                         answerClass = 'inline-analytics-correct';
@@ -152,15 +167,21 @@ window.InlineAnalytics = (function() {
                     tdDot = $('<td class="answer_box">');
                     tdDot.addClass(answerClass);
                     tdDot.append($('<span class="dot">'));
-                    tdCount = $('<td class="answer_box">');
-                    tdCount.text(count);
-                    tdPercent = $('<td class="answer_box">');
-                    tdPercent.text(percent + '%');
+                    tdFirstCount = $('<td class="checkbox_first_attempt">');
+                    tdFirstCount.text(firstCount);
+                    tdFirstPercent = $('<td class="checkbox_first_attempt">');
+                    tdFirstPercent.text(firstPercent + '%');
+                    tdLastCount = $('<td class="checkbox_last_attempt">');
+                    tdLastCount.text(lastCount);
+                    tdLastPercent = $('<td class="checkbox_last_attempt">');
+                    tdLastPercent.text(lastPercent + '%');
                     
                     tr.append(tdChoice);
                     tr.append(tdDot);
-                    tr.append(tdCount);
-                    tr.append(tdPercent);
+                    tr.append(tdFirstCount);
+                    tr.append(tdFirstPercent);
+                    tr.append(tdLastCount);
+                    tr.append(tdLastPercent);
                     trs.push(tr[0]);
                 }
             }
@@ -176,11 +197,11 @@ window.InlineAnalytics = (function() {
         }
 
         // Append the row array to the table
-        lastRow.after(trs);
+        lastTableRow.after(trs);
 
         // Set student count and last_update_date
         setCountAndDate(partId,
-            totalAttemptCount,
+            totalLastAttemptCount,
             lastUpdateDate);
     }
 
@@ -198,8 +219,10 @@ window.InlineAnalytics = (function() {
         var tr;
         var tdChoice;
         var tdDot;
-        var tdCount;
-        var tdPercent;
+        var tdFirstCount;
+        var tdLastCount;
+        var tdFirstPercent;
+        var tdLastPercent;
         
         correctResponse = correctResponse.substring(2, correctResponse.length - 2);
 
@@ -218,15 +241,21 @@ window.InlineAnalytics = (function() {
             tdDot = $('<td class="answer_box">');
             tdDot.addClass(answerClass);
             tdDot.append($('<span class="dot">'));
-            tdCount = $('<td class="answer_box">');
-            tdCount.text(0);
-            tdPercent = $('<td class="answer_box">');
-            tdPercent.text('0%');
+            tdFirstCount = $('<td class="checkbox_first_attempt">');
+            tdFirstCount.text(0);
+            tdLastCount = $('<td class="checkbox_last_attempt">');
+            tdLastCount.text(0);
+            tdFirstPercent = $('<td class="checkbox_first_attempt">');
+            tdFirstPercent.text('0%');
+            tdLastPercent = $('<td class="checkbox_last_attempt">');
+            tdLastPercent.text('0%');
             
             tr.append(tdChoice);
             tr.append(tdDot);
-            tr.append(tdCount);
-            tr.append(tdPercent);
+            tr.append(tdFirstCount);
+            tr.append(tdFirstPercent);
+            tr.append(tdLastCount);
+            tr.append(tdLastPercent);
             trs.push(tr[0]);
             currentIndex += 1;
         }
@@ -237,19 +266,21 @@ window.InlineAnalytics = (function() {
     function renderCheckboxAnalytics(
         result,
         partId,
-        totalAttemptCount,
-        totalCorrectCount,
-        totalIncorrectCount,
+        totalFirstAttemptCount,
+        totalLastAttemptCount,
         correctResponse,
         lastUpdateDate) {
 
-        var count;
-        var percent;
+    	var firstCount;
+        var lastCount;
+        var firstPercent;
+        var lastPercent;
         var answerClass;
         var actualResponse;
         var imaginedResponse;
         var checkboxChecked;
-        var countRow;
+        var firstCountRow;
+        var lastCountRow;
         var index;
         var maxColumns = 10;
         var choiceCounter = 1;
@@ -264,7 +295,10 @@ window.InlineAnalytics = (function() {
         // Add "Last Attempt" to the choice number column
         $('#' + partId + '_table .checkbox_header_row').after('<tr><td id="last_attempt" class="answer_box checkbox_last_attempt">Last Attempt</td></tr>');
 
-        // Contruct the choice number column array
+        // Add "First Attempt" to the choice number column
+        $('#' + partId + '_table .checkbox_header_row').after('<tr><td id="first_attempt" class="answer_box checkbox_first_attempt">First Attempt</td></tr>');
+        
+        // Construct the choice number column array
         while (choiceCounter <= choiceText.length) {
             tr = $('<tr><td id="column0:row' + choiceCounter + '" class="answer_box" title="' +
                 choiceText[choiceCounter - 1] + '">' + choiceCounter + '</td></tr>');
@@ -278,7 +312,7 @@ window.InlineAnalytics = (function() {
 
         // Loop through results constructing header row and data row arrays
         if (result) {
-            // Sort the results in decending response count order
+            // Sort the results in descending response count order
             result.sort(orderByCount);
 
             var arrayLength = result.length;
@@ -323,11 +357,15 @@ window.InlineAnalytics = (function() {
 
                     choiceCounter += 1;
                 }
-
+                // Construct the First Attempt row
+                firstCount = result[index]['first_count'];
+                firstPercent = Math.round(firstCount * 1000 / (totalFirstAttemptCount * 10));
+                firstCountRow += '<td class="checkbox_first_attempt">' + firstCount + '<br/>' + firstPercent + '%</td>'
+                
                 // Construct the Last Attempt row
-                count = result[index]['count'];
-                percent = Math.round(count * 1000 / (totalAttemptCount * 10));
-                countRow += '<td class="answer_box">' + count + '<br/>' + percent + '%</td>'
+                lastCount = result[index]['last_count'];
+                lastPercent = Math.round(lastCount * 1000 / (totalLastAttemptCount * 10));
+                lastCountRow += '<td class="checkbox_last_attempt">' + lastCount + '<br/>' + lastPercent + '%</td>'
             }
 
             // Append the header row array to the header row
@@ -349,13 +387,16 @@ window.InlineAnalytics = (function() {
             }
 
         }
+        //Append count row to the first attempt row
+        $('#' + partId + '_table #first_attempt').after(firstCountRow);
+        
         // Append count row to the last attempt row
-        $('#' + partId + '_table #last_attempt').after(countRow);
+        $('#' + partId + '_table #last_attempt').after(lastCountRow);
 
         // Set student count and last_update_date
         setCountAndDate(
             partId,
-            totalAttemptCount,
+            totalLastAttemptCount,
             lastUpdateDate);
     }
 
@@ -374,13 +415,13 @@ window.InlineAnalytics = (function() {
 
     function setCountAndDate(
         partId,
-        totalAttemptCount,
+        totalLastAttemptCount,
         lastUpdateDate) {
 
         // Set the Count and Date
         var part = document.getElementById(partId + '_analytics');
         part = $(part);
-        part.find('.num-students').text(totalAttemptCount);
+        part.find('.num-students').text(totalLastAttemptCount);
         part.find('.last-update').text(lastUpdateDate);
 
     }
@@ -388,26 +429,37 @@ window.InlineAnalytics = (function() {
 
     function setAggregateCounts(
         partId,
-        totalAttemptCount,
-        totalCorrectCount,
-        totalIncorrectCount) {
+        totalFirstAttemptCount,
+        totalFirstCorrectCount,
+        totalFirstIncorrectCount,
+        totalLastAttemptCount,
+        totalLastCorrectCount,
+        totalLastIncorrectCount) {
 
         // Set text information for questions that have no inline analytics
         // graphics (not radio or checkbox)
         var part = document.getElementById(partId + '_analytics');
         part = $(part);
-        var correctPercent = Math.round(totalCorrectCount * 1000 / (totalAttemptCount * 10));
-        var incorrectPercent = Math.round(totalIncorrectCount * 1000 / (totalAttemptCount * 10));
-        part.find('.num-students-extra').text(totalCorrectCount + ' (' + correctPercent + '%) correct and ' +
-            totalIncorrectCount + ' (' + incorrectPercent + '%) incorrect.');
+        
+        var correctFirstPercent = Math.round(totalFirstCorrectCount * 1000 / (totalFirstAttemptCount * 10));
+        var incorrectFirstPercent = Math.round(totalFirstIncorrectCount * 1000 / (totalFirstAttemptCount * 10));    
+        
+        var correctLastPercent = Math.round(totalLastCorrectCount * 1000 / (totalLastAttemptCount * 10));
+        var incorrectLastPercent = Math.round(totalLastIncorrectCount * 1000 / (totalLastAttemptCount * 10));
+        
+        part.find('.num-students-extra-first').text(totalFirstCorrectCount + ' (' + correctFirstPercent + '%) correct and ' +
+                totalFirstIncorrectCount + ' (' + incorrectFirstPercent + '%) incorrect (First Attempt).');
+        
+        part.find('.num-students-extra-last').text(totalLastCorrectCount + ' (' + correctLastPercent + '%) correct and ' +
+            totalLastIncorrectCount + ' (' + incorrectLastPercent + '%) incorrect (Last Attempt).');
     }
 
 
     function orderByCount(a, b) {
-        if (a['count'] > b['count']) {
+        if (a['last_count'] > b['last_count']) {
             return -1;
         }
-        if (a['count'] < b['count']) {
+        if (a['last_count'] < b['last_count']) {
             return 1;
         }
         return 0;
