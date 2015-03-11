@@ -19,11 +19,9 @@ import unicodecsv
 from pytz import UTC
 from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from student.tests.factories import CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
 from instructor_task.tasks_helper import (
     push_student_responses_to_s3,
@@ -330,13 +328,21 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
 
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(
+    TEST_DATA_DIR,
+    {'edX/unicode_graded/2012_Fall': 'xml', },
+    include_xml=True,
+    xml_course_dirs=['unicode_graded']
+)
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
     Tests that CSV student responses report generation works.
     """
     def test_unicode(self):
-        course_key = CourseKey.from_string('edX/unicode_graded/2012_Fall')
+        course_key = SlashSeparatedCourseKey('edX', 'unicode_graded', '2012_Fall')
         self.course = get_course_by_id(course_key)
         self.problem_location = Location("edX", "unicode_graded", "2012_Fall", "problem", "H1P1")
 

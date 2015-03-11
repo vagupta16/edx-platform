@@ -2,13 +2,13 @@
 Tests for instructor.basic
 """
 
-from courseware.courses import get_course
+from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from opaque_keys.edx.locations import Location
 
 import json
 from student.models import CourseEnrollment
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import patch
@@ -27,7 +27,7 @@ from instructor_analytics.basic import (
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
 import datetime
 from django.db.models import Q
@@ -361,12 +361,24 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             )
 
 
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(
+    TEST_DATA_DIR,
+    {
+        'edX/graded/2012_Fall': 'xml',
+        'edX/simple/2012_Fall': 'xml',
+    },
+    include_xml=True,
+    xml_course_dirs=['graded', 'simple']
+)
+
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
+class TestStudentResponsesAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic student responses analytics function. """
     def load_course(self, course_id):
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        self.course = get_course(course_key)
+        self.course = get_course_by_id(course_key)
 
     def create_student(self):
         self.student = UserFactory()

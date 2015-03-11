@@ -660,17 +660,8 @@ def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _
 
     rows = student_response_rows(course)
 
-    # Generate parts of the file name
-    timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
-    course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
-
     # Perform the actual upload
-    report_store = ReportStore.from_config()
-    report_store.store_rows(
-        course_id,
-        u"{}_responses_report_{}.csv".format(course_id_prefix, timestamp_str),
-        rows
-    )
+    upload_csv_to_report_store(rows, 'responses_report', course_id, start_time)
 
     return "succeeded" 
 
