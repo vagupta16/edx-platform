@@ -1009,6 +1009,37 @@ section.instructor-dashboard-content-2 {
       color: $black
     }
 
+    .emailWidget.invisibleSavedGroupName{
+      display:none;
+    }
+
+    .emailWidget.saveEditName, .emailWidget.cancelEditName{
+      display:inline-block;
+    }
+
+    .emailWidget.cancelEditName{
+      float:right;
+    }
+
+    .emailWidget.saveEditName{
+      float:left;
+    }
+
+
+
+    .emailWidget.editNameInput{
+      width:100%;
+    }
+
+    .emailWidget.editName, .emailWidget.saveEditName, .emailWidget.cancelEditName{
+      color: $black;
+      cursor: pointer;
+      text-align: right;
+      &:hover, &:focus {
+        color: $blue;
+      }
+    }
+
 
     .loadQuery {
       color: $black;
@@ -1066,13 +1097,19 @@ section.instructor-dashboard-content-2 {
       box-shadow: inset #bbb 0 1px 1px 0;
     }
 
+    .savequeryname{
+      float: right;
+      right: $baseline;
+      font-size: 15px;
+      margin-right: 5px;
+    }
+
     .savequery {
       @include idashbutton($red);
       float: right;
       right: $baseline;
       font-size: 15px;
     }
-
     .getcsv {
       @include idashbutton($blue);
       float: right;
