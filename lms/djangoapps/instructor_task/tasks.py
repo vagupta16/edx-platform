@@ -176,6 +176,7 @@ def get_ora2_responses(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_ora2_responses_to_s3, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
 
 
 @task(base=BaseInstructorTask)  # pylint: disable=E1102
