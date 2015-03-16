@@ -66,6 +66,7 @@ def instructor_dashboard_2(request, course_id):
     sections = [
         _section_course_info(course, access),
         _section_membership(course, access),
+        _section_queries(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
         _section_analytics(course, access),
@@ -235,6 +236,26 @@ def _section_course_info(course, access):
     except Exception:  # pylint: disable=broad-except
         section_data['course_errors'] = [('Error fetching errors', '')]
 
+    return section_data
+
+def _section_queries(course, access):
+    """ Provide data for the corresponding dashboard section """
+    course_key = course.id
+    section_data = {
+        'section_key': 'queries',
+        'section_display_name': _('Queries'),
+        'access': access,
+        'list_course_sections': reverse('list_course_sections', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'list_course_problems': reverse('list_course_problems', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_all_students': reverse('get_all_students', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_single_query': reverse('get_single_query', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'save_query': reverse('save_query', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_saved_queries': reverse('get_saved_queries', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_temp_queries': reverse('get_temp_queries', kwargs={'course_id': course_key.to_deprecated_string()}),
+        "delete_saved_query": reverse("delete_saved_query", kwargs={'course_id': course_key.to_deprecated_string()}),
+        "delete_temp_query": reverse("delete_temp_query", kwargs={'course_id': course_key.to_deprecated_string()}),
+        "delete_temp_query_batch": reverse("delete_temp_query_batch", kwargs={'course_id': course_key.to_deprecated_string()}),
+    }
     return section_data
 
 
