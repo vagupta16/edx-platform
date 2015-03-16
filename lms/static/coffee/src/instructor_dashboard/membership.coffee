@@ -1077,10 +1077,11 @@ class EmailWidget
 
   # we don't care if these calls succeed or not so no wrapped callback
   delete_temp_query: (queryId) ->
-    send_url = @$deleteTempEndpoint + '/' + queryId
     $.ajax(
       dataType: 'json'
-      url: send_url
+      url: @$deleteTempEndpoint
+      type: 'POST'
+      data: "query_id": queryId
     )
 
   delete_temp_query_batch: (queryIds) ->
@@ -1088,16 +1089,18 @@ class EmailWidget
     sendData =
       existing: queryIds.join(',')
     $.ajax(
+      type: 'POST'
       dataType: 'json'
       url: sendUrl
       data: sendData
     )
 
   delete_saved_query: (queryId) ->
-    sendUrl = @$deleteSavedEndpoint + '/' + queryId
     $.ajax(
+      type: 'POST'
       dataType: 'json'
-      url: sendUrl
+      url: @$deleteSavedEndpoint
+      data: "query_id" : queryId
     )
 
   # adds a row to active queries
@@ -1188,6 +1191,7 @@ class EmailWidget
       existing: cur_queries.join(',')
     $.ajax
       dataType: 'json'
+      type: 'POST'
       url: @$saveQueryBtn.data('endpoint')
       data: send_data
       success: (data) -> cb? null, data
