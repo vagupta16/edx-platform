@@ -97,6 +97,22 @@ class Command(BaseCommand):
             help='The course code (e.g., 40490) that accreditors expect.',
         ),
         make_option(
+            '-s',
+            '--start',
+            metavar='START_DATE',
+            dest='start_date',
+            default=False,
+            help='The date to start collecting enrollment/completion events.',
+        ),
+        make_option(
+            '-e',
+            '--end',
+            metavar='END_DATE',
+            dest='end_date',
+            default=False,
+            help='The date to stop collecting enrollment/completion events.',
+        ),
+        make_option(
             '-o',
             '--outfile',
             metavar='OUTFILE',
@@ -109,6 +125,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         course_id = options['course']
         course_code = options['code']
+        start_date = datetime.strptime(options['start_date'], '%m/%d/%Y').replace(tzinfo=UTC)
+        end_date = datetime.strptime(options['end_date'], '%m/%d/%Y').replace(tzinfo=UTC)
         outfile_name = options['outfile']
         verbose = int(options['verbosity']) > 1
 
@@ -185,6 +203,15 @@ class Command(BaseCommand):
 
             student_dict['System ID'] = course_code
 
+            try:
+                if (self.lies_between(student_dict['Date Registered'], start_date, end_date) or
+                    self.lies_between(student_dict['Credit Date'], start_date, end_date)):
+                    pass
+                else:
+                    continue
+            except KeyError:
+                continue
+
             for item in student_dict:
                 student_dict[item] = self.preprocess(student_dict[item])
 
@@ -227,6 +254,12 @@ class Command(BaseCommand):
                     values[label] = getattr(raw_data, field, '')
 
         return raw_data
+
+    def lies_between(self, query_date, start, end):
+        if type(query_date) is datetime:
+            return start <= query_date and query_date <= end
+        else:
+            return False
 
     def preprocess(self, value):
         if type(value) is datetime:
