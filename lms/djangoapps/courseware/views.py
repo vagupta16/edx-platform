@@ -1237,13 +1237,13 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
             'totalLastIncorrectCount': 0,
         })
         count_dict['totalFirstAttemptCount'] = count_dict.get('totalFirstAttemptCount') + item['first_response_count']
-        count_dict['totalLastAttemptCount'] = count_dict.get('totalLastAttemptCount') + item['final_response_count']
+        count_dict['totalLastAttemptCount'] = count_dict.get('totalLastAttemptCount') + item['last_response_count']
         if item['correct']:
             count_dict['totalFirstCorrectCount'] = count_dict.get('totalFirstCorrectCount') + item['first_response_count']
-            count_dict['totalLastCorrectCount'] = count_dict.get('totalLastCorrectCount') + item['final_response_count']
+            count_dict['totalLastCorrectCount'] = count_dict.get('totalLastCorrectCount') + item['last_response_count']
         else:
             count_dict['totalFirstIncorrectCount'] = count_dict.get('totalFirstIncorrectCount') + item['first_response_count']
-            count_dict['totalLastIncorrectCount'] = count_dict.get('totalLastIncorrectCount') + item['final_response_count']
+            count_dict['totalLastIncorrectCount'] = count_dict.get('totalLastIncorrectCount') + item['last_response_count']
 
         count_by_part[part_id] = count_dict
 
@@ -1252,7 +1252,7 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
         part_dict['value_id'] = item['value_id']
         part_dict['correct'] = item['correct']
         part_dict['first_count'] = item['first_response_count']
-        part_dict['last_count'] = item['final_response_count']
+        part_dict['last_count'] = item['last_response_count']
 
         data_by_part[part_id] = data_by_part.get(part_id, []) + [part_dict]
 
