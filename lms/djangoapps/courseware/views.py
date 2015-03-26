@@ -1155,21 +1155,29 @@ def get_analytics_answer_dist(request):
     num_options_by_part = all_data['num_options_by_part']
     course_key = SlashSeparatedCourseKey.from_string(all_data['course_id'])
 
+    # Construct an error message with link
     zendesk_base_url = getattr(settings, 'ZENDESK_URL')
-    zendesk_url_str = "<a href=\"" + zendesk_base_url + "/hc/en-us/requests/new\">here</a>"
+    link_start = "<a href=\"" + zendesk_base_url + "/hc/en-us/requests/new\">"
+    link_text = _('here')
+    link_end = "</a>"
+    error_message_with_link = _("A problem has occurred retrieving the data, to report the problem click {link_start}{link_text}{link_end}").format(
+        link_start=link_start,
+        link_text=link_text,
+        link_end=link_end,
+    )
 
     # Check user is enrolled as a staff member of this course
     try:
         course = get_course_with_access(request.user, 'staff', course_key, depth=None)
     except Http404:
-        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url=zendesk_url_str))
+        return HttpResponseServerError(error_message_with_link)
 
     having_access = has_access(request.user, 'staff', course)
     url = getattr(settings, 'ANALYTICS_DATA_URL')
     auth_token = getattr(settings, 'ANALYTICS_DATA_TOKEN')
 
     if not having_access or not url:
-        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url=zendesk_url_str))
+        return HttpResponseServerError(error_message_with_link)
 
     client = Client(base_url=url, auth_token=auth_token)
     module = client.modules(course.id, module_id)
@@ -1179,9 +1187,9 @@ def get_analytics_answer_dist(request):
     except NotFoundError:
         return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
     except InvalidRequestError:
-        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url=zendesk_url_str))
+        return HttpResponseServerError(error_message_with_link)
     except TimeoutError:
-        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url=zendesk_url_str))
+        return HttpResponseServerError(error_message_with_link)
 
     return process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
 

@@ -36,16 +36,16 @@ window.InlineAnalytics = (function() {
             }
 
             if (countByPart[partId]) {
-            	totalFirstAttemptCount = countByPart[partId]['totalFirstAttemptCount'];
-            	totalFirstCorrectCount = countByPart[partId]['totalFirstCorrectCount'];
-            	totalFirstIncorrectCount = countByPart[partId]['totalFirstIncorrectCount'];
+                totalFirstAttemptCount = countByPart[partId]['totalFirstAttemptCount'];
+                totalFirstCorrectCount = countByPart[partId]['totalFirstCorrectCount'];
+                totalFirstIncorrectCount = countByPart[partId]['totalFirstIncorrectCount'];
                 totalLastAttemptCount = countByPart[partId]['totalLastAttemptCount'];
                 totalLastCorrectCount = countByPart[partId]['totalLastCorrectCount'];
                 totalLastIncorrectCount = countByPart[partId]['totalLastIncorrectCount'];
             } else {
-            	totalFirstAttemptCount = 0;
-            	totalFirstCorrectCount = 0;
-            	totalFirstIncorrectCount = 0;
+                totalFirstAttemptCount = 0;
+                totalFirstCorrectCount = 0;
+                totalFirstIncorrectCount = 0;
                 totalLastAttemptCount = 0;
                 totalLastCorrectCount = 0;
                 totalLastIncorrectCount = 0;
@@ -271,7 +271,7 @@ window.InlineAnalytics = (function() {
         correctResponse,
         lastUpdateDate) {
 
-    	var firstCount;
+        var firstCount;
         var lastCount;
         var firstPercent;
         var lastPercent;

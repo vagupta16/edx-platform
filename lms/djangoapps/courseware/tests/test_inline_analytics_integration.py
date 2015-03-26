@@ -35,8 +35,8 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         json_analytics_data = json.dumps(analytics_data)
         self.data = {"data": json_analytics_data}
 
-    @override_settings(ANALYTICS_DATA_URL='dummy_url')
-    @override_settings(ZENDESK_URL='https://stanfordonline.zendesk.com')
+    @override_settings(ANALYTICS_DATA_URL='dummy_url',
+                       ZENDESK_URL='https://stanfordonline.zendesk.com')
     def test_regular_user(self):
 
         request = self.factory.post('', self.data)
@@ -54,16 +54,13 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         response = get_analytics_answer_dist(request)
         self.assertEquals(response.content, 'A problem has occurred retrieving the data, to report the problem click <a href="https://stanfordonline.zendesk.com/hc/en-us/requests/new">here</a>')
 
-    @override_settings(ANALYTICS_DATA_URL='dummy_url')
-    @override_settings(ZENDESK_URL='https://stanfordonline.zendesk.com')
+    @override_settings(ANALYTICS_DATA_URL='dummy_url',
+                       ZENDESK_URL='https://stanfordonline.zendesk.com')
     @patch('courseware.views.process_analytics_answer_dist')
     @patch('courseware.views.Client')
     def test_staff_and_url(self, mock_client, mock_process_analytics):
 
-        mock_client.return_value.modules.return_value.answer_distribution.return_value = [
-            {
-            },
-        ]
+        mock_client.return_value.modules.return_value.answer_distribution.return_value = [{}]
 
         factory = self.factory
         request = factory.post('', self.data)
@@ -73,16 +70,13 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
         response = get_analytics_answer_dist(request)
         self.assertEquals(response, [{'dummy': 'dummy'}])
 
-    @override_settings(ANALYTICS_DATA_URL='dummy_url')
-    @override_settings(ZENDESK_URL='https://stanfordonline.zendesk.com')
+    @override_settings(ANALYTICS_DATA_URL='dummy_url',
+                       ZENDESK_URL='https://stanfordonline.zendesk.com')
     @patch('courseware.views.process_analytics_answer_dist')
     @patch('courseware.views.Client')
     def test_instructor_and_url(self, mock_client, mock_process_analytics):
 
-        mock_client.return_value.modules.return_value.answer_distribution.return_value = [
-            {
-            },
-        ]
+        mock_client.return_value.modules.return_value.answer_distribution.return_value = [{}]
 
         factory = self.factory
         request = factory.post('', self.data)
@@ -101,7 +95,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
                 "correct": False,
                 "first_response_count": 7,
-                "final_response_count": 2,
+                "last_response_count": 2,
                 "value_id": "choice_0",
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
@@ -114,7 +108,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
                 "correct": True,
                 "first_response_count": 23,
-                "final_response_count": 25,
+                "last_response_count": 25,
                 "value_id": "choice_1",
                 "answer_value_text": "Option 2",
                 "answer_value_numeric": "null",
@@ -175,7 +169,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
                 "correct": False,
                 "first_response_count": 1,
-                "final_response_count": 7,
+                "last_response_count": 7,
                 "value_id": "choice_0",
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
@@ -243,7 +237,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
                 "correct": True,
                 "first_response_count": 18,
-                "final_response_count": 23,
+                "last_response_count": 23,
                 "value_id": "choice_1",
                 "answer_value_text": "Option 2",
                 "answer_value_numeric": "null",

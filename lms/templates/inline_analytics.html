@@ -25,9 +25,9 @@ ${block_content}
         <section aria-hidden="true" >
           <div class="grid-wrapper radio">
             <p>
-              ${_('{title}').format(title=u'Answer distribution of the <strong class="num-students"></strong> students who answered this question.')}
+              ${_('Answer distribution of the {num_students} students who answered this question.').format(num_students='<strong class="num-students"></strong>')}
             </p>
-            <p>${_('Last updated: ')}<strong class="last-update"></strong></p>
+            <p>${_('Last updated:')} <strong class="last-update"></strong></p>
             <div class="grid-block table">
               <table cellspacing="2px" id="${part_id}_table" class="analytics-table">
                 <tr>
@@ -46,9 +46,9 @@ ${block_content}
         <section aria-hidden="true" >
           <div class="grid-wrapper checkbox">
             <p>
-              ${_('{title}').format(title=u'Answer distribution of the <strong class="num-students"></strong> students who answered this question.')}
+              ${_('Answer distribution of the {num_students} students who answered this question.').format(num_students='<strong class="num-students"></strong>')}
             </p>
-            <p>${_('Last updated: ')}<strong class="last-update"></strong></p>
+            <p>${_('Last updated:')} <strong class="last-update"></strong></p>
             <div class="grid-block table">
               <table cellspacing="2px" id="${part_id}_table" class="analytics-table">
                 <tr class="checkbox_header_row">
@@ -64,11 +64,11 @@ ${block_content}
         <section aria-hidden="true" >
           <div class="grid-wrapper">
             <p>
-              <strong class="num-students"></strong>${_(' students answered this question:')}<br/>
-              <strong class="num-students-extra-first"></strong> <br/>
+              <strong class="num-students"></strong> ${_('students answered this question:')}<br/>
+              <strong class="num-students-extra-first"></strong><br/>
               <strong class="num-students-extra-last"></strong>
             </p>
-            <p>${_('Last updated: ')}<strong class="last-update"></strong></p>
+            <p>${_('Last updated:')} <strong class="last-update"></strong></p>
           </div>
         </section>
       </div>
