@@ -69,6 +69,9 @@ def save_query(course_id, saved_name, queries):
     """
     Makes a new grouped query by saving the individual subqueries and then associating them to a grouped query
     """
+    if saved_name is None:
+        saved_name = ''
+
     temp_queries = TemporaryQuery.objects.filter(id__in=queries)
     group = GroupedQuery(course_id=course_id, title=saved_name)
     group.save()

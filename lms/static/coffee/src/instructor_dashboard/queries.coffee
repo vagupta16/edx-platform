@@ -355,7 +355,7 @@ class EmailWidget
         dataType: 'json'
         url: $('.emailWidget.savedQueriesTable').data('group-name-endpoint')
         data: send_data
-        success: (data) -> cb? null, data
+        success: $('.emailWidget.savedQueriesTable').data('group-name-endpoint')
         error: std_ajax_err ->
           cb? gettext('Error saving group name')
       newText = newGroupName
@@ -436,6 +436,7 @@ class EmailWidget
       curRow.remove()
       queryToDelete = curRow.getAttribute('groupquery')
       @delete_saved_query(queryToDelete)
+      $('#send_email option[value="' + queryToDelete + '"]').remove()
     $td = $('<td>')
     $td.append($deleteBtn)
     row.appendChild($td[0])
@@ -482,10 +483,11 @@ class EmailWidget
 
   # we don't care if these calls succeed or not so no wrapped callback
   delete_temp_query: (queryId) ->
-    send_url = @$deleteTempEndpoint + '/' + queryId
     $.ajax(
+      type: 'POST'
       dataType: 'json'
-      url: send_url
+      url:  @$deleteTempEndpoint
+      data: "query_id": queryId
     )
 
   delete_temp_query_batch: (queryIds) ->
@@ -493,16 +495,18 @@ class EmailWidget
     sendData =
       existing: queryIds.join(',')
     $.ajax(
+      type: 'POST'
       dataType: 'json'
       url: sendUrl
       data: sendData
     )
 
   delete_saved_query: (queryId) ->
-    sendUrl = @$deleteSavedEndpoint + '/' + queryId
     $.ajax(
+      type: 'POST'
       dataType: 'json'
-      url: sendUrl
+      url: @$deleteSavedEndpoint
+      data: "query_id": queryId
     )
 
   # adds a row to active queries
@@ -593,19 +597,21 @@ class EmailWidget
       existing: cur_queries.join(',')
       savedName: $(".emailWidget.savequeryname").val()
     $(".emailWidget.savequeryname").val("")
-    $.ajax
+    $.ajax(
+      type: 'POST'
       dataType: 'json'
       url: @$saveQueryBtn.data('endpoint')
       data: send_data
       success: (data) -> cb? null, data
       error: std_ajax_err ->
         cb? gettext('Error saving query')
-
+    )
   # save queries in active queries
   send_save_query: ->
-    @save_query (error, students) =>
+    @save_query (error, data) =>
       if error
         return @show_errors error
+      $('#send_email select').append('<option value="' + data['group_id'] + '">' + data['group_title'] + '</option>')
       @load_saved_queries()
 
   get_estimated: (cb)->
