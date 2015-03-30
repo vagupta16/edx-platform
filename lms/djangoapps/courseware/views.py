@@ -58,6 +58,7 @@ from opaque_keys import InvalidKeyError
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor.enrollment import uses_shib
+from instructor.utils import collect_student_forums_data
 from util.date_utils import get_time_display
 
 from util.db import commit_on_success_with_read_committed
@@ -72,6 +73,7 @@ template_imports = {'urllib': urllib}
 
 CONTENT_DEPTH = 2
 
+NO_STUDENT_DATA = -1
 
 def user_groups(user):
     """
@@ -1335,3 +1337,130 @@ def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num
         return True
 
     return False
+
+
+def get_analytics_student_data(request):
+    """
+    Calls the the analytics student. Proxies to analytics data api to retrieve per-student
+    engagement data.
+
+    Arguments:
+        request (django request object):  the HTTP request object that triggered this view function
+
+    Returns:
+        (django response object):  JSON response.  404 if api url is not found, 500 if server error, otherwise 200 with JSON body.
+    """
+
+    all_data = json.loads(request.POST['data'])
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(all_data['course_id'])
+
+    # Check user is enrolled as a staff member of this course
+    try:
+        course = get_course_with_access(request.user, 'staff', course_key, depth=None)
+    except Http404:
+        return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
+
+    having_access = has_access(request.user, 'staff', course)
+
+    # Contruct API call
+    url = getattr(settings, 'ANALYTICS_ON_CAMPUS_DATA_URL')
+    if url:
+        url = url.format(course_id=course_id)
+
+    if not having_access or not url:
+        return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
+
+    api_secret = getattr(settings, 'ANALYTICS_DATA_TOKEN_URL')
+    token = 'Token %s' % api_secret
+
+    analytics_req = urllib2.Request(url)
+    analytics_req.add_header('Authorization', token)
+
+    try:
+        response = urllib2.urlopen(analytics_req)
+        data = json.loads(response.read())
+
+    except urllib2.HTTPError, error:
+        log.warning('Analytics API error: ' + str(error))
+        if error.code == 404:
+            return HttpResponseNotFound(_('There is no student data for this course; please try again later'))
+        else:
+            return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url="<a href=\"https://stanfordonline.zendesk.com/hc/en-us/requests/new\">here</a>"))
+
+    except urllib2.URLError, error:
+        log.warning('Analytics API error: ' + str(error))
+        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url="<a href=\"https://stanfordonline.zendesk.com/hc/en-us/requests/new\">here</a>"))
+
+    return process_analytics_student_data(course_key, data)
+
+
+def process_analytics_student_data(course_id, data):
+    """
+    Augments student data from analytics api with forum usage and grade distribution data.
+
+    Arguments:
+        data: response from the analytics student data api
+
+    Returns:
+        A json payload of:
+          - student_data: array of nested objects, each object with attributes
+            - username: string
+            - num_videos_watched: integer
+            - total_video_watch_time: integer
+            - num_forum_points: integer
+            - num_forum_created: integer
+            - num_attempts: integer, total attempts for given user
+            - num_unique_problems_tried: integer
+            - cumulative_grade: number
+          - last updated: string, when analytics data was last processed
+    """
+    student_data = []
+    last_updated = 0
+
+    # Aggregated forum data from students
+    student_forum_usage_data = _get_forum_usage_data_for_course(course_id)
+
+    for row in data:
+        if _student_data_validates(row):
+            # front-end expects fields to be filled out
+            row.update({
+                'num_forum_points': NO_STUDENT_DATA,
+                'num_forum_created': NO_STUDENT_DATA,
+                'num_attempts': NO_STUDENT_DATA,
+                'num_unique_problems_tried': NO_STUDENT_DATA,
+                'cumulative_grade': NO_STUDENT_DATA,
+            })
+
+            username = row['username']
+            if username in student_forum_usage_data:
+                usage_data = student_forum_usage_data[username]
+                row.update({
+                    'num_forum_created': usage_data[0],
+                    'num_forum_points': usage_data[1],
+                })
+            student_data.append(row)
+
+    response_payload = {
+       'student_data': student_data,
+       'last_updated': last_updated
+    }
+    return JsonResponse(response_payload)
+
+def _get_forum_data_for_course(course_id):
+    """
+    Retrieves forum usage data for a given course. Reformats results
+    obtained from raw mongo query for easy lookup.
+
+    Arguments:
+        course_id: string representing course id to look up
+
+    Returns:
+        a dictionary representing results of query.
+        Keys are usernames (strings).
+        Values are tuples with format (posts_read, posts_created)
+    """
+    results = collect_student_forums_data(course_id)
+    usernames = map(itemgetter(0), results)
+    usage = map(itemgetter(1, 2), results)
+    formatted_results = dict(zip(usernames, usage))
+    return formatted_results

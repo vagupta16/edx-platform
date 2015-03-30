@@ -386,6 +386,9 @@ if settings.COURSEWARE_ENABLED:
         # Analytics api endpoints for in-line analytics
         url(r'^get_analytics_answer_dist/',
             'courseware.views.get_analytics_answer_dist', name='get_analytics_answer_dist'),
+        # Analytics api endpoints for student data
+        url(r'^get_analytics_student_data/',
+            'courseware.views.get_analytics_student_data', name='get_analytics_student_data'),
 
         # Student account and profile
         url(r'^account/', include('student_account.urls')),
