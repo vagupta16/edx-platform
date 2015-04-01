@@ -20,7 +20,7 @@
     <div class="grade-distributions-widget">
       <div class="header">
 	<h2 class="title"> ${_("Score Distribution")} </h2>
-	<p>${_("The chart below displays the score distribution for each standard problem in your class, specified by the problem's url name.")}
+	<p>${_("Tahe chart below displays the score distribution for each standard problem in your class, specified by the problem's url name.")}
 	  ${_("Scores are shown without weighting applied, so if your problem contains 2 questions, it will display as having a total of 2 points.")}</p>
 	<br />
 	${_("Problem")}: <select class="problem-selector">
@@ -44,13 +44,40 @@
   <hr>
 %endif
 
-%if settings.FEATURES['DISPLAY_ANALYTICS_DEMOGRAPHICS']:
-    <div class="profile-distribution-widget-container"
-      data-title="${_("Year of Birth")}"
-      data-feature="year_of_birth"
-      data-endpoint="${ section_data['get_student_data_url'] }"
-    ></div>
 
+%if settings.FEATURES['ENABLE_STUDENT_DATA_ANALYTICS']:
+  <script type="text/template" id="student-analytics-data-widget-template">
+    <div class="student-analytics-data-widget">
+      <div class="header">
+        <h2 class="title"> ${_("Student Activity Data")} </h2>
+        <p>
+          ${_("The table below summarizes your student's activities.")}
+        </p>
+        <br />
+        ${_("Timeframe")}:
+        <select class="problem-selector">
+          <option value="wk">${_("Week")}</option>
+          <option value="mo">${_("Month")}</option>
+          <option value="qt">${_("Quarter")}</option>
+        </select>
+        <div class="last-updated"></div>
+      </div>
+      <div class="view">
+        <div class="display-errors"></div>
+        <div class="display-text"></div>
+        <div class="display-table"></div>
+      </div>
+    </div>
+  </script>
+
+  <div class="student-analytics-data-widget-container"
+       data-endpoint="${ section_data['get_analytics_student_data_url'] }">
+  </div>
+  <hr>
+%endif
+
+
+%if settings.FEATURES['DISPLAY_ANALYTICS_DEMOGRAPHICS']:
     <div class="profile-distribution-widget-container"
       data-title="${_("Year of Birth")}"
       data-feature="year_of_birth"

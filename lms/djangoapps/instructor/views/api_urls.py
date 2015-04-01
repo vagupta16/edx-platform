@@ -66,6 +66,8 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_anon_ids', name="get_anon_ids"),
     url(r'^get_distribution$',
         'instructor.views.api.get_distribution', name="get_distribution"),
+    url(r'^get_analytics_student_data$',
+        'instructor.views.api.get_analytics_student_data', name="get_analytics_student_data"),
     url(r'^get_student_progress_url$',
         'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
     url(r'^reset_student_attempts$',

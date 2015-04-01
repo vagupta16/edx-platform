@@ -404,7 +404,7 @@ def _section_analytics(course, access):
         'access': access,
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_key.to_deprecated_string()}),
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_student_data_url': reverse('get_analytics_student_data', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_analytics_student_data_url': reverse('get_analytics_student_data', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
 
     if settings.ANALYTICS_DASHBOARD_URL:

@@ -37,6 +37,12 @@ FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't r
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
 
+ANALYTICS_DATA_TOKEN = "lt839GJYvE7lWrek29b"
+
+# On campus student analytics
+ANALYTICS_ON_CAMPUS_DATA_URL = os.path.join(ANALYTICS_SERVER_URL,
+        'courses', '{course_id}', 'on_campus_student_data')
+
 # Set this to the dashboard URL in order to display the link from the
 # dashboard to the Analytics Dashboard.
 ANALYTICS_DASHBOARD_URL = None

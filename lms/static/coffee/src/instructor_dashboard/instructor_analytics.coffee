@@ -9,6 +9,13 @@ such that the value can be defined later than this assignment (file load order).
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 
+autogenerate_slickgrid_cols = (row) ->
+  # Given an object representing a json row of data,
+  # infers columns as keys
+  return _(row).chain()
+      .keys()
+      .map((attr) -> {id: attr, name: attr.toUpperCase(), field: attr})
+      .value()
 
 class ProfileDistributionWidget
   constructor: ({@$container, @feature, @title, @endpoint}) ->
@@ -86,6 +93,70 @@ class ProfileDistributionWidget
       dataType: 'json'
       url: @endpoint
       data: feature: feature
+
+    if typeof handler is 'function'
+      _.extend settings, success: handler
+    else
+      _.extend settings, handler
+
+    $.ajax settings
+
+
+class StudentAnalyticsDataWidget
+  constructor: ({@$container, @feature, @title, @endpoint}) ->
+    # render template
+    template_params =
+      title: @title
+      feature: @feature
+      endpoint: @endpoint
+    template_html = $("#student-analytics-data-widget-template").text()
+    @$container.html Mustache.render template_html, template_params
+
+  reset_display: ->
+      @$container.find('.display-errors').empty()
+      @$container.find('.display-text').empty()
+      @$container.find('.display-graph').empty()
+      @$container.find('.display-table').empty()
+
+  show_error: (msg) ->
+    @$container.find('.display-errors').text msg
+
+  # display data
+  load: ->
+    @reset_display()
+    @get_student_analytics_data {error: @error_handler, success: @success_handler}
+
+  error_handler: (std_ajax_err) =>
+      @show_error gettext("Error fetching student data.")
+
+  success_handler: (response) =>
+    @render_last_updated response.timestamp
+    @render_table response.student_data
+
+  render_last_updated: (timestamp) =>
+        time_updated = gettext("Last Updated: <%= timestamp %>")
+        full_time_updated = _.template(time_updated, {timestamp: timestamp})
+        @$container.find('.last-updated').text full_time_updated
+
+  render_table: (data) =>
+    options =
+      enableCellNavigation: true
+      enableColumnReorder: false
+      forceFitColumns: true
+    columns = autogenerate_slickgrid_cols(_.first(data))
+
+    # display on SlickGrid
+    table_placeholder = $ '<div/>', class: 'slickgrid'
+    @$container.find('.display-table').append table_placeholder
+    grid = new Slick.Grid(table_placeholder, data, columns, options)
+
+  # fetch distribution data from server.
+  # `handler` can be either a callback for success
+  # or a mapping e.g. {success: ->, error: ->, complete: ->}
+  get_student_analytics_data: (handler) ->
+    settings =
+      dataType: 'json'
+      url: @endpoint
 
     if typeof handler is 'function'
       _.extend settings, success: handler
@@ -209,6 +280,7 @@ class InstructorAnalytics
 
     @$pd_containers = @$section.find '.profile-distribution-widget-container'
     @$gd_containers = @$section.find '.grade-distributions-widget-container'
+    @$sd_container = _.first (@$section.find '.student-analytics-data-widget-container')
 
     @pdws = _.map (@$pd_containers), (container) =>
       new ProfileDistributionWidget
@@ -222,12 +294,18 @@ class InstructorAnalytics
         $container: $(container)
         endpoint:   $(container).data 'endpoint'
 
+    @sdw = new StudentAnalyticsDataWidget
+      $container: $(@$sd_container)
+      endpoint:   $(@$sd_container).data 'endpoint'
+
   refresh: ->
     for pdw in @pdws
       pdw.load()
 
     for gdw in @gdws
       gdw.load()
+
+    @sdw.load()
 
   onClickTitle: ->
     @refresh()

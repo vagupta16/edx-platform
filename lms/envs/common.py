@@ -310,6 +310,9 @@ FEATURES = {
 
     # Enable display of enrollment counts in instructor and legacy analytics dashboard
     'DISPLAY_ANALYTICS_ENROLLMENTS': True,
+
+    # Enable display of student data reporting
+    'ENABLE_STUDENT_DATA_ANALYTICS': True,
 }
 
 # Ignore static asset files on import which match this pattern
