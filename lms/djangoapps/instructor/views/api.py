@@ -13,6 +13,7 @@ import re
 import time
 import requests
 import urllib2
+from operator import itemgetter
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
@@ -23,7 +24,8 @@ from django.db import IntegrityError
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, \
+    HttpResponseServerError, Http404
 from django.utils.html import strip_tags
 import string  # pylint: disable=W0402
 import random
@@ -32,6 +34,7 @@ import urllib2
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 import gzip
+from instructor.utils import collect_student_forums_data
 
 from microsite_configuration import microsite
 
@@ -98,6 +101,9 @@ from instructor.views.data_access_constants import INCLUDE_PROBLEM_PATTERN, ALL_
 from instructor.tasks import make_single_query
 
 log = logging.getLogger(__name__)
+
+
+NO_STUDENT_DATA = -1
 
 
 def common_exceptions_400(func):
@@ -2583,7 +2589,7 @@ def process_analytics_student_data(course_id, data):
     student_forum_usage_data = _get_forum_usage_data_for_course(course_id)
 
     for row in data:
-        if _student_data_validates(row):
+        if len(row) > 0:
             # front-end expects fields to be filled out
             row.update({
                 'num_forum_points': NO_STUDENT_DATA,
@@ -2608,7 +2614,7 @@ def process_analytics_student_data(course_id, data):
     }
     return JsonResponse(response_payload)
 
-def _get_forum_data_for_course(course_id):
+def _get_forum_usage_data_for_course(course_id):
     """
     Retrieves forum usage data for a given course. Reformats results
     obtained from raw mongo query for easy lookup.
@@ -2621,7 +2627,7 @@ def _get_forum_data_for_course(course_id):
         Keys are usernames (strings).
         Values are tuples with format (posts_read, posts_created)
     """
-    results = collect_student_forums_data(course_id)
+    _header, results = collect_student_forums_data(course_id)
     usernames = map(itemgetter(0), results)
     usage = map(itemgetter(1, 2), results)
     formatted_results = dict(zip(usernames, usage))

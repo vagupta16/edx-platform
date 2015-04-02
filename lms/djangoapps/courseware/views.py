@@ -73,8 +73,6 @@ template_imports = {'urllib': urllib}
 
 CONTENT_DEPTH = 2
 
-NO_STUDENT_DATA = -1
-
 def user_groups(user):
     """
     TODO (vshnayder): This is not used. When we have a new plan for groups, adjust appropriately.

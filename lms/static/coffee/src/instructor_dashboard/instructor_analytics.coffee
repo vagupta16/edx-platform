@@ -124,7 +124,9 @@ class StudentAnalyticsDataWidget
   # display data
   load: ->
     @reset_display()
-    @get_student_analytics_data {error: @error_handler, success: @success_handler}
+    @get_student_analytics_data
+      error: @error_handler
+      success: @success_handler
 
   error_handler: (std_ajax_err) =>
       @show_error gettext("Error fetching student data.")
@@ -134,9 +136,9 @@ class StudentAnalyticsDataWidget
     @render_table response.student_data
 
   render_last_updated: (timestamp) =>
-        time_updated = gettext("Last Updated: <%= timestamp %>")
-        full_time_updated = _.template(time_updated, {timestamp: timestamp})
-        @$container.find('.last-updated').text full_time_updated
+    time_updated = gettext("Last Updated: <%= timestamp %>")
+    full_time_updated = _.template(time_updated, {timestamp: timestamp})
+    @$container.find('.last-updated').text full_time_updated
 
   render_table: (data) =>
     options =
@@ -147,6 +149,7 @@ class StudentAnalyticsDataWidget
 
     # display on SlickGrid
     table_placeholder = $ '<div/>', class: 'slickgrid'
+    $(table_placeholder).css 'height', '500px'
     @$container.find('.display-table').append table_placeholder
     grid = new Slick.Grid(table_placeholder, data, columns, options)
 
