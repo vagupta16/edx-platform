@@ -10,9 +10,11 @@ from collections import namedtuple
 from django.conf import settings
 
 from xmodule.capa_module import CapaModule
+from xmodule.video_module import VideoModule
 
 ValidResponse = namedtuple('ValidResponse', 'correct_response response_type choice_name_list')  # pylint: disable=invalid-name
 AnalyticsContextResponse = namedtuple('AnalyticsContextResponse', 'id correct_response response_type message choice_name_list')  # pylint: disable=invalid-name
+VideoContextResponse = namedtuple('VideoContextResponse', 'id') # pylint: disable=invalid-name
 
 
 def get_responses_data(block):
@@ -32,10 +34,18 @@ def get_responses_data(block):
     Problems with randomize are not currently supported for in-line analytics.
     If settings.ANALYTICS_ANSWER_DIST_URL is unset then returns None
     """
+#    import pudb; pudb.set_trace()
     responses_data = []
     valid_group_nodes = []
     valid_types = getattr(settings, 'INLINE_ANALYTICS_SUPPORTED_TYPES', {})
 
+    # Check if Video module
+    if isinstance(block, VideoModule) and 'VideoModule' in valid_types:
+        module_id = block.location.to_deprecated_string()
+        responses_data.append(VideoContextResponse(module_id))
+        return responses_data
+
+    # Check if Capa problem
     if not isinstance(block, CapaModule) or not valid_types:
         return responses_data
 

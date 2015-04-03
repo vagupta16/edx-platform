@@ -1,0 +1,12 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+${block_content}
+
+<div aria-hidden="true" class="wrap-instructor-info">
+  <a class="instructor-info-action instructor-analytics-action" id="${element_id}_analytics_button" data-location="${location}" data-answer-dist-url="${answer_dist_url}" data-course-id="${course_id}">${_("Staff Analytics Info")}</a>
+</div>
+
+<div aria-hidden="true" class="inline-analytics-video_block"></div>
+
+<script>$(document).ready(function () {window.InlineVideoAnalytics.runDocReady("${element_id}");});</script>

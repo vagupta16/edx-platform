@@ -21,7 +21,7 @@ from xmodule.vertical_module import VerticalModule
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from courseware.inline_analytics_utils import get_responses_data
+from courseware.inline_analytics_utils import get_responses_data, AnalyticsContextResponse, VideoContextResponse
 
 log = logging.getLogger(__name__)
 
@@ -289,16 +289,34 @@ def add_inline_analytics(user, block, view, frag, context):  # pylint: disable=u
     Otherwise, returns the fragment unchanged.
     """
     responses_data = get_responses_data(block)
+    
+
+    
+#    import pudb; pudb.set_trace()
     if responses_data:
+        
+        if isinstance(responses_data[0], VideoContextResponse):
+            template = "inline_video_analytics.html"
+            analytics_url = reverse('get_analytics_video_data')
+        elif isinstance(responses_data[0], AnalyticsContextResponse):
+            template = "inline_analytics.html"
+            analytics_url = reverse('get_analytics_answer_dist')
+        
+        
+        ### Need to change answer_dist_url below.
+        
         analytics_context = {
             'block_content': frag.content,
             'location': block.location.to_deprecated_string(),
             'element_id': block.location.html_id().replace('-', '_'),
-            'answer_dist_url': reverse('get_analytics_answer_dist'),
+            'answer_dist_url': analytics_url, #reverse('get_analytics_answer_dist'),
             'responses_data': responses_data,
             'course_id': block.course_id.to_deprecated_string(),
         }
-        return wrap_fragment(frag, render_to_string("inline_analytics.html", analytics_context))
+        
+
+        
+        return wrap_fragment(frag, render_to_string(template, analytics_context))
 
     else:
         return frag

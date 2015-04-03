@@ -1136,6 +1136,13 @@ def get_course_lti_endpoints(request, course_id):
     return HttpResponse(json.dumps(endpoints), content_type='application/json')
 
 
+def get_analytics_video_data(request):
+    
+    print "In get_analytics_video_data"
+
+    return JsonResponse({})
+
+
 def get_analytics_answer_dist(request):
     """
     Calls the the analytics answer distribution api. Retrieves answer distribution data for the in-line analytics display.

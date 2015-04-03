@@ -1971,6 +1971,7 @@ INLINE_ANALYTICS_SUPPORTED_TYPES = {
     'NumericalResponse': 'numerical',
     'StringResponse': 'string',
     'FormulaResponse': 'formula',
+    'VideoModule': 'video',
 }
 # Country code overrides
 # Used by django-countries

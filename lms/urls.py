@@ -384,6 +384,8 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.get_course_lti_endpoints', name='lti_rest_endpoints'),
 
         # Analytics api endpoints for in-line analytics
+        url(r'^get_analytics_video_data/',
+            'courseware.views.get_analytics_video_data', name='get_analytics_video_data'),
         url(r'^get_analytics_answer_dist/',
             'courseware.views.get_analytics_answer_dist', name='get_analytics_answer_dist'),
 
