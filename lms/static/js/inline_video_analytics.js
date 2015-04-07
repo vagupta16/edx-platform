@@ -7,8 +7,162 @@ window.InlineVideoAnalytics = (function() {
     	
     	console.log("In processResponse");
     	$('.inline-analytics-video_block').text('123213213');
+    	
+    	
+    	var dataset = [ 5, 20, 35, 50, 65 ];
+    //	d3.select('.inline-analytics-video_block').append("p").text("New paragraph!");
+    	
+   // 	d3.select('.inline-analytics-video_block').selectAll("p");
+    	
+//        .data(dataset)
+//        .enter()
+//        .append("p")
+//        .text(function(d) { return d; })
+//        .style("color", "red");
+    	
+    	
+    	
+//    	d3.select('.inline-analytics-video_block').selectAll("div")
+//        .data(dataset)
+//        .enter()
+//        .append("div")
+//        .attr("width", "20px")
+//        .attr("background-color", "red")
+//        .attr("height", "75px");
+    	
+    	var svg = d3.select(".inline-analytics-video_block").append("svg");
+    	
+//    	svg.selectAll("circle")
+//        .data(dataset)
+//        .enter()
+//        .append("circle")
+//        .attr("cx", function(d, i) {
+//            return (i * 50) + 25;
+//        });
+    	
+    	svg.selectAll(".bar")
+        .data(dataset)
+        .enter().append("rect")
+        .attr("x", function(d, i) { return i * 20; })
+        .attr("width", 5)
+        .attr("height", function(d) { return d; })
+        .style("fill", "red");
+    	
+//        svg.attr("width", 100)
+//        .attr("height", 200)
+//        .append("rect")
+//        .attr("x", 100 )
+//        .attr("width", 18)
+//        .attr("height", 180)
+//        .style("fill", "red");
+    	
+   //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    	
+    	
     }
     		
+    
+    function processResponse2(response) {
+    	
+        var data = [ 5, 20, 35, 50, 65, 70, 65, 50, 90, 100, 70, 65, 50, 35, 20];
+        var margin = {top: 20, right: 80, bottom: 30, left: 50};
+        var width = $('.inline-analytics-video_block').parent().width() - margin.left - margin.right;
+        var height = 500 - margin.top - margin.bottom;
+        var parseDate = d3.time.format("%Y-%m-%d").parse;
+        var color = d3.scale.category10();
+        var barWidth =  (width-300)/data.length;
+        var barPadding = 1;
+    	
+        var x = d3.scale.linear()
+        .range([20, width-barWidth-70]);
+
+        var y = d3.scale.linear()
+        .rangeRound([height, 0]);
+        
+        y.domain([0, d3.max(data, function(d) { return d; })]);
+    	
+        //these colors don't exactly correspond to the exact elements in the graph but to generate them
+        //we read the header to generate the colors
+        var header = d3.keys(data[0]);
+        var coloredHeader = header.map(color);
+
+        var color = d3.scale.ordinal()
+            .range(coloredHeader);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .ticks(Math.min(5, data.length));
+        
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .tickFormat(d3.format(".2s"));
+    	
+        var svg = d3.select(".inline-analytics-video_block").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        
+        color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Date"; }));
+        
+        //x.domain(d3.extent(data, function(d) { return d.count(); }));
+        //y.domain([0, d3.max(data, function(d) { return d; })]);
+        
+        
+//        data.forEach(function(d) {
+//            d.date = parseDate(d.Date);
+//            var y0 = 0;
+//            d.counts = color.domain().map(function(name) {
+//                return {
+//                    name: name, y0: y0, y1: y0 += +d[name]}; });
+//            d.total = d.counts[d.counts.length - 1].y1;
+//        });
+        
+        
+//    	svg.selectAll(".bar")
+//        .data(data)
+//        .enter().append("rect")
+//        .attr("x", function(d, i) { return i * 20; })
+//        .attr("width", 15)
+//        .attr("height", function(d) { return d; })
+//        .style("fill", "red");
+    	
+    	svg.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d, i) { return i * (width / data.length);})
+        .attr("width", function(d, i) { return width/data.length - barPadding;})
+        .attr("y", function(d) {return y(d);})
+        .attr("height", function(d) { return y(0) - y(d);})
+        .style("fill", "teal");
+    	
+    	
+        
+   //     x.domain(d3.extent(data, function(d) { return d; }));
+   //     y.domain([0, d3.max(data, function(d) { return d; })]); 	
+   
+
+    	
+        svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate("+  barWidth/2 +"," +height + ")")
+        .call(xAxis);
+    
+        svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Count");	
+    
+        
+    }
     		
     		
     function runDocReady(elementId) {
@@ -44,7 +198,7 @@ window.InlineVideoAnalytics = (function() {
                 
                 success: function(response) {
                     if (response) {
-                    	window.InlineVideoAnalytics.processResponse(response);
+                    	window.InlineVideoAnalytics.processResponse2(response);
                    //     window.InlineAnalytics.processResponse(response, partsToGet, questionTypesByPart, correctResponses, choiceNameListByPart);
                         // Store that we retrieved data for this problem
                    //     elementsRetrieved.push(elementId);
@@ -69,6 +223,7 @@ window.InlineVideoAnalytics = (function() {
     
     return {
     	processResponse: processResponse,
+    	processResponse2: processResponse2,
         runDocReady: runDocReady,
         
         
