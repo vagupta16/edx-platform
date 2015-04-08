@@ -111,12 +111,20 @@ class StudentAnalyticsDataWidget
       endpoint: @endpoint
     template_html = $("#student-analytics-data-widget-template").text()
     @$container.html Mustache.render template_html, template_params
+    @$container.find('.problem-selector').on 'change', @on_select_date
+
+  on_select_date: (e) =>
+    time_span = $(e.currentTarget).value()
+    @get_student_analytics_data
+      data: {time_span: time_span}
+      error: @error_handler
+      success: @success_handler
 
   reset_display: ->
-      @$container.find('.display-errors').empty()
-      @$container.find('.display-text').empty()
-      @$container.find('.display-graph').empty()
-      @$container.find('.display-table').empty()
+    @$container.find('.display-errors').empty()
+    @$container.find('.display-text').empty()
+    @$container.find('.display-graph').empty()
+    @$container.find('.display-table').empty()
 
   show_error: (msg) ->
     @$container.find('.display-errors').text msg

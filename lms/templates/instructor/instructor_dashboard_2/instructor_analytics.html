@@ -20,7 +20,7 @@
     <div class="grade-distributions-widget">
       <div class="header">
 	<h2 class="title"> ${_("Score Distribution")} </h2>
-	<p>${_("Tahe chart below displays the score distribution for each standard problem in your class, specified by the problem's url name.")}
+	<p>${_("The chart below displays the score distribution for each standard problem in your class, specified by the problem's url name.")}
 	  ${_("Scores are shown without weighting applied, so if your problem contains 2 questions, it will display as having a total of 2 points.")}</p>
 	<br />
 	${_("Problem")}: <select class="problem-selector">
@@ -56,10 +56,12 @@
         <br />
         ${_("Timeframe")}:
         <select class="problem-selector">
+          <option value="all">${_("All Time")}</option>
           <option value="wk">${_("Week")}</option>
           <option value="mo">${_("Month")}</option>
           <option value="qt">${_("Quarter")}</option>
         </select>
+        <br/>
         <div class="last-updated"></div>
       </div>
       <div class="view">

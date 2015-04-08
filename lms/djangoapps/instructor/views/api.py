@@ -2514,7 +2514,8 @@ def get_analytics_student_data(request, course_id):
     engagement data.
 
     Arguments:
-        request (django request object):  the HTTP request object that triggered this view function
+        request (django request object): the HTTP request object that triggered this view function
+        course_id: the course id part extracted from the url
 
     Returns:
         (django response object):  JSON response.  404 if api url is not found, 500 if server error, otherwise 200 with JSON body.
@@ -2530,6 +2531,8 @@ def get_analytics_student_data(request, course_id):
 
     having_access = has_access(request.user, 'staff', course)
 
+    start, end = _get_start_end_from_time_span(request.GET.get('time_span'))
+
     # Contruct API call
     url = getattr(settings, 'ANALYTICS_ON_CAMPUS_DATA_URL')
     if url:
@@ -2544,8 +2547,10 @@ def get_analytics_student_data(request, course_id):
     analytics_req = urllib2.Request(url)
     analytics_req.add_header('Authorization', token)
 
+    query_params = {'start': start, 'end': end}
+
     try:
-        response = urllib2.urlopen(analytics_req)
+        response = urllib2.urlopen(analytics_req, query_params)
         data = json.loads(response.read())
 
     except urllib2.HTTPError, error:
@@ -2614,6 +2619,7 @@ def process_analytics_student_data(course_id, data):
     }
     return JsonResponse(response_payload)
 
+
 def _get_forum_usage_data_for_course(course_id):
     """
     Retrieves forum usage data for a given course. Reformats results
@@ -2632,6 +2638,34 @@ def _get_forum_usage_data_for_course(course_id):
     usage = map(itemgetter(1, 2), results)
     formatted_results = dict(zip(usernames, usage))
     return formatted_results
+
+
+def _get_start_end_from_time_span(time_span):
+    """
+    Given a time span, returns a tuple of datetime objects
+    representing the start and end of the time span. The time
+    span starts at the most recent week / month / quarter
+    before today and ends at today. Time span treated as UTC
+
+    Arguments:
+        time_span: string representing time span. One of
+            all|wk|mo|qt
+
+    Returns:
+        a tuple of datetimes.
+    """
+    end = datetime.now()
+    if time_span == 'mo':
+        start = end.replace(day=0)
+    elif time_span == 'wk':
+        start = end - timedelta(weeks=1)
+    elif time_span == 'qt':
+        start = end.replace(month=end.month / 3)
+    else:
+        # in the case where time_span is None or 'all'
+        start = datetime.utcfromtimestamp(0)
+    return (start, end)
+
 
 def _split_input_list(str_list):
     """
