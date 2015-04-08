@@ -13,6 +13,7 @@ import re
 import time
 import requests
 import urllib2
+from urllib import urlencode
 from operator import itemgetter
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
@@ -33,8 +34,9 @@ import urllib
 import urllib2
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
-import gzip
 from instructor.utils import collect_student_forums_data
+import gzip
+from datetime import datetime, timedelta
 
 from microsite_configuration import microsite
 
@@ -2541,16 +2543,17 @@ def get_analytics_student_data(request, course_id):
     if not having_access or not url:
         return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
 
+    query_params = urlencode({'start_date': start, 'end_date': end})
+    url += ("?%s" % query_params)
+
     api_secret = getattr(settings, 'ANALYTICS_DATA_TOKEN')
     token = 'Token %s' % api_secret
 
     analytics_req = urllib2.Request(url)
     analytics_req.add_header('Authorization', token)
 
-    query_params = {'start': start, 'end': end}
-
     try:
-        response = urllib2.urlopen(analytics_req, query_params)
+        response = urllib2.urlopen(url)
         data = json.loads(response.read())
 
     except urllib2.HTTPError, error:
@@ -2579,6 +2582,7 @@ def process_analytics_student_data(course_id, data):
           - student_data: array of nested objects, each object with attributes
             - username: string
             - num_videos_watched: integer
+            - total_activity: integer
             - total_video_watch_time: integer
             - num_forum_points: integer
             - num_forum_created: integer

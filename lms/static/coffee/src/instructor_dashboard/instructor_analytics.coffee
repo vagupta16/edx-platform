@@ -9,12 +9,21 @@ such that the value can be defined later than this assignment (file load order).
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 
-autogenerate_slickgrid_cols = (row) ->
+capitalize = (str) -> str.charAt(0).toUpperCase() + str.slice(1)
+
+autogenerate_slickgrid_cols = (row, formatters={}) ->
   # Given an object representing a json row of data,
-  # infers columns as keys
+  # infers columns as keys. Optionally takes in a
+  # dict of key / values representing fields and their
+  # formatter constructors
   return _(row).chain()
       .keys()
-      .map((attr) -> {id: attr, name: attr.toUpperCase(), field: attr})
+      .map((attr) ->
+        if attr of formatters
+          {id: attr, name: capitalize(attr), field: attr, formatter: formatters[attr]}
+        else
+          {id: attr, name: capitalize(attr), field: attr}
+      )
       .value()
 
 class ProfileDistributionWidget
@@ -113,6 +122,16 @@ class StudentAnalyticsDataWidget
     @$container.html Mustache.render template_html, template_params
     @$container.find('.problem-selector').on 'change', @on_select_date
 
+  slickgrid_formatters:
+    'total_activity': (row, cell, value, column_def, data_context) ->
+      z_score = (parseInt(value, 10) - 12.0) / 23.0
+      if value > 0.5
+        '<span style="color: green; font-weight: bold">' + value + '</span>'
+      else if value < -0.5
+        '<span style="color: red; font-weight: bold">' + value + '</span>'
+      else
+        value
+
   on_select_date: (e) =>
     time_span = $(e.currentTarget).value()
     @get_student_analytics_data
@@ -153,7 +172,7 @@ class StudentAnalyticsDataWidget
       enableCellNavigation: true
       enableColumnReorder: false
       forceFitColumns: true
-    columns = autogenerate_slickgrid_cols(_.first(data))
+    columns = autogenerate_slickgrid_cols(_.first(data), @slickgrid_formatters)
 
     # display on SlickGrid
     table_placeholder = $ '<div/>', class: 'slickgrid'
