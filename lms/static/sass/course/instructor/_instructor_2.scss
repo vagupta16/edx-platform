@@ -1429,6 +1429,39 @@ section.instructor-dashboard-content-2 {
   }
 }
 
+.student-analytics-data-widget {
+   .last-updated {
+    line-height: 2.2em;
+    @include font-size(12);
+    clear: both;
+    content: ".";
+  }
+  
+  .slickgrid {
+    height: 400px;
+
+    .slick-cell { word-wrap: normal; }
+    .slick-header.ui-state-default {
+      background: $gray-l5;
+      padding-top: 3px;
+      padding-bottom: 5px;  
+    }
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    float: right;
+    background: gray;
+    margin-right: 5px;
+
+    &.red { background: $red; }
+    &.green { background: $green; }
+    &.silver { background: $gray-l1; }
+  }
+}
+
 input[name="subject"] {
   width:600px;
 }

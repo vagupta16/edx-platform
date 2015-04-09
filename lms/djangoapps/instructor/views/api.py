@@ -2533,9 +2533,10 @@ def get_analytics_student_data(request, course_id):
 
     having_access = has_access(request.user, 'staff', course)
 
-    start, end = _get_start_end_from_time_span(request.GET.get('time_span'))
+    start_date, end_date = _get_start_end_from_time_span(request.GET.get('time_span'))
 
     # Contruct API call
+    # To be replaced soon with calls to the analytics data client
     url = getattr(settings, 'ANALYTICS_ON_CAMPUS_DATA_URL')
     if url:
         url = url.format(course_id=course_id)
@@ -2543,7 +2544,10 @@ def get_analytics_student_data(request, course_id):
     if not having_access or not url:
         return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
 
-    query_params = urlencode({'start_date': start, 'end_date': end})
+    query_params = urlencode({
+        'start_date': start_date,
+        'end_date': end_date,
+    })
     url += ("?%s" % query_params)
 
     api_secret = getattr(settings, 'ANALYTICS_DATA_TOKEN')
@@ -2553,7 +2557,7 @@ def get_analytics_student_data(request, course_id):
     analytics_req.add_header('Authorization', token)
 
     try:
-        response = urllib2.urlopen(url)
+        response = urllib2.urlopen(analytics_req)
         data = json.loads(response.read())
 
     except urllib2.HTTPError, error:
@@ -2581,8 +2585,7 @@ def process_analytics_student_data(course_id, data):
         A json payload of:
           - student_data: array of nested objects, each object with attributes
             - username: string
-            - num_videos_watched: integer
-            - total_activity: integer
+            - unique_videos_watched: integer
             - total_video_watch_time: integer
             - num_forum_points: integer
             - num_forum_created: integer
@@ -2592,12 +2595,14 @@ def process_analytics_student_data(course_id, data):
           - last updated: string, when analytics data was last processed
     """
     student_data = []
-    last_updated = 0
+    last_updated = datetime.now().strftime("%Y-%m-%d")
 
     # Aggregated forum data from students
     student_forum_usage_data = _get_forum_usage_data_for_course(course_id)
 
-    for row in data:
+    sorted_data = sorted(data, key=lambda x: -itemgetter('unique_videos_watched')(x))
+
+    for row in sorted_data:
         if len(row) > 0:
             # front-end expects fields to be filled out
             row.update({
@@ -2615,6 +2620,10 @@ def process_analytics_student_data(course_id, data):
                     'num_forum_created': usage_data[0],
                     'num_forum_points': usage_data[1],
                 })
+
+            # for anonymous usernames, abbreviate names to "anon"
+            _abbreviate_anon_username(row)
+
             student_data.append(row)
 
     response_payload = {
@@ -2656,7 +2665,9 @@ def _get_start_end_from_time_span(time_span):
             all|wk|mo|qt
 
     Returns:
-        a tuple of datetimes.
+        a tuple of strings representing (start, end)
+        dates in "%Y-%m-%d" corresponding to the
+        DATE_FORMAT setting of the data api
     """
     end = datetime.now()
     if time_span == 'mo':
@@ -2668,7 +2679,16 @@ def _get_start_end_from_time_span(time_span):
     else:
         # in the case where time_span is None or 'all'
         start = datetime.utcfromtimestamp(0)
-    return (start, end)
+
+    start_str = start.strftime('%Y-%m-%d')
+    end_str = end.strftime('%Y-%m-%d')
+
+    return (start_str, end_str)
+
+
+def _abbreviate_anon_username(row):
+    if 'anon' in row['username']:
+        row['username'] = 'anon'
 
 
 def _split_input_list(str_list):

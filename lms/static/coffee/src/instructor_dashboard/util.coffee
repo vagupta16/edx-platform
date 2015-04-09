@@ -332,6 +332,59 @@ class KeywordValidator
         invalid_keywords: invalid_keywords
       }
 
+# Helper class that encompasses static functions 
+# for doing some math on reasonably small arrays
+class Statistics
+  @square: (x) -> x * x
+
+  @sum_reducer: (accum, n) -> accum + n
+
+  @get_avg: (nums) ->
+    if nums? and nums.length > 0
+      return _.reduce(nums, Statistics.sum_reducer, 0) / nums.length
+    else
+      return 0
+
+  @get_stddev: (nums) ->
+    avg = Statistics.get_avg(nums)
+    mean_differences = _.map(nums, (n) -> Statistics.square(n - avg))
+    return Statistics.get_avg(mean_differences)
+ 
+# Helper class that provides additional functions
+# around data for SlickGrid
+class SlickGridHelpers
+  @capitalize: (str) -> str.charAt(0).toUpperCase() + str.slice(1)
+
+  @autogenerate_slickgrid_cols: (row, names={}, formatters={}) ->
+    # Given an object representing a json row of data,
+    # infers columns as keys. 
+    #
+    # Arguments:
+    #
+    #   row (dict): a representative sample row of the dataset
+    #
+    #   names (dict): (optional) a dict of key / values 
+    #     representing attributes to their displayed col names
+    #
+    #   formatters (dict): (optional) a dict of key / values
+    #     representing fields and their formatter constructors
+    #
+    # Returns:
+    #     
+    #   An array of objects that represent Slickgrid columns,
+    #   suitable for passing to a Slickgrid constructor
+    return _(row).chain()
+        .keys()
+        .map((attr) ->
+            {
+              id: attr,
+              name: if attr of names then names[attr] else SlickGridHelpers.capitalize(attr),
+              field: attr,
+              formatter: if attr of formatters then formatters[attr] else undefined,
+            }
+        )
+        .value()
+
 # export for use
 # create parent namespaces if they do not already exist.
 # abort if underscore can not be found.
@@ -347,3 +400,5 @@ if _?
     create_email_message_views: create_email_message_views
     PendingInstructorTasks: PendingInstructorTasks
     KeywordValidator: KeywordValidator
+    SlickGridHelpers: SlickGridHelpers
+    Statistics: Statistics

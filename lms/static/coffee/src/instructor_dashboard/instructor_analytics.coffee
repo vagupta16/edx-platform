@@ -9,22 +9,10 @@ such that the value can be defined later than this assignment (file load order).
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 
-capitalize = (str) -> str.charAt(0).toUpperCase() + str.slice(1)
-
-autogenerate_slickgrid_cols = (row, formatters={}) ->
-  # Given an object representing a json row of data,
-  # infers columns as keys. Optionally takes in a
-  # dict of key / values representing fields and their
-  # formatter constructors
-  return _(row).chain()
-      .keys()
-      .map((attr) ->
-        if attr of formatters
-          {id: attr, name: capitalize(attr), field: attr, formatter: formatters[attr]}
-        else
-          {id: attr, name: capitalize(attr), field: attr}
-      )
-      .value()
+# proxies to functions instead of specifying full path
+get_avg = -> window.InstructorDashboard.util.Statistics.get_avg.apply this, arguments
+get_stddev = -> window.InstructorDashboard.util.Statistics.get_stddev.apply this, arguments
+autogenerate_slickgrid_cols = -> window.InstructorDashboard.util.SlickGridHelpers.autogenerate_slickgrid_cols.apply this, arguments
 
 class ProfileDistributionWidget
   constructor: ({@$container, @feature, @title, @endpoint}) ->
@@ -113,6 +101,13 @@ class ProfileDistributionWidget
 
 class StudentAnalyticsDataWidget
   constructor: ({@$container, @feature, @title, @endpoint}) ->
+    @grid = null
+    # resolve slickgrid formatter names to the
+    # corresponding instance functions
+    for attr in _.keys(@slickgrid_formatters)
+      fn_name = @slickgrid_formatters[attr]
+      @slickgrid_formatters[attr] = this[fn_name]
+
     # render template
     template_params =
       title: @title
@@ -122,18 +117,57 @@ class StudentAnalyticsDataWidget
     @$container.html Mustache.render template_html, template_params
     @$container.find('.problem-selector').on 'change', @on_select_date
 
+  slickgrid_col_names:
+    'total_video_activity': 'video activity'
+    'unique_videos_watched': 'videos watched'
+    'total_video_watch_time': 'min. watched'
+    'num_forum_points': 'forum points'
+    'num_forum_created': 'posts created'
+    'num_attempts': 'num attempts'
+    'num_unique_problems_tried': 'problems attempted'
+    'cumulative_grade': 'cum grade'
+
   slickgrid_formatters:
-    'total_activity': (row, cell, value, column_def, data_context) ->
-      z_score = (parseInt(value, 10) - 12.0) / 23.0
-      if value > 0.5
-        '<span style="color: green; font-weight: bold">' + value + '</span>'
-      else if value < -0.5
-        '<span style="color: red; font-weight: bold">' + value + '</span>'
+    'total_video_activity': 'video_activity_formatter'
+    'total_video_watch_time': 'watch_time_formatter'
+    
+  video_activity_formatter: (row, cell, value) =>
+      avg = @calculated_stats.total_video_activity.avg
+      stddev = @calculated_stats.total_video_activity.stddev
+      if not avg or not stddev
+        return value
+
+      z_score = (parseInt(value, 10) - avg) / stddev
+      if z_score < -0.5
+        return '<div class="red dot"></div>'
+      else if 0 < z_score < 1
+        return '<div class="silver dot"></div>'
+      else if 1 < z_score < 2
+        return '<div class="green dot"></div>'
       else
-        value
+        return """
+          <div class="green dot"></div>
+          <div class="green dot"></div>
+        """
+
+  watch_time_formatter: (row, cell, value) =>
+      avg = @calculated_stats.total_video_watch_time.avg
+      stddev = @calculated_stats.total_video_watch_time.stddev
+      if not avg or not stddev
+        return value
+
+      z_score = (parseInt(value, 10) - avg) / stddev
+      value_in_min = Math.round(value / 60.0)
+      if z_score > 0.5
+        return '<span style="color: green; font-weight: bold">' + value_in_min + '</span>'
+      else if z_score < -0.5
+        return '<span style="color: red; font-weight: bold">' + value_in_min + '</span>'
+      else
+        return value_in_min
 
   on_select_date: (e) =>
-    time_span = $(e.currentTarget).value()
+    console.log 'selected: ', $(e.currentTarget).val()
+    time_span = $(e.currentTarget).val()
     @get_student_analytics_data
       data: {time_span: time_span}
       error: @error_handler
@@ -159,8 +193,8 @@ class StudentAnalyticsDataWidget
       @show_error gettext("Error fetching student data.")
 
   success_handler: (response) =>
-    @render_last_updated response.timestamp
-    @render_table response.student_data
+    @render_last_updated(response.timestamp)
+    @render_table(response.student_data)
 
   render_last_updated: (timestamp) =>
     time_updated = gettext("Last Updated: <%= timestamp %>")
@@ -172,13 +206,15 @@ class StudentAnalyticsDataWidget
       enableCellNavigation: true
       enableColumnReorder: false
       forceFitColumns: true
-    columns = autogenerate_slickgrid_cols(_.first(data), @slickgrid_formatters)
+    columns = autogenerate_slickgrid_cols(_.first(data), @slickgrid_col_names, @slickgrid_formatters)
+
+    # populate calculated stats for formatters
+    @make_calculated_stats()
 
     # display on SlickGrid
     table_placeholder = $ '<div/>', class: 'slickgrid'
-    $(table_placeholder).css 'height', '500px'
     @$container.find('.display-table').append table_placeholder
-    grid = new Slick.Grid(table_placeholder, data, columns, options)
+    @grid = new Slick.Grid(table_placeholder, data, columns, options)
 
   # fetch distribution data from server.
   # `handler` can be either a callback for success
@@ -195,6 +231,18 @@ class StudentAnalyticsDataWidget
 
     $.ajax settings
 
+  make_calculated_stats: =>
+    attrs = _.keys(@slickgrid_col_names)
+    stats = _.map attrs, (attr) ->
+      values = _.pluck(data, attr)
+      return {
+        avg: get_avg(values)
+        stddev: get_stddev(values)
+      }
+
+    # Make calculated stats into a map of attr => stats
+    # so we can do lookup
+    @calculated_stats = _.object(attrs, stats)
 
 class GradeDistributionDisplay
   constructor: ({@$container, @endpoint}) ->
