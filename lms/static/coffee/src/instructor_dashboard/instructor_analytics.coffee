@@ -105,7 +105,6 @@ class StudentAnalyticsDataWidget
   constructor: ({@$container, @feature, @title, @endpoint}) ->
     @dataview = new Slick.Data.DataView({inlineFilters: true})
     @grid = null
-    @columnpicker = null
 
     # resolve slickgrid formatter names to the
     # corresponding instance functions
@@ -239,7 +238,6 @@ class StudentAnalyticsDataWidget
     
     # initialize grid and add sortable columns as a feature
     @grid = new Slick.Grid(table_placeholder, @dataview, columns, options)
-    @columnpicker = new Slick.Controls.ColumnPicker(columns, @grid, options)
 
   update_filter: =>
     dataView.setFilterArgs({
