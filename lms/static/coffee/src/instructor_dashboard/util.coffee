@@ -339,6 +339,8 @@ class Statistics
 
   @sum_reducer: (accum, n) -> accum + n
 
+  @get_zscore: (x, avg, stddev) -> (x - avg) / stddev
+
   @get_avg: (nums) ->
     if nums? and nums.length > 0
       return _.reduce(nums, Statistics.sum_reducer, 0) / nums.length
@@ -348,7 +350,8 @@ class Statistics
   @get_stddev: (nums) ->
     avg = Statistics.get_avg(nums)
     mean_differences = _.map(nums, (n) -> Statistics.square(n - avg))
-    return Statistics.get_avg(mean_differences)
+    return Math.sqrt Statistics.get_avg mean_differences
+
  
 # Helper class that provides additional functions
 # around data for SlickGrid

@@ -2574,6 +2574,9 @@ def get_analytics_student_data(request, course_id):
     return process_analytics_student_data(course_key, data)
 
 
+STUDENT_DATA_SORT_KEY = 'total_video_activity'
+
+
 def process_analytics_student_data(course_id, data):
     """
     Augments student data from analytics api with forum usage and grade distribution data.
@@ -2585,6 +2588,7 @@ def process_analytics_student_data(course_id, data):
         A json payload of:
           - student_data: array of nested objects, each object with attributes
             - username: string
+            - total_video_activity: integer
             - unique_videos_watched: integer
             - total_video_watch_time: integer
             - num_forum_points: integer
@@ -2600,7 +2604,7 @@ def process_analytics_student_data(course_id, data):
     # Aggregated forum data from students
     student_forum_usage_data = _get_forum_usage_data_for_course(course_id)
 
-    sorted_data = sorted(data, key=lambda x: -itemgetter('unique_videos_watched')(x))
+    sorted_data = sorted(data, key=lambda x: -itemgetter(STUDENT_DATA_SORT_KEY)(x))
 
     for row in sorted_data:
         if len(row) > 0:

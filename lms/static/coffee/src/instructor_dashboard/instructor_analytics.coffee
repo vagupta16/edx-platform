@@ -12,6 +12,7 @@ std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, argum
 # proxies to functions instead of specifying full path
 get_avg = -> window.InstructorDashboard.util.Statistics.get_avg.apply this, arguments
 get_stddev = -> window.InstructorDashboard.util.Statistics.get_stddev.apply this, arguments
+get_zscore = -> window.InstructorDashboard.util.Statistics.get_zscore.apply this, arguments
 autogenerate_slickgrid_cols = -> window.InstructorDashboard.util.SlickGridHelpers.autogenerate_slickgrid_cols.apply this, arguments
 
 class ProfileDistributionWidget
@@ -137,7 +138,8 @@ class StudentAnalyticsDataWidget
       if not avg or not stddev
         return value
 
-      z_score = (parseInt(value, 10) - avg) / stddev
+      z_score = get_zscore(parseInt(value, 10), avg, stddev)
+      console.log z_score, value, avg, stddev
       if z_score < -0.5
         return '<div class="red dot"></div>'
       else if 0 < z_score < 1
@@ -156,7 +158,7 @@ class StudentAnalyticsDataWidget
       if not avg or not stddev
         return value
 
-      z_score = (parseInt(value, 10) - avg) / stddev
+      z_score = get_zscore(parseInt(value, 10), avg, stddev)
       value_in_min = Math.round(value / 60.0)
       if z_score > 0.5
         return '<span style="color: green; font-weight: bold">' + value_in_min + '</span>'
@@ -209,7 +211,7 @@ class StudentAnalyticsDataWidget
     columns = autogenerate_slickgrid_cols(_.first(data), @slickgrid_col_names, @slickgrid_formatters)
 
     # populate calculated stats for formatters
-    @make_calculated_stats()
+    @make_calculated_stats(data)
 
     # display on SlickGrid
     table_placeholder = $ '<div/>', class: 'slickgrid'
@@ -231,7 +233,7 @@ class StudentAnalyticsDataWidget
 
     $.ajax settings
 
-  make_calculated_stats: =>
+  make_calculated_stats: (data) =>
     attrs = _.keys(@slickgrid_col_names)
     stats = _.map attrs, (attr) ->
       values = _.pluck(data, attr)
