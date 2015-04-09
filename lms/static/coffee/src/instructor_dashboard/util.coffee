@@ -352,7 +352,24 @@ class Statistics
     mean_differences = _.map(nums, (n) -> Statistics.square(n - avg))
     return Math.sqrt Statistics.get_avg mean_differences
 
- 
+# Base class for a Slickgrid Column Sorter
+class DefaultNumericSorter
+  constructor: (dataview) ->
+    @dataview = dataview
+    # constructor returns a callback fn that
+    # can be passed into Slickgrid's onSort.subscribe
+    return @callback
+
+  callback: (e, args) =>
+    @sortcol = args.sortCol.field
+    console.log 'in callback', args
+    @dataview.sort(@comparer, args.sortAsc)
+
+  comparer: (a, b) =>
+    x = a[@sortcol]
+    y = b[@sortcol]
+    return (x == y ? 0 : (x > y ? 1 : -1))
+
 # Helper class that provides additional functions
 # around data for SlickGrid
 class SlickGridHelpers
@@ -396,6 +413,7 @@ class SlickGridHelpers
         )
         .value()
 
+
 # export for use
 # create parent namespaces if they do not already exist.
 # abort if underscore can not be found.
@@ -413,3 +431,4 @@ if _?
     KeywordValidator: KeywordValidator
     SlickGridHelpers: SlickGridHelpers
     Statistics: Statistics
+    DefaultNumericSorter: DefaultNumericSorter
