@@ -1451,13 +1451,23 @@ section.instructor-dashboard-content-2 {
     }
   }
 
+  .highlight-text-red { 
+    color: $red; 
+    font-weight: bold;
+  }
+
+  .highlight-text-green { 
+    color: $green; 
+    font-weight: bold; 
+  }
+
   .dot {
     width: 5px;
     height: 5px;
     border-radius: 50%;
     float: right;
-    background: gray;
     margin-right: 5px;
+    margin-top: 5px;
 
     &.red { background: $red; }
     &.green { background: $green; }

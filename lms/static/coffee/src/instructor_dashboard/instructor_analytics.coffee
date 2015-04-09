@@ -139,15 +139,23 @@ class StudentAnalyticsDataWidget
         return value
 
       z_score = get_zscore(parseInt(value, 10), avg, stddev)
-      console.log z_score, value, avg, stddev
       if z_score < -0.5
         return '<div class="red dot"></div>'
-      else if 0 < z_score < 1
-        return '<div class="silver dot"></div>'
-      else if 1 < z_score < 2
-        return '<div class="green dot"></div>'
+      else if -0.5 <= z_score < 1
+        return """
+          <div class="silver dot"></div>
+          <div class="silver dot"></div>
+        """
+      else if 1 <= z_score < 2
+        return """
+          <div class="green dot"></div>
+          <div class="green dot"></div>
+          <div class="green dot"></div>
+        """
       else
         return """
+          <div class="green dot"></div>
+          <div class="green dot"></div>
           <div class="green dot"></div>
           <div class="green dot"></div>
         """
@@ -161,14 +169,13 @@ class StudentAnalyticsDataWidget
       z_score = get_zscore(parseInt(value, 10), avg, stddev)
       value_in_min = Math.round(value / 60.0)
       if z_score > 0.5
-        return '<span style="color: green; font-weight: bold">' + value_in_min + '</span>'
+        return '<span class="highlight-text-green">' + value_in_min + '</span>'
       else if z_score < -0.5
-        return '<span style="color: red; font-weight: bold">' + value_in_min + '</span>'
+        return '<span class="highlight-text-red">' + value_in_min + '</span>'
       else
         return value_in_min
 
   on_select_date: (e) =>
-    console.log 'selected: ', $(e.currentTarget).val()
     time_span = $(e.currentTarget).val()
     @get_student_analytics_data
       data: {time_span: time_span}
@@ -191,11 +198,12 @@ class StudentAnalyticsDataWidget
       error: @error_handler
       success: @success_handler
 
-  error_handler: (std_ajax_err) =>
-      @show_error gettext("Error fetching student data.")
+  error_handler: (response) =>
+    @show_error(if response.text? then response.text else "Error fetching student data")
 
   success_handler: (response) =>
-    @render_last_updated(response.timestamp)
+    @reset_display()
+    @render_last_updated(response.last_updated)
     @render_table(response.student_data)
 
   render_last_updated: (timestamp) =>

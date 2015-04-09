@@ -2563,7 +2563,7 @@ def get_analytics_student_data(request, course_id):
     except urllib2.HTTPError, error:
         log.warning('Analytics API error: ' + str(error))
         if error.code == 404:
-            return HttpResponseNotFound(_('There is no student data for this course; please try again later'))
+            return HttpResponseNotFound(_('There is no student data for this course for specified time period; please try again later'))
         else:
             return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url="<a href=\"https://stanfordonline.zendesk.com/hc/en-us/requests/new\">here</a>"))
 
@@ -2675,7 +2675,7 @@ def _get_start_end_from_time_span(time_span):
     """
     end = datetime.now()
     if time_span == 'mo':
-        start = end.replace(day=0)
+        start = end.replace(day=1)
     elif time_span == 'wk':
         start = end - timedelta(weeks=1)
     elif time_span == 'qt':
