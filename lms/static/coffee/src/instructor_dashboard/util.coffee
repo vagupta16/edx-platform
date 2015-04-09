@@ -358,7 +358,11 @@ class Statistics
 class SlickGridHelpers
   @capitalize: (str) -> str.charAt(0).toUpperCase() + str.slice(1)
 
-  @autogenerate_slickgrid_cols: (row, names={}, formatters={}) ->
+  @update_rows_with_unique_ids: (data, id_getter_fn) ->
+    for row in data
+      row['id'] = id_getter_fn(row)
+
+  @autogenerate_slickgrid_cols: (row, names={}, formatters={}, options={}) ->
     # Given an object representing a json row of data,
     # infers columns as keys. 
     #
@@ -379,12 +383,16 @@ class SlickGridHelpers
     return _(row).chain()
         .keys()
         .map((attr) ->
-            {
+            column_definition = {
               id: attr,
               name: if attr of names then names[attr] else SlickGridHelpers.capitalize(attr),
               field: attr,
               formatter: if attr of formatters then formatters[attr] else undefined,
+              sortable: if _.isNaN(parseFloat(row[attr])) then false else true,
             }
+            if attr in options
+              _.extend(column_definition, options)
+            return column_definition
         )
         .value()
 

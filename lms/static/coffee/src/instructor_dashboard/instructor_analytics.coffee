@@ -13,6 +13,7 @@ std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, argum
 get_avg = -> window.InstructorDashboard.util.Statistics.get_avg.apply this, arguments
 get_stddev = -> window.InstructorDashboard.util.Statistics.get_stddev.apply this, arguments
 get_zscore = -> window.InstructorDashboard.util.Statistics.get_zscore.apply this, arguments
+update_rows_with_unique_ids = -> window.InstructorDashboard.util.SlickGridHelpers.update_rows_with_unique_ids.apply this, arguments
 autogenerate_slickgrid_cols = -> window.InstructorDashboard.util.SlickGridHelpers.autogenerate_slickgrid_cols.apply this, arguments
 
 class ProfileDistributionWidget
@@ -102,7 +103,10 @@ class ProfileDistributionWidget
 
 class StudentAnalyticsDataWidget
   constructor: ({@$container, @feature, @title, @endpoint}) ->
+    @dataview = new Slick.Data.DataView({inlineFilters: true})
     @grid = null
+    @columnpicker = null
+
     # resolve slickgrid formatter names to the
     # corresponding instance functions
     for attr in _.keys(@slickgrid_formatters)
@@ -199,7 +203,8 @@ class StudentAnalyticsDataWidget
       success: @success_handler
 
   error_handler: (response) =>
-    @show_error(if response.text? then response.text else "Error fetching student data")
+    text = if response.responseText? then response.responseText else gettext("Error fetching student data for given time period")
+    @show_error text
 
   success_handler: (response) =>
     @reset_display()
@@ -216,15 +221,32 @@ class StudentAnalyticsDataWidget
       enableCellNavigation: true
       enableColumnReorder: false
       forceFitColumns: true
+
     columns = autogenerate_slickgrid_cols(_.first(data), @slickgrid_col_names, @slickgrid_formatters)
 
     # populate calculated stats for formatters
     @make_calculated_stats(data)
 
-    # display on SlickGrid
+    # create SlickGrid container
     table_placeholder = $ '<div/>', class: 'slickgrid'
     @$container.find('.display-table').append table_placeholder
-    @grid = new Slick.Grid(table_placeholder, data, columns, options)
+
+    # add data to dataview
+    update_rows_with_unique_ids(data, (row) -> row.username)
+    @dataview.beginUpdate()
+    @dataview.setItems(data)
+    @dataview.endUpdate()
+    
+    # initialize grid and add sortable columns as a feature
+    @grid = new Slick.Grid(table_placeholder, @dataview, columns, options)
+    @columnpicker = new Slick.Controls.ColumnPicker(columns, @grid, options)
+
+  update_filter: =>
+    dataView.setFilterArgs({
+      percentCompleteThreshold: percentCompleteThreshold,
+      searchString: searchString
+    })
+    dataView.refresh()
 
   # fetch distribution data from server.
   # `handler` can be either a callback for success

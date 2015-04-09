@@ -108,6 +108,9 @@ log = logging.getLogger(__name__)
 NO_STUDENT_DATA = -1
 
 
+ONE_DAY_IN_SEC = 60 * 60 * 24
+
+
 def common_exceptions_400(func):
     """
     Catches common exceptions and renders matching 400 errors.
@@ -2508,12 +2511,14 @@ def show_student_extensions(request, course_id):
 
 @handle_dashboard_error
 @ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@cache_control(must_revalidate=True, max_age=ONE_DAY_IN_SEC)
 @require_level('staff')
 def get_analytics_student_data(request, course_id):
     """
     Calls the the analytics student. Proxies to analytics data api to retrieve per-student
     engagement data.
+
+    Cached once a day since the data analytics pipeline aggregates on a daily basis
 
     Arguments:
         request (django request object): the HTTP request object that triggered this view function
@@ -2577,6 +2582,10 @@ def get_analytics_student_data(request, course_id):
 STUDENT_DATA_SORT_KEY = 'total_video_activity'
 
 
+def _is_anonymous_username(username):
+    return 'anon' in username
+
+
 def process_analytics_student_data(course_id, data):
     """
     Augments student data from analytics api with forum usage and grade distribution data.
@@ -2607,7 +2616,7 @@ def process_analytics_student_data(course_id, data):
     sorted_data = sorted(data, key=lambda x: -itemgetter(STUDENT_DATA_SORT_KEY)(x))
 
     for row in sorted_data:
-        if len(row) > 0:
+        if len(row) > 0 and not _is_anonymous_username(row['username']):
             # front-end expects fields to be filled out
             row.update({
                 'num_forum_points': NO_STUDENT_DATA,
@@ -2624,9 +2633,6 @@ def process_analytics_student_data(course_id, data):
                     'num_forum_created': usage_data[0],
                     'num_forum_points': usage_data[1],
                 })
-
-            # for anonymous usernames, abbreviate names to "anon"
-            _abbreviate_anon_username(row)
 
             student_data.append(row)
 
@@ -2688,11 +2694,6 @@ def _get_start_end_from_time_span(time_span):
     end_str = end.strftime('%Y-%m-%d')
 
     return (start_str, end_str)
-
-
-def _abbreviate_anon_username(row):
-    if 'anon' in row['username']:
-        row['username'] = 'anon'
 
 
 def _split_input_list(str_list):
