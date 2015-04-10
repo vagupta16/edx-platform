@@ -238,16 +238,19 @@ class StudentAnalyticsDataWidget
     
     # initialize grid and add sortable columns as a feature
     @grid = new Slick.Grid(table_placeholder, @dataview, columns, options)
-    @grid.onSort.subscribe (e, args) =>
+    @grid.onSort.subscribe((e, args) =>
       sortcol = args.sortCol.field
-      console.log 'in callback ', args
-      comparator = (a, b) ->
+      comparator = ((a, b) ->
         x = a[sortcol]
         y = b[sortcol]
-        return (x == y ? 0 : (x > y ? 1: -1))
+        if x == y
+          return 0
+        else if x > y
+          return 1
+        else
+          return -1
+      )
       @dataview.sort(comparator, args.sortAsc)
-    @grid.onCellChange.subscribe((e, args) =>
-      @dataview.updateItem(args.item.id, args.item)
     )
     @dataview.onRowsChanged.subscribe((e, args) =>
       @grid.invalidateRows(args.rows)
