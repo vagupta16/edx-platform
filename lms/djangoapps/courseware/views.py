@@ -57,6 +57,7 @@ from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from instructor.enrollment import uses_shib
 from util.date_utils import get_time_display
 
@@ -64,6 +65,9 @@ from util.db import commit_on_success_with_read_committed
 
 import survey.utils
 import survey.views
+
+from analyticsclient.client import Client
+from analyticsclient.exceptions import NotFoundError, InvalidRequestError, TimeoutError
 
 from util.views import ensure_valid_course_key
 log = logging.getLogger("edx.courseware")
@@ -1139,8 +1143,74 @@ def get_course_lti_endpoints(request, course_id):
 def get_analytics_video_data(request):
     
     print "In get_analytics_video_data"
+    
+    all_data = json.loads(request.POST['data'])
+    module_id = all_data['module_id']
+    course_id = all_data['course_id']
+    course_id = 'DB/Indexes/SelfPaced'
+    course_key = CourseKey.from_string(course_id)
+    
+    print module_id
+    print course_id
+    
+ #   import pudb; pudb.set_trace()
+    
+    # Check user is enrolled as a staff member of this course
+    try:
+        course = get_course_with_access(request.user, 'staff', course_key, depth=None)
+    except Http404:
+        return HttpResponseServerError(error_message_with_link)
 
-    return JsonResponse({})
+    having_access = has_access(request.user, 'staff', course)
+    url = getattr(settings, 'ANALYTICS_DATA_URL')
+    auth_token = getattr(settings, 'ANALYTICS_DATA_TOKEN')
+
+    if not having_access or not url:
+        return HttpResponseServerError(error_message_with_link)
+
+    client = Client(base_url=url, auth_token=auth_token)
+    
+    coursex = client.courses(course_id)
+    
+   # module = client.modules(course.id, module_id)
+
+    try:
+        data = coursex.videos() #answer_distribution()
+    except NotFoundError:
+        return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
+    except InvalidRequestError:
+        return HttpResponseServerError(error_message_with_link)
+    except TimeoutError:
+        return HttpResponseServerError(error_message_with_link)
+     
+#     print "**************************"
+#     print data
+#     print "**************************"
+    
+    try:
+        data = coursex.video_seek_times('i4x-DB-Indexes-video-vid-isolation_levels-slice1')
+    except NotFoundError:
+        return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
+    except InvalidRequestError:
+        return HttpResponseServerError(error_message_with_link)
+    except TimeoutError:
+        return HttpResponseServerError(error_message_with_link)
+    
+
+    print "**************************"
+    print data
+    print "**************************"
+    
+    
+    return JsonResponse(data);
+
+    return process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
+    
+    
+    
+    
+
+    
 
 
 def get_analytics_answer_dist(request):
