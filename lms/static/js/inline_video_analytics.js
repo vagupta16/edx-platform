@@ -64,49 +64,46 @@ window.InlineVideoAnalytics = (function() {
     
     function processResponse2(response) {
     	
-    	var data = d3.values(response);
+    	var data = d3.values(response.data);
     	console.log(data);
-    	var analytics_granularity = 10;
+    	var videoSettings = d3.values(response.video_settings);
+    	var seekInterval = 0;
     	
+    	for (var index = 0; index < videoSettings.length; index++) {
+    		if (videoSettings[index]['name'] === 'seek_interval') {
+    			seekInterval = videoSettings[index]['value'];
+    			break;
+    		}
+    	}
     	
         var youtubeId = Video.previousState.metadata[Object.keys(Video.previousState.metadata)[0]].id;
         console.log(youtubeId);
         
         var duration = Video.previousState.metadata[youtubeId].duration;
         console.log(duration);
-        duration = 450;
     	
-    	
-    //    var data = [ 5, 20, 35, 50, 65, 70, 65, 50, 90, 100, 70, 65, 50, 35, 20];
         var margin = {top: 20, right: 20, bottom: 30, left: 40};
         var width = $('.inline-analytics-video_block').parent().width() - margin.left - margin.right;
-        var height = 500 - margin.top - margin.bottom;
+        var height = 250 - margin.top - margin.bottom;
         var parseDate = d3.time.format("%Y-%m-%d").parse;
         var color = d3.scale.category10();
-        var barWidth = (width-300)/(duration/analytics_granularity);
+        var barWidth = 10; //(width-300)/(duration/analytics_granularity);
         var barPadding = 1;
         
-        
-    	
         var x = d3.scale.linear()
-        .range([20, width-70])
+        .range([20, width - 40])
         .domain([0, duration]);
+
 
         var y = d3.scale.linear()
         .rangeRound([height, 0])
         .domain([0, d3.max(data, function(d) { return d.total_activity; })]);
     	
-        //these colors don't exactly correspond to the exact elements in the graph but to generate them
-        //we read the header to generate the colors
-//        var header = d3.keys(data[0]);
-//        var coloredHeader = header.map(color);
-//
-//        var color = d3.scale.ordinal()
-//            .range(coloredHeader);
 
         var xAxis = d3.svg.axis()
             .scale(x)
             .orient("bottom");
+        
         
         var yAxis = d3.svg.axis()
             .scale(y)
@@ -119,44 +116,17 @@ window.InlineVideoAnalytics = (function() {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         
- //       color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Date"; }));
-        
-        //x.domain(d3.extent(data, function(d) { return d.count(); }));
-        //y.domain([0, d3.max(data, function(d) { return d; })]);
-        
-        
-//        data.forEach(function(d) {
-//            d.date = parseDate(d.Date);
-//            var y0 = 0;
-//            d.counts = color.domain().map(function(name) {
-//                return {
-//                    name: name, y0: y0, y1: y0 += +d[name]}; });
-//            d.total = d.counts[d.counts.length - 1].y1;
-//        });
-        
-        
-//    	svg.selectAll(".bar")
-//        .data(data)
-//        .enter().append("rect")
-//        .attr("x", function(d, i) { return i * 20; })
-//        .attr("width", 15)
-//        .attr("height", function(d) { return d; })
-//        .style("fill", "red");
     	
     	svg.selectAll(".bar")
         .data(data)
         .enter().append("rect")
         .attr("class", "bar")
-        .attr("x", function(d) { return x(d.seek_interval - barWidth/2);})
-        .attr("width", barWidth - barPadding) // function(d, i) { return analytics_granularity - barPadding;})
+        .attr("x", function(d) { return x(d.seek_interval);}) // + barWidth/2);})
+        .attr("width", barWidth - barPadding)              //  barWidth - barPadding) //     x(barWidth) + "px";)
         .attr("y", function(d) {return y(d.total_activity);})
         .attr("height", function(d) { return y(0) - y(d.total_activity);})
         .style("fill", "teal");
     	
-    	
-        
-   //     x.domain(d3.extent(data, function(d) { return d; }));
-   //     y.domain([0, d3.max(data, function(d) { return d; })]); 	
    
 
     	
@@ -193,10 +163,12 @@ window.InlineVideoAnalytics = (function() {
             var answerDistUrl = this.dataset.answerDistUrl;
             var courseId = this.dataset.courseId;
             
-            console.log(location);
-            console.log(answerDistUrl);
-            console.log(courseId);
+         //   console.log(location);
+         //   console.log(answerDistUrl);
+         //   console.log(courseId);
             
+            location = Video.previousState.id;
+            console.log(location);
             
             var data = {
             		module_id: location,
@@ -209,7 +181,7 @@ window.InlineVideoAnalytics = (function() {
                 type: 'POST',
                 data: {data: JSON.stringify(data)},
                 dataType: 'json',
-                contentType: "application/json",
+                contentType: 'application/json',
                 
                 success: function(response) {
                     if (response) {

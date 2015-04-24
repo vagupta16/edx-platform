@@ -1142,12 +1142,12 @@ def get_course_lti_endpoints(request, course_id):
 
 def get_analytics_video_data(request):
     
-    print "In get_analytics_video_data"
-    
     all_data = json.loads(request.POST['data'])
     module_id = all_data['module_id']
     course_id = all_data['course_id']
-    course_id = 'DB/Indexes/SelfPaced'
+    
+  #  course_id = 'DB/Indexes/SelfPaced'
+    
     course_key = CourseKey.from_string(course_id)
     
     print module_id
@@ -1169,26 +1169,25 @@ def get_analytics_video_data(request):
         return HttpResponseServerError(error_message_with_link)
 
     client = Client(base_url=url, auth_token=auth_token)
-    
-    coursex = client.courses(course_id)
-    
-   # module = client.modules(course.id, module_id)
+    client_course = client.courses(course_id)
 
-    try:
-        data = coursex.videos() #answer_distribution()
-    except NotFoundError:
-        return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
-    except InvalidRequestError:
-        return HttpResponseServerError(error_message_with_link)
-    except TimeoutError:
-        return HttpResponseServerError(error_message_with_link)
+#     try:
+#         data = client_course.videos() #answer_distribution()
+#     except NotFoundError:
+#         return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
+#     except InvalidRequestError:
+#         return HttpResponseServerError(error_message_with_link)
+#     except TimeoutError:
+#         return HttpResponseServerError(error_message_with_link)
      
 #     print "**************************"
 #     print data
 #     print "**************************"
     
+   # module_id = 'i4x-DB-Indexes-video-vid-isolation_levels-slice1'
+    
     try:
-        data = coursex.video_seek_times('i4x-DB-Indexes-video-vid-isolation_levels-slice1')
+        data = client_course.video_seek_times(module_id)
     except NotFoundError:
         return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
     except InvalidRequestError:
@@ -1196,21 +1195,27 @@ def get_analytics_video_data(request):
     except TimeoutError:
         return HttpResponseServerError(error_message_with_link)
     
+    try:
+        video_settings = client_course.video_settings()
+    except NotFoundError:
+        return HttpResponseNotFound(_('Could not find the settings.'))
+    except InvalidRequestError:
+        return HttpResponseServerError(error_message_with_link)
+    except TimeoutError:
+        return HttpResponseServerError(error_message_with_link)
+            
+    print "---------------"
+    print video_settings
 
     print "**************************"
     print data
     print "**************************"
     
-    
-    return JsonResponse(data);
-
-    return process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
-    
-    
-    
-    
-
-    
+    response_payload = {
+        'data': data,
+        'video_settings': video_settings,
+    }
+    return JsonResponse(response_payload);
 
 
 def get_analytics_answer_dist(request):
