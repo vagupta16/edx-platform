@@ -76,6 +76,21 @@ CERTIFICATE_FIELDS = [
     ('has_certificate_special_case', 'Certif'),
 ]
 
+CME_SPECIFIC_ORDER = (
+    PROFILE_FIELDS +
+    REGISTRATION_FIELDS[0:1] +
+    ORDER_FIELDS[0:1] +
+    REGISTRATION_FIELDS[1:2] +
+    ORDER_FIELDS[1:2] + 
+    REGISTRATION_FIELDS[2:3] +
+    ORDER_FIELDS[2:3] +
+    REGISTRATION_FIELDS[3:4] +
+    ORDER_FIELDS[3:4] + 
+    REGISTRATION_FIELDS[4:] + 
+    CERTIFICATE_FIELDS
+)
+
+
 class Command(BaseCommand):
     help = """Export data required by Stanford SCCME Tracker Project to .csv file."""
 
@@ -144,8 +159,7 @@ class Command(BaseCommand):
             outfile = tempfile.NamedTemporaryFile(suffix='.csv', delete=False)
             outfile_name = outfile.name
 
-        all_fields = PROFILE_FIELDS + REGISTRATION_FIELDS + ORDER_FIELDS + CERTIFICATE_FIELDS
-        csv_fieldnames = [label for field, label in all_fields if len(label) > 0]
+        csv_fieldnames = [label for field, label in CME_SPECIFIC_ORDER if len(label) > 0]
 
         csvwriter = csv.DictWriter(outfile, fieldnames=csv_fieldnames, delimiter='\t', quoting=csv.QUOTE_ALL)
         csvwriter.writeheader()
