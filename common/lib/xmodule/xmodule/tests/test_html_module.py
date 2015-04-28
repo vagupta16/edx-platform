@@ -35,10 +35,10 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
         module_system = get_test_system()
         module_system.substitute_keywords_with_data = Mock(return_value=anon_id)
         module = HtmlModule(self.descriptor, module_system, field_data, Mock())
-<<<<<<< HEAD
+        # TODO:FUNK <<<<<<< HEAD
         self.assertEqual(module.get_html(), anon_id)
-=======
-        self.assertEqual(module.get_html(), sample_xml)
+        # TODO:FUNK =======
+        # self.assertEqual(module.get_html(), sample_xml)
 
 
 class HtmlDescriptorIndexingTestCase(unittest.TestCase):
@@ -107,4 +107,4 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
             "content_type": "Text"
         })
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+        # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
