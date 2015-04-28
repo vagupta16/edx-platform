@@ -53,8 +53,12 @@ class HeartbeatFailure(Exception):
         In addition to a msg, provide the name of the service.
         """
         self.service = service
+<<<<<<< HEAD
         return super(HeartbeatFailure, self).__init__(msg)
 
 
 class TimeExpiredError(Exception):
     pass
+=======
+        super(HeartbeatFailure, self).__init__(msg)
+>>>>>>> 00b75f0119b981641833240be214ef2076329747

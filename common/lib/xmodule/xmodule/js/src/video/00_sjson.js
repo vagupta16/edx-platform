@@ -62,15 +62,35 @@ function() {
         };
 
         function filter(start, end) {
+<<<<<<< HEAD
+=======
+            /* filters captions that occur between inputs
+             * `start` and `end`. Start and end should
+             * be Numbers (doubles) corresponding to the
+             * number of seconds elapsed since the beginning
+             * of the video.
+             *
+             * Returns an object with properties
+             * "start" and "captions" representing
+             * parallel arrays of start times and
+             * their corresponding captions.
+             */
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
             var filteredTimes = [];
             var filteredCaptions = [];
             var startTimes = getStartTimes();
             var captions = getCaptions();
+<<<<<<< HEAD
             var currentStartTime;
             var i;
 
             if (startTimes.length !== captions.length) {
                 return [];
+=======
+
+            if (startTimes.length !== captions.length) {
+                throw new Exception("video caption and start time arrays do not match in length");
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
             }
 
             // if end is null, then it's been set to
@@ -80,6 +100,7 @@ function() {
                 end = startTimes[startTimes.length - 1];
             }
 
+<<<<<<< HEAD
             for (i = 0; i < startTimes.length; i++) {
               currentStartTime = startTimes[i];
               if (currentStartTime >= start && currentStartTime <= end) {
@@ -91,6 +112,18 @@ function() {
             return {
               'start': filteredTimes,
               'captions': filteredCaptions
+=======
+            _.filter(startTimes, function(currentStartTime, i) {
+                if (currentStartTime >= start && currentStartTime <= end) {
+                    filteredTimes.push(currentStartTime);
+                    filteredCaptions.push(captions[i]);
+                }
+            });
+
+            return {
+                'start': filteredTimes,
+                'captions': filteredCaptions
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
             };
         }
 

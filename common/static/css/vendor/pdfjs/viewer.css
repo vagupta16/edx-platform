@@ -1988,6 +1988,7 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
     display: none;
   }
 }
+<<<<<<< HEAD
 
 .toolbarButton#openFile,
 .toolbarButton#print,
@@ -1998,3 +1999,5 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
 .horizontalToolbarSeparator.visibleLargeView {
     display: none;
 }
+=======
+>>>>>>> 00b75f0119b981641833240be214ef2076329747

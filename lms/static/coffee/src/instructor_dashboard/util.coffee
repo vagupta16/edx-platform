@@ -19,7 +19,7 @@ find_and_assert = ($root, selector) ->
 #
 # wraps a `handler` function so that first
 # it prints basic error information to the console.
-std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
+@std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
   console.warn """ajax error
                   textStatus: #{textStatus}
                   errorThrown: #{errorThrown}"""
@@ -29,7 +29,7 @@ std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
 # render a task list table to the DOM
 # `$table_tasks` the $element in which to put the table
 # `tasks_data`
-create_task_list_table = ($table_tasks, tasks_data) ->
+@create_task_list_table = ($table_tasks, tasks_data) ->
   $table_tasks.empty()
 
   options =
@@ -209,7 +209,7 @@ create_email_message_views = ($messages_wrapper, emails) ->
     $email_header.append $('<input>', type: "button", name: "copy-email-body-text", value: gettext("Copy Email To Editor"), id: "copy_email_" + email_id)
 
     $close_button = $ '<a>', href: '#', class: "close-modal"
-    $close_button.append $ '<i>', class: 'icon-remove'
+    $close_button.append $ '<i>', class: 'icon fa fa-times'
     $email_header.append $close_button
 
     # HTML escape the subject line
@@ -264,7 +264,7 @@ class IntervalManager
     @intervalID = null
 
 
-class PendingInstructorTasks
+class @PendingInstructorTasks
   ### Pending Instructor Tasks Section ####
   constructor: (@$section) ->
     # Currently running tasks
@@ -303,6 +303,7 @@ class PendingInstructorTasks
 class KeywordValidator
 
     @keyword_regex = /%%+[^%]+%%/g
+<<<<<<< HEAD
     @keywords = [
       '%%USER_ID%%',
       '%%USER_FULLNAME%%',
@@ -311,6 +312,9 @@ class KeywordValidator
       '%%COURSE_START_DATE%%',
       '%%COURSE_END_DATE%%'
     ]
+=======
+    @keywords = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%']
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     @validate_string: (string) =>
       regex_match = string.match(@keyword_regex)
@@ -323,10 +327,17 @@ class KeywordValidator
         do (found_keyword) ->
           if found_keyword not in keywords
             invalid_keywords.push found_keyword
+<<<<<<< HEAD
       
       if invalid_keywords.length != 0
         is_valid = false
       
+=======
+
+      if invalid_keywords.length != 0
+        is_valid = false
+
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
       return {
         is_valid: is_valid,
         invalid_keywords: invalid_keywords

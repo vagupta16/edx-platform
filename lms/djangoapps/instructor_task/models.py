@@ -238,6 +238,7 @@ class S3ReportStore(ReportStore):
             settings.AWS_ACCESS_KEY_ID,
             settings.AWS_SECRET_ACCESS_KEY
         )
+
         self.bucket = conn.get_bucket(bucket_name)
 
     @classmethod
@@ -334,6 +335,7 @@ class S3ReportStore(ReportStore):
         can be plugged straight into an href
         """
         course_dir = self.key_for(course_id, '')
+<<<<<<< HEAD
         sorted_link_data = sorted(
             [
                 # each element in the array is a list with the following format: ('date, 'filename', 'url')
@@ -345,6 +347,11 @@ class S3ReportStore(ReportStore):
         return [
             (link_data[1], link_data[2])
             for link_data in sorted_link_data
+=======
+        return [
+            (key.key.split("/")[-1], key.generate_url(expires_in=300))
+            for key in sorted(self.bucket.list(prefix=course_dir.key), reverse=True, key=lambda k: k.last_modified)
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
         ]
 
 
@@ -429,6 +436,7 @@ class LocalFSReportStore(ReportStore):
         course_dir = self.path_to(course_id, '')
         if not os.path.exists(course_dir):
             return []
+<<<<<<< HEAD
         sorted_link_data = sorted(
             [
                 # each element in the array is a list with the following format: ('date, 'filename', 'url')
@@ -440,4 +448,12 @@ class LocalFSReportStore(ReportStore):
         return [
             (link_data[1], link_data[2])
             for link_data in sorted_link_data
+=======
+        files = [(filename, os.path.join(course_dir, filename)) for filename in os.listdir(course_dir)]
+        files.sort(key=lambda (filename, full_path): os.path.getmtime(full_path), reverse=True)
+
+        return [
+            (filename, ("file://" + urllib.quote(full_path)))
+            for filename, full_path in files
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
         ]

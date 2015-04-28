@@ -9,6 +9,10 @@ from django.core.urlresolvers import reverse
 from edxmako import add_lookup, LOOKUP
 from lms import startup
 from xmodule.modulestore.tests.factories import CourseFactory
+<<<<<<< HEAD
+=======
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
 from util import keyword_substitution
 
 
@@ -43,9 +47,10 @@ class TemplateLookupTests(TestCase):
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_FEEDBACK_SUBMISSION': True})
-class HelpModalTests(TestCase):
+class HelpModalTests(ModuleStoreTestCase):
     """Tests for the help modal"""
     def setUp(self):
+        super(HelpModalTests, self).setUp()
         self.course = CourseFactory.create()
 
     def test_simple_test(self):

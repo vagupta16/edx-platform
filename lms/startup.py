@@ -7,14 +7,15 @@ Module for code that should run during LMS startup
 from django.conf import settings
 
 # Force settings to run so that the python path is modified
-settings.INSTALLED_APPS  # pylint: disable=W0104
+settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
-from django_startup import autostartup
+from openedx.core.lib.django_startup import autostartup
 import edxmako
 import logging
 from monkey_patch import django_utils_translation
 import analytics
 from util import keyword_substitution
+
 
 
 log = logging.getLogger(__name__)

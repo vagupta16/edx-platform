@@ -296,10 +296,17 @@ function () {
     }
 
     function updateVcrVidTime(params) {
+<<<<<<< HEAD
         var duration = (this.config.endTime !== null) ? this.config.endTime : params.duration;
         // in case endTime is accidentally specified as being greater than the video
         duration = Math.min(duration, params.duration);
         this.videoControl.vidTimeEl.html(Time.format(params.time) + ' / ' + Time.format(duration));
+=======
+        var endTime = (this.config.endTime !== null) ? this.config.endTime : params.duration;
+        // in case endTime is accidentally specified as being greater than the video
+        endTime = Math.min(endTime, params.duration);
+        this.videoControl.vidTimeEl.html(Time.format(params.time) + ' / ' + Time.format(endTime));
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
     }
 
 });

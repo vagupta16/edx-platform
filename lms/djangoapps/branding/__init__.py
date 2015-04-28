@@ -12,11 +12,17 @@ def get_visible_courses():
     Return the set of CourseDescriptors that should be visible in this branded instance
     """
 
+<<<<<<< HEAD
     # In the event we don't want any course tiles displayed
     if not getattr(settings, 'DISPLAY_COURSE_TILES', False):
         return []
 
     _courses = modulestore().get_courses()
+=======
+    filtered_by_org = microsite.get_value('course_org_filter')
+
+    _courses = modulestore().get_courses(org=filtered_by_org)
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     courses = [c for c in _courses
                if isinstance(c, CourseDescriptor)]
@@ -31,6 +37,7 @@ def get_visible_courses():
     if hasattr(settings, 'COURSE_LISTINGS') and subdomain in settings.COURSE_LISTINGS and not settings.DEBUG:
         filtered_visible_ids = frozenset([SlashSeparatedCourseKey.from_deprecated_string(c) for c in settings.COURSE_LISTINGS[subdomain]])
 
+<<<<<<< HEAD
     filtered_by_org = microsite.get_value('course_org_filter')
 
     filtered_by_db = TileConfiguration.objects.filter(
@@ -41,6 +48,8 @@ def get_visible_courses():
         filtered_by_db_ids = [course['course_id'] for course in filtered_by_db]
         filtered_by_db_keys = frozenset([SlashSeparatedCourseKey.from_string(c) for c in filtered_by_db_ids])
         return [course for course in courses if course.id in filtered_by_db_keys]
+=======
+>>>>>>> 00b75f0119b981641833240be214ef2076329747
     if filtered_by_org:
         return [course for course in courses if course.location.org == filtered_by_org]
     if filtered_visible_ids:
@@ -77,11 +86,15 @@ def get_logo_url():
     # otherwise, use the legacy means to configure this
     university = microsite.get_value('university')
 
-    if university is None:
-        return '{static_url}images/logo-edX-77x36.png'.format(
+    if university is None and settings.FEATURES.get('IS_EDX_DOMAIN', False):
+        return '{static_url}images/edx-theme/edx-logo-77x36.png'.format(
             static_url=settings.STATIC_URL
         )
-
-    return '{static_url}images/{uni}-on-edx-logo.png'.format(
-        static_url=settings.STATIC_URL, uni=university
-    )
+    elif university:
+        return '{static_url}images/{uni}-on-edx-logo.png'.format(
+            static_url=settings.STATIC_URL, uni=university
+        )
+    else:
+        return '{static_url}images/default-theme/logo.png'.format(
+            static_url=settings.STATIC_URL
+        )
