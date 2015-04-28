@@ -170,10 +170,10 @@ class LTIModuleTest(LogicTest):
         """
         Should fail if we do not accept past due grades, and it is past due.
         """
-<<<<<<< HEAD
-=======
+        # TODO:FUNK <<<<<<< HEAD
+        # TODO:FUNK =======
         self.xmodule.accept_grades_past_due = False
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+        # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         self.xmodule.due = datetime.datetime.now(UTC())
         self.xmodule.graceperiod = Timedelta().from_json("0 seconds")
         request = Request(self.environ)
