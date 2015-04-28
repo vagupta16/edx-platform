@@ -9,12 +9,12 @@ import json
 import warnings
 from collections import defaultdict
 from pytz import UTC
-<<<<<<< HEAD
-from pytz import timezone
+# TODO:FUNK <<<<<<< HEAD
+# from pytz import timezone
 import json
-=======
+# TODO:FUNK =======
 from ipware.ip import get_ip
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -77,11 +77,12 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from collections import namedtuple
 
-<<<<<<< HEAD
-from courseware.courses import get_courses, sort_by_announcement, get_course_about_section
-=======
+# TODO:FUNK <<<<<<< HEAD
+# from courseware.courses import get_courses, sort_by_announcement, get_course_about_section
+from courseware.courses import get_course_about_section
+# TODO:FUNK =======
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from courseware.access import has_access
 from courseware.models import CoursePreference
 
@@ -107,14 +108,14 @@ import dogstats_wrapper as dog_stats_api
 from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 from util.keyword_substitution import substitute_keywords_with_data
 
-=======
+# TODO:FUNK =======
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
 )
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from microsite_configuration import microsite
 
 from util.password_policy_validators import (
@@ -403,27 +404,29 @@ def _cert_info(user, course, cert_status, course_mode):
 
 @ensure_csrf_cookie
 def signin_user(request):
-<<<<<<< HEAD
-    """
-    This view will display the non-modal login form
-    """
-    if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
-            external_auth.views.ssl_get_cert_from_request(request)):
-        # SSL login doesn't require a view, so redirect
-        # branding and allow that to process the login if it
-        # is enabled and the header is in the request.
-        return external_auth.views.redirect_with_get('root', request.GET)
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        # If CAS is enabled, redirect auth handling to there
-        return redirect(reverse('cas-login'))
+# TODO:FUNK <<<<<<< HEAD
+#     """
+#     This view will display the non-modal login form
+#     """
+#     if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
+#             external_auth.views.ssl_get_cert_from_request(request)):
+#         # SSL login doesn't require a view, so redirect
+#         # branding and allow that to process the login if it
+#         # is enabled and the header is in the request.
+#         return external_auth.views.redirect_with_get('root', request.GET)
+#     if settings.FEATURES.get('AUTH_USE_CAS'):
+#         # If CAS is enabled, redirect auth handling to there
+#         return redirect(reverse('cas-login'))
     if UserProfile.has_registered(request.user):
-=======
+# TODO:FUNK =======
     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
     external_auth_response = external_auth_login(request)
     if external_auth_response is not None:
         return external_auth_response
-    if request.user.is_authenticated():
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+    # if request.user.is_authenticated():
+# CUSTOM
+    if UserProfile.has_registered(request.user):
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         return redirect(reverse('dashboard'))
 
     course_id = request.GET.get('course_id')
@@ -449,18 +452,18 @@ def signin_user(request):
 
 @ensure_csrf_cookie
 def register_user(request, extra_context=None):
-<<<<<<< HEAD
-    """
-    This view will display the non-modal registration form
-    """
+# TODO:FUNK <<<<<<< HEAD
+#     """
+#     This view will display the non-modal registration form
+#     """
     if settings.FEATURES.get('USE_CME_REGISTRATION'):
         return cme_register_user(request, extra_context=extra_context)
 
     if UserProfile.has_registered(request.user):
-=======
+# TODO:FUNK =======
     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
-    if request.user.is_authenticated():
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+#     if request.user.is_authenticated():
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         return redirect(reverse('dashboard'))
 
     external_auth_response = external_auth_register(request)
@@ -560,13 +563,13 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 def dashboard(request):
     user = request.user
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     if not UserProfile.has_registered(user):
         logout(request)
         return redirect(reverse('dashboard'))
-=======
+# TODO:FUNK =======
     platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     # for microsites, we want to filter and only show enrollments for courses within
     # the microsites 'ORG'
@@ -955,16 +958,16 @@ def change_enrollment(request, check_access=True):
             )
             return HttpResponseBadRequest(_("Course id is invalid"))
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
         can_enroll, error_msg = _check_can_enroll_in_course(user, course_id)
 
         if not can_enroll:
             return HttpResponseBadRequest(error_msg)
-=======
+# TODO:FUNK =======
         # Record the user's email opt-in preference
         if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
             _update_email_opt_in(request, course_id.org)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
         available_modes = CourseMode.modes_for_course_dict(course_id)
 
@@ -1574,18 +1577,18 @@ def create_account_with_params(request, params):
       minimum of two characters long" rather than "Please use a username of
       at least two characters").
     """
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     if settings.FEATURES.get('USE_CME_REGISTRATION'):
         return cme_create_account(request, post_override=post_override)
 
-    js = {'success': False}  # pylint: disable-msg=invalid-name
-
-    post_vars = post_override if post_override else request.POST
-=======
+#     js = {'success': False}  # pylint: disable-msg=invalid-name
+# 
+#     post_vars = post_override if post_override else request.POST
+# TODO:FUNK =======
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values
     params = dict(params.items())
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     # allow for microsites to define their own set of required/optional/hidden fields
     extra_fields = microsite.get_value(
