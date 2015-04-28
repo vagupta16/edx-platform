@@ -297,52 +297,52 @@ class LibraryExportManager(ExportManager):
             self.courselike_key.org, self.courselike_key.library
         )
 
-<<<<<<< HEAD
-                if draft_modules:
-                    draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
-
-                    # accumulate tuples of draft_modules and their parents in
-                    # this list:
-                    draft_node_list = []
-
-                    for draft_module in draft_modules:
-                        parent_loc = modulestore.get_parent_location(
-                            draft_module.location,
-                            revision=ModuleStoreEnum.RevisionOption.draft_preferred
-                        )
-                        # Don't try to export orphaned items.
-                        if parent_loc is not None:
-                            logging.debug('parent_loc = {0}'.format(parent_loc))
-                            draft_node = draft_node_constructor(
-                                draft_module,
-                                location=draft_module.location,
-                                url=draft_module.location.to_deprecated_string(),
-                                parent_location=parent_loc,
-                                parent_url=parent_loc.to_deprecated_string(),
-                            )
-
-                            draft_node_list.append(draft_node)
-
-                    for draft_node in get_draft_subtree_roots(draft_node_list):
-                        # only export the roots of the draft subtrees
-                        # since export_from_xml (called by `add_xml_to_node`)
-                        # exports a whole tree
-
-                        # ensure module has "xml_attributes" attr
-                        if not hasattr(draft_node.module, 'xml_attributes'):
-                            draft_node.module.xml_attributes = {}
-
-                        draft_node.module.xml_attributes['parent_url'] = draft_node.parent_url
-                        parent = modulestore.get_item(draft_node.parent_location)
-                        index = parent.children.index(draft_node.module.location)
-                        draft_node.module.xml_attributes['index_in_children_list'] = str(index)
-
-                        draft_node.module.runtime.export_fs = draft_course_dir
-                        adapt_references(draft_node.module, xml_centric_course_key, draft_course_dir)
-                        node = lxml.etree.Element('unknown')
-
-                        draft_node.module.add_xml_to_node(node)
-=======
+# TODO:FUNK <<<<<<< HEAD
+#                 if draft_modules:
+#                     draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
+# 
+#                     # accumulate tuples of draft_modules and their parents in
+#                     # this list:
+#                     draft_node_list = []
+# 
+#                     for draft_module in draft_modules:
+#                         parent_loc = modulestore.get_parent_location(
+#                             draft_module.location,
+#                             revision=ModuleStoreEnum.RevisionOption.draft_preferred
+#                         )
+#                         # Don't try to export orphaned items.
+#                         if parent_loc is not None:
+#                             logging.debug('parent_loc = {0}'.format(parent_loc))
+#                             draft_node = draft_node_constructor(
+#                                 draft_module,
+#                                 location=draft_module.location,
+#                                 url=draft_module.location.to_deprecated_string(),
+#                                 parent_location=parent_loc,
+#                                 parent_url=parent_loc.to_deprecated_string(),
+#                             )
+# 
+#                             draft_node_list.append(draft_node)
+# 
+#                     for draft_node in get_draft_subtree_roots(draft_node_list):
+#                         # only export the roots of the draft subtrees
+#                         # since export_from_xml (called by `add_xml_to_node`)
+#                         # exports a whole tree
+# 
+#                         # ensure module has "xml_attributes" attr
+#                         if not hasattr(draft_node.module, 'xml_attributes'):
+#                             draft_node.module.xml_attributes = {}
+# 
+#                         draft_node.module.xml_attributes['parent_url'] = draft_node.parent_url
+#                         parent = modulestore.get_item(draft_node.parent_location)
+#                         index = parent.children.index(draft_node.module.location)
+#                         draft_node.module.xml_attributes['index_in_children_list'] = str(index)
+# 
+#                         draft_node.module.runtime.export_fs = draft_course_dir
+#                         adapt_references(draft_node.module, xml_centric_course_key, draft_course_dir)
+#                         node = lxml.etree.Element('unknown')
+# 
+#                         draft_node.module.add_xml_to_node(node)
+# TODO:FUNK =======
     def get_courselike(self):
         """
         Get the library from the modulestore.
@@ -397,7 +397,8 @@ def export_library_to_xml(modulestore, contentstore, library_key, root_dir, libr
     Thin wrapper for the Library Export Manager. See ExportManager for details.
     """
     LibraryExportManager(modulestore, contentstore, library_key, root_dir, library_dir).export()
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
+
 
 
 def adapt_references(subtree, destination_course_key, export_fs):
