@@ -155,16 +155,6 @@ testtools==0.9.34
 analytics-python==0.4.4
 
 git+https://github.com/mfogel/django-settings-context-processor.git
-<<<<<<< HEAD
-
-# django-cas version 2.0.3 with patch to be compatible with django 1.4
-git+https://github.com/mitocw/django-cas.git
-
-# edX packages
-# Forking Submissions repo for ORA2 score override function.
--e git+https://github.com/Stanford-Online/edx-submissions.git@346bee219e888e78c20bf8ce381bb37f40e86e08#egg=edx-submissions
 
 # XBlocks from PyPi
 xblock-image-modal >=0.1.2, <1.0.0
-=======
->>>>>>> 00b75f0119b981641833240be214ef2076329747
