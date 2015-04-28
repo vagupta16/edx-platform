@@ -421,7 +421,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/accounts/login?next={url}'.format(url=TARGET_URL), 302))
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
         self.assertContains(
             noshib_response,
             "Log into your {account_name} Account | {platform_name}".format(
@@ -429,10 +429,10 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
                 platform_name=settings.PLATFORM_NAME,
             )
         )
-=======
+# TODO:FUNK =======
         self.assertContains(noshib_response, ("Sign in or Register | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         self.assertEqual(noshib_response.status_code, 200)
 
         TARGET_URL_SHIB = reverse('courseware', args=[self.shib_course.id.to_deprecated_string()])  # pylint: disable=invalid-name
