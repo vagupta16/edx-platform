@@ -918,11 +918,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             close_date = due_date + self.graceperiod  # pylint: disable=no-member
         else:
             close_date = due_date
-<<<<<<< HEAD
-        return (close_date is not None and datetime.datetime.now(UTC()) > close_date)
-=======
+        # TODO:FUNK <<<<<<< HEAD
+        # return (close_date is not None and datetime.datetime.now(UTC()) > close_date)
+        # TODO:FUNK =======
         return close_date is not None and datetime.datetime.now(UTC()) > close_date
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+        # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 
 class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
