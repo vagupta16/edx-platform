@@ -13,12 +13,12 @@ from contracts import contract
 
 from django.conf import settings
 from django.utils.timezone import UTC
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 from django.core.urlresolvers import reverse
-=======
+# TODO:FUNK =======
 from django.utils.html import escape
 from django.contrib.auth.models import User
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from edxmako.shortcuts import render_to_string
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
@@ -294,7 +294,7 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 def add_inline_analytics(user, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Adds a fragment for in-line analytics.
@@ -320,7 +320,9 @@ def add_inline_analytics(user, block, view, frag, context):  # pylint: disable=u
 
     else:
         return frag
-=======
+# TODO:FUNK =======
+
+
 def get_course_update_items(course_updates, provided_index=0):
     """
     Returns list of course_updates data dictionaries either from new format if available or
@@ -379,4 +381,4 @@ def get_course_update_items(course_updates, provided_index=0):
                         return payload
 
     return course_update_items
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
