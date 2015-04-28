@@ -62,8 +62,8 @@
         <span class="tip tip-stacked timezone">(UTC)</span>
       </div>
     </li>
-<<<<<<< HEAD
-=======
+<!-- <<<<<<< HEAD -->
+<!-- ======= -->
     <li>
     <li class="field field-select" id="field-pre-requisite-course">
                     <label for="pre-requisite-course" class="">Prerequisite Course</label>
@@ -90,7 +90,7 @@
                 </div>
             </div>
     </li>
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+<!-- >>>>>>> 00b75f0119b981641833240be214ef2076329747 -->
   </ol>
 </section>
 </form>
