@@ -5,10 +5,7 @@
     },
     "invalid_tags": {
         "test_string": "The user with id %%user-id%% is named %%USER_FULLNAME%% and is in %%COURSE_DISPLAY_NAME",
-<<<<<<< HEAD
-        "expected": "The user with id %%user-id%% is named Test User and is in test_course"
-=======
+        "//TODO:FUNK:expected": "The user with id %%user-id%% is named Test User and is in test_course"
         "expected": "The user with id %%user-id%% is named Test User and is in %%COURSE_DISPLAY_NAME"
->>>>>>> 00b75f0119b981641833240be214ef2076329747
     }
 }
