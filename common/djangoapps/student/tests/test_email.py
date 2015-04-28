@@ -4,14 +4,15 @@ import django.db
 import unittest
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
-<<<<<<< HEAD
-from student.views import reactivation_email_for_user, change_email_request, confirm_email_change, notify_enrollment_by_email
-=======
+# TODO:FUNK <<<<<<< HEAD
+# from student.views import reactivation_email_for_user, change_email_request, confirm_email_change, notify_enrollment_by_email
+from student.views import notify_enrollment_by_email
+# TODO:FUNK =======
 from student.views import (
     reactivation_email_for_user, change_email_request, do_email_change_request, confirm_email_change,
     SETTING_CHANGE_INITIATED
 )
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from student.models import UserProfile, PendingEmailChange
 from django.core.urlresolvers import reverse
 from django.core import mail
@@ -24,12 +25,12 @@ from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-=======
+# TODO:FUNK =======
 from util.testing import EventTestMixin
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 
 class TestException(Exception):
@@ -75,7 +76,7 @@ class EmailTestMixin(object):
         self.addCleanup(settings.ALLOWED_HOSTS.pop)
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 class EnrollmentEmailTests(ModuleStoreTestCase):
     """ Test senging automated emails to users upon course enrollment. """
     def setUp(self):
@@ -108,7 +109,9 @@ class EnrollmentEmailTests(ModuleStoreTestCase):
         email_result = self.send_enrollment_email()
         self.assertNotIn('email_did_fire', email_result)
         self.assertIn('is_success', email_result)
-=======
+# TODO:FUNK =======
+
+
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ActivationEmailTests(TestCase):
     """Test sending of the activation email. """
@@ -174,7 +177,7 @@ class ActivationEmailTests(TestCase):
         self.assertEqual(msg.subject, subject)
         for fragment in body_fragments:
             self.assertIn(fragment, msg.body)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
