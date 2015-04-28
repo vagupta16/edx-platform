@@ -1316,16 +1316,23 @@ class RegistrationViewTest(ApiTestCase):
         self.assertEqual(len(mail.outbox), 1)
         sent_email = mail.outbox[0]
         self.assertEqual(sent_email.to, [self.EMAIL])
-<<<<<<< HEAD:common/djangoapps/user_api/tests/test_views.py
+        # TODO:FUNK <<<<<<< HEAD:common/djangoapps/user_api/tests/test_views.py
         self.assertEqual(sent_email.subject, "Activate Your {account_name} Account".format(account_name=settings.ACCOUNT_NAME))
-        self.assertIn("activate your account", sent_email.body)
-=======
-        self.assertEqual(sent_email.subject, "Activate Your edX Account")
+        # self.assertIn("activate your account", sent_email.body)
+        # TODO:FUNK =======
+        # self.assertEqual(sent_email.subject, "Activate Your edX Account")
+        # self.assertIn(
+        #     u"activating your {platform} account".format(platform=settings.PLATFORM_NAME),
+        #     sent_email.body
+        # )
+        # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747:openedx/core/djangoapps/user_api/tests/test_views.py
         self.assertIn(
-            u"activating your {platform} account".format(platform=settings.PLATFORM_NAME),
+            u"activating your {account_name} account".format(
+                account_name=settings.ACCOUNT_NAME,
+            ),
             sent_email.body
         )
->>>>>>> 00b75f0119b981641833240be214ef2076329747:openedx/core/djangoapps/user_api/tests/test_views.py
+        # TODO:FUNK ------- custom
 
     @ddt.data(
         {"email": ""},
