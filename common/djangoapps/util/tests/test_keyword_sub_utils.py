@@ -18,10 +18,10 @@ class KeywordSubTest(ModuleStoreTestCase):
     """ Tests for the keyword substitution feature """
 
     def setUp(self):
-<<<<<<< HEAD
-=======
+        # TODO:FUNK <<<<<<< HEAD
+        # TODO:FUNK =======
         super(KeywordSubTest, self).setUp(create_user=False)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+        # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         self.user = UserFactory.create(
             email="testuser@edx.org",
             username="testuser",
@@ -33,70 +33,70 @@ class KeywordSubTest(ModuleStoreTestCase):
             display_name='test_course'
         )
 
-<<<<<<< HEAD
-        # Mimic monkeypatching done in startup.py
-        Ks.KEYWORD_FUNCTION_MAP = self.get_keyword_function_map()
-
-    def get_keyword_function_map(self):
-        """
-        Generates a mapping from keywords to functions for testing
-
-        The keyword sub functions should not return %% encoded strings. This
-        would lead to ugly and inconsistent behavior due to the way in which
-        keyword subbing is handled.
-        """
-
-        def user_fullname_sub(user, course):  # pylint: disable=unused-argument
-            """ Returns the user's name """
-            return user.profile.name
-
-        def course_display_name_sub(user, course):  # pylint: disable=unused-argument
-            """ Returns the course name """
-            return course.display_name
-
-        return {
-            '%%USER_FULLNAME%%': Ks.Keyword(user_fullname_sub, 'user profile name'),
-            '%%COURSE_DISPLAY_NAME%%': Ks.Keyword(course_display_name_sub, 'display name of the course'),
-=======
+# TODO:FUNK <<<<<<< HEAD
+#         # Mimic monkeypatching done in startup.py
+#         Ks.KEYWORD_FUNCTION_MAP = self.get_keyword_function_map()
+# 
+#     def get_keyword_function_map(self):
+#         """
+#         Generates a mapping from keywords to functions for testing
+# 
+#         The keyword sub functions should not return %% encoded strings. This
+#         would lead to ugly and inconsistent behavior due to the way in which
+#         keyword subbing is handled.
+#         """
+# 
+#         def user_fullname_sub(user, course):  # pylint: disable=unused-argument
+#             """ Returns the user's name """
+#             return user.profile.name
+# 
+#         def course_display_name_sub(user, course):  # pylint: disable=unused-argument
+#             """ Returns the course name """
+#             return course.display_name
+# 
+#         return {
+#             '%%USER_FULLNAME%%': Ks.Keyword(user_fullname_sub, 'user profile name'),
+#             '%%COURSE_DISPLAY_NAME%%': Ks.Keyword(course_display_name_sub, 'display name of the course'),
+# TODO:FUNK =======
         self.context = {
             'user_id': self.user.id,
             'course_title': self.course.display_name,
             'name': self.user.profile.name,
             'course_end_date': get_default_time_display(self.course.end),
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         }
 
     @file_data('fixtures/test_keyword_coursename_sub.json')
     def test_course_name_sub(self, test_info):
         """ Tests subbing course name in various scenarios """
         course_name = self.course.display_name
-<<<<<<< HEAD
-        result = Ks.substitute_keywords_with_data(test_info['test_string'], self.user.id, self.course.id)
-=======
+# TODO:FUNK <<<<<<< HEAD
+#         result = Ks.substitute_keywords_with_data(test_info['test_string'], self.user.id, self.course.id)
+# TODO:FUNK =======
         result = Ks.substitute_keywords_with_data(
             test_info['test_string'], self.context,
         )
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
         self.assertIn(course_name, result)
         self.assertEqual(result, test_info['expected'])
 
-<<<<<<< HEAD
-    @file_data('fixtures/test_keyword_anonid_sub.json')
-    def test_anonymous_id_subs(self, test_info):
-        """ Tests subbing anon user id in various scenarios """
-        anon_id = '123456789'
-        with patch.dict(Ks.KEYWORD_FUNCTION_MAP, {'%%USER_ID%%': Ks.Keyword(lambda x, y: anon_id, 'anonymous_user_id (for use in survey links)')}):
-            result = Ks.substitute_keywords_with_data(test_info['test_string'], self.user.id, self.course.id)
-
-            self.assertIn(anon_id, result)
-            self.assertEqual(result, test_info['expected'])
-
-    def test_name_sub(self):
-        test_string = "This is the test string. subthis:  %%USER_FULLNAME%% into user name"
-        user_name = self.user.profile.name
-        result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
-=======
+# TODO:FUNK <<<<<<< HEAD
+#     @file_data('fixtures/test_keyword_anonid_sub.json')
+#     def test_anonymous_id_subs(self, test_info):
+#         """ Tests subbing anon user id in various scenarios """
+#         anon_id = '123456789'
+#         with patch.dict(Ks.KEYWORD_FUNCTION_MAP, {'%%USER_ID%%': Ks.Keyword(lambda x, y: anon_id, 'anonymous_user_id (for use in survey links)')}):
+#             result = Ks.substitute_keywords_with_data(test_info['test_string'], self.user.id, self.course.id)
+# 
+#             self.assertIn(anon_id, result)
+#             self.assertEqual(result, test_info['expected'])
+# 
+#     def test_name_sub(self):
+#         test_string = "This is the test string. subthis:  %%USER_FULLNAME%% into user name"
+#         user_name = self.user.profile.name
+#         result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
+# TODO:FUNK =======
     def test_anonymous_id_sub(self):
         """
         Test that anonymous_id is subbed
@@ -118,7 +118,7 @@ class KeywordSubTest(ModuleStoreTestCase):
         result = Ks.substitute_keywords_with_data(
             test_string, self.context,
         )
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
         self.assertNotIn('%%USER_FULLNAME%%', result)
         self.assertIn(user_name, result)
@@ -128,13 +128,13 @@ class KeywordSubTest(ModuleStoreTestCase):
         Test that sub-ing doesn't ocurr with illegal tags
         """
         test_string = "%%user_id%%"
-<<<<<<< HEAD
-        result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
-=======
+# TODO:FUNK <<<<<<< HEAD
+#         result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
+# TODO:FUNK =======
         result = Ks.substitute_keywords_with_data(
             test_string, self.context,
         )
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
         self.assertEquals(test_string, result)
 
@@ -143,13 +143,13 @@ class KeywordSubTest(ModuleStoreTestCase):
         Test that sub-ing doesn't work without subtags
         """
         test_string = "this string has no subtags"
-<<<<<<< HEAD
-        result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
-=======
+# TODO:FUNK <<<<<<< HEAD
+#         result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
+# TODO:FUNK =======
         result = Ks.substitute_keywords_with_data(
             test_string, self.context,
         )
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
         self.assertEquals(test_string, result)
 
@@ -157,32 +157,32 @@ class KeywordSubTest(ModuleStoreTestCase):
     def test_sub_multiple_tags(self, test_info):
         """ Test that subbing works with multiple subtags """
         anon_id = '123456789'
-<<<<<<< HEAD
-        patched_dict = {
-            '%%USER_ID%%': Ks.Keyword(lambda x, y: anon_id, 'anonymous_user_id (for use in survey links)'),
-            '%%USER_FULLNAME%%': Ks.Keyword(lambda x, y: self.user.profile.name, 'user profile name'),
-            '%%COURSE_DISPLAY_NAME': Ks.Keyword(lambda x, y: self.course.display_name, 'display name of the course'),
-            '%%COURSE_END_DATE': Ks.Keyword(lambda x, y: get_default_time_display(self.course.end), 'end date of the course')
-        }
-
-        with patch.dict(Ks.KEYWORD_FUNCTION_MAP, patched_dict):
-            result = Ks.substitute_keywords_with_data(test_info['test_string'], self.user.id, self.course.id)
-            self.assertEqual(result, test_info['expected'])
-
-    def test_no_subbing_empty_subtable(self):
-        """
-        Test that no sub-ing occurs when the sub table is empty.
-        """
-        # Set the keyword sub mapping to be empty
-        Ks.KEYWORD_FUNCTION_MAP = {}
-
-        test_string = 'This user\'s name is %%USER_FULLNAME%%'
-        result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
-
-        self.assertNotIn(self.user.profile.name, result)
-        self.assertIn('%%USER_FULLNAME%%', result)
-
-=======
+# TODO:FUNK <<<<<<< HEAD
+#         patched_dict = {
+#             '%%USER_ID%%': Ks.Keyword(lambda x, y: anon_id, 'anonymous_user_id (for use in survey links)'),
+#             '%%USER_FULLNAME%%': Ks.Keyword(lambda x, y: self.user.profile.name, 'user profile name'),
+#             '%%COURSE_DISPLAY_NAME': Ks.Keyword(lambda x, y: self.course.display_name, 'display name of the course'),
+#             '%%COURSE_END_DATE': Ks.Keyword(lambda x, y: get_default_time_display(self.course.end), 'end date of the course')
+#         }
+# 
+#         with patch.dict(Ks.KEYWORD_FUNCTION_MAP, patched_dict):
+#             result = Ks.substitute_keywords_with_data(test_info['test_string'], self.user.id, self.course.id)
+#             self.assertEqual(result, test_info['expected'])
+# 
+#     def test_no_subbing_empty_subtable(self):
+#         """
+#         Test that no sub-ing occurs when the sub table is empty.
+#         """
+#         # Set the keyword sub mapping to be empty
+#         Ks.KEYWORD_FUNCTION_MAP = {}
+# 
+#         test_string = 'This user\'s name is %%USER_FULLNAME%%'
+#         result = Ks.substitute_keywords_with_data(test_string, self.user.id, self.course.id)
+# 
+#         self.assertNotIn(self.user.profile.name, result)
+#         self.assertIn('%%USER_FULLNAME%%', result)
+# 
+# TODO:FUNK =======
 
         with patch('util.keyword_substitution.anonymous_id_from_user_id', lambda user_id: anon_id):
             result = Ks.substitute_keywords_with_data(
@@ -190,31 +190,31 @@ class KeywordSubTest(ModuleStoreTestCase):
             )
             self.assertEqual(result, test_info['expected'])
 
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     def test_subbing_no_userid_or_courseid(self):
         """
         Tests that no subbing occurs if no user_id or no course_id is given.
         """
         test_string = 'This string should not be subbed here %%USER_ID%%'
 
-<<<<<<< HEAD
-        result = Ks.substitute_keywords_with_data(test_string, None, self.course.id)
-        self.assertEqual(test_string, result)
-
-        result = Ks.substitute_keywords_with_data(test_string, self.user.id, None)
-        self.assertEqual(test_string, result)
-
-    def test_subbing_no_user_or_course(self):
-        """
-        Tests that no subbing occurs if no user or no course is given
-        """
-        test_string = "This string should not be subbed here %%USER_ID%%"
-
-        result = Ks.substitute_keywords(test_string, course=self.course, user=None)
-        self.assertEqual(test_string, result)
-
-        result = Ks.substitute_keywords(test_string, self.user, None)
-=======
+# TODO:FUNK <<<<<<< HEAD
+#         result = Ks.substitute_keywords_with_data(test_string, None, self.course.id)
+#         self.assertEqual(test_string, result)
+# 
+#         result = Ks.substitute_keywords_with_data(test_string, self.user.id, None)
+#         self.assertEqual(test_string, result)
+# 
+#     def test_subbing_no_user_or_course(self):
+#         """
+#         Tests that no subbing occurs if no user or no course is given
+#         """
+#         test_string = "This string should not be subbed here %%USER_ID%%"
+# 
+#         result = Ks.substitute_keywords(test_string, course=self.course, user=None)
+#         self.assertEqual(test_string, result)
+# 
+#         result = Ks.substitute_keywords(test_string, self.user, None)
+# TODO:FUNK =======
         no_course_context = dict(
             (key, value) for key, value in self.context.iteritems() if key != 'course_title'
         )
@@ -225,5 +225,5 @@ class KeywordSubTest(ModuleStoreTestCase):
             (key, value) for key, value in self.context.iteritems() if key != 'user_id'
         )
         result = Ks.substitute_keywords_with_data(test_string, no_user_id_context)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         self.assertEqual(test_string, result)
