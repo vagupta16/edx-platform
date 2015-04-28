@@ -23,11 +23,11 @@ from capa.responsetypes import StudentInputError, \
 from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.exceptions import NotFoundError
-<<<<<<< HEAD
-from xmodule.exceptions import ProcessingError
+# TODO:FUNK <<<<<<< HEAD
+# from xmodule.exceptions import ProcessingError
 from xmodule.exceptions import TimeExpiredError
-=======
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK =======
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from xblock.fields import JSONField
 from .fields import Timedelta, Date
