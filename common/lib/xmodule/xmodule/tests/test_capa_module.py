@@ -24,12 +24,12 @@ from capa import responsetypes
 from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
-<<<<<<< HEAD
-from xmodule.capa_module import CapaModule, ComplexEncoder
+# TODO:FUNK <<<<<<< HEAD
+# from xmodule.capa_module import CapaModule, ComplexEncoder
 from xmodule.exceptions import TimeExpiredError
-=======
+# TODO:FUNK =======
 from xmodule.capa_module import CapaModule, CapaDescriptor, ComplexEncoder
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from opaque_keys.edx.locations import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -1867,15 +1867,15 @@ class TestProblemCheckTracking(unittest.TestCase):
                 </checkboxgroup>
               </choiceresponse>
             </problem>
-<<<<<<< HEAD
-           """)
-=======
             """
+        # TODO:FUNK <<<<<<< HEAD
+        #    """)
+        # TODO:FUNK =======
 
         # Whitespace screws up comparisons
         xml = ''.join(line.strip() for line in xml.split('\n'))
         factory = self.capa_factory_for_problem_xml(xml)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+        # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         module = factory.create()
 
         answer_input_dict = {
