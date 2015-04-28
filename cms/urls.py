@@ -81,18 +81,18 @@ urlpatterns += patterns(
         r'^course_info_update/{}/(?P<provided_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         'course_info_update_handler'
     ),
-<<<<<<< HEAD
+    # TODO:FUNK <<<<<<< HEAD
     url(r'^utilities/{}$'.format(settings.COURSE_KEY_PATTERN), 'utility_handler'),
     url(r'^utility/captions/{}$'.format(settings.COURSE_KEY_PATTERN), 'utility_captions_handler'),
     url(r'^utility/bulksettings/{}$'.format(settings.COURSE_KEY_PATTERN), 'utility_bulksettings_handler'),
-=======
+    # TODO:FUNK =======
     url(r'^home/?$', 'course_listing', name='home'),
     url(
         r'^course/{}/search_reindex?$'.format(settings.COURSE_KEY_PATTERN),
         'course_search_index_handler',
         name='course_search_index_handler'
     ),
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+    # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), 'course_handler', name='course_handler'),
     url(r'^course_notifications/{}/(?P<action_state_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         'course_notifications_handler'),
