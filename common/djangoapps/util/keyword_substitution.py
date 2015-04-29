@@ -5,19 +5,12 @@ Contains utility functions to help substitute keywords in a text body with
 the appropriate user / course data.
 
 Supported:
-<<<<<<< HEAD
     LMS and CMS (email on enrollment):
         - %%USER_ID%% => anonymous user id
         - %%USER_FULLNAME%% => User's full name
         - %%COURSE_DISPLAY_NAME%% => display name of the course
         - %%COURSE_ID%% => course identifier
         - %%COURSE_START_DATE%% => start date of the course
-=======
-    LMS:
-        - %%USER_ID%% => anonymous user id
-        - %%USER_FULLNAME%% => User's full name
-        - %%COURSE_DISPLAY_NAME%% => display name of the course
->>>>>>> 00b75f0119b981641833240be214ef2076329747
         - %%COURSE_END_DATE%% => end date of the course
 
 Usage:
@@ -25,7 +18,7 @@ Usage:
     above other modules in the dependency tree and acts like a global var.
     Then we can call substitute_keywords_with_data where substitution is
     needed. Currently called in:
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
         - LMS:
             - Bulk email
             - emails on enrollment
@@ -71,15 +64,15 @@ def get_keywords_supported():
     ]
 
 
-def substitute_keywords(string, user=None, course=None):
-=======
-        - LMS: Announcements + Bulk emails
-        - CMS: Not called
-"""
-
-from django.contrib.auth.models import User
+# def substitute_keywords(string, user=None, course=None):
+# TODO:FUNK =======
+#         - LMS: Announcements + Bulk emails
+#         - CMS: Not called
+# """
+# 
+# from django.contrib.auth.models import User
 from student.models import anonymous_id_for_user
-from xmodule.modulestore.django import modulestore
+# from xmodule.modulestore.django import modulestore
 
 
 def anonymous_id_from_user_id(user_id):
@@ -91,7 +84,7 @@ def anonymous_id_from_user_id(user_id):
 
 
 def substitute_keywords(string, user_id, context):
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     """
     Replaces all %%-encoded words using KEYWORD_FUNCTION_MAP mapping functions
 
@@ -99,22 +92,22 @@ def substitute_keywords(string, user_id, context):
     them by calling the corresponding functions stored in KEYWORD_FUNCTION_MAP.
 
     Functions stored in KEYWORD_FUNCTION_MAP must return a replacement string.
-<<<<<<< HEAD
-    Also, functions imported from other modules must be wrapped in a
-    new function if they don't take in user_id and course_id. This simplifies
-    the loop below, and reduces the need for piling up if elif else statements
-    when the keyword pool grows.
+# TODO:FUNK <<<<<<< HEAD
+#     Also, functions imported from other modules must be wrapped in a
+#     new function if they don't take in user_id and course_id. This simplifies
+#     the loop below, and reduces the need for piling up if elif else statements
+#     when the keyword pool grows.
     """
-    if user is None or course is None:
-        # Cannot proceed without course and user information
-        return string
-
-    for key, value in KEYWORD_FUNCTION_MAP.iteritems():
-        if key in string:
-            substitutor = value.func(user, course)
-            string = string.replace(key, substitutor)
-=======
-    """
+#     if user is None or course is None:
+#         # Cannot proceed without course and user information
+#         return string
+# 
+#     for key, value in KEYWORD_FUNCTION_MAP.iteritems():
+#         if key in string:
+#             substitutor = value.func(user, course)
+#             string = string.replace(key, substitutor)
+# TODO:FUNK =======
+#     """
 
     # do this lazily to avoid unneeded database hits
     KEYWORD_FUNCTION_MAP = {
@@ -128,36 +121,36 @@ def substitute_keywords(string, user_id, context):
         if key in string:
             substitutor = KEYWORD_FUNCTION_MAP[key]
             string = string.replace(key, substitutor())
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     return string
 
 
-<<<<<<< HEAD
-def substitute_keywords_with_data(string, user_id=None, course_id=None):
-    """
-    Given user and course ids, replaces all %%-encoded words in the given string
-=======
+# TODO:FUNK <<<<<<< HEAD
+# def substitute_keywords_with_data(string, user_id=None, course_id=None):
+#     """
+#     Given user and course ids, replaces all %%-encoded words in the given string
+# TODO:FUNK =======
 def substitute_keywords_with_data(string, context):
     """
     Given an email context, replaces all %%-encoded words in the given string
     `context` is a dictionary that should include `user_id` and `course_title`
     keys
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     """
 
     # Do not proceed without parameters: Compatibility check with existing tests
     # that do not supply these parameters
-<<<<<<< HEAD
-    if user_id is None or course_id is None:
-        return string
-
-    # Grab user objects
-    user = User.objects.get(id=user_id)
-    course = modulestore().get_course(course_id, depth=0)
-
-    return substitute_keywords(string, user, course)
-=======
+# TODO:FUNK <<<<<<< HEAD
+#     if user_id is None or course_id is None:
+#         return string
+# 
+#     # Grab user objects
+#     user = User.objects.get(id=user_id)
+#     course = modulestore().get_course(course_id, depth=0)
+# 
+#     return substitute_keywords(string, user, course)
+# TODO:FUNK =======
     user_id = context.get('user_id')
     course_title = context.get('course_title')
 
@@ -165,4 +158,4 @@ def substitute_keywords_with_data(string, context):
         return string
 
     return substitute_keywords(string, user_id, context)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
