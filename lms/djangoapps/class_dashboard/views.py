@@ -44,11 +44,12 @@ def all_sequential_open_distrib(request, course_id, enrollment):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
-<<<<<<< HEAD
-            json = dashboard_data.get_d3_sequential_open_distrib(course_key, int(enrollment))
-=======
-            data = dashboard_data.get_d3_sequential_open_distrib(course_key)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK <<<<<<< HEAD
+#             json = dashboard_data.get_d3_sequential_open_distrib(course_key, int(enrollment))
+            data = dashboard_data.get_d3_sequential_open_distrib(course_key, int(enrollment))
+# TODO:FUNK =======
+#             data = dashboard_data.get_d3_sequential_open_distrib(course_key)
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
             data = {'error': "error"}
@@ -76,11 +77,12 @@ def all_problem_grade_distribution(request, course_id, enrollment):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
-<<<<<<< HEAD
-            json = dashboard_data.get_d3_problem_grade_distrib(course_key, int(enrollment))
-=======
-            data = dashboard_data.get_d3_problem_grade_distrib(course_key)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK <<<<<<< HEAD
+#             json = dashboard_data.get_d3_problem_grade_distrib(course_key, int(enrollment))
+            data = dashboard_data.get_d3_problem_grade_distrib(course_key, int(enrollment))
+# TODO:FUNK =======
+#             data = dashboard_data.get_d3_problem_grade_distrib(course_key)
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
             data = {'error': "error"}
@@ -113,11 +115,12 @@ def section_problem_grade_distrib(request, course_id, section, enrollment):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
-<<<<<<< HEAD
-            json = dashboard_data.get_d3_section_grade_distrib(course_key, section, int(enrollment))
-=======
-            data = dashboard_data.get_d3_section_grade_distrib(course_key, section)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK <<<<<<< HEAD
+#             json = dashboard_data.get_d3_section_grade_distrib(course_key, section, int(enrollment))
+            data = dashboard_data.get_d3_section_grade_distrib(course_key, section, int(enrollment))
+# TODO:FUNK =======
+#             data = dashboard_data.get_d3_section_grade_distrib(course_key, section)
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
             data = {'error': "error"}
