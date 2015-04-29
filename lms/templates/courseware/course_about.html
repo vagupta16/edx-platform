@@ -1,19 +1,19 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
-<<<<<<< HEAD
-  from django.core.urlresolvers import reverse
-  from courseware.courses import course_image_url, get_course_about_section
-  from django.conf import settings
-  from student.models import UserProfile
-  from edxmako.shortcuts import marketing_link
-=======
+## TODO:FUNK <<<<<<< HEAD
+##   from django.core.urlresolvers import reverse
+##   from courseware.courses import course_image_url, get_course_about_section
+##   from django.conf import settings
+##   from student.models import UserProfile
+##   from edxmako.shortcuts import marketing_link
+## TODO:FUNK =======
 from microsite_configuration import microsite
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
 from django.conf import settings
 from edxmako.shortcuts import marketing_link
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+## TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 %>
 
 <%inherit file="../main.html" />
@@ -45,7 +45,7 @@ from edxmako.shortcuts import marketing_link
       event.preventDefault();
     });
 
-<<<<<<< HEAD
+// TODO:FUNK <<<<<<< HEAD
     sneakpeek_handler = function(jqXHR) {
       if (jqXHR.status == 200) {
         location.href = "${course_target}";
@@ -66,10 +66,10 @@ from edxmako.shortcuts import marketing_link
       event.preventDefault();
     });
 
-    % if is_shopping_cart_enabled:
-=======
+##    % if is_shopping_cart_enabled:
+## TODO:FUNK =======
     % if can_add_course_to_cart:
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+## TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
       add_course_complete_handler = function(jqXHR, textStatus) {
         if (jqXHR.status == 200) {
           location.href = "${cart_link}";
@@ -272,21 +272,21 @@ from edxmako.shortcuts import marketing_link
           % if microsite.get_value('course_about_show_social_links', True):
           <div class="social-sharing">
             <div class="sharing-message">${_("Share with friends and family!")}</div>
-<<<<<<< HEAD
+## TODO:FUNK <<<<<<< HEAD
             % if self.course_about_social_sharing_file:
               <%include file="${self.course_about_social_sharing_file}" />
-=======
+## TODO:FUNK =======
             ## TODO: this should probably be an overrideable block,
             ##       or something allowing themes to do whatever they
             ##       want here (and on this whole page, really).
-            % if self.stanford_theme_enabled():
-              <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
-              </a>
-              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
-              </a>
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+            ## % if self.stanford_theme_enabled():
+            ##   <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
+            ##     <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
+            ##   </a>
+            ##   <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
+            ##     <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
+            ##   </a>
+## TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
             % else:
               <%
                 site_domain = microsite.get_value('site_domain', settings.SITE_NAME)
@@ -361,14 +361,14 @@ from edxmako.shortcuts import marketing_link
 
           ##<li class="important-dates-item"><i class="icon fa fa-clock-o"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
-<<<<<<< HEAD
-          <li>
-              <i class="icon icon-money"></i>
-              <p>${_("Price")}</p>
-              <span>${course_display_price}</span>
-          </li>
-
-=======
+## TODO:FUNK <<<<<<< HEAD
+##           <li>
+##               <i class="icon icon-money"></i>
+##               <p>${_("Price")}</p>
+##               <span>${course_display_price}</span>
+##           </li>
+## 
+## TODO:FUNK =======
           %if course_price and (can_add_course_to_cart or is_cosmetic_price_enabled):
             <li class="important-dates-item">
               <i class="icon fa fa-money"></i>
@@ -393,7 +393,7 @@ from edxmako.shortcuts import marketing_link
             </p>
           </li>
           % endif
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+## TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
           % if get_course_about_section(course, "prerequisites"):
             <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
