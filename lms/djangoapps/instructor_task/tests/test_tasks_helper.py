@@ -16,8 +16,8 @@ from mock import Mock, patch
 import tempfile
 import unicodecsv
 
-<<<<<<< HEAD
-from django.test.testcases import TestCase
+# TODO:FUNK <<<<<<< HEAD
+# from django.test.testcases import TestCase
 from pytz import UTC
 
 from courseware.courses import get_course
@@ -44,7 +44,7 @@ TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
 from instructor_task.models import ReportStore
-=======
+# TODO:FUNK =======
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -56,7 +56,7 @@ import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
 from django.conf import settings
 from django.test.utils import override_settings
@@ -389,7 +389,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
@@ -590,7 +590,7 @@ class TestInstructorStudentForumsReport(TestReportMixin, InstructorTaskCourseTes
                 with patch('instructor_task.models.LocalFSReportStore.store_rows'):
                     return_val = push_student_forums_data_to_s3(None, None, self.course.id, None, 'generated')
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
-=======
+# TODO:FUNK =======
 class MockDefaultStorage(object):
     """Mock django's DefaultStorage"""
     def __init__(self):
@@ -825,4 +825,4 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ],
             verify_order=False
         )
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
