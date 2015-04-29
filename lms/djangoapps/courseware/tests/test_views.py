@@ -708,7 +708,7 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 class TestNonRegisteredUser(TestCase):
     """
     Tests nonregistered (auto-created) users
@@ -727,9 +727,9 @@ class TestNonRegisteredUser(TestCase):
             req.user = self.user
             views.progress(req, self.course_id)
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-=======
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+# TODO:FUNK =======
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
