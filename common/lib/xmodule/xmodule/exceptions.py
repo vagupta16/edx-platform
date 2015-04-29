@@ -53,15 +53,12 @@ class HeartbeatFailure(Exception):
         In addition to a msg, provide the name of the service.
         """
         self.service = service
-        # TODO:FUNK ------- custom
-        super(HeartbeatFailure, self).__init__(msg)
         # TODO:FUNK <<<<<<< HEAD
-        #return super(HeartbeatFailure, self).__init__(msg)
+        # return super(HeartbeatFailure, self).__init__(msg)
+        # TODO:FUNK =======
+        super(HeartbeatFailure, self).__init__(msg)
+        # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 
 class TimeExpiredError(Exception):
     pass
-        # TODO:FUNK =======
-        # super(HeartbeatFailure, self).__init__(msg)
-        super(TimeExpiredError, self).__init__(msg)
-        # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
