@@ -206,11 +206,11 @@ class CourseEmailTemplate(models.Model):
 
         # Substitute all %%-encoded keywords in the message body
         if 'user_id' in context and 'course_id' in context:
-<<<<<<< HEAD
-            message_body = substitute_keywords_with_data(message_body, context['user_id'], context['course_id'])
-=======
+# TODO:FUNK <<<<<<< HEAD
+#             message_body = substitute_keywords_with_data(message_body, context['user_id'], context['course_id'])
+# TODO:FUNK =======
             message_body = substitute_keywords_with_data(message_body, context)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
         result = format_string.format(**context)
 
