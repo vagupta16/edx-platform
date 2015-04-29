@@ -574,11 +574,6 @@ else:
         <p>${_('Please check your Junk or Spam folders in case our email isn\'t in your INBOX. Still can\'t find the verification email? Request help via the link below.')}</p>
 
         <ol class='list-actions'>
-<!-- <<<<<<< HEAD -->
-<!--           <li class="action-item"> -->
-<!--             <a href="https://groups.google.com/d/forum/openedx-studio" target="_blank" title="Use our feedback tool, Tender, to request help">Request help with your Studio account</a> -->
-<!--           </li> -->
-<!-- ======= -->
           % if settings.TENDER_DOMAIN:
             <li class="action-item">
               <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
@@ -586,7 +581,6 @@ else:
               </a>
             </li>
           % endif
-<!-- >>>>>>> 00b75f0119b981641833240be214ef2076329747 -->
         </ol>
       </div>
     </aside>
