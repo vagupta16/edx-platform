@@ -29,14 +29,14 @@ import string  # pylint: disable=deprecated-module
 import random
 import unicodecsv
 import urllib
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 import urllib2
-=======
+# TODO:FUNK =======
 import decimal
 from student import auth
 from student.roles import GlobalStaff, CourseSalesAdminRole
 from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 import gzip
@@ -111,7 +111,7 @@ from .tools import (
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 from opaque_keys.edx import locator
 from student.models import UserProfile, Registration
 import instructor.views.data_access as data_access
@@ -119,9 +119,9 @@ from instructor.views.data_access_constants import QueryType, StudentQuery, QUER
 from instructor.views.data_access_constants import REVERSE_INCLUSION_MAP, INCLUDE_SECTION_PATTERN
 from instructor.views.data_access_constants import INCLUDE_PROBLEM_PATTERN, ALL_PROBLEM_FILTERS, ALL_SECTION_FILTERS
 from instructor.tasks import make_single_query
-=======
+# TODO:FUNK =======
 from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 log = logging.getLogger(__name__)
 
@@ -2336,9 +2336,9 @@ def list_instructor_tasks(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-<<<<<<< HEAD
-def list_report_downloads(request, course_id):  # pylint: disable=unused-argument
-=======
+# TODO:FUNK <<<<<<< HEAD
+# def list_report_downloads(request, course_id):  # pylint: disable=unused-argument
+# TODO:FUNK =======
 def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=invalid-name
     """
     List entrance exam related instructor tasks.
@@ -2374,7 +2374,7 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def list_report_downloads(_request, course_id):
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     """
     List grade CSV files that are available for download for this course.
     """
@@ -3003,7 +3003,7 @@ def spoc_gradebook(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 def irc_instructor_auth_token(request, course_id):
     # Note: course_id is assumed to be deprecated crappy SSCK value
     #       in future, hashing it below will need to convert from course_key
@@ -3014,7 +3014,8 @@ def irc_instructor_auth_token(request, course_id):
         extras_key = hashlib.sha1(course_id + "happy fish").hexdigest()
         return JsonResponse({'extras': extras_key, 'error': ''})
     return JsonResponse({'extras': '', 'error': 'NotInstructor'})
-=======
+# TODO:FUNK =======
+
 @require_level('staff')
 @require_POST
 def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=invalid-name
@@ -3035,4 +3036,4 @@ def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=
         'message': message,
     }
     return JsonResponse(response_payload)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
