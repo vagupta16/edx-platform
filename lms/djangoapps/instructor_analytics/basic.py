@@ -3,14 +3,14 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 from itertools import chain
-import json
+# import json
 import logging
 
-=======
+# TODO:FUNK =======
 import json
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from shoppingcart.models import (
     PaidCourseRegistration, CouponRedemption, CourseRegCodeItem,
     RegistrationCodeRedemption, CourseRegistrationCodeInvoiceItem
