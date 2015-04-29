@@ -9,10 +9,10 @@ from django.core.urlresolvers import reverse
 from edxmako import add_lookup, LOOKUP
 from lms import startup
 from xmodule.modulestore.tests.factories import CourseFactory
-<<<<<<< HEAD
-=======
+# TODO:FUNK <<<<<<< HEAD
+# TODO:FUNK =======
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from util import keyword_substitution
 
 
