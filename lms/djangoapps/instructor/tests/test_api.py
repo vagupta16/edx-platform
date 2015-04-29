@@ -52,9 +52,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
 
-<<<<<<< HEAD
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from courseware.models import StudentModule
+# TODO:FUNK <<<<<<< HEAD
+# from student.models import CourseEnrollment, CourseEnrollmentAllowed
+# from courseware.models import StudentModule
 from instructor_email_widget.models import StudentsForQuery, TemporaryQuery
 from instructor.views.data_access import (
     purge_temporary_queries,
@@ -62,9 +62,9 @@ from instructor.views.data_access import (
     delete_group_temp_queries_and_students,
 )
 from instructor.views.data_access_constants import TEMPORARY_QUERY_LIFETIME
-=======
+# TODO:FUNK =======
 from courseware.models import StudentFieldOverride
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 import instructor_task.api
 import instructor.views.api
@@ -160,7 +160,7 @@ class TestCommonExceptions400(TestCase):
         self.assertIn("Task is already running", result["error"])
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -687,10 +687,10 @@ class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertSetEqual(subsection_names, check_subsections)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-=======
+# @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+# TODO:FUNK =======
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
