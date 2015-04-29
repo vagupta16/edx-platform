@@ -20,11 +20,11 @@ from django.utils.html import escape
 from django.http import Http404, HttpResponseServerError
 from django.conf import settings
 from util.json_request import JsonResponse
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 from util.keyword_substitution import get_keywords_supported
-=======
+# TODO:FUNK =======
 from mock import patch
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
@@ -39,14 +39,14 @@ from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration
 from course_modes.models import CourseMode, CourseModesArchive
-<<<<<<< HEAD
-from student.roles import CourseFinanceAdminRole
+# TODO:FUNK <<<<<<< HEAD
+# from student.roles import CourseFinanceAdminRole
 from instructor_email_widget.models import GroupedQuery
-=======
+# TODO:FUNK =======
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from certificates.models import CertificateGenerationConfiguration
 from certificates import api as certs_api
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 from bulk_email.models import CourseEmail
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
@@ -84,11 +84,11 @@ def instructor_dashboard_2(request, course_id):
     sections = [
         _section_course_info(course, access),
         _section_membership(course, access),
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
         _section_queries(course, access),
-=======
+# TODO:FUNK =======
         _section_cohort_management(course, access),
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         _section_student_admin(course, access),
         _section_data_download(course, access),
         _section_analytics(course, access),
@@ -446,14 +446,14 @@ def _section_data_download(course, access):
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
         'access': access,
-<<<<<<< HEAD
-        'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_key.to_deprecated_string()}),
+# TODO:FUNK <<<<<<< HEAD
+#         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_key.to_deprecated_string()}),
+#         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_key.to_deprecated_string()}),
         'delete_report_download_url': reverse('delete_report_download', kwargs={'course_id': unicode(course_key)}),
-        'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_key.to_deprecated_string()}),
+#         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_key.to_deprecated_string()}),
+#         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
+#         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': course_key.to_deprecated_string()}),
+#         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_student_responses_url': reverse('get_student_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_student_forums_usage_url': reverse('get_student_forums_usage', kwargs={'course_id': unicode(course_key)}),
         'get_ora2_responses_url': reverse('get_ora2_responses', kwargs={'course_id': course_key.to_deprecated_string(), 'include_email': False}),
@@ -461,14 +461,14 @@ def _section_data_download(course, access):
         'get_course_forums_usage_url': reverse('get_course_forums_usage', kwargs={'course_id': course_key.to_deprecated_string()}),
         'graph_course_forums_usage_url': reverse('graph_course_forums_usage',
                                                  kwargs={'course_id': unicode(course_key)}),
-=======
+# TODO:FUNK =======
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': unicode(course_key)}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': unicode(course_key)}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': unicode(course_key)}),
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     }
     return section_data
 
@@ -514,12 +514,12 @@ def _section_send_email(course, access):
         'section_display_name': _('Email'),
         'keywords_supported': get_keywords_supported(),
         'access': access,
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
         'to_options': CourseEmail.TO_OPTION_CHOICES + query_options,
-        'send_email': reverse('send_email', kwargs={'course_id': course_key.to_deprecated_string()}),
-=======
+#         'send_email': reverse('send_email', kwargs={'course_id': course_key.to_deprecated_string()}),
+# TODO:FUNK =======
         'send_email': reverse('send_email', kwargs={'course_id': unicode(course_key)}),
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         'editor': email_editor,
         'list_instructor_tasks_url': reverse(
             'list_instructor_tasks', kwargs={'course_id': unicode(course_key)}
