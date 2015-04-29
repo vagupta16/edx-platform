@@ -846,16 +846,16 @@ def course_about(request, course_id):
         if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
             return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
+        registered = registered_for_course(course, request.user)
 # TODO:FUNK <<<<<<< HEAD
         regularly_registered = (
-            registered_for_course(course, request.user)
+            registered
             and
             UserProfile.has_registered(request.user)
         )
 #     staff_access = has_access(request.user, 'staff', course)
 #     studio_url = get_studio_url(course, 'settings/details')
 # TODO:FUNK =======
-#         registered = registered_for_course(course, request.user)
 
         staff_access = has_access(request.user, 'staff', course)
         studio_url = get_studio_url(course, 'settings/details')
