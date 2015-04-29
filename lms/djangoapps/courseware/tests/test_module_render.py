@@ -1283,7 +1283,7 @@ class TestRebindModule(TestSubmittingProblems):
         self.assertFalse(psycho_handler.called)
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(ANALYTICS_ANSWER_DIST_URL=True)
 class TestInlineAnalytics(ModuleStoreTestCase):
@@ -1448,7 +1448,9 @@ class TestInlineAnalytics(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertNotIn('Staff Analytics Info', result_fragment.content)
-=======
+# TODO:FUNK =======
+
+
 @ddt.ddt
 class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -1716,4 +1718,4 @@ class TestFilteredChildren(ModuleStoreTestCase):
         Used to assert that sets of children are equivalent.
         """
         self.assertEquals(set(child_usage_ids), set(child.scope_ids.usage_id for child in block.get_children()))
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
