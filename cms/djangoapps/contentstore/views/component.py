@@ -27,12 +27,12 @@ from contentstore.views.item import create_xblock_info, add_container_page_publi
 
 from opaque_keys.edx.keys import UsageKey
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 from util.keyword_substitution import get_keywords_supported
-from .access import has_course_access
-=======
+# from .access import has_course_access
+# TODO:FUNK =======
 from student.auth import has_course_author_access
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from django.utils.translation import ugettext as _
 from models.settings.course_grading import CourseGradingModel
 
@@ -223,11 +223,11 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
                 'keywords_supported': get_keywords_supported(),
-=======
+# TODO:FUNK =======
                 'templates': CONTAINER_TEMPATES
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
