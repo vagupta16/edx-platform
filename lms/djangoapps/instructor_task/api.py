@@ -20,16 +20,16 @@ from instructor_task.tasks import (
     send_bulk_course_email,
     calculate_grades_csv,
     calculate_students_features_csv,
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     get_student_responses,
     get_student_forums_usage,
     get_ora2_responses,
     get_course_forums_usage,
-)
-from instructor_task.api_helper import (
-    check_arguments_for_rescoring,
-    encode_problem_and_student_input,
-=======
+# )
+# from instructor_task.api_helper import (
+#     check_arguments_for_rescoring,
+#     encode_problem_and_student_input,
+# TODO:FUNK =======
     cohort_students,
 )
 
@@ -38,7 +38,7 @@ from instructor_task.api_helper import (
     encode_problem_and_student_input,
     encode_entrance_exam_and_student_input,
     check_entrance_exam_problems_for_rescoring,
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     submit_task,
 )
 from bulk_email.models import CourseEmail
@@ -396,7 +396,7 @@ def submit_calculate_students_features_csv(request, course_key, features):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 # pylint: disable=invalid-name
 def submit_student_forums_usage_task(request, course_key):
     """
@@ -406,7 +406,11 @@ def submit_student_forums_usage_task(request, course_key):
     task_class = get_student_forums_usage
     task_input = {}
     task_key = ''
-=======
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+# TODO:FUNK =======
+
+
 def submit_cohort_students(request, course_key, file_name):
     """
     Request to have students cohorted in bulk.
@@ -417,6 +421,6 @@ def submit_cohort_students(request, course_key, file_name):
     task_class = cohort_students
     task_input = {'file_name': file_name}
     task_key = ""
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
