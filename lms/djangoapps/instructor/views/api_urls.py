@@ -138,7 +138,7 @@ urlpatterns = patterns(
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     # Collect student forums data
     url(r'get_student_forums_usage',
         'instructor.views.api.get_student_forums_usage', name='get_student_forums_usage'),
@@ -158,7 +158,8 @@ urlpatterns = patterns(
     # Generating course forums usage graph
     url(r'^graph_course_forums_usage',
         'instructor.views.api.graph_course_forums_usage', name="graph_course_forums_usage"),
-=======
+# TODO:FUNK =======
+
     # Cohort management
     url(r'add_users_to_cohorts$',
         'instructor.views.api.add_users_to_cohorts', name="add_users_to_cohorts"),
@@ -171,5 +172,5 @@ urlpatterns = patterns(
     url(r'^enable_certificate_generation$',
         'instructor.views.api.enable_certificate_generation',
         name='enable_certificate_generation'),
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 )
