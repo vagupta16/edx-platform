@@ -31,15 +31,16 @@ from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-<<<<<<< HEAD
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, UserProfile
-from opaque_keys.edx.keys import CourseKey, UsageKey
-=======
+# TODO:FUNK <<<<<<< HEAD
+# from student.models import CourseEnrollment, CourseEnrollmentAllowed, UserProfile
+from student.models import UserProfile
+# from opaque_keys.edx.keys import CourseKey, UsageKey
+# TODO:FUNK =======
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
 
 import dogstats_wrapper as dog_stats_api
 
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -155,7 +156,7 @@ def _has_access_course_desc(user, action, course):
             )
         )
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     def within_enrollment_period():
         """
         Just a time boundary check, handles if start or stop were set to None
@@ -165,7 +166,8 @@ def _has_access_course_desc(user, action, course):
         end = course.enrollment_end
 
         return (start is None or now > start) and (end is None or now < end)
-=======
+# TODO:FUNK =======
+
     def can_load_mobile():
         """
         Can this user access this course from a mobile device?
@@ -191,7 +193,7 @@ def _has_access_course_desc(user, action, course):
             # check mobile_available flag
             is_mobile_available_for_user(user, course)
         )
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     def can_enroll():
         """
@@ -349,7 +351,7 @@ def _has_access_error_desc(user, action, descriptor, course_key):
     return _dispatch(checkers, action, user, descriptor)
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 NONREGISTERED_CATEGORY_WHITELIST = [
     "about",
     "chapter",
@@ -390,7 +392,8 @@ NONREGISTERED_CATEGORY_WHITELIST = [
 
 def _can_load_descriptor_nonregistered(descriptor):
     return descriptor.category in NONREGISTERED_CATEGORY_WHITELIST
-=======
+# TODO:FUNK =======
+
 def _has_group_access(descriptor, user, course_key):
     """
     This function returns a boolean indicating whether or not `user` has
@@ -454,7 +457,7 @@ def _has_group_access(descriptor, user, course_key):
 
     # all checks passed.
     return True
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 
 def _has_access_descriptor(user, action, descriptor, course_key=None):
