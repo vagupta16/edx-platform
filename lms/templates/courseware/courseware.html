@@ -156,7 +156,7 @@ ${page_title_breadcrumbs(course_name())}
   </script>
 % endif
 
-% if settings.FEATURES.get("ENABLE_CHAT") and course.show_chat:
+## % if settings.FEATURES.get("ENABLE_CHAT") and course.show_chat:
 ## TODO:FUNK =======
 % if show_chat:
   <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
