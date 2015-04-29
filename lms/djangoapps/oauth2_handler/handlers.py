@@ -237,18 +237,18 @@ class UserInfoHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler, Permis
 
 
 def _get_all_courses():
-<<<<<<< HEAD
-    """
-    Utitilty function to list all available courses.
-
-    """
-    ms_courses = modulestore().get_courses()
-    courses = [c for c in ms_courses if isinstance(c, CourseDescriptor)]
-=======
+# TODO:FUNK <<<<<<< HEAD
+#     """
+#     Utitilty function to list all available courses.
+# 
+#     """
+#     ms_courses = modulestore().get_courses()
+#     courses = [c for c in ms_courses if isinstance(c, CourseDescriptor)]
+# TODO:FUNK =======
     """ Utility function to list all available courses. """
 
     ms_courses = modulestore().get_courses()
     courses = [course for course in ms_courses if course.scope_ids.block_type == 'course']
 
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     return courses
