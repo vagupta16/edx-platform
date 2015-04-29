@@ -514,13 +514,13 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         exported successfully
         """
         content_store = contentstore()
-<<<<<<< HEAD
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-=======
+# TODO:FUNK <<<<<<< HEAD
+#         import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
+#         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+# TODO:FUNK =======
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_if_not_present=True)
         course_id = self.store.make_course_key('edX', 'toy', '2012_Fall')
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
         vertical = verticals[0]
 
@@ -540,11 +540,11 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         # export should still complete successfully
         root_dir = path(mkdtemp_clean())
-<<<<<<< HEAD
-        export_to_xml(
-=======
+# TODO:FUNK <<<<<<< HEAD
+#         export_to_xml(
+# TODO:FUNK =======
         export_course_to_xml(
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
             self.store,
             content_store,
             course_id,
