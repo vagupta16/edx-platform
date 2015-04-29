@@ -233,7 +233,7 @@ class OfflineComputedGradeLog(models.Model):
         return "[OCGLog] %s: %s" % (self.course_id.to_deprecated_string(), self.created)  # pylint: disable=no-member
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 class CoursePreference(models.Model):
     """
     This is a place to keep course preferences that are not inherent to the course.  Those should be attributes
@@ -260,7 +260,9 @@ class CoursePreference(models.Model):
 
     def __unicode__(self):
         return u"{} : {} : {}".format(self.course_id, self.pref_key, self.pref_value)
-=======
+# TODO:FUNK =======
+
+
 class StudentFieldOverride(TimeStampedModel):
     """
     Holds the value of a specific field overriden for a student.  This is used
@@ -276,4 +278,4 @@ class StudentFieldOverride(TimeStampedModel):
 
     field = models.CharField(max_length=255)
     value = models.TextField(default='null')
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
