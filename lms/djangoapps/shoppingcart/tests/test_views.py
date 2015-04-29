@@ -1635,12 +1635,12 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         # now reset the time to 10 mins from now in future in order to unblock
         reset_time = datetime.now(UTC) + timedelta(seconds=600)
         with freeze_time(reset_time):
-<<<<<<< HEAD
-            response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
-            print(response)
-=======
+# TODO:FUNK <<<<<<< HEAD
+#             response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
+#             print(response)
+# TODO:FUNK =======
             response = self.client.post(url)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
             self.assertEquals(response.status_code, 404)
 
         cache.clear()
