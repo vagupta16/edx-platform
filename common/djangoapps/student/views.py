@@ -1572,7 +1572,7 @@ def create_account_with_params(request, params):
     """
 # TODO:FUNK <<<<<<< HEAD
     if settings.FEATURES.get('USE_CME_REGISTRATION'):
-        return cme_create_account(request, post_override=post_override)
+        return cme_create_account(request)
 
 #     js = {'success': False}  # pylint: disable-msg=invalid-name
 # 
