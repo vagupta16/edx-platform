@@ -367,16 +367,16 @@ class XQueueCertInterface(object):
                             new_status
                         )
             else:
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
                 if not keep_current:
                     cert_status = status.notpassing
                     cert.status = cert_status
                     cert.save()
-=======
-                new_status = status.notpassing
-                cert.status = new_status
-                cert.save()
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK =======
+#                 new_status = status.notpassing
+#                 cert.status = new_status
+#                 cert.save()
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
                 LOGGER.info(
                     (

@@ -7,21 +7,21 @@ import logging
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-<<<<<<< HEAD
-from django.conf import settings
-from django.http import HttpResponse
-=======
+# TODO:FUNK <<<<<<< HEAD
+# from django.conf import settings
+# from django.http import HttpResponse
+# TODO:FUNK =======
 from django.http import HttpResponse, Http404, HttpResponseForbidden
 from django.utils.translation import ugettext as _
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 from student.models import UserProfile
-from xmodule.course_module import CourseDescriptor
-=======
+# from xmodule.course_module import CourseDescriptor
+# TODO:FUNK =======
 from certificates.models import (
     certificate_status_for_student,
     CertificateStatuses,
@@ -31,7 +31,7 @@ from certificates.models import (
 )
 from certificates.queue import XQueueCertInterface
 from edxmako.shortcuts import render_to_response
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -39,8 +39,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
-from certificates.models import certificate_status_for_student, CertificateStatuses, GeneratedCertificate
-from certificates.queue import XQueueCertInterface
+# from certificates.models import certificate_status_for_student, CertificateStatuses, GeneratedCertificate
+# from certificates.queue import XQueueCertInterface
 
 use_cme = settings.FEATURES.get('USE_CME_REGISTRATION', False)
 if use_cme:
@@ -59,7 +59,7 @@ def request_certificate(request):
     at the end of a course run, so that we can be sure users get graded and
     then if and only if they pass, do they get a certificate issued.
     """
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     # Memoize user information; return error if it's invalid
     user = None
     username = ''
@@ -89,26 +89,27 @@ def request_certificate(request):
 
     status = certificate_status_for_student(student, course_key)['status']
     if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
-        logger.info('Grading and certification requested for user {} in course {} via /request_certificate call'.format(username, course_key))
+        log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
+        logger.info(log_msg, username, course_key)
         status = xq.add_cert(student, course_key, course=course, title=title)
     return HttpResponse(json.dumps({'add_status': status, 'error': ''}), mimetype='application/json')
-=======
-    if request.method == "POST":
-        if request.user.is_authenticated():
-            xqci = XQueueCertInterface()
-            username = request.user.username
-            student = User.objects.get(username=username)
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
-            course = modulestore().get_course(course_key, depth=2)
-
-            status = certificate_status_for_student(student, course_key)['status']
-            if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
-                log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
-                logger.info(log_msg, username, course_key)
-                status = xqci.add_cert(student, course_key, course=course)
-            return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
-        return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK =======
+#     if request.method == "POST":
+#         if request.user.is_authenticated():
+#             xqci = XQueueCertInterface()
+#             username = request.user.username
+#             student = User.objects.get(username=username)
+#             course_key = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get('course_id'))
+#             course = modulestore().get_course(course_key, depth=2)
+# 
+#             status = certificate_status_for_student(student, course_key)['status']
+#             if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
+#                 log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
+#                 logger.info(log_msg, username, course_key)
+#                 status = xqci.add_cert(student, course_key, course=course)
+#             return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
+#         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 
 @csrf_exempt

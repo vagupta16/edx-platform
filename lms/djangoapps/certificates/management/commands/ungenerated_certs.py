@@ -159,12 +159,12 @@ class Command(BaseCommand):
 
                     if not options['noop']:
                         # Add the certificate request to the queue
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
                         ret = xq.add_cert(student, course_key, course=course, keep_current=options['keep_current'])
-=======
-                        ret = xq.add_cert(student, course_key, course=course)
+# TODO:FUNK =======
+#                         ret = xq.add_cert(student, course_key, course=course)
 
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
                         if ret == 'generating':
                             LOGGER.info(
                                 (
