@@ -39,11 +39,11 @@ from instructor_task.tasks_helper import (
     push_course_forums_data_to_s3,
     upload_grades_csv,
     upload_students_csv,
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     push_student_forums_data_to_s3,
-=======
+# TODO:FUNK =======
     cohort_students_and_upload
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 )
 
 
@@ -125,11 +125,11 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 @task(base=BaseInstructorTask, routing_key=settings.BULK_EMAIL_ROUTING_KEY)  # pylint: disable=E1102
-=======
-@task(base=BaseInstructorTask)  # pylint: disable=not-callable
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK =======
+# @task(base=BaseInstructorTask)  # pylint: disable=not-callable
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 def send_bulk_course_email(entry_id, _xmodule_instance_args):
     """Sends emails to recipients enrolled in a course.
 
@@ -178,7 +178,7 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 @task(base=BaseInstructorTask, routing_key=settings.STUDENT_RESPONSES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
 def get_student_responses(entry_id, xmodule_instance_args):
     """
@@ -218,7 +218,10 @@ def get_student_forums_usage(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_student_forums_data_to_s3, xmodule_instance_args)
-=======
+    return run_main_task(entry_id, task_fn, action_name)
+# TODO:FUNK =======
+
+
 @task(base=BaseInstructorTask)  # pylint: disable=E1102
 def cohort_students(entry_id, xmodule_instance_args):
     """
@@ -228,5 +231,5 @@ def cohort_students(entry_id, xmodule_instance_args):
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = ugettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     return run_main_task(entry_id, task_fn, action_name)
