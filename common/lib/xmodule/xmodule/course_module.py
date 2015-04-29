@@ -189,6 +189,7 @@ class CourseFields(object):
     display_price = Integer(
         display_name=_("Course Display Price"),
         help=_("The cost displayed to students for enrolling in the course. If a paid course registration price is set by platform staff in the database, that price will be displayed instead of this one."),
+    )
     # TODO:FUNK =======
     cosmetic_display_price = Integer(
         display_name=_("Cosmetic Course Display Price"),
