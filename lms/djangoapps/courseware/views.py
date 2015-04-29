@@ -1142,6 +1142,8 @@ def get_course_lti_endpoints(request, course_id):
 
 def get_analytics_video_data(request):
     
+    #import pudb; pudb.set_trace()
+    
     all_data = json.loads(request.POST['data'])
     module_id = all_data['module_id']
     course_id = all_data['course_id']
@@ -1185,6 +1187,11 @@ def get_analytics_video_data(request):
 #     print "**************************"
     
    # module_id = 'i4x-DB-Indexes-video-vid-isolation_levels-slice1'
+   
+   # import pudb; pudb.set_trace()
+    datax = client_course.video_summary(module_id)
+    print "-------------"
+    print datax
     
     try:
         data = client_course.video_seek_times(module_id)
