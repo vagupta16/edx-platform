@@ -94,12 +94,14 @@ urlpatterns = (
     url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
 )
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 if settings.SHIB_ONLY_SITE:
     urlpatterns += (
         url(r'^backup_login$', 'student.views.signin_user', name="backup_signin_user"),
         url(r'^backup_register$', 'student.views.register_user', name="backup_register_user"),
-=======
+    )
+# TODO:FUNK =======
+
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += (
@@ -116,7 +118,7 @@ else:
         url(r'^login$', 'student.views.signin_user', name="signin_user"),
         url(r'^register$', 'student.views.register_user', name="register_user"),
         url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     )
 
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
@@ -427,15 +429,15 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/{}/lti_rest_endpoints/'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.get_course_lti_endpoints', name='lti_rest_endpoints'),
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
         # Analytics api endpoints for in-line analytics
         url(r'^get_analytics_answer_dist/',
             'courseware.views.get_analytics_answer_dist', name='get_analytics_answer_dist'),
 
-        # Student account and profile
-=======
+#        # Student account and profile
+# TODO:FUNK =======
         # Student account
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         url(r'^account/', include('student_account.urls')),
 
         # Student profile
@@ -453,21 +455,21 @@ if settings.COURSEWARE_ENABLED:
                 'courseware.masquerade.handle_ajax', name="masquerade_update"),
         )
 
-<<<<<<< HEAD
-    # chat renders inside an iframe so that we can better track
-    # an active chat user between page requests and pop out the chat
-    # widget window
-    if settings.FEATURES.get('ENABLE_CHAT'):
-        urlpatterns += (
-            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/chat/?$',
-                'jabber.views.chat', name="chat"),
-        )
-=======
+# TODO:FUNK <<<<<<< HEAD
+#     # chat renders inside an iframe so that we can better track
+#     # an active chat user between page requests and pop out the chat
+#     # widget window
+#     if settings.FEATURES.get('ENABLE_CHAT'):
+#         urlpatterns += (
+#             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/chat/?$',
+#                 'jabber.views.chat', name="chat"),
+#         )
+# TODO:FUNK =======
     urlpatterns += (
         url(r'^courses/{}/generate_user_cert'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.generate_user_cert', name="generate_user_cert"),
     )
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
@@ -544,16 +546,18 @@ urlpatterns += (
     url(r'^commerce/', include('commerce.urls', namespace='commerce')),
 )
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 if settings.FEATURES.get('ENABLE_SUPERUSER_LOGIN_AS'):
     urlpatterns += (
         url(r'^su_login_as/(?P<username>[\w.@+-]+)/?$', 'student.views.superuser_login_as', name='impersonate'),
-=======
+    )
+# TODO:FUNK =======
+
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += (
         url(r'^embargo/', include('embargo.urls')),
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     )
 
 # Survey Djangoapp
