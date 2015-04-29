@@ -87,10 +87,10 @@ def login_and_registration_form(request, initial_mode="login"):
         'initial_mode': initial_mode,
         'third_party_auth': json.dumps(_third_party_auth_context(request)),
         'platform_name': settings.PLATFORM_NAME,
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
         'account_name': settings.ACCOUNT_NAME,
-        'responsive': True
-=======
+#         'responsive': True
+# TODO:FUNK =======
         'responsive': True,
 
         # Include form descriptions retrieved from the user API.
@@ -106,7 +106,7 @@ def login_and_registration_form(request, initial_mode="login"):
         'enrollment_action': request.GET.get('enrollment_action'),
         'course_id': request.GET.get('course_id'),
         'course_mode': request.GET.get('course_mode'),
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     }
 
     return render_to_response('student_account/login_and_register.html', context)
