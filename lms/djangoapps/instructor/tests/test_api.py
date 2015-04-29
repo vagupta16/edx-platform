@@ -49,6 +49,7 @@ from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFina
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
 
@@ -161,7 +162,7 @@ class TestCommonExceptions400(TestCase):
 
 
 # TODO:FUNK <<<<<<< HEAD
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_SPLIT_MODULESTORE)
 class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensures the backend logic is sound for instructor email widget
@@ -567,7 +568,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse(result2)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_SPLIT_MODULESTORE)
 class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure appropriate access and format of course information

@@ -390,7 +390,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
 
 
 # TODO:FUNK <<<<<<< HEAD
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+# @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
     Tests that CSV student responses report generation works.

@@ -7,6 +7,7 @@ import json
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 # TODO:FUNK <<<<<<< HEAD
+from django.test.utils import override_settings
 # from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 # from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 # from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
