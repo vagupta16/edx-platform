@@ -12,17 +12,17 @@ def get_visible_courses():
     Return the set of CourseDescriptors that should be visible in this branded instance
     """
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     # In the event we don't want any course tiles displayed
     if not getattr(settings, 'DISPLAY_COURSE_TILES', False):
         return []
 
-    _courses = modulestore().get_courses()
-=======
+#     _courses = modulestore().get_courses()
+# TODO:FUNK =======
     filtered_by_org = microsite.get_value('course_org_filter')
 
     _courses = modulestore().get_courses(org=filtered_by_org)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     courses = [c for c in _courses
                if isinstance(c, CourseDescriptor)]
@@ -37,19 +37,19 @@ def get_visible_courses():
     if hasattr(settings, 'COURSE_LISTINGS') and subdomain in settings.COURSE_LISTINGS and not settings.DEBUG:
         filtered_visible_ids = frozenset([SlashSeparatedCourseKey.from_deprecated_string(c) for c in settings.COURSE_LISTINGS[subdomain]])
 
-<<<<<<< HEAD
-    filtered_by_org = microsite.get_value('course_org_filter')
-
-    filtered_by_db = TileConfiguration.objects.filter(
-        enabled=True,
-    ).values('course_id').order_by('-change_date')
-
-    if filtered_by_db:
-        filtered_by_db_ids = [course['course_id'] for course in filtered_by_db]
-        filtered_by_db_keys = frozenset([SlashSeparatedCourseKey.from_string(c) for c in filtered_by_db_ids])
-        return [course for course in courses if course.id in filtered_by_db_keys]
-=======
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK <<<<<<< HEAD
+#     filtered_by_org = microsite.get_value('course_org_filter')
+# 
+#     filtered_by_db = TileConfiguration.objects.filter(
+#         enabled=True,
+#     ).values('course_id').order_by('-change_date')
+# 
+#     if filtered_by_db:
+#         filtered_by_db_ids = [course['course_id'] for course in filtered_by_db]
+#         filtered_by_db_keys = frozenset([SlashSeparatedCourseKey.from_string(c) for c in filtered_by_db_ids])
+#         return [course for course in courses if course.id in filtered_by_db_keys]
+# TODO:FUNK =======
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     if filtered_by_org:
         return [course for course in courses if course.location.org == filtered_by_org]
     if filtered_visible_ids:
