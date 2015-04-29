@@ -3,10 +3,10 @@ define([
     'js/common_helpers/ajax_helpers'
 ], function($, CourseDetailsModel, MainView, AjaxHelpers) {
     'use strict';
-<<<<<<< HEAD
-    describe('Settings/Main', function () {
-        var urlRoot = '/course-details',
-=======
+// TODO:FUNK <<<<<<< HEAD
+//     describe('Settings/Main', function () {
+//         var urlRoot = '/course-details',
+// TODO:FUNK =======
 
     var SELECTORS = {
         entrance_exam_min_score: '#entrance-exam-minimum-score-pct',
@@ -16,7 +16,7 @@ define([
 
     describe('Settings/Main', function () {
         var urlRoot = '/course/settings/org/DemoX/Demo_Course',
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
             modelData = {
                 start_date: "2014-10-05T00:00:00Z",
                 end_date: "2014-11-05T20:00:00Z",
@@ -32,13 +32,14 @@ define([
                 effort : null,
                 course_image_name : '',
                 course_image_asset_path : '',
-<<<<<<< HEAD
-                enable_enrollment_email: false
-=======
+// TODO:FUNK <<<<<<< HEAD
+//                enable_enrollment_email: false
+                enable_enrollment_email: false,
+// TODO:FUNK =======
                 pre_requisite_courses : [],
                 entrance_exam_enabled : '',
                 entrance_exam_minimum_score_pct: '50'
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 
@@ -66,10 +67,10 @@ define([
                     // Expect to see changes just in `start_date` field.
                     start_date: "2014-10-05T22:00:00.000Z"
                 });
-<<<<<<< HEAD
-
-=======
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+// TODO:FUNK <<<<<<< HEAD
+//
+// TODO:FUNK =======
+// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
             this.view.$el.find('#course-start-time')
                 .val('22:00')
                 .trigger('input');
@@ -78,10 +79,10 @@ define([
             // It sends `POST` request, because the model doesn't have `id`. In
             // this case, it is considered to be new according to Backbone documentation.
             AjaxHelpers.expectJsonRequest(
-<<<<<<< HEAD
-                requests, 'POST', '/course-details', expectedJson
-            );
-=======
+// TODO:FUNK <<<<<<< HEAD
+//                requests, 'POST', '/course-details', expectedJson
+//            );
+// TODO:FUNK =======
                 requests, 'POST', urlRoot, expectedJson
             );
         });
@@ -169,7 +170,7 @@ define([
                 requests, 'POST', urlRoot, expectedJson
             );
             AjaxHelpers.respondWithJson(requests, expectedJson);
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         });
     });
 });
