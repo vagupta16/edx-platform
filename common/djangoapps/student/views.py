@@ -417,7 +417,7 @@ def signin_user(request):
 #     if settings.FEATURES.get('AUTH_USE_CAS'):
 #         # If CAS is enabled, redirect auth handling to there
 #         return redirect(reverse('cas-login'))
-    if UserProfile.has_registered(request.user):
+#    if UserProfile.has_registered(request.user):
 # TODO:FUNK =======
     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
     external_auth_response = external_auth_login(request)
