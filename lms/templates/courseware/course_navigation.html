@@ -12,16 +12,11 @@ def url_class(is_active):
     return "active"
   return ""
 %>
-## TODO:FUNK <<<<<<< HEAD
 <%! from xmodule.tabs import CourseTabList %>
 <%! from courseware.access import has_access %>
 <%! from student.models import UserProfile %>
 <%! from django.conf import settings %>
-##<%! from django.core.urlresolvers import reverse %>
-##<%! from django.utils.translation import ugettext as _ %>
-## TODO:FUNK =======
 <%! from courseware.tabs import get_course_tab_list %>
-## TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 <%! from courseware.views import notification_image_for_tab %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition %>
@@ -33,7 +28,6 @@ def url_class(is_active):
   masquerade_group_id = masquerade.group_id if masquerade else None
 %>
 
-## TODO:FUNK <<<<<<< HEAD
 % if course and user.is_authenticated() and not UserProfile.has_registered(user):
   <p class="unauth-warning">
   <%
@@ -47,7 +41,6 @@ def url_class(is_active):
              tag_start="<a href='{}'>".format(reg_url),
              tag_end="</a>")}
   </p>
-## TODO:FUNK =======
 
 % if show_preview_menu:
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
@@ -73,7 +66,6 @@ def url_class(is_active):
             </ol>
         </div>
     </nav>
-## TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 % endif
 
 % if disable_tabs is UNDEFINED or not disable_tabs:
