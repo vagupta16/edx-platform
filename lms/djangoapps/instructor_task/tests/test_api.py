@@ -1,15 +1,16 @@
 """
 Test for LMS instructor background task queue management
 """
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 
-from mock import MagicMock, patch
-from xmodule.modulestore.exceptions import ItemNotFoundError
-
-=======
+# from mock import MagicMock, patch
+from mock import MagicMock
+# from xmodule.modulestore.exceptions import ItemNotFoundError
+# 
+# TODO:FUNK =======
 from mock import patch, Mock
 from bulk_email.models import CourseEmail, SEND_TO_ALL
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from courseware.tests.factories import UserFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -220,7 +221,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         )
         self._test_resubmission(api_call)
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     def test_submit_ora2_request_task(self):
         request = self.create_task_request(self.instructor)
 
@@ -256,7 +257,8 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             submit_student_forums_usage_task(request, self.course.id)
 
             mock_submit_task.assert_called_once_with(request, 'student_forums', get_student_forums_usage, self.course.id, {}, '')
-=======
+# TODO:FUNK =======
+
     def test_submit_cohort_students(self):
         api_call = lambda: submit_cohort_students(
             self.create_task_request(self.instructor),
@@ -264,4 +266,4 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             file_name=u'filename.csv'
         )
         self._test_resubmission(api_call)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
