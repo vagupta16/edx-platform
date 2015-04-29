@@ -1,9 +1,9 @@
-<<<<<<< HEAD
-define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
-=======
+// TODO:FUNK <<<<<<< HEAD
+// define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
+// TODO:FUNK =======
 define(["backbone", "underscore", "gettext", "js/models/validation_helpers"],
     function(Backbone, _, gettext, ValidationHelpers) {
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 var CourseDetails = Backbone.Model.extend({
     defaults: {
@@ -21,13 +21,14 @@ var CourseDetails = Backbone.Model.extend({
         effort: null,   // an int or null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
-<<<<<<< HEAD
-        enable_enrollment_email: false
-=======
+// TODO:FUNK <<<<<<< HEAD
+//        enable_enrollment_email: false
+        enable_enrollment_email: false,
+// TODO:FUNK =======
         pre_requisite_courses: [],
         entrance_exam_enabled : '',
         entrance_exam_minimum_score_pct: '50'
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     },
 
     validate: function(newattrs) {
