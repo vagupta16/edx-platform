@@ -2,13 +2,13 @@
 """
 Tests for course access
 """
-<<<<<<< HEAD
-import datetime
+# TODO:FUNK <<<<<<< HEAD
+# import datetime
 from mock import MagicMock
-=======
+# TODO:FUNK =======
 import ddt
 import itertools
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 import mock
 
 from django.conf import settings
