@@ -36,18 +36,18 @@ ${page_title_breadcrumbs(course_name())}
 </%block>
 
 <%block name="headextra">
-<<<<<<< HEAD
-
-  <%static:css group='style-course-vendor'/>
-  <%static:css group='style-course'/>
-=======
+## TODO:FUNK <<<<<<< HEAD
+##
+##  <%static:css group='style-course-vendor'/>
+##  <%static:css group='style-course'/>
+## TODO:FUNK =======
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 ## Utility: Notes
 % if is_edxnotes_enabled(course):
 <%static:css group='style-student-notes'/>
 % endif
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 <%block name="nav_skip">${"#seq_content" if section_title else "#course-content"}</%block>
 
@@ -107,7 +107,7 @@ ${page_title_breadcrumbs(course_name())}
       });
   </script>
 
-<<<<<<< HEAD
+## TODO:FUNK <<<<<<< HEAD
 % if timer_expiration_duration:
   <script type="text/javascript">
     var timer = {
@@ -157,12 +157,12 @@ ${page_title_breadcrumbs(course_name())}
 % endif
 
 % if settings.FEATURES.get("ENABLE_CHAT") and course.show_chat:
-=======
+## TODO:FUNK =======
 % if show_chat:
   <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
 
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+## TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
   <script type="text/javascript">
     $(function() {
       // show/hide the chat widget
@@ -262,7 +262,7 @@ ${fragment.foot_html()}
       </section>
     % endif
   </div>
-<<<<<<< HEAD
+## TODO:FUNK <<<<<<< HEAD
   % if course and user.is_authenticated() and not UserProfile.has_registered(user):
     <div class="unauth-tos">
       ${_("By exploring the course, you are agreeing to our")}
@@ -271,8 +271,8 @@ ${fragment.foot_html()}
       ${_("Please read them carefully.")}
     </div>
   % endif
-</div>
-=======
+## </div>
+## TODO:FUNK =======
 </div>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
@@ -280,7 +280,7 @@ ${fragment.foot_html()}
   % if show_chat:
     <%include file="/chat/toggle_chat.html" />
   % endif
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+## TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
   ## Utility: Notes
   % if is_edxnotes_enabled(course):
