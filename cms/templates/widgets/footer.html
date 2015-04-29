@@ -21,28 +21,32 @@
           <li class="nav-item nav-peripheral-feedback">
             <a data-rel="edx.org" href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
           </li>
+          % elif user.is_authenticated():
+          <li class="nav-item nav-peripheral-feedback">
+            <a href="mailto:courseops@stanfordonline.zendesk.com" rel="external">${_("Contact Us")}</a>
+          </li>
           % endif
         </ol>
       </nav>
     </div>
 
-<<<<<<< HEAD
-    <nav class="nav-peripheral">
-      <ol>
-        <li class="nav-item nav-peripheral-tos">
-          <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
-        </li>
-        <li class="nav-item nav-peripheral-pp">
-          <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
-        </li>
-        % if user.is_authenticated():
-        <li class="nav-item nav-peripheral-feedback">
-          <a href="mailto:courseops@stanfordonline.zendesk.com" rel="external">${_("Contact Us")}</a>
-        </li>
-        % endif
-      </ol>
-    </nav>
-=======
+<!-- # TODO:FUNK <<<<<<< HEAD -->
+<!--     <nav class="nav-peripheral"> -->
+<!--       <ol> -->
+<!--         <li class="nav-item nav-peripheral-tos"> -->
+<!--           <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a> -->
+<!--         </li> -->
+<!--         <li class="nav-item nav-peripheral-pp"> -->
+<!--           <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a> -->
+<!--         </li> -->
+<!--         % if user.is_authenticated(): -->
+<!--         <li class="nav-item nav-peripheral-feedback"> -->
+<!--           <a href="mailto:courseops@stanfordonline.zendesk.com" rel="external">${_("Contact Us")}</a> -->
+<!--         </li> -->
+<!--         % endif -->
+<!--       </ol> -->
+<!--     </nav> -->
+<!-- # TODO:FUNK ======= -->
     <div class="footer-content-secondary" aria-label="{_('Legal')}">
       <div class="footer-about-copyright">
         ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
@@ -61,7 +65,7 @@
         </a>
       </div>
     </div>
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+<!-- # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747 -->
   </footer>
 </div>
 
