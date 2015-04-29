@@ -294,8 +294,8 @@ def encode_problem_and_student_input(usage_key, student=None):  # pylint: disabl
 
     return task_input, task_key
 
-<<<<<<< HEAD
-=======
+# TODO:FUNK <<<<<<< HEAD
+# TODO:FUNK =======
 
 def encode_entrance_exam_and_student_input(usage_key, student=None):  # pylint: disable=invalid-name
     """
@@ -319,7 +319,7 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):  # pylint: 
     return task_input, task_key
 
 
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 def submit_task(request, task_type, task_class, course_key, task_input, task_key):
     """
     Helper method to submit a task.
