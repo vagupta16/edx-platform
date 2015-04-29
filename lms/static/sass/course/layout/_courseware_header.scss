@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+// TODO:FUNK <<<<<<< HEAD
 p.unauth-warning {
   padding: 10px;
   text-align: center;
@@ -13,12 +13,12 @@ p.unauth-warning a {
   border-radius: 5px;
 }
 
-nav.course-material {
-  @include clearfix;
-=======
+//nav.course-material {
+//  @include clearfix;
+// TODO:FUNK =======
 .wrapper-course-material {
   @include clearfix();
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
   @include box-sizing(border-box);
   border-bottom: none;
   margin: 0 auto 0;
