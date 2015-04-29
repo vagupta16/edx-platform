@@ -34,10 +34,10 @@ class @Problem
     @checkButton.click @check_fd
     @$('div.action button.reset').click @reset
     @$('div.action button.show').click @show
-<<<<<<< HEAD
-    @$('div.action input.save').click @save
+# TODO:FUNK <<<<<<< HEAD
+#     @$('div.action input.save').click @save
     @$('div.action input.start').click @start
-=======
+# TODO:FUNK =======
     @$('div.action button.save').click @save
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
     @$('.clarification').focus (ev) =>
@@ -45,7 +45,7 @@ class @Problem
       window.globalTooltipManager.openTooltip icon
     @$('.clarification').blur (ev) =>
       window.globalTooltipManager.hide()
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     @bindResetCorrectness()
 
