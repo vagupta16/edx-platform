@@ -15,28 +15,28 @@ class CourseMetadata(object):
     editable metadata.
     '''
     # The list of fields that wouldn't be shown in Advanced Settings.
-<<<<<<< HEAD
-    # Should not be used directly. Instead the filtered_list method should be used if the field needs to be filtered
-    # depending on the feature flag.
-    FILTERED_LIST = ['xml_attributes',
-                     'start',
-                     'end',
-                     'enrollment_start',
-                     'enrollment_end',
-                     'tabs',
-                     'graceperiod',
-                     'checklists',
-                     'show_timezone',
-                     'format',
-                     'graded',
-                     'hide_from_toc',
-                     'pdf_textbooks',
-                     'user_partitions',
-                     'name',  # from xblock
-                     'tags',  # from xblock
-                     'visible_to_staff_only',
-                     'enable_enrollment_email'
-=======
+# TODO:FUNK <<<<<<< HEAD
+#     # Should not be used directly. Instead the filtered_list method should be used if the field needs to be filtered
+#     # depending on the feature flag.
+#     FILTERED_LIST = ['xml_attributes',
+#                      'start',
+#                      'end',
+#                      'enrollment_start',
+#                      'enrollment_end',
+#                      'tabs',
+#                      'graceperiod',
+#                      'checklists',
+#                      'show_timezone',
+#                      'format',
+#                      'graded',
+#                      'hide_from_toc',
+#                      'pdf_textbooks',
+#                      'user_partitions',
+#                      'name',  # from xblock
+#                      'tags',  # from xblock
+#                      'visible_to_staff_only',
+#                      'enable_enrollment_email'
+# TODO:FUNK =======
     # Should not be used directly. Instead the filtered_list method should
     # be used if the field needs to be filtered depending on the feature flag.
     FILTERED_LIST = [
@@ -57,6 +57,9 @@ class CourseMetadata(object):
         'user_partitions',
         'name',  # from xblock
         'tags',  # from xblock
+        # TODO:FUNK
+        'enable_enrollment_email'
+        # TODO:FUNK
         'visible_to_staff_only',
         'group_access',
         'pre_requisite_courses',
@@ -65,7 +68,7 @@ class CourseMetadata(object):
         'entrance_exam_id',
         'is_entrance_exam',
         'in_entrance_exam',
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     ]
 
     @classmethod
