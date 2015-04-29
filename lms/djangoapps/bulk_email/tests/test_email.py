@@ -13,20 +13,20 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-<<<<<<< HEAD
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from courseware.tests.factories import StaffFactory, InstructorFactory
+# TODO:FUNK <<<<<<< HEAD
+# from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+# from student.tests.factories import CourseEnrollmentFactory, UserFactory
+# from courseware.tests.factories import StaffFactory, InstructorFactory
 
 from courseware.models import StudentModule
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from bulk_email.models import Optout
+# from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+# from xmodule.modulestore.tests.factories import CourseFactory
+# from bulk_email.models import Optout
 from instructor_email_widget.models import StudentsForQuery, TemporaryQuery
-=======
+# TODO:FUNK =======
 from bulk_email.models import Optout
 from courseware.tests.factories import StaffFactory, InstructorFactory
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
@@ -191,7 +191,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     def _setup_query(self):
         """
         Helper function for email to query tests
@@ -295,14 +295,14 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         temp_response = self.client.get(get_saved_url)
         queries = json.loads(temp_response.content)['queries']
         return queries
-=======
+# TODO:FUNK =======
     @override_settings(BULK_EMAIL_JOB_SIZE_THRESHOLD=1)
     def test_send_to_all_high_queue(self):
         """
         Test that email is still sent when the high priority queue is used
         """
         self.test_send_to_all()
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     def test_no_duplicate_emails_staff_instructor(self):
         """
