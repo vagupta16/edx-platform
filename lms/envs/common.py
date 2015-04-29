@@ -1751,11 +1751,11 @@ INSTALLED_APPS = (
     # Surveys
     'survey',
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     # Instructor email widget
     'instructor_email_widget',
 
-=======
+# TODO:FUNK =======
     'lms.djangoapps.lms_xblock',
 
     'openedx.core.djangoapps.content.course_structures',
@@ -1766,7 +1766,7 @@ INSTALLED_APPS = (
     'cors_csrf',
 
     'commerce',
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 )
 
 ######################### CSRF #########################################
@@ -1795,7 +1795,7 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 ######################### VISIBLE SETTINGS ###########################
 # These settings' values will be exposed to all templates
 TEMPLATE_VISIBLE_SETTINGS = [
@@ -1805,7 +1805,7 @@ TEMPLATE_VISIBLE_SETTINGS = [
 ############################### CHAT ################################
 JABBER = {}
 DATABASE_ROUTERS = []
-=======
+# TODO:FUNK =======
 ################# Social Media Footer Links #######################
 # The names list controls the order of social media
 # links in the footer.
@@ -1884,7 +1884,7 @@ MOBILE_STORE_URLS = {
     'apple': '#',
     'google': '#'
 }
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
@@ -1951,7 +1951,7 @@ GRADES_DOWNLOAD = {
     'ROOT_PATH': '/tmp/edx-s3/grades',
 }
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 #################### Student Responses Reports Downloads #################
 STUDENT_RESPONSES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
@@ -1974,8 +1974,8 @@ ORA2_RESPONSES_DOWNLOAD = {
 # The following fields are available in the URL: {course_id} {student_id}
 PROGRESS_SUCCESS_BUTTON_URL = 'http://<domain>/<path>/{course_id}'
 PROGRESS_SUCCESS_BUTTON_TEXT_OVERRIDE = None
-=======
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK =======
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 #### PASSWORD POLICY SETTINGS #####
 PASSWORD_MIN_LENGTH = 8
@@ -2295,7 +2295,7 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 # visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 # Metrics tab data source setting
 MAX_ENROLLEES_FOR_METRICS_USING_DB = 100
 
@@ -2314,7 +2314,7 @@ DISPLAY_COURSE_TILES = True
 
  # Set to True for systems where students are auto-registered on login
 DISABLE_REGISTER_BUTTON = False
-=======
+# TODO:FUNK =======
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
 
@@ -2411,4 +2411,4 @@ PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
