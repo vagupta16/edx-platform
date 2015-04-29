@@ -115,17 +115,17 @@ def _get_recipient_querysets(user_id, to_option, course_id):
         log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
         raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
 
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
     if to_option.isdigit():
         recipient_queryset = get_group_query_students(course_id, int(to_option))
         return recipient_queryset
     elif to_option == SEND_TO_MYSELF:
-        recipient_qset = User.objects.filter(id=user_id)
-=======
-    if to_option == SEND_TO_MYSELF:
+#         recipient_qset = User.objects.filter(id=user_id)
+# TODO:FUNK =======
+#     if to_option == SEND_TO_MYSELF:
         user = User.objects.filter(id=user_id)
         return [use_read_replica_if_available(user)]
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     else:
         staff_qset = CourseStaffRole(course_id).users_with_role()
         instructor_qset = CourseInstructorRole(course_id).users_with_role()
