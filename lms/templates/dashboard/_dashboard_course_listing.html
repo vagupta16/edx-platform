@@ -116,11 +116,6 @@ from student.helpers import (
                 % endif
               % endif
 
-<<<<<<< HEAD
-      % if (course.may_certify() and cert_status and (cert_status['status'] != 'processing')) or (course.has_ended() and cert_status and (not enrollment.mode == 'audit')):
-        <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status, course=course, enrollment=enrollment'/>
-      % endif
-=======
               % if share_settings:
                 <%
                   if share_settings.get("CUSTOM_COURSE_URLS", False):
@@ -276,10 +271,10 @@ from student.helpers import (
   </section>
   <footer class="wrapper-messages-primary">
     <ul class="messages-list">
-      % if course.may_certify() and cert_status:
+      ## % if course.may_certify() and cert_status:
+      % if (course.may_certify() and cert_status and (cert_status['status'] != 'processing')) or (course.has_ended() and cert_status and (not enrollment.mode == 'audit')):
         <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
         % endif
->>>>>>> 00b75f0119b981641833240be214ef2076329747
 
         % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
         <div class="message message-status wrapper-message-primary is-shown">
