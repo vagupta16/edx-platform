@@ -17,24 +17,25 @@ from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpRespon
 from smtplib import SMTPException
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.date_utils import get_default_time_display
-<<<<<<< HEAD
-from edxmako.shortcuts import render_to_response, render_to_string
-=======
+# TODO:FUNK <<<<<<< HEAD
+# from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_string
+# TODO:FUNK =======
 from util.db import generate_int_id, MYSQL_MAX_INT
 from edxmako.shortcuts import render_to_response
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
-<<<<<<< HEAD
-from xmodule.partitions.partitions import UserPartition, Group
-
-=======
+# TODO:FUNK <<<<<<< HEAD
+# from xmodule.partitions.partitions import UserPartition, Group
+# 
+# TODO:FUNK =======
 from xmodule.partitions.partitions import UserPartition
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
@@ -792,11 +793,11 @@ def course_info_handler(request, course_key_string):
                     'updates_url': reverse_course_url('course_info_update_handler', course_key),
                     'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
                     'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
                     'keywords_supported': get_keywords_supported(),
-=======
+# TODO:FUNK =======
                     'push_notification_enabled': push_notification_enabled()
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
                 }
             )
         else:
@@ -905,15 +906,15 @@ def settings_handler(request, course_key_string):
             )
 
             short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
 
             default_enroll_email_template_pre = render_to_string('emails/default_pre_enrollment_message.txt', {})
             default_enroll_email_template_post = render_to_string('emails/default_post_enrollment_message.txt', {})
 
-            return render_to_response('settings.html', {
-=======
+#             return render_to_response('settings.html', {
+# TODO:FUNK =======
             settings_context = {
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
                 'context_course': course_module,
                 'course_locator': course_key,
                 'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
@@ -922,13 +923,13 @@ def settings_handler(request, course_key_string):
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
                 'upload_asset_url': upload_asset_url,
-<<<<<<< HEAD
+# TODO:FUNK <<<<<<< HEAD
                 'test_email_url': reverse_course_url('send_test_enrollment_email', course_key),
                 'default_pre_template': default_enroll_email_template_pre,
                 'default_post_template': default_enroll_email_template_post,
                 'keywords_supported': get_keywords_supported(),
-            })
-=======
+#             })
+# TODO:FUNK =======
                 'course_handler_url': reverse_course_url('course_handler', course_key),
             }
             if prerequisite_course_enabled:
@@ -940,7 +941,7 @@ def settings_handler(request, course_key_string):
                 settings_context.update({'possible_pre_requisite_courses': courses})
 
             return render_to_response('settings.html', settings_context)
->>>>>>> 00b75f0119b981641833240be214ef2076329747
+# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
                 course_details = CourseDetails.fetch(course_key)
