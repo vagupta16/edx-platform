@@ -452,18 +452,11 @@ def signin_user(request):
 
 @ensure_csrf_cookie
 def register_user(request, extra_context=None):
-# TODO:FUNK <<<<<<< HEAD
-#     """
-#     This view will display the non-modal registration form
-#     """
+    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
     if settings.FEATURES.get('USE_CME_REGISTRATION'):
         return cme_register_user(request, extra_context=extra_context)
 
     if UserProfile.has_registered(request.user):
-# TODO:FUNK =======
-    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
-#     if request.user.is_authenticated():
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         return redirect(reverse('dashboard'))
 
     external_auth_response = external_auth_register(request)
