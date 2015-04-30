@@ -516,14 +516,6 @@
 
       % elif course_creator_status == "denied":
       <div class="bit">
-<!-- <<<<<<< HEAD -->
-<!--         <h3 class="title title-3">${_("Can I create courses in Studio?")}</h3> -->
-<!--         <p>${_("Your request to author courses in Studio has been denied. Please {link_start}contact edX Staff with further questions{link_end}.").format( -->
-<!--             link_start='<a href="{url}" class="show-tender">'.format( -->
-<!-- url="https://groups.google.com/d/forum/openedx-studio", -->
-<!--             ), -->
-<!--             link_end="</a>", -->
-<!-- ======= -->
         <h3 class="title title-3">${_("Can I create courses in {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</h3>
 <%!
 from django.conf import settings
@@ -542,7 +534,6 @@ else:
             platform_name=settings.PLATFORM_NAME,
             link_start=help_link_start,
             link_end=help_link_end,
-<!-- >>>>>>> 00b75f0119b981641833240be214ef2076329747 -->
           )}</p>
       </div>
 
@@ -576,9 +567,7 @@ else:
         <ol class='list-actions'>
           % if settings.TENDER_DOMAIN:
             <li class="action-item">
-              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
-                ${_("Request help with your {studio_name} account").format(studio_name=settings.STUDIO_NAME)}
-              </a>
+              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">${_("Request help with your {studio_name} account").format(studio_name=settings.STUDIO_NAME)}</a>
             </li>
           % endif
         </ol>
