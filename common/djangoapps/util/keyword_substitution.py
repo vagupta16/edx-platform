@@ -94,7 +94,7 @@ def substitute_keywords(string, context):
     """
     for key in KEYWORD_FUNCTION_MAP.keys():
         if key in string:
-            substitutor = KEYWORD_FUNCTION_MAP[key]
+            substitutor = KEYWORD_FUNCTION_MAP[key].func
             string = string.replace(key, substitutor(context))
 
     return string

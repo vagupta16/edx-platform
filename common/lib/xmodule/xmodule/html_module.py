@@ -4,6 +4,7 @@ import re
 import copy
 import logging
 import textwrap
+from django.contrib.auth.models import User
 from lxml import etree
 from path import path
 from fs.errors import ResourceNotFoundError
@@ -78,8 +79,8 @@ class HtmlModuleMixin(HtmlFields, XModule):
             course = self.descriptor.runtime.modulestore.get_course(self.course_id)
             user = self.system.get_real_user(self.system.anonymous_student_id)
             context = {
-                'user_id': user.id,
-                'name': user.profile.name,
+                'user_id': user.id if user else None,
+                'name': user.profile.name if user else '',
                 'course_title': course.display_name,
                 'course_id': self.course_id,
                 'course_start_date': course.start,
