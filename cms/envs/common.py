@@ -35,11 +35,7 @@ import sys
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
-# TODO:FUNK <<<<<<< HEAD
     ACCOUNT_NAME,
-#     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
-#     update_module_store_settings, ASSET_IGNORE_REGEX
-# TODO:FUNK =======
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR, ALL_LANGUAGES, WIKI_ENABLED,
     update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT,
     # The following PROFILE_IMAGE_* settings are included as they are
@@ -47,7 +43,6 @@ from lms.envs.common import (
     # technically accessible through the CMS via legacy URLs.
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES,
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 )
 from path import path
 from warnings import simplefilter
@@ -121,13 +116,11 @@ FEATURES = {
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
 
-# TODO:FUNK <<<<<<< HEAD
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': None,
 
     # Display option to send email confirmation of course enrollment
     'ENABLE_ENROLLMENT_EMAIL': False,
-# TODO:FUNK =======
 
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
@@ -170,7 +163,6 @@ FEATURES = {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
         'CUSTOM_COURSE_URLS': False
     }
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 }
 
 ENABLE_JASMINE = False
@@ -680,7 +672,6 @@ YOUTUBE = {
     },
 }
 
-# TODO:FUNK <<<<<<< HEAD
 ############################## Utilities ##########################################
 
 # Todo: add aws entries for this
@@ -700,7 +691,6 @@ COURSE_UTILITIES = [
           ]
     }
 ]
-# TODO:FUNK =======
 ############################# VIDEO UPLOAD PIPELINE #############################
 
 VIDEO_UPLOAD_PIPELINE = {
@@ -708,7 +698,6 @@ VIDEO_UPLOAD_PIPELINE = {
     'ROOT_PATH': '',
     'CONCURRENT_UPLOAD_LIMIT': 4,
 }
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 ############################ APPS #####################################
 
@@ -887,13 +876,11 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
-# TODO:FUNK <<<<<<< HEAD
 ### SHIB
 # For SHIB backup register and login URLs
 SHIB_ONLY_SITE = False
 SHIB_REDIRECT_DOMAIN_WHITELIST = {}
 
-# TODO:FUNK =======
 ### Size of chunks into which asset uploads will be divided
 UPLOAD_CHUNK_SIZE_IN_MB = 10
 
@@ -906,7 +893,6 @@ MAX_ASSET_UPLOAD_FILE_SIZE_URL = ""
 
 ### Default value for entrance exam minimum score
 ENTRANCE_EXAM_MIN_SCORE_PCT = 50
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 ################ ADVANCED_COMPONENT_TYPES ###############
 
@@ -945,15 +931,12 @@ ADVANCED_COMPONENT_TYPES = [
     'google-calendar',
 ]
 
-# TODO:FUNK <<<<<<< HEAD
 # XBlock types listed here will _always_ be selectable as Studio components
 XBLOCKS_ALWAYS_IN_STUDIO = [
 ]
-# TODO:FUNK =======
 # Adding components in this list will disable the creation of new problem for those
 # compoenents in studio. Existing problems will work fine and one can edit them in studio
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 # Specify xblocks that should be treated as advanced problems. Each entry is a tuple
 # specifying the xblock name and an optional YAML template to be used.
