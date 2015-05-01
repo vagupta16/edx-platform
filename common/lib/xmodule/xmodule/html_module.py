@@ -75,7 +75,17 @@ class HtmlModuleMixin(HtmlFields, XModule):
 
     def get_html(self):
         if self.system.substitute_keywords_with_data:
-            return self.system.substitute_keywords_with_data(self.data)
+            course = self.descriptor.runtime.modulestore.get_course(self.course_id)
+            user = self.system.get_real_user(self.system.anonymous_student_id)
+            context = {
+                'user_id': user.id,
+                'name': user.profile.name,
+                'course_title': course.display_name,
+                'course_id': self.course_id,
+                'course_start_date': course.start,
+                'course_end_date': course.end,
+            }
+            return self.system.substitute_keywords_with_data(self.data, context)
         return self.data
 
 

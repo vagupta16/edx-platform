@@ -793,11 +793,8 @@ def course_info_handler(request, course_key_string):
                     'updates_url': reverse_course_url('course_info_update_handler', course_key),
                     'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
                     'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
-# TODO:FUNK <<<<<<< HEAD
                     'keywords_supported': get_keywords_supported(),
-# TODO:FUNK =======
                     'push_notification_enabled': push_notification_enabled()
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
                 }
             )
         else:
@@ -864,11 +861,20 @@ def send_test_enrollment_email(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     user = request.user
+    course = get_course_and_check_access(course_key, user)
     from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     subject = request.POST.get('subject')
     subject = ''.join(subject.splitlines())
     message = request.POST.get('message')
-    message = substitute_keywords_with_data(message, user.id, course_key)
+    context = {
+        'user_id': user.id,
+        'name': user.profile.name,
+        'course_title': course.display_name,
+        'course_id': course_key,
+        'course_start_date': course.start,
+        'course_end_date': course.end,
+    }
+    message = substitute_keywords_with_data(message, context)
 
     try:
         user.email_user(subject, message, from_address)
@@ -906,15 +912,11 @@ def settings_handler(request, course_key_string):
             )
 
             short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
-# TODO:FUNK <<<<<<< HEAD
 
             default_enroll_email_template_pre = render_to_string('emails/default_pre_enrollment_message.txt', {})
             default_enroll_email_template_post = render_to_string('emails/default_post_enrollment_message.txt', {})
 
-#             return render_to_response('settings.html', {
-# TODO:FUNK =======
             settings_context = {
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
                 'context_course': course_module,
                 'course_locator': course_key,
                 'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
@@ -923,13 +925,10 @@ def settings_handler(request, course_key_string):
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
                 'upload_asset_url': upload_asset_url,
-# TODO:FUNK <<<<<<< HEAD
                 'test_email_url': reverse_course_url('send_test_enrollment_email', course_key),
                 'default_pre_template': default_enroll_email_template_pre,
                 'default_post_template': default_enroll_email_template_post,
                 'keywords_supported': get_keywords_supported(),
-#             })
-# TODO:FUNK =======
                 'course_handler_url': reverse_course_url('course_handler', course_key),
             }
             if prerequisite_course_enabled:
@@ -941,7 +940,6 @@ def settings_handler(request, course_key_string):
                 settings_context.update({'possible_pre_requisite_courses': courses})
 
             return render_to_response('settings.html', settings_context)
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
                 course_details = CourseDetails.fetch(course_key)

@@ -303,7 +303,6 @@ class @PendingInstructorTasks
 class KeywordValidator
 
     @keyword_regex = /%%+[^%]+%%/g
-# TODO:FUNK <<<<<<< HEAD
     @keywords = [
       '%%USER_ID%%',
       '%%USER_FULLNAME%%',
@@ -312,9 +311,6 @@ class KeywordValidator
       '%%COURSE_START_DATE%%',
       '%%COURSE_END_DATE%%'
     ]
-# TODO:FUNK =======
-#     @keywords = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%']
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     @validate_string: (string) =>
       regex_match = string.match(@keyword_regex)
@@ -327,17 +323,10 @@ class KeywordValidator
         do (found_keyword) ->
           if found_keyword not in keywords
             invalid_keywords.push found_keyword
-# TODO:FUNK <<<<<<< HEAD
-#       
-#       if invalid_keywords.length != 0
-#         is_valid = false
-#       
-# TODO:FUNK =======
 
       if invalid_keywords.length != 0
         is_valid = false
 
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
       return {
         is_valid: is_valid,
         invalid_keywords: invalid_keywords

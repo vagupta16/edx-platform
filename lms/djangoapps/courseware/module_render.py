@@ -639,11 +639,8 @@ def get_module_system_for_user(user, field_data_cache,
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
         user_location=user_location,
-# TODO:FUNK <<<<<<< HEAD
-        substitute_keywords_with_data=partial(substitute_keywords_with_data, user_id=user.id, course_id=course_id),
-# TODO:FUNK =======
+        substitute_keywords_with_data=partial(substitute_keywords_with_data),
         request_token=request_token,
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
     )
     if settings.FEATURES.get('SEND_USERS_EMAILADDR_WITH_CODERESPONSE', False):
         system.set('send_users_emailaddr_with_coderesponse', True)

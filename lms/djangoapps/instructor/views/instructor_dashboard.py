@@ -20,11 +20,8 @@ from django.utils.html import escape
 from django.http import Http404, HttpResponseServerError
 from django.conf import settings
 from util.json_request import JsonResponse
-# TODO:FUNK <<<<<<< HEAD
 from util.keyword_substitution import get_keywords_supported
-# TODO:FUNK =======
 from mock import patch
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock

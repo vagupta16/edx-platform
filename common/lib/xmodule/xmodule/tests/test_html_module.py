@@ -35,10 +35,7 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
         module_system = get_test_system()
         module_system.substitute_keywords_with_data = Mock(return_value=anon_id)
         module = HtmlModule(self.descriptor, module_system, field_data, Mock())
-        # TODO:FUNK <<<<<<< HEAD
         self.assertEqual(module.get_html(), anon_id)
-        # TODO:FUNK =======
-        # self.assertEqual(module.get_html(), sample_xml)
 
 
 class HtmlDescriptorIndexingTestCase(unittest.TestCase):

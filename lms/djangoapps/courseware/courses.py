@@ -292,7 +292,15 @@ def get_course_info_section(request, course, section_key):
     if info_module is not None:
         try:
             html = info_module.render(STUDENT_VIEW).content
-            html = substitute_keywords_with_data(html, request.user.id, course.id)
+            context = {
+                'user_id': request.user.id,
+                'name': request.user.profile.name,
+                'course_title': course.display_name,
+                'course_id': course.id,
+                'course_start_date': course.start,
+                'course_end_date': course.end,
+            }
+            html = substitute_keywords_with_data(html, context)
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(

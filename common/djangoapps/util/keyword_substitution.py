@@ -14,11 +14,8 @@ Supported:
         - %%COURSE_END_DATE%% => end date of the course
 
 Usage:
-    KEYWORD_FUNCTION_MAP must be supplied in startup.py, so that it lives
-    above other modules in the dependency tree and acts like a global var.
-    Then we can call substitute_keywords_with_data where substitution is
+    Call substitute_keywords_with_data where substitution is
     needed. Currently called in:
-# TODO:FUNK <<<<<<< HEAD
         - LMS:
             - Bulk email
             - emails on enrollment
@@ -31,24 +28,38 @@ Usage:
 from collections import namedtuple
 
 from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
+from student.models import anonymous_id_for_user
+from date_utils import get_default_time_display
 
 Keyword = namedtuple('Keyword', 'func desc')
-KEYWORD_FUNCTION_MAP = {}
 
-
-def keyword_function_map_is_empty():
-    """
-    Checks if the keyword function map has been filled
-    """
-    return not bool(KEYWORD_FUNCTION_MAP)
-
-
-def add_keyword_function_map(mapping):
-    """
-    Attaches the given keyword-function mapping to the existing one
-    """
-    KEYWORD_FUNCTION_MAP.update(mapping)
+# do this lazily to avoid unneeded database hits
+KEYWORD_FUNCTION_MAP = {
+    '%%USER_ID%%': Keyword(
+        lambda context: anonymous_id_from_user_id(context.get('user_id')),
+        'anonymous_user_id (for use in survey links)'
+    ),
+    '%%USER_FULLNAME%%': Keyword(
+        lambda context: context.get('name'),
+        'user profile name'
+    ),
+    '%%COURSE_DISPLAY_NAME%%': Keyword(
+        lambda context: context.get('course_title'),
+        'display name of the course'
+    ),
+    '%%COURSE_ID%%': Keyword(
+        lambda context: unicode(context.get('course_id')),
+        'course identifier'
+    ),
+    '%%COURSE_START_DATE%%': Keyword(
+        lambda context: get_default_time_display(context.get('course_start_date')),
+        'start date of the course'
+    ),
+    '%%COURSE_END_DATE%%': Keyword(
+        lambda context: get_default_time_display(context.get('course_end_date')),
+        'end date of the course'
+    ),
+}
 
 
 def get_keywords_supported():
@@ -64,17 +75,6 @@ def get_keywords_supported():
     ]
 
 
-# def substitute_keywords(string, user=None, course=None):
-# TODO:FUNK =======
-#         - LMS: Announcements + Bulk emails
-#         - CMS: Not called
-# """
-# 
-# from django.contrib.auth.models import User
-from student.models import anonymous_id_for_user
-# from xmodule.modulestore.django import modulestore
-
-
 def anonymous_id_from_user_id(user_id):
     """
     Gets a user's anonymous id from their user id
@@ -83,8 +83,7 @@ def anonymous_id_from_user_id(user_id):
     return anonymous_id_for_user(user, None)
 
 
-def substitute_keywords(string, user_id, context):
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
+def substitute_keywords(string, context):
     """
     Replaces all %%-encoded words using KEYWORD_FUNCTION_MAP mapping functions
 
@@ -92,70 +91,28 @@ def substitute_keywords(string, user_id, context):
     them by calling the corresponding functions stored in KEYWORD_FUNCTION_MAP.
 
     Functions stored in KEYWORD_FUNCTION_MAP must return a replacement string.
-# TODO:FUNK <<<<<<< HEAD
-#     Also, functions imported from other modules must be wrapped in a
-#     new function if they don't take in user_id and course_id. This simplifies
-#     the loop below, and reduces the need for piling up if elif else statements
-#     when the keyword pool grows.
     """
-#     if user is None or course is None:
-#         # Cannot proceed without course and user information
-#         return string
-# 
-#     for key, value in KEYWORD_FUNCTION_MAP.iteritems():
-#         if key in string:
-#             substitutor = value.func(user, course)
-#             string = string.replace(key, substitutor)
-# TODO:FUNK =======
-#     """
-
-    # do this lazily to avoid unneeded database hits
-    KEYWORD_FUNCTION_MAP = {
-        '%%USER_ID%%': lambda: anonymous_id_from_user_id(user_id),
-        '%%USER_FULLNAME%%': lambda: context.get('name'),
-        '%%COURSE_DISPLAY_NAME%%': lambda: context.get('course_title'),
-        '%%COURSE_END_DATE%%': lambda: context.get('course_end_date'),
-    }
-
     for key in KEYWORD_FUNCTION_MAP.keys():
         if key in string:
             substitutor = KEYWORD_FUNCTION_MAP[key]
-            string = string.replace(key, substitutor())
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
+            string = string.replace(key, substitutor(context))
 
     return string
 
 
-# TODO:FUNK <<<<<<< HEAD
-# def substitute_keywords_with_data(string, user_id=None, course_id=None):
-#     """
-#     Given user and course ids, replaces all %%-encoded words in the given string
-# TODO:FUNK =======
 def substitute_keywords_with_data(string, context):
     """
     Given an email context, replaces all %%-encoded words in the given string
-    `context` is a dictionary that should include `user_id` and `course_title`
-    keys
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
+    `context` is a dictionary that should include `user_id`, `name`, `course_title`,
+    `course_id`, `course_start_date`, and `course_end_date` keys
     """
 
     # Do not proceed without parameters: Compatibility check with existing tests
     # that do not supply these parameters
-# TODO:FUNK <<<<<<< HEAD
-#     if user_id is None or course_id is None:
-#         return string
-# 
-#     # Grab user objects
-#     user = User.objects.get(id=user_id)
-#     course = modulestore().get_course(course_id, depth=0)
-# 
-#     return substitute_keywords(string, user, course)
-# TODO:FUNK =======
     user_id = context.get('user_id')
     course_title = context.get('course_title')
 
     if user_id is None or course_title is None:
         return string
 
-    return substitute_keywords(string, user_id, context)
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
+    return substitute_keywords(string, context)

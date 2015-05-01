@@ -177,7 +177,6 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             return false;
         };
 
-// TODO:FUNK <<<<<<< HEAD
         var keywordValidator = (function () {
             var regexp = /%%[^%\s]+%%/g;
             var keywordsSupported = [
@@ -209,7 +208,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 'validateString': validate
             };
         }());
-// TODO:FUNK =======
+
         /**
          * Helper method for course/library creation - verifies a required field is not blank.
          */
@@ -258,7 +257,6 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 $(selectors.errorWrapper).removeClass(classes.shown).addClass(classes.hiding);
             }
         };
-// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
         return {
             'toggleExpandCollapse': toggleExpandCollapse,
@@ -273,15 +271,11 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             'setScrollOffset': setScrollOffset,
             'redirect': redirect,
             'reload': reload,
-// TODO:FUNK <<<<<<< HEAD
-            'keywordValidator': keywordValidator,
-//            'hasChangedAttributes': hasChangedAttributes
-// TODO:FUNK =======
             'hasChangedAttributes': hasChangedAttributes,
+            'keywordValidator': keywordValidator,
             'validateRequiredField': validateRequiredField,
             'validateURLItemEncoding': validateURLItemEncoding,
             'validateTotalKeyLength': validateTotalKeyLength,
             'checkTotalKeyLengthViolations': checkTotalKeyLengthViolations
-// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         };
     });

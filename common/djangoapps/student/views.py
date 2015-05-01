@@ -108,14 +108,10 @@ import dogstats_wrapper as dog_stats_api
 from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
-# TODO:FUNK <<<<<<< HEAD
 from util.keyword_substitution import substitute_keywords_with_data
-
-# TODO:FUNK =======
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
 )
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from microsite_configuration import microsite
 
 from util.password_policy_validators import (
@@ -1055,7 +1051,15 @@ def notify_enrollment_by_email(course, user, request):
                 message = get_course_about_section(course, 'pre_enrollment_email')
 
             subject = ''.join(subject.splitlines())
-            message = substitute_keywords_with_data(message, user.id, course.id)
+            context = {
+                'user_id': user.id,
+                'name': user.profile.name,
+                'course_title': course.display_name,
+                'course_id': course.id,
+                'course_start_date': course.start,
+                'course_end_date': course.end,
+            }
+            message = substitute_keywords_with_data(message, context)
             user.email_user(subject, message, from_address)
 
         except Exception:
