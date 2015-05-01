@@ -185,19 +185,12 @@ class CourseFields(object):
                  default=DEFAULT_START_DATE,
                  scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
-    # TODO:FUNK <<<<<<< HEAD
-    display_price = Integer(
-        display_name=_("Course Display Price"),
-        help=_("The cost displayed to students for enrolling in the course. If a paid course registration price is set by platform staff in the database, that price will be displayed instead of this one."),
-    )
-    # TODO:FUNK =======
     cosmetic_display_price = Integer(
         display_name=_("Cosmetic Course Display Price"),
         help=_(
             "The cost displayed to students for enrolling in the course. If a paid course registration price is "
             "set by an administrator in the database, that price will be displayed instead of this one."
         ),
-    # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         default=0,
         scope=Scope.settings,
     )
