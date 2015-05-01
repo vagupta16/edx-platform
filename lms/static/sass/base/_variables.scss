@@ -161,18 +161,6 @@ $blue-d2: shade($blue,40%);
 $blue-d4: shade($blue,80%);
 
 // edx.org marketing site variables
-// TODO:FUNK <<<<<<< HEAD
-//$m-gray: #8A8C8F;
-//$m-gray-a1: rgb(80,80,80);
-//$m-gray-l1: #97999B;
-//$m-gray-l2: #A4A6A8;
-//$m-gray-l3: #B1B2B4;
-//$m-gray-l4: #F5F5F5;
-//$m-gray-d1: #7D7F83;
-//$m-gray-d2: #707276;
-//$m-gray-d3: #646668;
-//$m-gray-d4: #050505;
-// TODO:FUNK =======
 $m-gray: rgb(138,140,143); // #8A8C8F
 $m-gray-l1: rgb(151,153,155); // #97999B
 $m-gray-l2: rgb(164,166,168); // #A4A6A8
@@ -182,7 +170,6 @@ $m-gray-d1: rgb(111, 112, 116); // #6f7074
 $m-gray-d2: rgb(112,114,118); // #707276
 $m-gray-d3: rgb(100,102,104); // #646668
 $m-gray-d4: rgb(5,5,5); // #050505
-// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 $m-gray-t0: rgba($m-gray,0.125);
 $m-gray-t1: rgba($m-gray,0.25);
 $m-gray-t2: rgba($m-gray,0.50);
@@ -194,14 +181,7 @@ $m-blue-l2: rgb(66,181,233); // #42B5E9
 $m-blue-l3: rgb(89,190,236); // #59BEEC
 $m-blue-l4: tint($m-blue,90%);
 $m-blue-l5: tint($m-blue,95%);
-// TODO:FUNK <<<<<<< HEAD
-//$m-blue-d1: #1790C7;
-//$m-blue-d2: #1580B0;
-//$m-blue-d3: #126F9A;
-//$m-blue-d4: #0A4A67;
-//$m-blue-d5: #009EE7;
 $m-blue-s1: saturate($m-blue,15%);
-// TODO:FUNK =======
 $m-blue-l6: #4bb4fb;
 $m-blue-d1: rgb(23,144,199); // #1790C7
 $m-blue-d2: $blue;
@@ -209,7 +189,6 @@ $m-blue-d3: rgb(18,111,154); // #126F9A
 $m-blue-d4: rgb(10,74,103); // #0A4A67
 $m-blue-d5: rgb(0,158,231); // #009EE7
 $m-blue-d6: #256A97;
-// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 $m-blue-t0: rgba($m-blue,0.125);
 $m-blue-t1: rgba($m-blue,0.25);
 $m-blue-t2: rgba($m-blue,0.50);

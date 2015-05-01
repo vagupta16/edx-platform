@@ -28,13 +28,9 @@
       <ul class="list-actions">
         % if settings.TENDER_DOMAIN:
         <li class="action-item">
-<!-- <<<<<<< HEAD -->
-<!--           <a href="https://groups.google.com/d/forum/openedx-studio" class="action action-primary" target="_blank">${_('Contact edX Support')}</a> -->
-<!-- ======= -->
           <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="action action-primary show-tender">
             ${_('Contact {platform_name} Support').format(platform_name=settings.PLATFORM_NAME)}
           </a>
-<!-- >>>>>>> 00b75f0119b981641833240be214ef2076329747 -->
         </li>
         % endif
       </ul>

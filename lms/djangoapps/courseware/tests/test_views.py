@@ -11,21 +11,6 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
-# TODO:FUNK <<<<<<< HEAD
-# 
-# from student.models import CourseEnrollment
-# from student.tests.factories import AdminFactory, NonRegisteredUserFactory
-from student.tests.factories import NonRegisteredUserFactory
-# from edxmako.middleware import MakoMiddleware
-# from edxmako.tests import mako_middleware_process_request
-# 
-# from opaque_keys.edx.locations import Location
-# from xmodule.modulestore.django import modulestore
-# from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-# from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-# from opaque_keys.edx.locations import SlashSeparatedCourseKey
-# from student.tests.factories import UserFactory
-# TODO:FUNK =======
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -36,7 +21,6 @@ from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import String, Scope
 from xblock.fragment import Fragment
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 import courseware.views as views
 import shoppingcart
@@ -302,26 +286,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         mock_course.id = self.course_key
         self.assertTrue(views.registered_for_course(mock_course, self.user))
 
-    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
-# TODO:FUNK <<<<<<< HEAD
-    def test_get_course_display_price(self):
-        """
-        Check that get_course_display_price() returns the correct price given its inputs.
-        """
-        registration_price = 99
-        self.course.display_price = 10
-        # Since registration_price is set, it overrides the cosmetic display_price and should be returned
-        self.assertEqual(views.get_course_display_price(self.course, registration_price), "$99")
-        
-        # Since registration_price is not set, display_price should be returned
-        registration_price = 0
-        self.assertEqual(views.get_course_display_price(self.course, registration_price), "$10")
-        
-        # Since both prices are not set, there is no price, thus "Free"
-        self.course.display_price = 0
-        self.assertEqual(views.get_course_display_price(self.course, registration_price), "Free")
-# TODO:FUNK =======
-
+    # @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
     def test_get_cosmetic_display_price(self):
         """
         Check that get_cosmetic_display_price() returns the correct price given its inputs.
@@ -338,7 +303,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.course.cosmetic_display_price = 0
         # Since both prices are not set, there is no price, thus "Free"
         self.assertEqual(views.get_cosmetic_display_price(self.course, registration_price), "Free")
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     def test_jump_to_invalid(self):
         # TODO add a test for invalid location
@@ -708,7 +672,6 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
 
-# TODO:FUNK <<<<<<< HEAD
 class TestNonRegisteredUser(TestCase):
     """
     Tests nonregistered (auto-created) users
@@ -727,14 +690,12 @@ class TestNonRegisteredUser(TestCase):
             req.user = self.user
             views.progress(req, self.course_id)
 
-# @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-# TODO:FUNK =======
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
     dashboard.
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(StartDateTests, self).setUp()

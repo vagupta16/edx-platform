@@ -666,22 +666,6 @@ hr.divider {
   }
 }
 
-// TODO:FUNK <<<<<<< HEAD
-// ====================
-
-// lean/simple modal window
-// .content-modal {
-//  @include border-bottom-radius(2px);
-//  @include box-sizing(border-box);
-//  box-shadow: 0 2px 4px $shadow-d1;
-//  position: relative;
-//  display: none;
-//  width: 700px;
-//  overflow: hidden;
-//  border: 1px solid $gray-d1;
-//  padding: ($baseline);
-//  background: $white;
-// TODO:FUNK =======
 // +JS Dependent
 // ==================== 
 body.js {
@@ -719,7 +703,6 @@ body.js {
       }
     }
   }
-// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
   .action-modal-close {
     @include transition(top $tmg-f3 ease-in-out 0s);

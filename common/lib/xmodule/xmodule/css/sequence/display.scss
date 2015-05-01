@@ -36,11 +36,7 @@ $sequence--border-color: #C8C8C8;
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-  // TODO:FUNK <<<<<<< HEAD
-  margin: -4px 30px 30px 30px;
-  // TODO:FUNK =======
-  // margin: -4px 0 ($baseline*1.5);
-  // TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
+  margin: -4px 0 ($baseline*1.5);
   position: relative;
   border-bottom: none;
 
@@ -74,14 +70,8 @@ $sequence--border-color: #C8C8C8;
     position: relative;
     border: 1px solid $gray-l3;
     height: 44px;
-    // TODO:FUNK <<<<<<< HEAD
-    // margin: 0;
-    @include linear-gradient(top, #ddd, #eee);
-    // box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
-    // TODO:FUNK =======
     margin: 0 ($baseline*2);
     box-shadow: 0 1px 3px $shadow-l1 inset;
-    // TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
   }
 
   ol {
@@ -247,11 +237,6 @@ $sequence--border-color: #C8C8C8;
   }
 }
 
-// TODO:FUNK <<<<<<< HEAD
-//       &.prev {
-//         @include left(-40px);
-//         @include border-radius(35px, 0, 0, 35px);
-// TODO:FUNK =======
 .sequence-nav-button {
   @extend %ui-depth3;
   position: absolute;
@@ -269,7 +254,6 @@ $sequence--border-color: #C8C8C8;
     @include border-radius(35px, 0, 0, 35px);
     left: 0;
     background-position: center 15px;
-// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     // CASE: left to right layout
     @include ltr {
@@ -287,16 +271,10 @@ $sequence--border-color: #C8C8C8;
     right: 0;
     background-position: center 15px;
 
-//# TODO:FUNK <<<<<<< HEAD
-//      &.next {
-//        @include right(-40px);
-//        @include border-radius(0, 35px, 35px, 0);
-//# TODO:FUNK =======
     // CASE: left to right layout
     @include ltr {
       background-image: url('../images/sequence-nav/next-icon.png');
     }
-//# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
     // CASE: right to left layout
     @include rtl {

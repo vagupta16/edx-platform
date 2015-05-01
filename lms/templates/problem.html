@@ -11,7 +11,6 @@ from django.conf import settings
 
 <div class="problem-progress"></div>
 
-<!-- <<<<<<< HEAD -->
 % if problem_is_timed:
   % if not problem_has_finished:
     <div class="time_limit">
@@ -42,13 +41,6 @@ from django.conf import settings
   % endif
 % endif
 
-<!-- <div class="problem" aria-live="polite" aria-relevant="all"> -->
-<!--   ${ problem['html'] } -->
-<!--  -->
-<!--   <div class="action"> -->
-<!--     <input type="hidden" name="problem_id" value="${ problem['name'] }" /> -->
-<!--  -->
-<!-- ======= -->
 <div class="problem">
     <div aria-live="polite">
         ${ problem['html'] }
@@ -59,7 +51,6 @@ from django.conf import settings
     % if check_button:
     <button class="check ${ check_button }" data-checking="${ check_button_checking }" data-value="${ check_button }"><span class="check-label">${ check_button }</span><span class="sr"> ${_("your answer")}</span></button>
     % endif
-<!-- >>>>>>> 00b75f0119b981641833240be214ef2076329747 -->
     % if reset_button:
     <button class="reset" data-value="${_('Reset')}">${_('Reset')}<span class="sr"> ${_("your answer")}</span></button>
     % endif
@@ -77,13 +68,8 @@ from django.conf import settings
     % if answer_available:
     <button class="show"><span class="show-label">${_('Show Answer')}</span> </button>
     % endif
-<!-- # TODO:FUNK <<<<<<< HEAD -->
     % if attempts_allowed and not problem_is_timed:
-<!--     <div class="submission_feedback"> -->
-<!-- # TODO:FUNK ======= -->
-<!--     % if attempts_allowed : -->
     <div class="submission_feedback" aria-live="polite">
-<!-- # TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747 -->
       ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}
     </div>
     % endif
