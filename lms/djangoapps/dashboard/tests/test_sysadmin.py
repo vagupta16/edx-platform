@@ -6,13 +6,10 @@ import os
 import re
 import shutil
 import unittest
-# TODO:FUNK <<<<<<< HEAD
 from uuid import uuid4
 from mock import patch
 from pymongo.errors import PyMongoError
-# TODO:FUNK =======
 from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
@@ -37,14 +34,8 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-# TODO:FUNK <<<<<<< HEAD
 from instructor_task.tests.factories import InstructorTaskFactory
-# 
-# from xmodule.modulestore.tests.django_utils import xml_store_config
-# TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, ['empty'])
-# TODO:FUNK =======
 from xmodule.modulestore.xml import XMLModuleStore
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 
 TEST_MONGODB_LOG = {
