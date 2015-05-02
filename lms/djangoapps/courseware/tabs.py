@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
 from student.models import CourseEnrollment, EntranceExamConfiguration
+from student.models import UserProfile
 from xmodule.tabs import CourseTabList
 
 from util import milestones_helpers
@@ -24,7 +25,8 @@ def get_course_tab_list(course, user):
         settings,
         user.is_authenticated(),
         has_access(user, 'staff', course, course.id),
-        user_is_enrolled
+        user_is_enrolled,
+        not UserProfile.has_registered(user),
     )
 
     # Now that we've loaded the tabs for this course, perform the Entrance Exam work
