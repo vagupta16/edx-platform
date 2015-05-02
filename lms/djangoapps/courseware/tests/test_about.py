@@ -392,7 +392,6 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
 
 # TODO:FUNK <<<<<<< HEAD
 # @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class AboutSidebarHTMLTestCase(ModuleStoreTestCase):
     """
     This test case will check the About page for the content in the HTML sidebar.

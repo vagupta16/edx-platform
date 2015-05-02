@@ -9,7 +9,8 @@ from django.test.utils import override_settings
 from courseware.courses import get_course
 # from courseware.tests.factories import StudentModuleFactory, InstructorFactory
 from courseware.tests.factories import StudentModuleFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 # from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon
 # from student.models import CourseEnrollment
 # from student.tests.factories import UserFactory
@@ -385,9 +386,10 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic student responses analytics function. """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     def load_course(self, course_id):
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         self.course = get_course(course_key)

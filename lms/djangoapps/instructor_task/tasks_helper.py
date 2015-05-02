@@ -8,6 +8,7 @@ from datetime import datetime
 from time import time
 import unicodecsv
 import logging
+import urllib
 
 from celery import Task, current_task
 from celery.states import SUCCESS, FAILURE

@@ -20,9 +20,9 @@ import unicodecsv
 # from django.test.testcases import TestCase
 from pytz import UTC
 
-from courseware.courses import get_course
+from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_XML_MODULESTORE
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -300,6 +300,7 @@ class TestReportStore(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests for the ReportStore model"""
 
     def setUp(self):
+        super(TestReportStore, self).setUp()
         self.course = CourseFactory.create()
 
     def test_delete_report(self):
@@ -395,9 +396,11 @@ class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
     Tests that CSV student responses report generation works.
     """
+    MODULESTORE = TEST_DATA_XML_MODULESTORE
+
     def test_unicode(self):
         course_key = CourseKey.from_string('edX/unicode_graded/2012_Fall')
-        self.course = get_course(course_key)
+        self.course = get_course_by_id(course_key)
         self.problem_location = Location("edX", "unicode_graded", "2012_Fall", "problem", "H1P1")
 
         self.student = UserFactory(username=u'student\xec')
@@ -420,6 +423,7 @@ class TestInstructorOra2Report(TestReportMixin, InstructorTaskCourseTestCase):
     Tests that ORA2 response report generation works.
     """
     def setUp(self):
+        super(TestInstructorOra2Report, self).setUp()
         self.course = CourseFactory.create(org=TEST_COURSE_ORG,
                                            number=TEST_COURSE_NUMBER,
                                            display_name=TEST_COURSE_NAME)
@@ -469,6 +473,7 @@ class TestInstructorOra2EmailReport(TestReportMixin, InstructorTaskCourseTestCas
     Tests that ORA2 response report generation works.
     """
     def setUp(self):
+        super(TestInstructorOra2EmailReport, self).setUp()
         self.course = CourseFactory.create(org=TEST_COURSE_ORG,
                                            number=TEST_COURSE_NUMBER,
                                            display_name=TEST_COURSE_NAME)
@@ -517,6 +522,7 @@ class TestInstructorCourseForumsReport(TestReportMixin, InstructorTaskCourseTest
     Tests that course forums usage report generation works.
     """
     def setUp(self):
+        super(TestInstructorCourseForumsReport, self).setUp()
         self.course = CourseFactory.create(org=TEST_COURSE_ORG,
                                            number=TEST_COURSE_NUMBER,
                                            display_name=TEST_COURSE_NAME)
@@ -557,6 +563,7 @@ class TestInstructorStudentForumsReport(TestReportMixin, InstructorTaskCourseTes
     Tests that Student forums usage report generation works.
     """
     def setUp(self):
+        super(TestInstructorStudentForumsReport, self).setUp()
         self.course = CourseFactory.create(org=TEST_COURSE_ORG,
                                            number=TEST_COURSE_NUMBER,
                                            display_name=TEST_COURSE_NAME)

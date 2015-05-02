@@ -1285,12 +1285,13 @@ class TestRebindModule(TestSubmittingProblems):
 
 
 # TODO:FUNK <<<<<<< HEAD
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(ANALYTICS_ANSWER_DIST_URL=True)
 class TestInlineAnalytics(ModuleStoreTestCase):
     """Tests to verify that Inline Analytics fragment is generated correctly"""
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
+        super(TestInlineAnalytics, self).setUp()
         self.user = UserFactory.create()
         self.request = RequestFactory().get('/')
         self.request.user = self.user
