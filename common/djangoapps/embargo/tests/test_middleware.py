@@ -148,102 +148,11 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-# TODO:FUNK <<<<<<< HEAD
-#         # Accessing a regular course from a non-embargoed IP that's been blacklisted
-#         # should succeed
-#         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
-#         self.assertEqual(response.status_code, 200)
-# 
-#     @ddt.data(
-#         (None, False),
-#         ("", False),
-#         ("us", False),
-#         ("CU", True),
-#         ("Ir", True),
-#         ("sy", True),
-#         ("sd", True)
-#     )
-#     @ddt.unpack
-#     def test_embargo_profile_country(self, profile_country, is_embargoed):
-#         # Set the country in the user's profile
-#         profile = self.user.profile
-#         profile.country = profile_country
-#         profile.save()
-# 
-#         # Attempt to access an embargoed course
-#         response = self.client.get(self.embargoed_page)
-# 
-#         # If the user is from an embargoed country, verify that
-#         # they are redirected to the embargo page.
-#         if is_embargoed:
-#             embargo_url = reverse('embargo')
-#             self.assertRedirects(response, embargo_url)
-# 
-#         # Otherwise, verify that the student can access the page
-#         else:
-#             self.assertEqual(response.status_code, 200)
-# 
-#         # For non-embargoed courses, the student should be able to access
-#         # the page, even if he/she is from an embargoed country.
-#         response = self.client.get(self.regular_page)
-#         self.assertEqual(response.status_code, 200)
-# 
-#     def test_embargo_profile_country_cache(self):
-#         # Set the country in the user's profile
-#         profile = self.user.profile
-#         profile.country = "us"
-#         profile.save()
-# 
-#         # Warm the cache
-#         with self.assertNumQueries(16):
-#             self.client.get(self.embargoed_page)
-# 
-#         # Access the page multiple times, but expect that we hit
-#         # the database to check the user's profile only once
-#         with self.assertNumQueries(11):
-#             self.client.get(self.embargoed_page)
-# 
-#     def test_embargo_profile_country_db_null(self):
-#         # Django country fields treat NULL values inconsistently.
-#         # When saving a profile with country set to None, Django saves an empty string to the database.
-#         # However, when the country field loads a NULL value from the database, it sets
-#         # `country.code` to `None`.  This caused a bug in which country values created by
-#         # the original South schema migration -- which defaulted to NULL -- caused a runtime
-#         # exception when the embargo middleware treated the value as a string.
-#         # In order to simulate this behavior, we can't simply set `profile.country = None`.
-#         # (because when we save it, it will set the database field to an empty string instead of NULL)
-#         query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
-#         connection.cursor().execute(query, [str(self.user.profile.id)])
-#         transaction.commit_unless_managed()
-# 
-#         # Attempt to access an embargoed course
-#         # Verify that the student can access the page without an error
-#         response = self.client.get(self.embargoed_page)
-#         self.assertEqual(response.status_code, 200)
-# 
-#     @mock.patch.dict(settings.FEATURES, {'EMBARGO': False})
-#     def test_countries_embargo_off(self):
-#         # When the middleware is turned off, all requests should go through
-#         # Accessing an embargoed page from a blocked IP OK
-#         response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
-#         self.assertEqual(response.status_code, 200)
-# 
-#         # Accessing a regular page from a blocked IP should succeed
-#         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
-#         self.assertEqual(response.status_code, 200)
-# 
-#         # Explicitly whitelist/blacklist some IPs
-#         IPFilter(
-#             whitelist='1.0.0.0',
-#             blacklist='5.0.0.0',
-#             changed_by=self.user,
-# TODO:FUNK =======
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_whitelist_ip_skips_country_access_checks(self):
         # Whitelist an IP address
         IPFilter.objects.create(
             whitelist="192.168.10.20",
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
             enabled=True
         )
 
