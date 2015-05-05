@@ -390,8 +390,6 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.assertNotIn('<span class="important-dates-item-text">$10</span>', resp.content)
 
 
-# TODO:FUNK <<<<<<< HEAD
-# @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class AboutSidebarHTMLTestCase(ModuleStoreTestCase):
     """
     This test case will check the About page for the content in the HTML sidebar.
@@ -417,8 +415,6 @@ class AboutSidebarHTMLTestCase(ModuleStoreTestCase):
         self.assertIn("About Sidebar HTML Heading", resp.content)
 
 
-# TODO:FUNK =======
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class AboutPurchaseCourseTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
