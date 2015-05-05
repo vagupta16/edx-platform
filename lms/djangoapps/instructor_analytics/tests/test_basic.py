@@ -2,24 +2,9 @@
 Tests for instructor.basic
 """
 
-# TODO:FUNK <<<<<<< HEAD
-# from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
-
-from courseware.courses import get_course
-# from courseware.tests.factories import StudentModuleFactory, InstructorFactory
-from courseware.tests.factories import StudentModuleFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
-# from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon
-# from student.models import CourseEnrollment
-# from student.tests.factories import UserFactory
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
-# from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon, CourseRegCodeItem
-
-# TODO:FUNK =======
 import json
 from student.models import CourseEnrollment
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from mock import patch
 from student.roles import CourseSalesAdminRole
@@ -29,22 +14,30 @@ from shoppingcart.models import (
     Invoice, Coupon, CourseRegCodeItem, CouponRedemption, CourseRegistrationCodeInvoiceItem
 )
 from course_modes.models import CourseMode
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from instructor_analytics.basic import (
     sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
     coupon_codes_features, student_responses, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
 )
-# TODO:FUNK <<<<<<< HEAD
-# from course_groups.tests.helpers import CohortFactory
-# TODO:FUNK =======
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
-from courseware.tests.factories import InstructorFactory
+from courseware.courses import get_course
+from courseware.tests.factories import StudentModuleFactory, InstructorFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory
 
 import datetime
 from django.db.models import Q
 import pytz
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+XML_COURSE_DIRS = ['simple', 'graded']
+MAPPINGS = {
+    'edX/simple/2012_Fall': 'xml',
+    'edX/graded/2012_Fall': 'xml',
+}
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(
+    TEST_DATA_DIR, MAPPINGS, include_xml=True, xml_source_dirs=XML_COURSE_DIRS,
+)
 
 
 class TestAnalyticsBasic(ModuleStoreTestCase):
@@ -388,7 +381,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
 
 class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic student responses analytics function. """
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def load_course(self, course_id):
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)

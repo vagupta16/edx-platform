@@ -22,12 +22,11 @@ from pytz import UTC
 
 from courseware.courses import get_course_by_id
 from courseware.tests.factories import StudentModuleFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_XML_MODULESTORE
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
 from instructor_task.tasks_helper import (
     upload_grades_csv,
@@ -60,6 +59,13 @@ from instructor_task.tasks_helper import cohort_students_and_upload, upload_grad
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
 from django.conf import settings
 from django.test.utils import override_settings
+
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(
+    settings.COMMON_TEST_DATA_ROOT,
+    {'edX/unicode_graded/2012_Fall': 'xml', },
+    include_xml=True,
+    xml_source_dirs=['unicode_graded']
+)
 
 
 @ddt.ddt
@@ -390,13 +396,11 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
 
-# TODO:FUNK <<<<<<< HEAD
-# @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
     Tests that CSV student responses report generation works.
     """
-    MODULESTORE = TEST_DATA_XML_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def test_unicode(self):
         course_key = CourseKey.from_string('edX/unicode_graded/2012_Fall')
