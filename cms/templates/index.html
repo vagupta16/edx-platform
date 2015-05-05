@@ -560,7 +560,9 @@ else:
         <ol class='list-actions'>
           % if settings.TENDER_DOMAIN:
             <li class="action-item">
-              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">${_("Request help with your {studio_name} account").format(studio_name=settings.STUDIO_NAME)}</a>
+              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
+                ${_("Request help with your {studio_name} account").format(studio_name=settings.STUDIO_NAME)}
+              </a>
             </li>
           % endif
         </ol>
