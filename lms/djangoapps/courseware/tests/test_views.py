@@ -33,6 +33,7 @@ from edxmako.middleware import MakoMiddleware
 from edxmako.tests import mako_middleware_process_request
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
+from student.tests.factories import NonRegisteredUserFactory
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
 from util.views import ensure_valid_course_key
 from xmodule.modulestore import ModuleStoreEnum
