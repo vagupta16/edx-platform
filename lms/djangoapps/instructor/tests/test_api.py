@@ -166,7 +166,6 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensures the backend logic is sound for instructor email widget
     """
-    MODULESTORE = TEST_DATA_SPLIT_TOY_MODULESTORE
 
     OPEN = "opened"
     COMPLETED = "completed"
@@ -174,6 +173,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     NOT_COMPLETED = "not completed"
 
     def setUp(self):
+        super(TestEmailQueries, self).setUp()
         self.course = CourseFactory.create(
             org="edX",
             number="emailToy",
@@ -572,9 +572,9 @@ class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure appropriate access and format of course information
     """
-    MODULESTORE = TEST_DATA_SPLIT_TOY_MODULESTORE
 
     def setUp(self):
+        super(TestCourseTreeLookup, self).setUp()
         self.course = CourseFactory.create(
             org="edX",
             number="emailToy2",
