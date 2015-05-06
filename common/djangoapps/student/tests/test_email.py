@@ -116,7 +116,7 @@ class EnrollmentEmailTests(ModuleStoreTestCase):
 class ActivationEmailTests(TestCase):
     """Test sending of the activation email. """
 
-    ACTIVATION_SUBJECT = "Activate Your edX Account"
+    ACTIVATION_SUBJECT = "Activate Your {account_name} Account".format(account_name=settings.ACCOUNT_NAME)
 
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
