@@ -464,7 +464,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
             reverse("account_login"),
             HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
         )
-        self.assertContains(resp, "Log into your Test Microsite Account")
+        self.assertContains(resp, "Log into your {account} Account".format(account=settings.ACCOUNT_NAME))
         self.assertContains(resp, "login-form")
 
     def test_microsite_uses_old_register_page(self):
@@ -474,11 +474,12 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
             reverse("account_register"),
             HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
         )
-        self.assertContains(resp, "Register for Test Microsite")
+        self.assertContains(resp, "Create your {account}".format(account=settings.ACCOUNT_NAME))
         self.assertContains(resp, "register-form")
 
     def _assert_third_party_auth_data(self, response, current_provider, providers):
-        """Verify that third party auth info is rendered correctly in a DOM data attribute. """
+        """Verify that
+        third party auth info is rendered correctly in a DOM data attribute. """
         auth_info = markupsafe.escape(
             json.dumps({
                 "currentProvider": current_provider,
