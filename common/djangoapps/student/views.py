@@ -1574,10 +1574,6 @@ def create_account_with_params(request, params):
       minimum of two characters long" rather than "Please use a username of
       at least two characters").
     """
-# TODO:FUNK <<<<<<< HEAD
-    if settings.FEATURES.get('USE_CME_REGISTRATION'):
-        return cme_create_account(request)
-
 #     js = {'success': False}  # pylint: disable-msg=invalid-name
 # 
 #     post_vars = post_override if post_override else request.POST
@@ -1823,6 +1819,8 @@ def create_account(request, post_override=None):
     Used by form in signup_modal.html, which is included into navigation.html
     """
     warnings.warn("Please use RegistrationView instead.", DeprecationWarning)
+    if settings.FEATURES.get('USE_CME_REGISTRATION'):
+        return cme_create_account(request, post_override=post_override)
 
     try:
         create_account_with_params(request, post_override or request.POST)
