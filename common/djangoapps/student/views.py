@@ -9,12 +9,7 @@ import json
 import warnings
 from collections import defaultdict
 from pytz import UTC
-# TODO:FUNK <<<<<<< HEAD
-# from pytz import timezone
-import json
-# TODO:FUNK =======
 from ipware.ip import get_ip
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -77,12 +72,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from collections import namedtuple
 
-# TODO:FUNK <<<<<<< HEAD
-# from courseware.courses import get_courses, sort_by_announcement, get_course_about_section
 from courseware.courses import get_course_about_section
-# TODO:FUNK =======
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
-# TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
 from courseware.access import has_access
 from courseware.models import CoursePreference
 
