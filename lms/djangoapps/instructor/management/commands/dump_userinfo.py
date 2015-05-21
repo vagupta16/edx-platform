@@ -140,8 +140,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         course_id = options['course']
         course_code = options['code']
-        start_date = datetime.strptime(options['start_date'], '%m/%d/%Y').replace(tzinfo=UTC)
-        end_date = datetime.strptime(options['end_date'], '%m/%d/%Y').replace(tzinfo=UTC)
+        start_date = datetime.strptime(options['start_date'], '%Y-%m-%d').replace(tzinfo=UTC)
+        end_date = datetime.strptime(options['end_date'], '%Y-%m-%d').replace(tzinfo=UTC)
         outfile_name = options['outfile']
         verbose = int(options['verbosity']) > 1
 
@@ -271,7 +271,7 @@ class Command(BaseCommand):
 
     def lies_between(self, query_date, start, end):
         if type(query_date) is datetime:
-            return start <= query_date and query_date <= end
+            return start <= query_date and query_date < end
         else:
             return False
 
@@ -280,7 +280,8 @@ class Command(BaseCommand):
             value = value.strftime("%m/%d/%Y")
 
         value = unidecode(unicode(value))
-        value = value.replace("_"," ")
+        value = value.replace("_", " ")
+        value = value.replace("\t", "")
 
         return value
 
