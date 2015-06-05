@@ -8,7 +8,6 @@ Replace this with more appropriate tests for your application.
 import unittest
 from textwrap import dedent
 from mock import Mock, patch
-
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -514,7 +513,7 @@ class TestCmeRegistration(TestCase):
         user = UserFactory.create(username="student002", email="student002@test.com")
         self.client.login(username=user.username, password='test')
 
-        url = reverse('register_user')
+        url = reverse('old_register_user')
         response = self.client.post(url, {})
         self.assertRedirects(response, reverse('dashboard'), status_code=302)
 
@@ -522,7 +521,7 @@ class TestCmeRegistration(TestCase):
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_register_page_loads(self):
 
-        url = reverse('register_user')
+        url = reverse('old_register_user')
         response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
 

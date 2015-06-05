@@ -118,6 +118,8 @@ else:
         url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
     )
 
+# super hacky to fix broken cme registration page test. the correct url doesn't load when running the entire test suite
+urlpatterns += url(r'^old_register$', 'student.views.register_user', name="old_register_user"),
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
