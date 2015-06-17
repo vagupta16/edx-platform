@@ -878,6 +878,7 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
             self.partition_id,
             self.group1_id,
         )
+        import sqlite3; print sqlite3.sqlite_version
         with self.assertRaisesRegexp(IntegrityError, 'not unique'):
             self._link_cohort_partition_group(
                 self.first_cohort,
