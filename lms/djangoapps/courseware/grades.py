@@ -317,10 +317,13 @@ def _progress_summary(student, request, course):
         student: A User object for the student to grade
         course: A Descriptor containing the course to grade
 
-    If the student does not have access to load the course module, this function
-    will return None.
-
+    If the student does not have access to load the course module, or is not
+    authenticated, this function will return None.
     """
+
+    if not student.is_authenticated():
+        return None
+
     with manual_transaction():
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, student, course, depth=None
@@ -335,6 +338,13 @@ def _progress_summary(student, request, course):
         course_module = getattr(course_module, '_x_module', course_module)
 
     submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
+
+    # Build a dict of scores and use as a cache
+    scores_dict = {}
+    scores_dict = get_all_scores(
+        course.id,
+        student,
+    )
 
     chapters = []
     # Don't include chapters that aren't displayable (e.g. due to error)
@@ -357,14 +367,16 @@ def _progress_summary(student, request, course):
                 module_creator = section_module.xmodule_runtime.get_module
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
-                    course_id = course.id
-                    (correct, total) = get_score(
-                        course_id, student, module_descriptor, module_creator, scores_cache=submissions_scores
-                    )
-                    if correct is None and total is None:
-                        continue
+                    location_url = module_descriptor.location.to_deprecated_string()
+                    if location_url in submissions_scores:
+                        # use the submissions score
+                        scores_dict[location_url] = {'correct': submissions_scores[location_url][0], 'total': submissions_scores[location_url][1]}
+                    else:
+                        # We need to check if re-score is required
+                        rescore_if_needed(course.id, student, module_descriptor, module_creator, scores_dict)               
 
-                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+                    if location_url in scores_dict:
+                        scores.append(Score(scores_dict[location_url]['correct'], scores_dict[location_url]['total'], graded, module_descriptor.display_name_with_default))
 
                 scores.reverse()
                 section_total, _ = graders.aggregate_scores(
@@ -469,6 +481,97 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
         total = weight
 
     return (correct, total)
+
+def rescore_if_needed(course_id, student, problem_descriptor, module_creator, scores_dict):
+    """
+    Re-score the problem for this student if required.
+    
+    scores_dict is updated if the scores are modified.
+    
+    Args:
+      - student: a Student object
+      - problem_descriptor: an XModuleDescriptor
+      - module_creator: a function that takes a descriptor, and returns the corresponding XModule for this user.
+           Can return None if user doesn't have access, or if something else went wrong.
+      - scores_dict: A cache of all the scores for this student/course retrieved from courseware_studentmodule.
+      
+    Returns:
+      - None
+    """
+
+    # some problems have state that is updated independently of interaction
+    # with the LMS, so they need to always be scored. (E.g. foldit.)
+    if problem_descriptor.always_recalculate_grades:
+        problem = module_creator(problem_descriptor)
+        if problem is None:
+            return
+        score = problem.get_score()
+        if score is not None:
+            scores_dict[problem_descriptor] = {'correct': score['score'], 'total': score['total']}
+            return
+
+    if problem_descriptor in scores_dict and scores_dict[problem_descriptor]['total'] is not None:
+        correct = scores_dict[problem_descriptor]['score'] if scores_dict[problem_descriptor]['score'] else 0
+        total = scores_dict[problem_descriptor]['total']
+    else:
+        # If the problem was not in the cache, or hasn't been graded yet,
+        # we need to instantiate the problem.
+        # Otherwise, the max score (cached in student_module) won't be available
+        problem = module_creator(problem_descriptor)
+        if problem is None:
+            return
+
+        correct = 0.0
+        total = problem.max_score()
+
+        # Problem may be an error module (if something in the problem builder failed)
+        # In which case total might be None
+        if total is None:
+            return
+
+    # Now we re-weight the problem, if specified
+    weight = problem_descriptor.weight
+    if weight is not None:
+        if total == 0:
+            log.exception("Cannot reweight a problem with zero total points. Problem: " + str(student_module))
+            scores_dict[problem_descriptor] = {'correct': correct, 'total': total}
+            return
+        correct = correct * weight / total
+        total = weight
+        scores_dict[problem_descriptor] = {'correct': correct, 'total': total}
+
+
+def get_all_scores(course_id, user):
+    """
+    Get all scores for this student/course.
+    
+    Arg:
+      - user: A student Object.
+    
+    Returns:
+      - scores_dict: A dict of dicts of all student scores with the structure:
+          {problem_descriptor: {'correct': grade, 'total': max_grade}}
+    """
+
+    # Get all scores for the student in this course
+    try:
+        student_modules = StudentModule.objects.filter(
+            student=user,
+            course_id=course_id,
+            grade__isnull=False
+        ).values(
+            'module_state_key',
+            'grade',
+            'max_grade',
+        )
+    except StudentModule.DoesNotExist:
+        student_module = None
+
+    scores_dict = {}
+    for student_module in student_modules:
+        scores_dict[student_module['module_state_key']] = {'correct': student_module['grade'], 'total': student_module['max_grade']}
+
+    return scores_dict
 
 
 @contextmanager
