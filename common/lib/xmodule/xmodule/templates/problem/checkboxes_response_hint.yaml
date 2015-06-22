@@ -1,7 +1,6 @@
 ---
 metadata:
     display_name: Checkboxes with Hints and Feedback
-    tab: hint
     markdown: |
       
       You can provide feedback for each option in a checkbox problem, with distinct feedback depending on whether or not the learner selects that option.
@@ -28,7 +27,7 @@ metadata:
       ||A fruit is the fertilized ovary from a flower.||
       ||A fruit contains seeds of the plant.||
 
-
+tab: hint
 data: |
       <problem>
       
