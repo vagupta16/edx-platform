@@ -29,6 +29,7 @@ import traceback
 import xml.sax.saxutils as saxutils
 from cmath import isnan
 from sys import float_info
+import struct
 
 from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
@@ -1187,7 +1188,8 @@ class MultipleChoiceResponse(LoncapaResponse):
         # for general use.
         # pylint: disable=protected-access
         if not hasattr(problem, '_shared_rng'):
-            problem._shared_rng = random.Random(self.context['seed'])
+            new_seed = struct.unpack('i', os.urandom(4))[0]
+            problem._shared_rng = random.Random(new_seed)
         return problem._shared_rng
 
     def do_answer_pool(self, tree, problem):
