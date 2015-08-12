@@ -8,7 +8,6 @@ from xmodule.modulestore.django import modulestore
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
-from util.query import get_read_replica_cursor_if_available
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient
 from bson.son import SON
@@ -178,21 +177,7 @@ def collect_email_ora2_data(course_id):
     return collect_ora2_data(course_id, True)
 
 
-def collect_ora2_data(course_id, include_email=False):
-    """
-    Query MySQL database for aggregated ora2 response data. include_email = False by default
-    """
-    cursor = get_read_replica_cursor_if_available(db)
-    #Syntax unsupported by other vendors such as SQLite test db
-    if db.connection.vendor != 'mysql':
-        return '', ['']
-    raw_queries = ora2_data_queries(include_email).split(';')
-    cursor.execute(raw_queries[0])
-    cursor.execute(raw_queries[1], [course_id])
-    header = [item[0] for item in cursor.description]
-    return header, cursor.fetchall()
-
-
+from openedx.contrib.stanford.data_ora2 import collect_ora2_data
 from openedx.contrib.stanford.data_ora2 import ora2_data_queries
 
 

@@ -3,6 +3,24 @@ Helpers for instructor dashboard, data download, ora2 report
 """
 
 
+from util.query import get_read_replica_cursor_if_available
+
+
+def collect_ora2_data(course_id, include_email=False):
+    """
+    Query MySQL database for aggregated ora2 response data. include_email = False by default
+    """
+    cursor = get_read_replica_cursor_if_available(db)
+    #Syntax unsupported by other vendors such as SQLite test db
+    if db.connection.vendor != 'mysql':
+        return '', ['']
+    raw_queries = ora2_data_queries(include_email).split(';')
+    cursor.execute(raw_queries[0])
+    cursor.execute(raw_queries[1], [course_id])
+    header = [item[0] for item in cursor.description]
+    return header, cursor.fetchall()
+
+
 # pylint: disable=invalid-name
 def ora2_data_queries(include_email):
     """
@@ -110,5 +128,3 @@ WHERE `student`.`item_type`="openassessment" AND `student`.`course_id`=%s
         id_column = "`student`.`student_id` AS `anonymized_student_id`"
 
     return RAW_QUERY.format(id_column=id_column)
-
-
