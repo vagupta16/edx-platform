@@ -166,5 +166,5 @@ from openedx.contrib.stanford.data_ora2 import collect_anonymous_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_email_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_ora2_data
 from openedx.contrib.stanford.data_ora2 import ora2_data_queries
-from openedx.contrib.stanford.data_ora2 import collect_student_forums_data
-from openedx.contrib.stanford.data_ora2 import generate_student_forums_query
+from openedx.contrib.stanford.data_forums import collect_student_forums_data
+from openedx.contrib.stanford.data_forums import generate_student_forums_query
