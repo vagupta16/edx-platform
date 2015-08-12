@@ -191,27 +191,4 @@ def collect_student_forums_data(course_id):
     header = ['Username', 'Posts', 'Votes']
     return header, parsed_results
 
-
-def generate_student_forums_query(course_id):
-    """
-    generates an aggregate query for student data which can be executed using pymongo
-    :param course_id:
-    :return: a list with dictionaries to fetch aggregate query for
-    student forums data
-    """
-    query = [
-        {
-            "$match": {
-                "course_id": course_id.to_deprecated_string(),
-            }
-        },
-
-        {
-            "$group": {
-                "_id": "$author_username",
-                "posts": {"$sum": 1},
-                "votes": {"$sum": "$votes.point"}
-            }
-        },
-    ]
-    return query
+from openedx.contrib.stanford.data_ora2 import generate_student_forums_query

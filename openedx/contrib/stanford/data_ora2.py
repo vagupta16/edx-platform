@@ -22,6 +22,31 @@ def collect_email_ora2_data(course_id):
     return collect_ora2_data(course_id, True)
 
 
+def generate_student_forums_query(course_id):
+    """
+    generates an aggregate query for student data which can be executed using pymongo
+    :param course_id:
+    :return: a list with dictionaries to fetch aggregate query for
+    student forums data
+    """
+    query = [
+        {
+            "$match": {
+                "course_id": course_id.to_deprecated_string(),
+            }
+        },
+
+        {
+            "$group": {
+                "_id": "$author_username",
+                "posts": {"$sum": 1},
+                "votes": {"$sum": "$votes.point"}
+            }
+        },
+    ]
+    return query
+
+
 def collect_ora2_data(course_id, include_email=False):
     """
     Query MySQL database for aggregated ora2 response data. include_email = False by default
