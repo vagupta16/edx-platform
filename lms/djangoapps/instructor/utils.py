@@ -9,7 +9,6 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient
-from datetime import date
 from django.conf import settings
 from django_comment_client.management_utils import get_mongo_connection_string
 
@@ -82,45 +81,7 @@ def collect_course_forums_data(course_id):
     return header, parsed_results
 
 
-def merge_join_course_forums(threads, responses, comments):
-    """
-    Performs a merge of sorted threads, responses, comments data
-    interleaving the results so the final result is in chronological order
-    """
-    data = []
-    t_index, r_index, c_index = 0, 0, 0
-    while (t_index < len(threads) or r_index < len(responses) or c_index < len(comments)):
-        # checking out of bounds
-        if t_index == len(threads):
-            thread_date = date.max
-        else:
-            thread = threads[t_index]['_id']
-            thread_date = date(thread["year"], thread["month"], thread["day"])
-        if r_index == len(responses):
-            response_date = date.max
-        else:
-            response = responses[r_index]["_id"]
-            response_date = date(response["year"], response["month"], response["day"])
-        if c_index == len(comments):
-            comment_date = date.max
-        else:
-            comment = comments[c_index]["_id"]
-            comment_date = date(comment["year"], comment["month"], comment["day"])
-
-        if thread_date <= comment_date and thread_date <= response_date:
-            data.append(threads[t_index])
-            t_index += 1
-            continue
-        elif response_date <= thread_date and response_date <= comment_date:
-            data.append(responses[r_index])
-            r_index += 1
-            continue
-        else:
-            data.append(comments[c_index])
-            c_index += 1
-    return data
-
-
+from openedx.contrib.stanford.data_forums import merge_join_course_forums
 from openedx.contrib.stanford.data_forums import generate_course_forums_query
 from openedx.contrib.stanford.data_ora2 import collect_anonymous_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_email_ora2_data
