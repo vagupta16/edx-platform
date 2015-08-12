@@ -2,7 +2,6 @@
 Helpers for instructor app.
 """
 
-from django import db
 
 from xmodule.modulestore.django import modulestore
 

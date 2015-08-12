@@ -3,6 +3,8 @@ Helpers for instructor dashboard, data download, ora2 report
 """
 
 
+from django import db
+
 from util.query import get_read_replica_cursor_if_available
 
 
