@@ -8,6 +8,13 @@ from django import db
 from util.query import get_read_replica_cursor_if_available
 
 
+def collect_anonymous_ora2_data(course_id):
+    """
+    Call collect_ora2_data for anonymized, aggregated ORA2 response data.
+    """
+    return collect_ora2_data(course_id, False)
+
+
 def collect_email_ora2_data(course_id):
     """
     Call collect_ora2_data for aggregated ORA2 response data including users' email addresses

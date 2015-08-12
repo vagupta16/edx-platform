@@ -162,13 +162,7 @@ def generate_course_forums_query(course_id, query_type, parent_id_check=None):
     return query
 
 
-def collect_anonymous_ora2_data(course_id):
-    """
-    Call collect_ora2_data for anonymized, aggregated ORA2 response data.
-    """
-    return collect_ora2_data(course_id, False)
-
-
+from openedx.contrib.stanford.data_ora2 import collect_anonymous_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_email_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_ora2_data
 from openedx.contrib.stanford.data_ora2 import ora2_data_queries
