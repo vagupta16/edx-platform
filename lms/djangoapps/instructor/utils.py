@@ -9,7 +9,6 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient
-from bson.son import SON
 from datetime import date
 from django.conf import settings
 from django_comment_client.management_utils import get_mongo_connection_string
@@ -122,46 +121,7 @@ def merge_join_course_forums(threads, responses, comments):
     return data
 
 
-def generate_course_forums_query(course_id, query_type, parent_id_check=None):
-    """
-    We can make one of 3 possible queries: CommentThread, Comment, or Response
-    CommentThread is specified by _type
-    Response, Comment are both _type="Comment". Comment differs in that it has a
-    parent_id, so parent_id_check is set to True for Comments.
-    """
-    query = [
-        {'$match': {
-            'course_id': course_id.to_deprecated_string(),
-            '_type': query_type,
-        }},
-        {'$project': {
-            'year': {'$year': '$created_at'},
-            'month': {'$month': '$created_at'},
-            'day': {'$dayOfMonth': '$created_at'},
-            'type': '$_type',
-            'votes': '$votes',
-        }},
-        {'$group': {
-            '_id': {
-                'year': '$year',
-                'month': '$month',
-                'day': '$day',
-                'type': '$type',
-            },
-            'posts': {"$sum": 1},
-            'net_points': {'$sum': '$votes.point'},
-            'up_votes': {'$sum': '$votes.up_count'},
-            'down_votes': {'$sum': '$votes.down_count'},
-        }},
-        # order of the sort is important so we use SON
-        {'$sort': SON([('_id.year', 1), ('_id.month', 1), ('_id.day', 1)])},
-    ]
-    if query_type == 'Comment':
-        if parent_id_check is not None:
-            query[0]['$match']['parent_id'] = {'$exists': parent_id_check}
-    return query
-
-
+from openedx.contrib.stanford.data_forums import generate_course_forums_query
 from openedx.contrib.stanford.data_ora2 import collect_anonymous_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_email_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_ora2_data
