@@ -166,29 +166,5 @@ from openedx.contrib.stanford.data_ora2 import collect_anonymous_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_email_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_ora2_data
 from openedx.contrib.stanford.data_ora2 import ora2_data_queries
-
-
-def collect_student_forums_data(course_id):
-    """
-    Given a SlashSeparatedCourseKey course_id, return headers and information
-    related to student forums usage
-    """
-    try:
-        client = MongoClient(get_mongo_connection_string())
-        mongodb = client[FORUMS_MONGO_PARAMS['database']]
-        student_forums_query = generate_student_forums_query(course_id)
-        results = mongodb.contents.aggregate(student_forums_query)['result']
-    except PyMongoError:
-        raise
-
-    parsed_results = [
-        [
-            result['_id'],
-            result['posts'],
-            result['votes'],
-        ] for result in results
-    ]
-    header = ['Username', 'Posts', 'Votes']
-    return header, parsed_results
-
+from openedx.contrib.stanford.data_ora2 import collect_student_forums_data
 from openedx.contrib.stanford.data_ora2 import generate_student_forums_query

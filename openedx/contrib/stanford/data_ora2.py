@@ -5,7 +5,13 @@ Helpers for instructor dashboard, data download, ora2 report
 
 from django import db
 
+from django.conf import settings
+from django_comment_client.management_utils import get_mongo_connection_string
+from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 from util.query import get_read_replica_cursor_if_available
+
+FORUMS_MONGO_PARAMS = settings.FORUM_MONGO_PARAMS
 
 
 def collect_anonymous_ora2_data(course_id):
@@ -20,6 +26,30 @@ def collect_email_ora2_data(course_id):
     Call collect_ora2_data for aggregated ORA2 response data including users' email addresses
     """
     return collect_ora2_data(course_id, True)
+
+
+def collect_student_forums_data(course_id):
+    """
+    Given a SlashSeparatedCourseKey course_id, return headers and information
+    related to student forums usage
+    """
+    try:
+        client = MongoClient(get_mongo_connection_string())
+        mongodb = client[FORUMS_MONGO_PARAMS['database']]
+        student_forums_query = generate_student_forums_query(course_id)
+        results = mongodb.contents.aggregate(student_forums_query)['result']
+    except PyMongoError:
+        raise
+
+    parsed_results = [
+        [
+            result['_id'],
+            result['posts'],
+            result['votes'],
+        ] for result in results
+    ]
+    header = ['Username', 'Posts', 'Votes']
+    return header, parsed_results
 
 
 def generate_student_forums_query(course_id):
