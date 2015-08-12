@@ -39,12 +39,12 @@ def get_module_for_student(student, usage_key, request=None):
     return get_module(student, request, usage_key, field_data_cache)
 
 
-from openedx.contrib.stanford.data_downloads.instructor_reports.data_forums import collect_course_forums_data
-from openedx.contrib.stanford.data_downloads.instructor_reports.data_forums import merge_join_course_forums
-from openedx.contrib.stanford.data_downloads.instructor_reports.data_forums import generate_course_forums_query
+from openedx.contrib.stanford.data_downloads.instructor_reports.forums_course import collect_course_forums_data
+from openedx.contrib.stanford.data_downloads.instructor_reports.forums_course import merge_join_course_forums
+from openedx.contrib.stanford.data_downloads.instructor_reports.forums_course import generate_course_forums_query
 from openedx.contrib.stanford.data_ora2 import collect_anonymous_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_email_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_ora2_data
 from openedx.contrib.stanford.data_ora2 import ora2_data_queries
-from openedx.contrib.stanford.data_downloads.instructor_reports.data_forums import collect_student_forums_data
-from openedx.contrib.stanford.data_downloads.instructor_reports.data_forums import generate_student_forums_query
+from openedx.contrib.stanford.data_downloads.instructor_reports.forums_students import collect_student_forums_data
+from openedx.contrib.stanford.data_downloads.instructor_reports.forums_students import generate_student_forums_query
