@@ -169,13 +169,7 @@ def collect_anonymous_ora2_data(course_id):
     return collect_ora2_data(course_id, False)
 
 
-def collect_email_ora2_data(course_id):
-    """
-    Call collect_ora2_data for aggregated ORA2 response data including users' email addresses
-    """
-    return collect_ora2_data(course_id, True)
-
-
+from openedx.contrib.stanford.data_ora2 import collect_email_ora2_data
 from openedx.contrib.stanford.data_ora2 import collect_ora2_data
 from openedx.contrib.stanford.data_ora2 import ora2_data_queries
 
