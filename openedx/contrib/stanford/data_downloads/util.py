@@ -7,8 +7,6 @@ Group shared logic
 from __future__ import absolute_import
 from django import db
 
-# The import below is still broken:
-# <ImportError: No module named djangoapps.util.query>
 from util.query import get_read_replica_cursor_if_available
 
 
