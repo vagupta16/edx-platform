@@ -9,7 +9,7 @@ from django import db
 
 # The import below is still broken:
 # <ImportError: No module named djangoapps.util.query>
-from common.djangoapps.util.query import get_read_replica_cursor_if_available
+from util.query import get_read_replica_cursor_if_available
 
 
 def collect_ora2_data(course_id, include_email=False):
