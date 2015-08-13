@@ -5,7 +5,7 @@ import csv
 import optparse
 import os
 
-from instructor.utils import collect_course_forums_data
+from openedx.contrib.stanford.data_downloads.instructor_reports.forums_course import collect_course_forums_data
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.core.management.base import BaseCommand, CommandError

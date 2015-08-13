@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from instructor.utils import collect_student_forums_data
+from openedx.contrib.stanford.data_downloads.instructor_reports.forums_students import collect_student_forums_data
 
 
 class Command(BaseCommand):

@@ -37,7 +37,10 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment
-from instructor.utils import collect_anonymous_ora2_data, collect_email_ora2_data, collect_course_forums_data, collect_student_forums_data
+from openedx.contrib.stanford.data_downloads.instructor_reports.ora2_anonymous import collect_anonymous_ora2_data
+from openedx.contrib.stanford.data_downloads.instructor_reports.ora2_email import collect_email_ora2_data
+from openedx.contrib.stanford.data_downloads.instructor_reports.forums_course import collect_course_forums_data
+from openedx.contrib.stanford.data_downloads.instructor_reports.forums_students import collect_student_forums_data
 
 
 # define different loggers for use within tasks and on client side
