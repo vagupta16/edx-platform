@@ -3,7 +3,7 @@ import optparse
 import os
 import tempfile
 
-from instructor.utils import collect_ora2_data
+from openedx.contrib.stanford.data_downloads.util import collect_ora2_data
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
