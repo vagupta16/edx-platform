@@ -40,9 +40,6 @@ def get_module_for_student(student, usage_key, request=None):
 
 
 from openedx.contrib.stanford.data_downloads.instructor_reports.forums_course import collect_course_forums_data
-from openedx.contrib.stanford.data_downloads.instructor_reports.forums_course import merge_join_course_forums
-from openedx.contrib.stanford.data_downloads.instructor_reports.forums_course import generate_course_forums_query
 from openedx.contrib.stanford.data_downloads.instructor_reports.ora2_anonymous import collect_anonymous_ora2_data
 from openedx.contrib.stanford.data_downloads.instructor_reports.ora2_email import collect_email_ora2_data
 from openedx.contrib.stanford.data_downloads.instructor_reports.forums_students import collect_student_forums_data
-from openedx.contrib.stanford.data_downloads.instructor_reports.forums_students import generate_student_forums_query

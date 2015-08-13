@@ -50,7 +50,7 @@ def collect_course_forums_data(course_id):
     return header, parsed_results
 
 
-def generate_course_forums_query(course_id, query_type, parent_id_check=None):
+def _generate_course_forums_query(course_id, query_type, parent_id_check=None):
     """
     We can make one of 3 possible queries: CommentThread, Comment, or Response
     CommentThread is specified by _type
@@ -90,7 +90,7 @@ def generate_course_forums_query(course_id, query_type, parent_id_check=None):
     return query
 
 
-def merge_join_course_forums(threads, responses, comments):
+def _merge_join_course_forums(threads, responses, comments):
     """
     Performs a merge of sorted threads, responses, comments data
     interleaving the results so the final result is in chronological order

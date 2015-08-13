@@ -35,7 +35,7 @@ def collect_student_forums_data(course_id):
     return header, parsed_results
 
 
-def generate_student_forums_query(course_id):
+def _generate_student_forums_query(course_id):
     """
     generates an aggregate query for student data which can be executed using pymongo
     :param course_id:
