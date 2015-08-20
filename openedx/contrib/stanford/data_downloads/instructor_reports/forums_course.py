@@ -22,9 +22,9 @@ def collect_course_forums_data(course_id):
     try:
         client = MongoClient(get_mongo_connection_string())
         mongodb = client[FORUMS_MONGO_PARAMS['database']]
-        new_threads_query = generate_course_forums_query(course_id, "CommentThread")
-        new_responses_query = generate_course_forums_query(course_id, "Comment", False)
-        new_comments_query = generate_course_forums_query(course_id, "Comment", True)
+        new_threads_query = _generate_course_forums_query(course_id, "CommentThread")
+        new_responses_query = _generate_course_forums_query(course_id, "Comment", False)
+        new_comments_query = _generate_course_forums_query(course_id, "Comment", True)
 
         new_threads = mongodb.contents.aggregate(new_threads_query)['result']
         new_responses = mongodb.contents.aggregate(new_responses_query)['result']

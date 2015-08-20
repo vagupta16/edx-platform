@@ -19,7 +19,7 @@ def collect_student_forums_data(course_id):
     try:
         client = MongoClient(get_mongo_connection_string())
         mongodb = client[FORUMS_MONGO_PARAMS['database']]
-        student_forums_query = generate_student_forums_query(course_id)
+        student_forums_query = _generate_student_forums_query(course_id)
         results = mongodb.contents.aggregate(student_forums_query)['result']
     except PyMongoError:
         raise
