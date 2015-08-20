@@ -34,7 +34,7 @@ def collect_course_forums_data(course_id):
 
     for entry in new_responses:
         entry['_id']['type'] = "Response"
-    results = merge_join_course_forums(new_threads, new_responses, new_comments)
+    results = _merge_join_course_forums(new_threads, new_responses, new_comments)
     parsed_results = [
         [
             "{0}-{1}-{2}".format(result['_id']['year'], result['_id']['month'], result['_id']['day']),
