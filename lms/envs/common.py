@@ -2403,3 +2403,32 @@ PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
 PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
+
+      #<input type="button" name="get-student-responses" value="${_("Get Student Responses Report")}" data-endpoint="${ section_data['get_student_responses_url'] }"/>
+ENABLE_DATA_DONWLOADS = [
+    {
+        'name':'get-student-responses',
+        'value':_('Get Student Responses Report'),
+        'data-endpoints':'get_student_responses_url',
+    },
+    {
+        'name':'ora2-response-btn',
+        'value':_('Download Ora2 Responses (no email addresses)'),
+        'data-endpoints':'get_ora2_responses_url',
+    },
+    {
+        'name':'ora2-response-btn-email',
+        'value':_('Download Ora2 Responses (including email addresses)'),
+        'data-endpoints':'get_ora2_email_responses_url',
+    },
+    {
+        'name':'course-forums-btn',
+        'value':_('Generate Course Forums Usage Report'),
+        'data-endpoints':'get_course_forums_usage_url',
+    },
+    {
+        'name':'student-forums-btn',
+        'value':_('Generate Student Forums Usage Report'),
+        'data-endpoints':'get_student_forums_usage_url',
+    },
+]
