@@ -2404,7 +2404,7 @@ PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 
-ENABLE_DATA_DONWLOADS = [
+ENABLE_DATA_DOWNLOADS = [
     {
         'name':'get-student-responses',
         'value':_('Get Student Responses Report'),
