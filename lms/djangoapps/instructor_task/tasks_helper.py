@@ -8,7 +8,6 @@ from datetime import datetime
 from time import time
 import unicodecsv
 import logging
-import urllib
 
 from celery import Task, current_task
 from celery.states import SUCCESS, FAILURE
@@ -705,6 +704,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
 
 from openedx.contrib.stanford.data_downloads.instructor_reports.student_responses import push_student_responses_to_s3
+from openedx.core.lib.data_download import push_csv_responses_to_s3
 
 
 def push_course_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
@@ -719,66 +719,6 @@ def push_student_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id,
     Generate student forums report and upload it to s3 as a CSV
     """
     return push_csv_responses_to_s3(collect_student_forums_data, u'student_forums', course_id, action_name)
-
-
-def push_csv_responses_to_s3(csv_fn, filename, course_id, action_name):
-    """
-    Collect responses and upload them to S3 as a CSV
-    """
-
-    start_time = datetime.now(UTC)
-    num_attempted = 1
-    num_succeeded = 0
-    num_failed = 0
-    num_total = 1
-    curr_step = "Collecting responses"
-
-    def update_task_progress():
-        """Return a dict containing info about current task"""
-        current_time = datetime.now(UTC)
-        progress = {
-            'action_name': action_name,
-            'attempted': num_attempted,
-            'succeeded': num_succeeded,
-            'failed': num_failed,
-            'total': num_total,
-            'duration_ms': int((current_time - start_time).total_seconds() * 1000),
-            'step': curr_step,
-        }
-        _get_current_task().update_state(state=PROGRESS, meta=progress)
-
-        return progress
-
-    update_task_progress()
-
-    try:
-        header, datarows = csv_fn(course_id)
-        rows = [header] + [row for row in datarows]
-    # Update progress to failed regardless of error type
-    # pylint: disable=bare-except
-    except:
-        num_failed = 1
-        update_task_progress()
-
-        return UPDATE_STATUS_FAILED
-
-    timestamp_str = start_time.strftime('%Y-%m-%d-%H%M')
-    course_id_string = urllib.quote(course_id.to_deprecated_string().replace('/', '_'))
-
-    curr_step = "Uploading CSV"
-    update_task_progress()
-    upload_csv_to_report_store(
-        rows,
-        filename,
-        course_id,
-        start_time,
-    )
-
-    num_succeeded = 1
-    curr_step = "Task completed successfully"
-    update_task_progress()
-
-    return UPDATE_STATUS_SUCCEEDED
 
 
 def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
