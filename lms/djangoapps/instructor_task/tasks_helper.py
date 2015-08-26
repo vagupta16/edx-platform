@@ -220,7 +220,7 @@ class TaskProgress(object):
         return progress_dict
 
 
-def run_main_task(entry_id, task_fcn, action_name):
+def run_main_task(entry_id, task_fcn, action_name, push_csv_responses_to_s3):
     """
     Applies the `task_fcn` to the arguments defined in `entry_id` InstructorTask.
 
@@ -272,7 +272,7 @@ def run_main_task(entry_id, task_fcn, action_name):
 
     # Now do the work
     with dog_stats_api.timer('instructor_tasks.time.overall', tags=[u'action:{name}'.format(name=action_name)]):
-        task_progress = task_fcn(entry_id, course_id, task_input, action_name)
+        task_progress = task_fcn(entry_id, course_id, task_input, action_name, push_csv_responses_to_s3)
 
     # Release any queries that the connection has been hanging onto
     reset_queries()
@@ -704,24 +704,23 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
 
 from openedx.contrib.stanford.data_downloads.instructor_reports.student_responses import push_student_responses_to_s3
-from openedx.core.lib.data_download import push_csv_responses_to_s3
 
 
-def push_course_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+def push_course_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name, push_csv_responses_to_s3):
     """
     Collect course forums usage data and upload them to S3 as a CSV
     """
     return push_csv_responses_to_s3(collect_course_forums_data, u'course_forums', course_id, action_name)
 
 
-def push_student_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+def push_student_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name, push_csv_responses_to_s3):
     """
     Generate student forums report and upload it to s3 as a CSV
     """
     return push_csv_responses_to_s3(collect_student_forums_data, u'student_forums', course_id, action_name)
 
 
-def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name, push_csv_responses_to_s3):
     """
     Collect ora2 responses and upload them to S3 as a CSV, without email addresses.  Pass is_anonymous = True
     """

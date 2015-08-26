@@ -42,6 +42,7 @@ from instructor_task.tasks_helper import (
     push_student_forums_data_to_s3,
     cohort_students_and_upload
 )
+from openedx.core.lib.data_download import push_csv_responses_to_s3
 
 
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -189,7 +190,7 @@ def get_ora2_responses(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_ora2_responses_to_s3, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
+    return run_main_task(entry_id, task_fn, action_name, push_csv_responses_to_s3)
 
 
 # pylint: disable=not-callable
@@ -200,7 +201,7 @@ def get_course_forums_usage(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_course_forums_data_to_s3, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
+    return run_main_task(entry_id, task_fn, action_name, push_csv_responses_to_s3)
 
 
 @task(base=BaseInstructorTask, routing_key=settings.STUDENT_FORUMS_DOWNLOAD_ROUTING_KEY)
@@ -210,7 +211,7 @@ def get_student_forums_usage(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_student_forums_data_to_s3, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
+    return run_main_task(entry_id, task_fn, action_name, push_csv_responses_to_s3)
 
 
 @task(base=BaseInstructorTask)  # pylint: disable=E1102
