@@ -9,6 +9,7 @@ such that the value can be defined later than this assignment (file load order).
 # Load utilities
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
+ReportDownloads = -> window.InstructorDashboard.util.ReportDownloads
 
 # Data Download Section
 class DataDownload
@@ -19,6 +20,8 @@ class DataDownload
     # gather elements
     @$list_studs_btn = @$section.find("input[name='list-profiles']'")
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
+    @$list_proctored_exam_results_csv_btn = @$section.find("input[name='proctored-exam-results-report']'")
+    @$list_may_enroll_csv_btn = @$section.find("input[name='list-may-enroll-csv']")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
     @$get_student_responses_btn = @$section.find("input[name='get-student-responses']'")
@@ -37,8 +40,12 @@ class DataDownload
     @$reports_request_response        = @$reports.find '.request-response'
     @$reports_request_response_error  = @$reports.find '.request-response-error'
 
+<<<<<<< HEAD
 
     @report_downloads = new ReportDownloads(@$section)
+=======
+    @report_downloads = new (ReportDownloads()) @$section
+>>>>>>> hotfix-2015-08-20
     @instructor_tasks = new (PendingInstructorTasks()) @$section
     @clear_display()
 
@@ -47,6 +54,25 @@ class DataDownload
     @$list_anon_btn.click (e) =>
       url = @$list_anon_btn.data 'endpoint'
       location.href = url
+
+    # attach click handlers
+    # The list_proctored_exam_results case is always CSV
+    @$list_proctored_exam_results_csv_btn.click (e) =>
+      url = @$list_proctored_exam_results_csv_btn.data 'endpoint'
+      # display html from proctored exam results config endpoint
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: (std_ajax_err) =>
+          @clear_display()
+          @$reports_request_response_error.text gettext(
+            "Error generating proctored exam results. Please try again."
+          )
+          $(".msg-error").css({"display":"block"})
+        success: (data) =>
+          @clear_display()
+          @$reports_request_response.text data['status']
+          $(".msg-confirm").css({"display":"block"})
 
     # this handler binds to both the download
     # and the csv button
@@ -99,6 +125,20 @@ class DataDownload
           @$download_display_table.append $table_placeholder
           grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
           # grid.autosizeColumns()
+
+    @$list_may_enroll_csv_btn.click (e) =>
+      @clear_display()
+
+      url = @$list_may_enroll_csv_btn.data 'endpoint'
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: (std_ajax_err) =>
+          @$reports_request_response_error.text gettext("Error generating list of students who may enroll. Please try again.")
+          $(".msg-error").css({"display":"block"})
+        success: (data) =>
+          @$reports_request_response.text data['status']
+          $(".msg-confirm").css({"display":"block"})
 
     @$grade_config_btn.click (e) =>
       url = @$grade_config_btn.data 'endpoint'
@@ -183,6 +223,7 @@ class DataDownload
     $(".msg-confirm").css({"display":"none"})
     $(".msg-error").css({"display":"none"})
 
+<<<<<<< HEAD
 
 class ReportDownloads
   ### Report Downloads -- links expire quickly, so we refresh every 5 mins ####
@@ -348,6 +389,8 @@ class ReportDownloads
 
 
 
+=======
+>>>>>>> hotfix-2015-08-20
 # export for use
 # create parent namespaces if they do not already exist.
 _.defaults window, InstructorDashboard: {}

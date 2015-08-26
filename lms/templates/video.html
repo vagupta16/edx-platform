@@ -7,6 +7,7 @@
 <div
     id="video_${id}"
     class="video closed"
+<<<<<<< HEAD
 
     data-streams="${youtube_streams}"
 
@@ -49,6 +50,11 @@
     ## front-end exists.
     data-autohide-html5="False"
 
+=======
+    data-metadata='${metadata}'
+    data-bumper-metadata='${bumper_metadata}'
+    data-poster='${poster}'
+>>>>>>> hotfix-2015-08-20
     tabindex="-1"
 >
     <div class="focus_grabber first"></div>
@@ -66,41 +72,13 @@
           </section>
           <div class="video-player-post"></div>
           <section class="video-controls is-hidden">
-              <div class="slider" title="${_('Video position')}"></div>
               <div>
-                  <ul class="vcr">
-                      <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
-                      <li><div class="vidtime">0:00 / 0:00</div></li>
-                  </ul>
-                  <div class="secondary-controls">
-                      <div class="speeds menu-container">
-                          <a class="speed-button" href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
-                              <span class="label">${_('Speed')}</span>
-                              <span class="value"></span>
-                          </a>
-                          <ol class="video-speeds menu" role="menu"></ol>
-                      </div>
-                      <div class="volume">
-                          <a href="#" role="button" aria-disabled="false" title="${_('Volume')}" aria-label="${_('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.')}"></a>
-                          <div role="presentation" class="volume-slider-container">
-                              <div class="volume-slider"></div>
-                          </div>
-                      </div>
-                      <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
-                      <a href="#" class="quality-control is-hidden" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
-
-                      <div class="lang menu-container">
-                        <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
-                      </div>
-                  </div>
+                  <div class="vcr"><div class="vidtime">0:00 / 0:00</div></div>
+                  <div class="secondary-controls"></div>
               </div>
           </section>
           <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
       </article>
-
-      <ol id="transcript-captions" class="subtitles" tabindex="0" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.')}">
-        <li></li>
-      </ol>
     </div>
 
     <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
@@ -117,8 +95,8 @@
           % if transcript_download_format:
             <a href="${track}">${_('Download transcript')}</a>
             <div class="a11y-menu-container">
-                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
-                <ol class="a11y-menu-list">
+                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}" role="button" aria-disabled="false">${'.' + transcript_download_format}</a>
+                <ol class="a11y-menu-list" role="menu">
                 % for item in transcript_download_formats_list:
                   % if item['value'] == transcript_download_format:
                   <li class="a11y-menu-item active">
@@ -127,7 +105,7 @@
                   % endif
                   ## This is necessary so we don't scrape 'display_name' as a string.
                   <% dname = item['display_name'] %>
-                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
+                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}" role="menuitem" aria-disabled="false">
                         ${_(dname)}
                       </a>
                   </li>

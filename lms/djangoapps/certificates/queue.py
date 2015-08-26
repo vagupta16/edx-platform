@@ -4,6 +4,7 @@ import random
 import logging
 import lxml.html
 from lxml.etree import XMLSyntaxError, ParserError  # pylint:disable=no-name-in-module
+from uuid import uuid4
 
 from django.test.client import RequestFactory
 from django.conf import settings
@@ -104,7 +105,7 @@ class XQueueCertInterface(object):
         self.restricted = UserProfile.objects.filter(allow_certificate=False)
         self.use_https = True
 
-    def regen_cert(self, student, course_id, course=None, forced_grade=None, template_file=None):
+    def regen_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
         """(Re-)Make certificate for a particular student in a particular course
 
         Arguments:
@@ -154,7 +155,14 @@ class XQueueCertInterface(object):
         except GeneratedCertificate.DoesNotExist:
             pass
 
-        return self.add_cert(student, course_id, course, forced_grade, template_file)
+        return self.add_cert(
+            student,
+            course_id,
+            course=course,
+            forced_grade=forced_grade,
+            template_file=template_file,
+            generate_pdf=generate_pdf
+        )
 
     def del_cert(self, student, course_id):
 
@@ -173,7 +181,13 @@ class XQueueCertInterface(object):
 
         raise NotImplementedError
 
+<<<<<<< HEAD
     def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, title='None', keep_current=False):
+=======
+    # pylint: disable=too-many-statements
+    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None,
+                 title='None', generate_pdf=True):
+>>>>>>> hotfix-2015-08-20
         """
         Request a new certificate for a student.
 
@@ -183,10 +197,15 @@ class XQueueCertInterface(object):
           forced_grade - a string indicating a grade parameter to pass with
                          the certificate request. If this is given, grading
                          will be skipped.
+<<<<<<< HEAD
           keep_current - whether students who no longer meet grade standards
                          should keep any pre-existing certs.
+=======
+          generate_pdf - Boolean should a message be sent in queue to generate certificate PDF
+>>>>>>> hotfix-2015-08-20
 
-        Will change the certificate status to 'generating'.
+        Will change the certificate status to 'generating' or
+        `downloadable` in case of web view certificates.
 
         Certificate must be in the 'unavailable', 'error',
         'deleted' or 'generating' state.
@@ -200,7 +219,7 @@ class XQueueCertInterface(object):
         If a student does not have a passing grade the status
         will change to status.notpassing
 
-        Returns the student's status
+        Returns the student's status and newly created certificate instance
         """
 
         valid_statuses = [
@@ -217,6 +236,7 @@ class XQueueCertInterface(object):
 
         cert_status = certificate_status_for_student(student, course_id)['status']
         new_status = cert_status
+        cert = None
 
         if cert_status not in valid_statuses:
             LOGGER.warning(
@@ -251,11 +271,10 @@ class XQueueCertInterface(object):
             enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
             mode_is_verified = (enrollment_mode == GeneratedCertificate.MODES.verified)
             user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
-            user_is_reverified = SoftwareSecurePhotoVerification.user_is_reverified_for_all(course_id, student)
             cert_mode = enrollment_mode
-            if (mode_is_verified and user_is_verified and user_is_reverified):
+            if mode_is_verified and user_is_verified:
                 template_pdf = "certificate-template-{id.org}-{id.course}-verified.pdf".format(id=course_id)
-            elif (mode_is_verified and not (user_is_verified and user_is_reverified)):
+            elif mode_is_verified and not user_is_verified:
                 template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
                 cert_mode = GeneratedCertificate.MODES.honor
             else:
@@ -264,7 +283,11 @@ class XQueueCertInterface(object):
             if forced_grade:
                 grade['grade'] = forced_grade
 
+<<<<<<< HEAD
             cert, dummy0 = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
+=======
+            cert, __ = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
+>>>>>>> hotfix-2015-08-20
 
             cert.mode = cert_mode
             cert.user = student
@@ -339,35 +362,41 @@ class XQueueCertInterface(object):
                     }
                     if template_file:
                         contents['template_pdf'] = template_file
-                    new_status = status.generating
+                    if generate_pdf:
+                        new_status = status.generating
+                    else:
+                        new_status = status.downloadable
+                        cert.verify_uuid = uuid4().hex
+
                     cert.status = new_status
                     cert.save()
 
-                    try:
-                        self._send_to_xqueue(contents, key)
-                    except XQueueAddToQueueError as exc:
-                        new_status = ExampleCertificate.STATUS_ERROR
-                        cert.status = new_status
-                        cert.error_reason = unicode(exc)
-                        cert.save()
-                        LOGGER.critical(
-                            (
-                                u"Could not add certificate task to XQueue.  "
-                                u"The course was '%s' and the student was '%s'."
-                                u"The certificate task status has been marked as 'error' "
-                                u"and can be re-submitted with a management command."
-                            ), student.id, course_id
-                        )
-                    else:
-                        LOGGER.info(
-                            (
-                                u"The certificate status has been set to '%s'.  "
-                                u"Sent a certificate grading task to the XQueue "
-                                u"with the key '%s'. "
-                            ),
-                            key,
-                            new_status
-                        )
+                    if generate_pdf:
+                        try:
+                            self._send_to_xqueue(contents, key)
+                        except XQueueAddToQueueError as exc:
+                            new_status = ExampleCertificate.STATUS_ERROR
+                            cert.status = new_status
+                            cert.error_reason = unicode(exc)
+                            cert.save()
+                            LOGGER.critical(
+                                (
+                                    u"Could not add certificate task to XQueue.  "
+                                    u"The course was '%s' and the student was '%s'."
+                                    u"The certificate task status has been marked as 'error' "
+                                    u"and can be re-submitted with a management command."
+                                ), course_id, student.id
+                            )
+                        else:
+                            LOGGER.info(
+                                (
+                                    u"The certificate status has been set to '%s'.  "
+                                    u"Sent a certificate grading task to the XQueue "
+                                    u"with the key '%s'. "
+                                ),
+                                new_status,
+                                key
+                            )
             else:
                 if not keep_current:
                     cert_status = status.notpassing
@@ -385,7 +414,7 @@ class XQueueCertInterface(object):
                     new_status
                 )
 
-        return new_status
+        return new_status, cert
 
     def add_example_cert(self, example_cert):
         """Add a task to create an example certificate.

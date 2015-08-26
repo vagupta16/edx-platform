@@ -35,6 +35,7 @@
     <div class="tab" id="tab2">
         <ul class="new-component-template">
             <% for (var i = 0; i < templates.length; i++) { %>
+<<<<<<< HEAD
                 <% if (templates[i].tab == "hint") { %>
                 <li class="editor-manual">
                     <a href="#" data-category="<%= templates[i].category %>"
@@ -49,6 +50,8 @@
     <div class="tab" id="tab3">
         <ul class="new-component-template">
             <% for (var i = 0; i < templates.length; i++) { %>
+=======
+>>>>>>> hotfix-2015-08-20
                 <% if (templates[i].tab == "advanced") { %>
                 <li class="editor-manual">
                     <a href="#" data-category="<%= templates[i].category %>"

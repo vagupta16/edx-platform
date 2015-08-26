@@ -156,9 +156,10 @@ class CapaFields(object):
     )
     rerandomize = Randomization(
         display_name=_("Randomization"),
-        help=_("Defines how often inputs are randomized when a student loads the problem. "
-               "This setting only applies to problems that can have randomly generated numeric values. "
-               "A default value can be set in Advanced Settings."),
+        help=_(
+            'Defines when to randomize the variables specified in the associated Python script. '
+            'For problems that do not randomize values, specify \"Never\". '
+        ),
         default=RANDOMIZATION.NEVER,
         scope=Scope.settings,
         values=[
@@ -511,7 +512,7 @@ class CapaMixin(CapaFields):
 
         # If the problem is closed (and not a survey question with max_attempts==0),
         # then do NOT show the reset button.
-        if (self.closed() and not is_survey_question):
+        if self.closed() and not is_survey_question:
             return False
 
         # Button only shows up for randomized problems if the question has been submitted
@@ -675,10 +676,51 @@ class CapaMixin(CapaFields):
             'hint_index': hint_index
         }
 
+<<<<<<< HEAD
     def get_problem_html(self, encapsulate=True):
         """
         Return html for the problem.
 
+=======
+        Adds check, reset, save, and hint buttons as necessary based on the problem config
+        and state.
+        encapsulate: if True (the default) embed the html in a problem <div>
+        hint_index: (None is the default) if not None, this is the index of the next demand
+        hint to show.
+        """
+        demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
+        hint_index = hint_index % len(demand_hints)
+
+        _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
+        hint_element = demand_hints[hint_index]
+        hint_text = hint_element.text.strip()
+        if len(demand_hints) == 1:
+            prefix = _('Hint: ')
+        else:
+            # Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three hints.
+            prefix = _('Hint ({hint_num} of {hints_count}): ').format(hint_num=hint_index + 1,
+                                                                      hints_count=len(demand_hints))
+
+        # Log this demand-hint request
+        event_info = dict()
+        event_info['module_id'] = self.location.to_deprecated_string()
+        event_info['hint_index'] = hint_index
+        event_info['hint_len'] = len(demand_hints)
+        event_info['hint_text'] = hint_text
+        self.runtime.track_function('edx.problem.hint.demandhint_displayed', event_info)
+
+        # We report the index of this hint, the client works out what index to use to get the next hint
+        return {
+            'success': True,
+            'contents': prefix + hint_text,
+            'hint_index': hint_index
+        }
+
+    def get_problem_html(self, encapsulate=True):
+        """
+        Return html for the problem.
+
+>>>>>>> hotfix-2015-08-20
         Adds check, reset, save, and hint buttons as necessary based on the problem config
         and state.
         encapsulate: if True (the default) embed the html in a problem <div>
@@ -773,6 +815,7 @@ class CapaMixin(CapaFields):
 
         return html
 
+<<<<<<< HEAD
     def start_problem(self, _data=None):
         """
         Called from the interstitial view, starts a timed problem if
@@ -798,6 +841,8 @@ class CapaMixin(CapaFields):
         time_limit_end = self.time_started + datetime.timedelta(minutes=(self.minutes_allowed))
         return now > time_limit_end
 
+=======
+>>>>>>> hotfix-2015-08-20
     def remove_tags_from_html(self, html):
         """
         The capa xml includes many tags such as <additional_answer> or <demandhint> which are not
@@ -1159,8 +1204,6 @@ class CapaMixin(CapaFields):
 
         # Wait time between resets: check if is too soon for submission.
         if self.last_submission_time is not None and self.submission_wait_seconds != 0:
-            # pylint: disable=maybe-no-member
-            # pylint is unable to verify that .total_seconds() exists
             if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds())
                 msg = _(u'You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(

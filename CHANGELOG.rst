@@ -1,6 +1,7 @@
-Change Log
-----------
+We don't maintain a detailed changelog.  For details of changes, please see
+either the `edX Release Notes`_ or the `GitHub commit history`_.
 
+<<<<<<< HEAD
 These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
@@ -852,3 +853,7 @@ Blades: Added WAI-ARIA markup to the video player controls. These are now fully
 accessible by screen readers.
 
 Common: Added advanced_module for annotating images to go with the ones for text and videos.
+=======
+.. _edX Release Notes: http://edx.readthedocs.org/projects/edx-release-notes/en/latest/
+.. _GitHub commit history: https://github.com/edx/edx-platform/commits/master
+>>>>>>> hotfix-2015-08-20

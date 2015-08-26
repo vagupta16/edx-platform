@@ -23,7 +23,11 @@ metadata:
         ||A fruit is the fertilized ovary from a flower.||
         ||A fruit contains seeds of the plant.||
 
+<<<<<<< HEAD
 tab: hint
+=======
+hinted: true
+>>>>>>> hotfix-2015-08-20
 data: |
     <problem>
 

@@ -670,6 +670,7 @@ hr.divider {
 .content-modal {
   @include border-bottom-radius(2px);
   @include box-sizing(border-box);
+<<<<<<< HEAD
   box-shadow: 0 2px 4px $shadow-d1;
   position: relative;
   display: none;
@@ -678,6 +679,16 @@ hr.divider {
   border: 1px solid $gray-d1;
   padding: ($baseline);
   background: $white;
+=======
+  position: relative;
+  display: none;
+  width: 700px;
+  padding: ($baseline);
+  border: 1px solid $gray-d1;
+  background: $white;
+  box-shadow: 0 2px 4px $shadow-d1;
+  overflow: hidden;
+>>>>>>> hotfix-2015-08-20
 
   .action-modal-close {
     @include transition(top $tmg-f3 ease-in-out 0s);
@@ -699,8 +710,13 @@ hr.divider {
     }
 
     &:hover {
+<<<<<<< HEAD
       background: $blue;
       top: 0;
+=======
+      top: 0;
+      background: $blue;
+>>>>>>> hotfix-2015-08-20
     }
   }
 
@@ -723,6 +739,7 @@ hr.divider {
     @extend %t-copy-sub2;
     margin-top: ($baseline/2);
     color: $gray-l1;
+<<<<<<< HEAD
   }
 
   table {
@@ -737,5 +754,8 @@ hr.divider {
         width: 100%;
       }
     }
+=======
+>>>>>>> hotfix-2015-08-20
   }
 }
+

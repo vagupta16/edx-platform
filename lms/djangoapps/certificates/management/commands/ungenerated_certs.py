@@ -7,7 +7,7 @@ import datetime
 from pytz import UTC
 from django.core.management.base import BaseCommand, CommandError
 from certificates.models import certificate_status_for_student
-from certificates.queue import XQueueCertInterface
+from certificates.api import generate_user_certificates
 from django.contrib.auth.models import User
 from optparse import make_option
 from opaque_keys import InvalidKeyError
@@ -123,9 +123,6 @@ class Command(BaseCommand):
                 courseenrollment__course_id=course_key
             )
 
-            xq = XQueueCertInterface()
-            if options['insecure']:
-                xq.use_https = False
             total = enrolled_students.count()
             count = 0
             start = datetime.datetime.now(UTC)
@@ -159,7 +156,17 @@ class Command(BaseCommand):
 
                     if not options['noop']:
                         # Add the certificate request to the queue
+<<<<<<< HEAD
                         ret = xq.add_cert(student, course_key, course=course, keep_current=options['keep_current'])
+=======
+                        ret = generate_user_certificates(
+                            student,
+                            course_key,
+                            course=course,
+                            insecure=options['insecure']
+                        )
+
+>>>>>>> hotfix-2015-08-20
                         if ret == 'generating':
                             LOGGER.info(
                                 (
