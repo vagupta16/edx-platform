@@ -23,16 +23,11 @@ from shoppingcart.models import (
 )
 from course_modes.models import CourseMode
 from instructor_analytics.basic import (
-<<<<<<< HEAD
-    sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
-    coupon_codes_features, student_responses, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
-)
-=======
     sale_record_features, sale_order_record_features, enrolled_students_features,
     course_registration_features, coupon_codes_features, list_may_enroll,
     AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
     get_proctored_exam_results)
->>>>>>> hotfix-2015-08-20
+from instructor_analytics.basic import student_responses
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory

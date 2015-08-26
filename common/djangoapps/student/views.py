@@ -87,12 +87,8 @@ from external_auth.login_and_register import (
 )
 
 from bulk_email.models import Optout, CourseAuthorization
-<<<<<<< HEAD
 from cme_registration.views import cme_register_user, cme_create_account
 
-import shoppingcart
-=======
->>>>>>> hotfix-2015-08-20
 from lang_pref import LANGUAGE_KEY
 
 import track.views
@@ -406,10 +402,9 @@ def signin_user(request):
     external_auth_response = external_auth_login(request)
     if external_auth_response is not None:
         return external_auth_response
-<<<<<<< HEAD
     if UserProfile.has_registered(request.user):
         return redirect(reverse('dashboard'))
-=======
+
     # Determine the URL to redirect to following login:
     redirect_to = get_next_url_for_login_page(request)
     if request.user.is_authenticated():
@@ -421,7 +416,6 @@ def signin_user(request):
             # msg may or may not be translated. Try translating [again] in case we are able to:
             third_party_auth_error = _(unicode(msg))  # pylint: disable=translation-of-non-string
             break
->>>>>>> hotfix-2015-08-20
 
     context = {
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
@@ -434,11 +428,8 @@ def signin_user(request):
             'platform_name',
             settings.PLATFORM_NAME
         ),
-<<<<<<< HEAD
         'account_name': settings.ACCOUNT_NAME,
-=======
         'third_party_auth_error': third_party_auth_error
->>>>>>> hotfix-2015-08-20
     }
 
     return render_to_response('login.html', context)
@@ -447,18 +438,13 @@ def signin_user(request):
 @ensure_csrf_cookie
 def register_user(request, extra_context=None):
     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
-<<<<<<< HEAD
     if settings.FEATURES.get('USE_CME_REGISTRATION'):
         return cme_register_user(request, extra_context=extra_context)
 
-    if UserProfile.has_registered(request.user):
-        return redirect(reverse('dashboard'))
-=======
     # Determine the URL to redirect to following login:
     redirect_to = get_next_url_for_login_page(request)
-    if request.user.is_authenticated():
+    if UserProfile.has_registered(request.user):
         return redirect(redirect_to)
->>>>>>> hotfix-2015-08-20
 
     external_auth_response = external_auth_register(request)
     if external_auth_response is not None:
@@ -742,7 +728,6 @@ def dashboard(request):
     return render_to_response('dashboard.html', context)
 
 
-<<<<<<< HEAD
 def _create_and_login_nonregistered_user(request):
     new_student = UserProfile.create_nonregistered_user()
     new_student.backend = settings.AUTHENTICATION_BACKENDS[0]
@@ -777,13 +762,9 @@ def setup_sneakpeek(request, course_id):
     return HttpResponse("OK. Allowed sneakpeek")
 
 
-def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
-    """Builds a recent course enrollment message
-=======
 def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name
     """
     Builds a recent course enrollment message.
->>>>>>> hotfix-2015-08-20
 
     Constructs a new message template based on any recent course enrollments
     for the student.

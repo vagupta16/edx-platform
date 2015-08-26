@@ -14,13 +14,8 @@
 
 define(
 'video/01_initialize.js',
-<<<<<<< HEAD
-['video/03_video_player.js', 'video/00_video_storage.js', 'video/00_i18n.js'],
-function (VideoPlayer, VideoStorage, i18n) {
-=======
 ['video/03_video_player.js', 'video/00_i18n.js'],
 function (VideoPlayer, i18n) {
->>>>>>> hotfix-2015-08-20
     var moment = window.moment;
 
     /**
@@ -232,14 +227,6 @@ function (VideoPlayer, i18n) {
             state.el.trigger('youtube_availability', [state.youtubeApiAvailable]);
         }, state.config.ytTestTimeout);
 
-<<<<<<< HEAD
-    }
-
-    function loadYouTubeIFrameAPI(scriptTag) {
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(scriptTag, firstScriptTag);
-=======
->>>>>>> hotfix-2015-08-20
     }
 
     function loadYouTubeIFrameAPI(scriptTag) {
@@ -716,38 +703,12 @@ function (VideoPlayer, i18n) {
         // Will hit the API URL iF YT key is defined in settings.
         if (this.config.ytKey) {
             return $.ajax({
-<<<<<<< HEAD
-                url: [this.config.ytTestUrl, '?id=', url, '&part=contentDetails&key=', this.config.ytKey].join(''),
-=======
                 url: [this.config.ytMetadataUrl, '?id=', url, '&part=contentDetails&key=', this.config.ytKey].join(''),
->>>>>>> hotfix-2015-08-20
                 timeout: this.config.ytTestTimeout,
                 success: _.isFunction(callback) ? callback : null
             });
         } else {
             return $.Deferred().reject().promise();
-<<<<<<< HEAD
-        }
-    }
-
-    function saveState(async, data) {
-
-        if (!($.isPlainObject(data))) {
-            data = {
-                saved_video_position: this.videoPlayer.currentTime
-            };
-        }
-
-        if (data.speed) {
-            this.storage.setItem('speed', data.speed, true);
-        }
-
-        if (data.hasOwnProperty('saved_video_position')) {
-            this.storage.setItem('savedVideoPosition', data.saved_video_position, true);
-
-            data.saved_video_position = Time.formatFull(data.saved_video_position);
-=======
->>>>>>> hotfix-2015-08-20
         }
     }
 
@@ -761,11 +722,7 @@ function (VideoPlayer, i18n) {
 
     function getDuration() {
         try {
-<<<<<<< HEAD
-           return moment.duration(this.metadata[this.youtubeId()].duration, moment.ISO_8601).asSeconds();
-=======
             return moment.duration(this.metadata[this.youtubeId()].duration, moment.ISO_8601).asSeconds();
->>>>>>> hotfix-2015-08-20
         } catch (err) {
             try{
                 return _.result(this.metadata[this.youtubeId('1.0')], 'duration');

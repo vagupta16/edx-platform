@@ -22,12 +22,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import UTC
-<<<<<<< HEAD
 from django.http import HttpResponseNotFound, HttpResponseServerError
-from django.views.decorators.http import require_GET, require_POST
-=======
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
->>>>>>> hotfix-2015-08-20
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from certificates import api as certs_api
@@ -47,11 +43,7 @@ from courseware.courses import (
     sort_by_start_date,
     UserNotEnrolled)
 from courseware.masquerade import setup_masquerade
-<<<<<<< HEAD
 from courseware.models import CoursePreference
-from courseware.model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor, get_module
-=======
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
     is_user_eligible_for_credit,
@@ -60,7 +52,6 @@ from openedx.core.djangoapps.credit.api import (
 from courseware.models import StudentModuleHistory
 from courseware.model_data import FieldDataCache, ScoresClient
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
->>>>>>> hotfix-2015-08-20
 from .entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -72,14 +63,10 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from course_modes.models import CourseMode
 
 from open_ended_grading import open_ended_notifications
-<<<<<<< HEAD
-from student.models import UserTestGroup, CourseEnrollment, UserProfile
-from student.views import single_course_reverification_info, is_course_blocked
-=======
+from student.models import UserProfile
 from open_ended_grading.views import StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
->>>>>>> hotfix-2015-08-20
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
 from xblock.fragment import Fragment
@@ -462,13 +449,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'staff_access': staff_access,
             'studio_url': studio_url,
             'masquerade': masquerade,
-<<<<<<< HEAD
-            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
-            'reverifications': fetch_reverify_banner_info(request, course_key),
             'analytics_url': analytics_url,
-=======
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
->>>>>>> hotfix-2015-08-20
         }
 
         now = datetime.now(UTC())
@@ -1112,26 +1094,22 @@ def _progress(request, course_key, student_id):
     # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
-<<<<<<< HEAD
-
     courseware_summary = None
+    grade_summary = None
     if settings.FEATURES['ENABLE_PROGRESS_SUMMARY']:
-        courseware_summary = grades.progress_summary(student, request, course)
-        if courseware_summary is None:
-            # This means the student didn't have access to the course (which the instructor requested)
-            raise Http404
-
-=======
-    field_data_cache = grades.field_data_cache_for_grading(course, student)
-    scores_client = ScoresClient.from_field_data_cache(field_data_cache)
-    courseware_summary = grades.progress_summary(
-        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
-    )
-    grade_summary = grades.grade(
-        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
-    )
->>>>>>> hotfix-2015-08-20
+        field_data_cache = grades.field_data_cache_for_grading(course, student)
+        scores_client = ScoresClient.from_field_data_cache(field_data_cache)
+        courseware_summary = grades.progress_summary(
+            student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
+        )
+        grade_summary = grades.grade(
+            student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
+        )
     studio_url = get_studio_url(course, 'settings/grading')
+
+    if courseware_summary is None:
+        #This means the student didn't have access to the course (which the instructor requested)
+        raise Http404
 
     # checking certificate generation configuration
     show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)

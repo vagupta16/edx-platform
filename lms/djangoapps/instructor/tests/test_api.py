@@ -746,11 +746,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('students_update_enrollment',
              {'identifiers': 'foo@example.org', 'action': 'enroll'}),
             ('get_grading_config', {}),
-<<<<<<< HEAD
-            ('get_distribution', {}),
-=======
             ('get_students_features', {}),
->>>>>>> hotfix-2015-08-20
             ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
             ('reset_student_attempts',
              {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
@@ -766,15 +762,11 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('get_student_forums_usage', {}),
             ('get_ora2_responses', {'include_email': False}),
             ('get_course_forums_usage', {}),
-            ('get_students_features', {}),
-<<<<<<< HEAD
             ('graph_course_forums_usage', {}),
-=======
             ('get_enrollment_report', {}),
             ('get_students_who_may_enroll', {}),
             ('get_exec_summary_report', {}),
             ('get_proctored_exam_results', {}),
->>>>>>> hotfix-2015-08-20
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -3184,7 +3176,6 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
                                  " complete.".format(report_type=report_type)
         self.assertIn(already_running_status, response.content)
 
-<<<<<<< HEAD
     def test_get_ora2_responses_success(self):
         url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string(), 'include_email': False})
 
@@ -3237,48 +3228,6 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         already_running_status = "A student forums usage report task is already in progress."
         self.assertIn(already_running_status, response.content)
 
-    def test_get_distribution_no_feature(self):
-        """
-        Test that get_distribution lists available features
-        when supplied no feature parameter.
-        """
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
-        self.assertEqual(type(res_json['available_features']), list)
-
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url + u'?feature=')
-        self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
-        self.assertEqual(type(res_json['available_features']), list)
-
-    def test_get_distribution_unavailable_feature(self):
-        """
-        Test that get_distribution fails gracefully with
-            an unavailable feature.
-        """
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'feature': 'robot-not-a-real-feature'})
-        self.assertEqual(response.status_code, 400)
-
-    def test_get_distribution_gender(self):
-        """
-        Test that get_distribution fails gracefully with
-            an unavailable feature.
-        """
-        url = reverse('get_distribution', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'feature': 'gender'})
-        self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
-        self.assertEqual(res_json['feature_results']['data']['m'], 6)
-        self.assertEqual(res_json['feature_results']['choices_display_names']['m'], 'Male')
-        self.assertEqual(res_json['feature_results']['data']['no_data'], 0)
-        self.assertEqual(res_json['feature_results']['choices_display_names']['no_data'], 'No Data')
-
-=======
->>>>>>> hotfix-2015-08-20
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})

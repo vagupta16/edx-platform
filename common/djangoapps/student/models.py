@@ -960,7 +960,6 @@ class CourseEnrollment(models.Model):
             return None
 
     @classmethod
-<<<<<<< HEAD
     def num_enrolled_in(cls, course_id):
         """
         Returns the count of active enrollments in a course.
@@ -976,8 +975,6 @@ class CourseEnrollment(models.Model):
         return enrollment_number
 
     @classmethod
-=======
->>>>>>> hotfix-2015-08-20
     def is_enrollment_closed(cls, user, course):
         """
         Returns a boolean value regarding whether the user has access to enroll in the course. Returns False if the

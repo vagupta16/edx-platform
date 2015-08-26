@@ -271,12 +271,6 @@ from student.helpers import (
   </section>
   <footer class="wrapper-messages-primary">
     <ul class="messages-list">
-<<<<<<< HEAD
-      ## % if course.may_certify() and cert_status:
-      % if (course.may_certify() and cert_status and (cert_status['status'] != 'processing')) or (course.has_ended() and cert_status and (not enrollment.mode == 'audit')):
-        <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
-        % endif
-=======
       % if course_overview.may_certify() and cert_status:
         <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course_overview=course_overview, enrollment=enrollment'/>
       % endif
@@ -284,7 +278,6 @@ from student.helpers import (
       % if credit_status is not None:
         <%include file="_dashboard_credit_info.html" args="credit_status=credit_status"/>
       % endif 
->>>>>>> hotfix-2015-08-20
 
         % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
         <div class="message message-status wrapper-message-primary is-shown">

@@ -43,15 +43,11 @@ from lms.envs.common import (
     # technically accessible through the CMS via legacy URLs.
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
     PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES,
-<<<<<<< HEAD
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
     update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR,
-    YOUTUBE_API_KEY,
-=======
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY
->>>>>>> hotfix-2015-08-20
 )
 from path import path
 from warnings import simplefilter
@@ -1072,18 +1068,13 @@ ELASTIC_FIELD_MAPPINGS = {
 }
 
 XBLOCK_SETTINGS = {
-<<<<<<< HEAD
-=======
     "VideoDescriptor": {
         "licensing_enabled": FEATURES.get("LICENSING", False)
     },
->>>>>>> hotfix-2015-08-20
     'VideoModule': {
         'YOUTUBE_API_KEY': YOUTUBE_API_KEY
     }
 }
-<<<<<<< HEAD
-=======
 
 ################################ Settings for Credit Course Requirements ################################
 # Initial delay used for retrying tasks.
@@ -1112,4 +1103,3 @@ PROCTORING_BACKEND_PROVIDER = {
     'options': {},
 }
 PROCTORING_SETTINGS = {}
->>>>>>> hotfix-2015-08-20

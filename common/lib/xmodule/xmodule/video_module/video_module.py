@@ -25,10 +25,7 @@ from pkg_resources import resource_string
 
 from django.conf import settings
 
-<<<<<<< HEAD
-=======
 from openedx.core.lib.cache_utils import memoize_in_request_cache
->>>>>>> hotfix-2015-08-20
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
@@ -90,11 +87,7 @@ _ = lambda text: text
 
 
 @XBlock.wants('settings')
-<<<<<<< HEAD
-class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule):
-=======
 class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule, LicenseMixin):
->>>>>>> hotfix-2015-08-20
     """
     XML source example:
         <video show_captions="true"
@@ -268,11 +261,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             cdn_eval = False
             cdn_exp_group = None
 
-<<<<<<< HEAD
-=======
         self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
 
->>>>>>> hotfix-2015-08-20
         settings_service = self.runtime.service(self, 'settings')
 
         yt_api_key = None
@@ -281,13 +271,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             if xblock_settings and 'YOUTUBE_API_KEY' in xblock_settings:
                 yt_api_key = xblock_settings['YOUTUBE_API_KEY']
 
-<<<<<<< HEAD
-        return self.system.render_template('video.html', {
-            'ajax_url': self.system.ajax_url + '/save_user_state',
-=======
         metadata = {
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
->>>>>>> hotfix-2015-08-20
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'streams': self.youtube_streams,
             'sub': self.sub,
@@ -349,16 +334,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'handout': self.handout,
             'download_video_link': download_video_link,
             'track': track_url,
-<<<<<<< HEAD
-            'youtube_streams': youtube_streams or create_youtube_string(self),
-            # TODO: Later on the value 1500 should be taken from some global
-            # configuration setting field.
-            'yt_test_timeout': 1500,
-            'yt_api_url': settings.YOUTUBE['API'],
-            'yt_test_url': settings.YOUTUBE['METADATA_URL'],
-            'yt_key': yt_api_key,
-=======
->>>>>>> hotfix-2015-08-20
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.descriptor.fields['transcript_download_format'].values,
             'license': getattr(self, "license", None),

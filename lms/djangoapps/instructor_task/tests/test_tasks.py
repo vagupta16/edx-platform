@@ -28,22 +28,17 @@ from instructor_task.tasks import (
     rescore_problem,
     reset_problem_attempts,
     delete_problem_state,
-<<<<<<< HEAD
     get_ora2_responses,
     get_course_forums_usage,
     get_student_forums_usage,
+    generate_certificates,
 )
+from instructor_task.tasks_helper import UpdateProblemModuleStateError
 from instructor_task.tasks_helper import (
-    UpdateProblemModuleStateError,
     push_ora2_responses_to_s3,
     push_course_forums_data_to_s3,
     push_student_forums_data_to_s3,
 )
-=======
-    generate_certificates,
-)
-from instructor_task.tasks_helper import UpdateProblemModuleStateError
->>>>>>> hotfix-2015-08-20
 
 PROBLEM_URL_NAME = "test_urlname"
 
@@ -466,7 +461,6 @@ class TestDeleteStateInstructorTask(TestInstructorTasks):
                                           module_state_key=self.location)
 
 
-<<<<<<< HEAD
 class TestOra2ResponsesInstructorTask(TestInstructorTasks):
     """Tests instructor task that fetches ora2 response data."""
 
@@ -548,7 +542,8 @@ class TestStudentForumsUsageInstructorTask(TestInstructorTasks):
             task_fn = partial(push_student_forums_data_to_s3, task_xmodule_args)
 
             mock_main_task.assert_called_once_with_args(task_entry.id, task_fn, action_name)
-=======
+
+
 class TestCertificateGenerationnstructorTask(TestInstructorTasks):
     """Tests instructor task that generates student certificates."""
 
@@ -570,4 +565,3 @@ class TestCertificateGenerationnstructorTask(TestInstructorTasks):
             expected_attempted=1,
             expected_total=1
         )
->>>>>>> hotfix-2015-08-20

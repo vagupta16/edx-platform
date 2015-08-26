@@ -642,8 +642,6 @@ describe 'Problem', ->
       $(@problem.inputs[0]).data('waitfor', ->)
       expect(@problem.check_save_waitfor()).toEqual(false)
 
-<<<<<<< HEAD
-
   describe 'getDisplayText', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
@@ -787,7 +785,7 @@ describe 'Problem', ->
         expect(@problem.$timer.length).toEqual(2)
         expect(@problem.$timer.hasClass('danger')).toBe(true)
       )
-=======
+
   describe 'Submitting an xqueue-graded problem', ->
     matlabinput_html = readFixtures('matlabinput_problem.html')
 
@@ -815,4 +813,3 @@ describe 'Problem', ->
       expect(@problem.poll.callCount).toEqual(6)
 
       expect($('.capa_alert').text()).toEqual("The grading process is still running. Refresh the page to see updates.")
->>>>>>> hotfix-2015-08-20

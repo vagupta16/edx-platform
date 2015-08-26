@@ -120,15 +120,13 @@ urlpatterns = patterns(
     url(r'problem_grade_report$',
         'instructor.views.api.problem_grade_report', name="problem_grade_report"),
 
-<<<<<<< HEAD
     # Student responses for questions
     url(r'^get_student_responses$',
         'instructor.views.api.get_student_responses', name="get_student_responses"),
-=======
+
     # Financial Report downloads..
     url(r'^list_financial_report_downloads$',
         'instructor.views.api.list_financial_report_downloads', name="list_financial_report_downloads"),
->>>>>>> hotfix-2015-08-20
 
     # Registration Codes..
     url(r'get_registration_codes$',

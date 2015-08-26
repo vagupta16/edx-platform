@@ -17,6 +17,7 @@ import tempfile
 import unicodecsv
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from django.conf import settings
 
 from pytz import UTC
 
@@ -50,31 +51,20 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates.models import CertificateStatuses
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
 from course_modes.models import CourseMode
-<<<<<<< HEAD
-
-=======
 from courseware.tests.factories import InstructorFactory
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
->>>>>>> hotfix-2015-08-20
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-<<<<<<< HEAD
-=======
 from shoppingcart.models import Order, PaidCourseRegistration, CourseRegistrationCode, Invoice, \
     CourseRegistrationCodeInvoiceItem, InvoiceTransaction, Coupon
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED
->>>>>>> hotfix-2015-08-20
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from instructor_task.models import ReportStore
-<<<<<<< HEAD
-from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
-from django.conf import settings
-=======
 from instructor_task.tasks_helper import (
     cohort_students_and_upload,
     upload_grades_csv,
@@ -85,7 +75,6 @@ from instructor_task.tasks_helper import (
     upload_exec_summary_report,
     generate_students_certificates,
 )
->>>>>>> hotfix-2015-08-20
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -762,7 +751,6 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
 
 
 @ddt.ddt
-<<<<<<< HEAD
 class TestReportStore(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests for the ReportStore model"""
 
@@ -786,7 +774,9 @@ class TestReportStore(TestReportMixin, InstructorTaskCourseTestCase):
 
         links = report_store.links_for(self.course.id)
         self.assertEquals(len(links), 0)
-=======
+
+
+@ddt.ddt
 class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that Executive Summary report generation works.
@@ -910,7 +900,6 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
             html_file_data = html_file.read()
             for data in expected_data:
                 self.assertTrue(data in html_file_data)
->>>>>>> hotfix-2015-08-20
 
 
 @ddt.ddt
@@ -959,7 +948,6 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
 
-<<<<<<< HEAD
 class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
     Tests that CSV student responses report generation works.
@@ -1165,7 +1153,8 @@ class TestInstructorStudentForumsReport(TestReportMixin, InstructorTaskCourseTes
                 with patch('instructor_task.models.LocalFSReportStore.store_rows'):
                     return_val = push_student_forums_data_to_s3(None, None, self.course.id, None, 'generated')
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
-=======
+
+
 @ddt.ddt
 class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
     """
@@ -1209,7 +1198,6 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
         # This assertion simply confirms that the generation completed with no errors
         num_enrollments = len(enrollments)
         self.assertDictContainsSubset({'attempted': num_enrollments, 'succeeded': num_enrollments, 'failed': 0}, result)
->>>>>>> hotfix-2015-08-20
 
 
 class MockDefaultStorage(object):

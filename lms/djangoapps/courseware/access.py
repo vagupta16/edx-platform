@@ -324,20 +324,6 @@ def _has_access_course_desc(user, action, course):
         # delegate to generic descriptor check to check start dates
         return _has_access_descriptor(user, 'load', course, course.id)
 
-<<<<<<< HEAD
-    def can_load_forum():
-        """
-        Can this user access the forums in this course?
-        """
-        return (
-            can_load() and
-            UserProfile.has_registered(user) and
-            (
-                CourseEnrollment.is_enrolled(user, course.id) or
-                _has_staff_access_to_descriptor(user, course, course.id)
-            )
-        )
-
     def within_enrollment_period():
         """
         Just a time boundary check, handles if start or stop were set to None
@@ -352,39 +338,6 @@ def _has_access_course_desc(user, action, course):
 
         return (start is None or now > start) and (end is None or now < end)
 
-    def can_load_mobile():
-        """
-        Can this user access this course from a mobile device?
-        """
-        return (
-            # check mobile requirements
-            can_load_mobile_no_enroll_check() and
-            # check enrollment
-            (
-                CourseEnrollment.is_enrolled(user, course.id) or
-                _has_staff_access_to_descriptor(user, course, course.id)
-            )
-        )
-
-    def can_load_mobile_no_enroll_check():
-        """
-        Can this enrolled user access this course from a mobile device?
-        Note: does not check for enrollment since it is assumed the caller has done so.
-        """
-        return (
-            # check start date
-            can_load() and
-            # check mobile_available flag
-            is_mobile_available_for_user(user, course) and
-            # check staff access, if not then check for unfulfilled milestones
-            (
-                _has_staff_access_to_descriptor(user, course, course.id) or
-                not any_unfulfilled_milestones(course.id, user.id)
-            )
-        )
-
-=======
->>>>>>> hotfix-2015-08-20
     def can_enroll():
         return _can_enroll_courselike(user, course)
 
@@ -662,22 +615,13 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
                 _has_detached_class_tag(descriptor)
                 or _can_access_descriptor_with_start_date(user, descriptor, course_key)
             )
-<<<<<<< HEAD
-            if in_preview_mode():
-                # after start date, everyone can see it
-                debug("Allow: now > effective start date")
-                return True
-            if now > effective_start:
-                # after start date, all registered users can see it
-                # nonregistered users shouldn't be able to access certain descriptor types
-                debug("Allow: now > effective start date")
-                return UserProfile.has_registered(user) or _can_load_descriptor_nonregistered(descriptor)
-
-            # otherwise, need staff access
-            return _has_staff_access_to_descriptor(user, descriptor, course_key)
-=======
+            and
+            (
+                UserProfile.has_registered(user)
+                or
+                _can_load_descriptor_nonregistered(descriptor)
+            )
         )
->>>>>>> hotfix-2015-08-20
 
         return (
             ACCESS_GRANTED if (response or _has_staff_access_to_descriptor(user, descriptor, course_key))

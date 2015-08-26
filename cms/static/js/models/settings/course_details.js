@@ -6,26 +6,17 @@ var CourseDetails = Backbone.Model.extend({
         org : '',
         course_id: '',
         run: '',
-<<<<<<< HEAD
-        start_date: null,   // maps to 'start'
-        end_date: null,     // maps to 'end'
-=======
         language: '',
         start_date: null,	// maps to 'start'
         end_date: null,		// maps to 'end'
->>>>>>> hotfix-2015-08-20
         enrollment_start: null,
         enrollment_end: null,
         syllabus: null,
         short_description: "",
         overview: "",
         intro_video: null,
-<<<<<<< HEAD
-        effort: null,   // an int or null,
-=======
         effort: null,	// an int or null,
         license: null,
->>>>>>> hotfix-2015-08-20
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
         enable_enrollment_email: false,

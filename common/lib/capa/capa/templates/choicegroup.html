@@ -39,11 +39,6 @@
         % endfor
         <span id="answer_${id}"></span>
     </fieldset>
-<<<<<<< HEAD
-
-    % if show_correctness == "never" and value and status != "unsubmitted":
-        <div class="capa_alert">${submitted_message}</div>
-=======
     <div class="indicator-container">
         % if input_type == 'checkbox' or not value:
             <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" aria-describedby="inputtype_${id}" data-tooltip="${status.display_tooltip}">
@@ -59,9 +54,9 @@
             </span>
         % endif
     </div>
-    % if show_correctness == "never" and (value or status not in ['unsubmitted']):
+    ## TODO:FUNK % if show_correctness == "never" and (value or status not in ['unsubmitted']):
+    % if show_correctness == "never" and value and status != "unsubmitted":
     <div class="capa_alert">${submitted_message}</div>
->>>>>>> hotfix-2015-08-20
     %endif
     % if msg:
     <span class="message">${msg|n}</span>

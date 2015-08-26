@@ -451,11 +451,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course_key = self.create_toy_course()
         self.location = self.course_key.make_usage_key('chapter', 'Overview')
         self.toy_course = modulestore().get_course(self.course_key)
-<<<<<<< HEAD
-        self.mock_user = UserFactory()
-=======
         self.mock_user = UserFactory.create()
->>>>>>> hotfix-2015-08-20
         self.request_factory = RequestFactory()
 
         # Construct a mock module for the modulestore to return

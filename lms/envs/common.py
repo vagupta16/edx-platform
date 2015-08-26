@@ -2225,7 +2225,6 @@ GRADES_DOWNLOAD = {
     'ROOT_PATH': '/tmp/edx-s3/grades',
 }
 
-<<<<<<< HEAD
 #################### Student Responses Reports Downloads #################
 STUDENT_RESPONSES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
@@ -2248,14 +2247,13 @@ ORA2_RESPONSES_DOWNLOAD = {
 # The following fields are available in the URL: {course_id} {student_id}
 PROGRESS_SUCCESS_BUTTON_URL = 'http://<domain>/<path>/{course_id}'
 PROGRESS_SUCCESS_BUTTON_TEXT_OVERRIDE = None
-=======
+
 FINANCIAL_REPORTS = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': 'edx-financial-reports',
     'ROOT_PATH': '/tmp/edx-s3/financial_reports',
 }
 
->>>>>>> hotfix-2015-08-20
 
 #### PASSWORD POLICY SETTINGS #####
 PASSWORD_MIN_LENGTH = 8
@@ -2578,7 +2576,6 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 # visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
-<<<<<<< HEAD
 # Metrics tab data source setting
 MAX_ENROLLEES_FOR_METRICS_USING_DB = 100
 
@@ -2599,8 +2596,6 @@ DISPLAY_COURSE_TILES = True
 DISABLE_REGISTER_BUTTON = False
 # date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
-=======
->>>>>>> hotfix-2015-08-20
 
 # Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60

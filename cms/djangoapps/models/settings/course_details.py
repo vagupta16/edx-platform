@@ -94,14 +94,11 @@ class CourseDetails(object):
         course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
-<<<<<<< HEAD
         course_details.enable_enrollment_email = descriptor.enable_enrollment_email
-=======
         course_details.language = descriptor.language
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(descriptor, "license", "all-rights-reserved")
         course_details.has_cert_config = has_active_web_certificate(descriptor)
->>>>>>> hotfix-2015-08-20
 
         for attribute in ABOUT_ATTRIBUTES:
             value = cls._fetch_about_attribute(course_key, attribute)

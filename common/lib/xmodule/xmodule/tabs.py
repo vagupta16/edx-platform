@@ -6,12 +6,9 @@ from abc import ABCMeta
 import logging
 
 from xblock.fields import List
-<<<<<<< HEAD
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
-=======
 from openedx.core.lib.api.plugins import PluginError
->>>>>>> hotfix-2015-08-20
 
 # We should only scrape strings for i18n in this file, since the target language is known only when
 # they are rendered in the template.  So ugettext gets called in the template.
@@ -293,281 +290,6 @@ class StaticTab(CourseTab):
         return self.url_slug == other.get('url_slug')
 
 
-<<<<<<< HEAD
-class SingleTextbookTab(CourseTab):
-    """
-    A tab representing a single textbook.  It is created temporarily when enumerating all textbooks within a
-    Textbook collection tab.  It should not be serialized or persisted.
-    """
-    type = 'single_textbook'
-    is_movable = False
-    is_collection_item = True
-
-    def to_json(self):
-        raise NotImplementedError('SingleTextbookTab should not be serialized.')
-
-
-class TextbookTabsBase(AuthenticatedCourseTab):
-    """
-    Abstract class for textbook collection tabs classes.
-    """
-    is_collection = True
-
-    def __init__(self, tab_id):
-        # Translators: 'Textbooks' refers to the tab in the course that leads to the course' textbooks
-        super(TextbookTabsBase, self).__init__(
-            name=_("Textbooks"),
-            tab_id=tab_id,
-            link_func=None,
-        )
-
-    @abstractmethod
-    def items(self, course):
-        """
-        A generator for iterating through all the SingleTextbookTab book objects associated with this
-        collection of textbooks.
-        """
-        pass
-
-
-class TextbookTabs(TextbookTabsBase):
-    """
-    A tab representing the collection of all textbook tabs.
-    """
-    type = 'textbooks'
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(TextbookTabs, self).__init__(
-            tab_id=self.type,
-        )
-
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
-        return settings.FEATURES.get('ENABLE_TEXTBOOK')
-
-    def items(self, course):
-        for index, textbook in enumerate(course.textbooks):
-            yield SingleTextbookTab(
-                name=textbook.title,
-                tab_id='textbook/{0}'.format(index),
-                link_func=lambda course, reverse_func, index=index: reverse_func(
-                    'book', args=[course.id.to_deprecated_string(), index]
-                ),
-            )
-
-
-class PDFTextbookTabs(TextbookTabsBase):
-    """
-    A tab representing the collection of all PDF textbook tabs.
-    """
-    type = 'pdf_textbooks'
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(PDFTextbookTabs, self).__init__(
-            tab_id=self.type,
-        )
-
-    def items(self, course):
-        for index, textbook in enumerate(course.pdf_textbooks):
-            yield SingleTextbookTab(
-                name=textbook['tab_title'],
-                tab_id='pdftextbook/{0}'.format(index),
-                link_func=lambda course, reverse_func, index=index: reverse_func(
-                    'pdf_book', args=[course.id.to_deprecated_string(), index]
-                ),
-            )
-
-
-class HtmlTextbookTabs(TextbookTabsBase):
-    """
-    A tab representing the collection of all Html textbook tabs.
-    """
-    type = 'html_textbooks'
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(HtmlTextbookTabs, self).__init__(
-            tab_id=self.type,
-        )
-
-    def items(self, course):
-        for index, textbook in enumerate(course.html_textbooks):
-            yield SingleTextbookTab(
-                name=textbook['tab_title'],
-                tab_id='htmltextbook/{0}'.format(index),
-                link_func=lambda course, reverse_func, index=index: reverse_func(
-                    'html_book', args=[course.id.to_deprecated_string(), index]
-                ),
-            )
-
-
-class GradingTab(object):
-    """
-    Abstract class for tabs that involve Grading.
-    """
-    pass
-
-
-class StaffGradingTab(StaffTab, GradingTab):
-    """
-    A tab for staff grading.
-    """
-    type = 'staff_grading'
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(StaffGradingTab, self).__init__(
-            # Translators: "Staff grading" appears on a tab that allows
-            # staff to view open-ended problems that require staff grading
-            name=_("Staff grading"),
-            tab_id=self.type,
-            link_func=link_reverse_func(self.type),
-        )
-
-
-class PeerGradingTab(AuthenticatedCourseTab, GradingTab):
-    """
-    A tab for peer grading.
-    """
-    type = 'peer_grading'
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(PeerGradingTab, self).__init__(
-            # Translators: "Peer grading" appears on a tab that allows
-            # students to view open-ended problems that require grading
-            name=_("Peer grading"),
-            tab_id=self.type,
-            link_func=link_reverse_func(self.type),
-        )
-
-
-class OpenEndedGradingTab(AuthenticatedCourseTab, GradingTab):
-    """
-    A tab for open ended grading.
-    """
-    type = 'open_ended'
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(OpenEndedGradingTab, self).__init__(
-            # Translators: "Assessment Panel" appears on a tab that, when clicked, opens up a panel that
-            # displays information about open-ended problems that a user has submitted or needs to grade
-            name=_("Assessment Panel"),
-            tab_id=self.type,
-            link_func=link_reverse_func('open_ended_notifications'),
-        )
-
-
-class SyllabusTab(CourseTab):
-    """
-    A tab for the course syllabus.
-    """
-    type = 'syllabus'
-
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
-        return hasattr(course, 'syllabus_present') and course.syllabus_present
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(SyllabusTab, self).__init__(
-            # Translators: "Syllabus" appears on a tab that, when clicked, opens the syllabus of the course.
-            name=_('Syllabus'),
-            tab_id=self.type,
-            link_func=link_reverse_func(self.type),
-        )
-
-
-class NotesTab(AuthenticatedCourseTab):
-    """
-    A tab for the course notes.
-    """
-    type = 'notes'
-
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
-        return settings.FEATURES.get('ENABLE_STUDENT_NOTES')
-
-    def __init__(self, tab_dict=None):
-        super(NotesTab, self).__init__(
-            name=tab_dict['name'],
-            tab_id=self.type,
-            link_func=link_reverse_func(self.type),
-        )
-
-    @classmethod
-    def validate(cls, tab_dict, raise_error=True):
-        return super(NotesTab, cls).validate(tab_dict, raise_error) and need_name(tab_dict, raise_error)
-
-
-class EdxNotesTab(AuthenticatedCourseTab):
-    """
-    A tab for the course student notes.
-    """
-    type = 'edxnotes'
-
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
-        return settings.FEATURES.get('ENABLE_EDXNOTES')
-
-    def __init__(self, tab_dict=None):
-        super(EdxNotesTab, self).__init__(
-            name=tab_dict['name'] if tab_dict else _('Notes'),
-            tab_id=self.type,
-            link_func=link_reverse_func(self.type),
-        )
-
-    @classmethod
-    def validate(cls, tab_dict, raise_error=True):
-        return super(EdxNotesTab, cls).validate(tab_dict, raise_error) and need_name(tab_dict, raise_error)
-
-
-class InstructorTab(StaffTab):
-    """
-    A tab for the course instructors.
-    """
-    type = 'instructor'
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(InstructorTab, self).__init__(
-            # Translators: 'Instructor' appears on the tab that leads to the instructor dashboard, which is
-            # a portal where an instructor can get data and perform various actions on their course
-            name=_('Instructor'),
-            tab_id=self.type,
-            link_func=link_reverse_func('instructor_dashboard'),
-        )
-
-
-class CcxCoachTab(CourseTab):
-    """
-    A tab for the custom course coaches.
-    """
-    type = 'ccx_coach'
-
-    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(CcxCoachTab, self).__init__(
-            name=_('CCX Coach'),
-            tab_id=self.type,
-            link_func=link_reverse_func('ccx_coach_dashboard'),
-        )
-
-    def can_display(self, course, settings, *args, **kw):
-        """
-        Since we don't get the user here, we use a thread local defined in the ccx
-        overrides to get it, then use the course to get the coach role and find out if
-        the user is one.
-        """
-        user_is_coach = False
-        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-            from opaque_keys.edx.locations import SlashSeparatedCourseKey
-            from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
-            from ccx.overrides import get_current_request  # pylint: disable=import-error
-            course_id = course.id.to_deprecated_string()
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-            role = CourseCcxCoachRole(course_key)
-            request = get_current_request()
-            if request is not None:
-                user_is_coach = role.has_user(request.user)
-        super_can_display = super(CcxCoachTab, self).can_display(
-            course, settings, *args, **kw
-        )
-        return user_is_coach and super_can_display
-
-
-=======
->>>>>>> hotfix-2015-08-20
 class CourseTabList(List):
     """
     An XBlock field class that encapsulates a collection of Tabs in a course.
@@ -651,35 +373,30 @@ class CourseTabList(List):
         """
         return next((tab for tab in tab_list if tab.tab_id == tab_id), None)
 
-    SNEAKPEEK_TAB_TYPES = [CoursewareTab, CourseInfoTab, StaticTab, SyllabusTab]
-
     @staticmethod
-<<<<<<< HEAD
     def iterate_displayable(
-            course,
-            settings,
-            is_user_authenticated=True,
-            is_user_staff=True,
-            is_user_enrolled=False,
-            is_user_sneakpeek=False,
+        course,
+        user=None,
+        inline_collections=True,
+        settings=None,
+        is_user_authenticated=True,
+        is_user_staff=True,
+        is_user_enrolled=False,
+        is_user_sneakpeek=False,
+        sneakpeek_tab_types=None,
     ):
-=======
-    def iterate_displayable(course, user=None, inline_collections=True):
->>>>>>> hotfix-2015-08-20
         """
         Generator method for iterating through all tabs that can be displayed for the given course and
         the given user with the provided access settings.
         """
+        sneakpeek_tab_types = sneakpeek_tab_types or []
         for tab in course.tabs:
-<<<<<<< HEAD
+            # TODO:FUNK <<<<<<< HEAD
             if (
-                tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled) and
+                tab.is_enabled(course, user=user) and
                 (not tab.is_hideable or not tab.is_hidden) and
-                (not is_user_sneakpeek or any([isinstance(tab, t) for t in CourseTabList.SNEAKPEEK_TAB_TYPES]))
+                (not is_user_sneakpeek or any([isinstance(tab, t) for t in sneakpeek_tab_types]))
             ):
-=======
-            if tab.is_enabled(course, user=user) and not (user and tab.is_hidden):
->>>>>>> hotfix-2015-08-20
                 if tab.is_collection:
                     # If rendering inline that add each item in the collection,
                     # else just show the tab itself as long as it is not empty.

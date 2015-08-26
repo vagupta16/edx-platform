@@ -176,19 +176,6 @@ class CourseFields(object):
         help=_('Enter the passports for course LTI tools in the following format: "id:client_key:client_secret".'),
         scope=Scope.settings
     )
-<<<<<<< HEAD
-    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
-                             default=[], scope=Scope.content)
-
-    wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
-    enable_enrollment_email = Boolean(help="Whether to send notification email upon enrollment or not", default=False, scope=Scope.settings)
-    enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
-    enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
-    start = Date(help="Start time when this module is visible",
-                 default=DEFAULT_START_DATE,
-                 scope=Scope.settings)
-    end = Date(help="Date that this class ends", scope=Scope.settings)
-=======
     textbooks = TextbookList(
         help=_("List of pairs of (title, url) for textbooks used in this course"),
         default=[],
@@ -196,6 +183,7 @@ class CourseFields(object):
     )
 
     wiki_slug = String(help=_("Slug that points to the wiki for this course"), scope=Scope.content)
+    enable_enrollment_email = Boolean(help="Whether to send notification email upon enrollment or not", default=False, scope=Scope.settings)
     enrollment_start = Date(help=_("Date that enrollment for this class is opened"), scope=Scope.settings)
     enrollment_end = Date(help=_("Date that enrollment for this class is closed"), scope=Scope.settings)
     start = Date(
@@ -204,7 +192,6 @@ class CourseFields(object):
         scope=Scope.settings
     )
     end = Date(help=_("Date that this class ends"), scope=Scope.settings)
->>>>>>> hotfix-2015-08-20
     cosmetic_display_price = Integer(
         display_name=_("Cosmetic Course Display Price"),
         help=_(

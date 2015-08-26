@@ -1,13 +1,9 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-<<<<<<< HEAD
-    "js/views/uploads", "js/utils/change_on_enter", "js/views/utils/view_utils", "jquery.timepicker", "date"],
-    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter, ViewUtils) {
-=======
     "js/views/uploads", "js/utils/change_on_enter", "js/views/license", "js/models/license",
+    "js/views/utils/view_utils",
     "js/views/feedback_notification", "jquery.timepicker", "date"],
     function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
-        FileUploadDialog, TriggerChangeEventOnEnter, LicenseView, LicenseModel, NotificationView) {
->>>>>>> hotfix-2015-08-20
+        FileUploadDialog, TriggerChangeEventOnEnter, LicenseView, LicenseModel, ViewUtils, NotificationView) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -56,7 +52,6 @@ var DetailsView = ValidatingView.extend({
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
-<<<<<<< HEAD
 
         /* Memoize html elements for enrollment emails */
         this.enrollment_email_settings = this.$el.find('#enrollment-email-settings');
@@ -76,7 +71,7 @@ var DetailsView = ValidatingView.extend({
 
         this.default_pre_template = this.$el.find('#default_pre_enrollment_email_template');
         this.default_post_template = this.$el.find('#default_post_enrollment_email_template');
-=======
+
         // handle license separately, to avoid reimplementing view logic
         this.licenseModel = new LicenseModel({"asString": this.model.get('license')});
         this.licenseView = new LicenseView({
@@ -93,7 +88,6 @@ var DetailsView = ValidatingView.extend({
                 closeIcon: true
             }).show();
         }
->>>>>>> hotfix-2015-08-20
     },
 
     render: function() {
@@ -430,7 +424,6 @@ var DetailsView = ValidatingView.extend({
         modal.show();
     },
 
-<<<<<<< HEAD
     sendTestEmail: function (event) {
         event.preventDefault();
         var email_type = event.target.id;
@@ -487,11 +480,11 @@ var DetailsView = ValidatingView.extend({
             if (!confirmed) return;
         }
         codeMirrorItem.setValue(content);
-=======
+    },
+
     handleLicenseChange: function() {
         this.showNotificationBar()
         this.model.set("license", this.licenseModel.toString())
->>>>>>> hotfix-2015-08-20
     }
 });
 

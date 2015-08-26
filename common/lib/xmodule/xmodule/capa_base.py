@@ -676,51 +676,10 @@ class CapaMixin(CapaFields):
             'hint_index': hint_index
         }
 
-<<<<<<< HEAD
     def get_problem_html(self, encapsulate=True):
         """
         Return html for the problem.
 
-=======
-        Adds check, reset, save, and hint buttons as necessary based on the problem config
-        and state.
-        encapsulate: if True (the default) embed the html in a problem <div>
-        hint_index: (None is the default) if not None, this is the index of the next demand
-        hint to show.
-        """
-        demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
-        hint_index = hint_index % len(demand_hints)
-
-        _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
-        hint_element = demand_hints[hint_index]
-        hint_text = hint_element.text.strip()
-        if len(demand_hints) == 1:
-            prefix = _('Hint: ')
-        else:
-            # Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three hints.
-            prefix = _('Hint ({hint_num} of {hints_count}): ').format(hint_num=hint_index + 1,
-                                                                      hints_count=len(demand_hints))
-
-        # Log this demand-hint request
-        event_info = dict()
-        event_info['module_id'] = self.location.to_deprecated_string()
-        event_info['hint_index'] = hint_index
-        event_info['hint_len'] = len(demand_hints)
-        event_info['hint_text'] = hint_text
-        self.runtime.track_function('edx.problem.hint.demandhint_displayed', event_info)
-
-        # We report the index of this hint, the client works out what index to use to get the next hint
-        return {
-            'success': True,
-            'contents': prefix + hint_text,
-            'hint_index': hint_index
-        }
-
-    def get_problem_html(self, encapsulate=True):
-        """
-        Return html for the problem.
-
->>>>>>> hotfix-2015-08-20
         Adds check, reset, save, and hint buttons as necessary based on the problem config
         and state.
         encapsulate: if True (the default) embed the html in a problem <div>
@@ -815,7 +774,6 @@ class CapaMixin(CapaFields):
 
         return html
 
-<<<<<<< HEAD
     def start_problem(self, _data=None):
         """
         Called from the interstitial view, starts a timed problem if
@@ -841,8 +799,6 @@ class CapaMixin(CapaFields):
         time_limit_end = self.time_started + datetime.timedelta(minutes=(self.minutes_allowed))
         return now > time_limit_end
 
-=======
->>>>>>> hotfix-2015-08-20
     def remove_tags_from_html(self, html):
         """
         The capa xml includes many tags such as <additional_answer> or <demandhint> which are not

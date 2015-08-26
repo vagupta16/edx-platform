@@ -40,12 +40,7 @@ class DataDownload
     @$reports_request_response        = @$reports.find '.request-response'
     @$reports_request_response_error  = @$reports.find '.request-response-error'
 
-<<<<<<< HEAD
-
-    @report_downloads = new ReportDownloads(@$section)
-=======
     @report_downloads = new (ReportDownloads()) @$section
->>>>>>> hotfix-2015-08-20
     @instructor_tasks = new (PendingInstructorTasks()) @$section
     @clear_display()
 
@@ -223,7 +218,6 @@ class DataDownload
     $(".msg-confirm").css({"display":"none"})
     $(".msg-error").css({"display":"none"})
 
-<<<<<<< HEAD
 
 class ReportDownloads
   ### Report Downloads -- links expire quickly, so we refresh every 5 mins ####
@@ -387,10 +381,6 @@ class ReportDownloads
         d3_graph_data_download(data, "report-downloads-graph")
   show_errors: (msg) -> @$error_section?.text msg
 
-
-
-=======
->>>>>>> hotfix-2015-08-20
 # export for use
 # create parent namespaces if they do not already exist.
 _.defaults window, InstructorDashboard: {}

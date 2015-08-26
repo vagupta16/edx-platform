@@ -7,54 +7,9 @@
 <div
     id="video_${id}"
     class="video closed"
-<<<<<<< HEAD
-
-    data-streams="${youtube_streams}"
-
-    % if sub:
-      data-sub="${sub}"
-    % endif
-    % if autoplay:
-      data-autoplay="${autoplay}"
-    % endif
-
-    data-sources='${sources}'
-    data-save-state-url="${ajax_url}"
-    data-caption-data-dir="${data_dir}"
-    data-show-captions="${show_captions}"
-    data-general-speed="${general_speed}"
-    data-speed="${speed}"
-    data-saved-video-position="${saved_video_position}"
-    data-start="${start}"
-    data-end="${end}"
-    data-transcript-language="${transcript_language}"
-    data-transcript-languages='${transcript_languages}'
-    data-autoplay="${autoplay}"
-    data-yt-test-timeout="${yt_test_timeout}"
-    data-yt-api-url="${yt_api_url}"
-    data-yt-test-url="${yt_test_url}"
-    data-yt-key="${yt_key}"
-    data-transcript-translation-url="${transcript_translation_url}"
-    data-transcript-available-translations-url="${transcript_available_translations_url}"
-
-    ## For now, the option "data-autohide-html5" is hard coded. This option
-    ## either enables or disables autohiding of controls and captions on mouse
-    ## inactivity. If set to true, controls and captions will autohide for
-    ## HTML5 sources (non-YouTube) after a period of mouse inactivity over the
-    ## whole video. When the mouse moves (or a key is pressed while any part of
-    ## the video player is focused), the captions and controls will be shown
-    ## once again.
-    ##
-    ## There is no option in the "Advanced Editor" to set this option. However,
-    ## this option will have an effect if changed to "True". The code on
-    ## front-end exists.
-    data-autohide-html5="False"
-
-=======
     data-metadata='${metadata}'
     data-bumper-metadata='${bumper_metadata}'
     data-poster='${poster}'
->>>>>>> hotfix-2015-08-20
     tabindex="-1"
 >
     <div class="focus_grabber first"></div>

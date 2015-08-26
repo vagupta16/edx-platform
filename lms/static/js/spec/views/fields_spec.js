@@ -226,17 +226,11 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     title: 'About me',
                     valueAttribute: 'bio',
                     helpMessage: 'Wicked is good',
-<<<<<<< HEAD
                     placeholderValue: "Tell other learners a little about yourself: where you live, " +
                         "what your interests are, why you’re taking courses, or what you hope to learn.",
-                    editable: 'never'
-=======
-                    placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
-                        "what your interests are, why you’re taking courses on edX, or what you hope to learn.",
                     editable: 'never',
                     persistChanges: true,
                     messagePosition: 'header'
->>>>>>> hotfix-2015-08-20
                 });
 
                 // set bio to empty to see the placeholder.
@@ -263,18 +257,11 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     title: 'About me',
                     valueAttribute: 'bio',
                     helpMessage: 'Wicked is good',
-<<<<<<< HEAD
                     placeholderValue: "Tell other learners a little about yourself: where you live, " +
                         "what your interests are, why you’re taking courses, or what you hope to learn.",
-                    editable: 'toggle'
-
-=======
-                    placeholderValue: "Tell other edX learners a little about yourself: where you live, " +
-                        "what your interests are, why you’re taking courses on edX, or what you hope to learn.",
                     editable: 'toggle',
                     persistChanges: true,
                     messagePosition: 'header'
->>>>>>> hotfix-2015-08-20
                 });
                 fieldData.model.set({'bio': ''});
 

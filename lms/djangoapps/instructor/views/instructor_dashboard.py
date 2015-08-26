@@ -41,6 +41,7 @@ from instructor_email_widget.models import GroupedQuery
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from certificates.models import CertificateGenerationConfiguration
 from certificates import api as certs_api
+from util.date_utils import get_default_time_display
 
 from bulk_email.models import CourseEmail
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
@@ -96,12 +97,8 @@ def instructor_dashboard_2(request, course_id):
 
     sections = [
         _section_course_info(course, access),
-<<<<<<< HEAD
-        _section_membership(course, access),
-        _section_queries(course, access),
-=======
         _section_membership(course, access, is_white_label),
->>>>>>> hotfix-2015-08-20
+        _section_queries(course, access),
         _section_cohort_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
@@ -168,21 +165,13 @@ def instructor_dashboard_2(request, course_id):
 
     disable_buttons = not _is_small_course(course_key)
 
-<<<<<<< HEAD
-    insights_dashboard_url = None
-    if settings.ANALYTICS_DASHBOARD_URL:
-        # Construct a URL to the external analytics dashboard
-        insights_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-
-=======
->>>>>>> hotfix-2015-08-20
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(course_key)}),
         'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
-        'insights_dashboard_url': insights_dashboard_url,
+        'analytics_dashboard_message': analytics_dashboard_message
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
@@ -373,6 +362,9 @@ def _section_course_info(course, access):
         'course_display_name': course.display_name,
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
+        'start_date': get_default_time_display(course.start),
+        'end_date': get_default_time_display(course.end),
+        'num_sections': len(course.children),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
     }
 
@@ -488,22 +480,22 @@ def _section_student_admin(course, access):
         'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': unicode(course_key)}),
         'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': unicode(course_key)}),
-        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': unicode(course_key)}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
-        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': unicode(course_key)}),
         'reset_student_attempts_for_entrance_exam_url': reverse(
             'reset_student_attempts_for_entrance_exam',
             kwargs={'course_id': unicode(course_key)},
         ),
+        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': unicode(course_key)}),
         'rescore_entrance_exam_url': reverse('rescore_entrance_exam', kwargs={'course_id': unicode(course_key)}),
         'student_can_skip_entrance_exam_url': reverse(
             'mark_student_can_skip_entrance_exam',
             kwargs={'course_id': unicode(course_key)},
         ),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
         'list_entrace_exam_instructor_tasks_url': reverse('list_entrance_exam_instructor_tasks',
                                                           kwargs={'course_id': unicode(course_key)}),
         'get_blank_lti_url': reverse('get_blank_lti', kwargs={'course_id': unicode(course_key)}),
         'upload_lti_url': reverse('upload_lti', kwargs={'course_id': unicode(course_key)}),
+        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 
@@ -530,7 +522,6 @@ def _section_data_download(course, access):
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
         'access': access,
-<<<<<<< HEAD
         'delete_report_download_url': reverse('delete_report_download', kwargs={'course_id': unicode(course_key)}),
         'get_student_responses_url': reverse('get_student_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_student_forums_usage_url': reverse('get_student_forums_usage', kwargs={'course_id': unicode(course_key)}),
@@ -539,9 +530,7 @@ def _section_data_download(course, access):
         'get_course_forums_usage_url': reverse('get_course_forums_usage', kwargs={'course_id': course_key.to_deprecated_string()}),
         'graph_course_forums_usage_url': reverse('graph_course_forums_usage',
                                                  kwargs={'course_id': unicode(course_key)}),
-=======
         'show_generate_proctored_exam_report_button': settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False),
->>>>>>> hotfix-2015-08-20
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
         'get_students_who_may_enroll_url': reverse(

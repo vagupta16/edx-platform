@@ -366,17 +366,9 @@ body.course.advanced .nav-course-settings-advanced,
 body.course.view-certificates .nav-course-settings-certificates,
 
 // course tools
-<<<<<<< HEAD
-body.course.import .nav-course-tools .title,
-body.course.export .nav-course-tools .title,
-body.course.checklists .nav-course-tools .title,
 body.course.utilities .nav-course-tools .title,
-
-body.course.import .nav-course-tools-import,
-body.course.export .nav-course-tools-export,
-body.course.checklists .nav-course-tools-checklists,
 body.course.utilities .nav-course-tools-utilities,
-=======
+
 body.course.view-import .nav-course-tools .title,
 body.course.view-export .nav-course-tools .title,
 body.course.view-checklists .nav-course-tools .title,
@@ -391,7 +383,6 @@ body.course.view-export-git .nav-course-tools-export-git,
 body.course.view-team .nav-library-settings .title,
 
 body.course.view-team .nav-library-settings-team,
->>>>>>> hotfix-2015-08-20
 
 {
   color: $blue;

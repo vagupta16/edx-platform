@@ -23,11 +23,7 @@ metadata:
         ||Consider the square miles, not population.||
         ||Consider all 50 states, not just the continental United States.||
 
-<<<<<<< HEAD
-tab: hint
-=======
 hinted: true
->>>>>>> hotfix-2015-08-20
 data: |
   <problem>
 

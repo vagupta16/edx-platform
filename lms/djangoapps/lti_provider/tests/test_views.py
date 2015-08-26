@@ -142,33 +142,6 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         request = build_launch_request()
         response = views.lti_launch(request, None, None)
         self.assertEqual(response.status_code, 403)
-<<<<<<< HEAD
-
-
-class LtiRunTest(TestCase):
-    """
-    Tests for the lti_run view
-    """
-
-#     Commented out as test is failing (dca 7/30/15).
-#     @patch('lti_provider.views.render_courseware')
-#     def test_valid_launch(self, render):
-#         """
-#         Verifies that the view returns OK if called with the correct context
-#         """
-#         request = build_run_request()
-#         render.assert_called_with(request, ALL_PARAMS)
-
-    def test_forbidden_if_session_key_missing(self):
-        """
-        Verifies that the lti_run view returns a Forbidden status if the session
-        doesn't have an entry for the LTI parameters.
-        """
-        request = build_run_request()
-        del request.session[views.LTI_SESSION_KEY]
-        response = views.lti_run(request)
-=======
->>>>>>> hotfix-2015-08-20
         self.assertEqual(response.status_code, 403)
 
     @patch('lti_provider.views.render_courseware')

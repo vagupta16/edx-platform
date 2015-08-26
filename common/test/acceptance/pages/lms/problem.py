@@ -42,8 +42,6 @@ class ProblemPage(PageObject):
         """
         return self.q(css="div.problem div.problem-hint").text[0]
 
-<<<<<<< HEAD
-=======
     @property
     def mathjax_rendered_in_problem(self):
         """
@@ -60,7 +58,6 @@ class ProblemPage(PageObject):
         mathjax_container = self.q(css="div.problem div.problem-hint .MathJax .math")
         return mathjax_container.visible and mathjax_container.present
 
->>>>>>> hotfix-2015-08-20
     def fill_answer(self, text):
         """
         Fill in the answer to the problem.

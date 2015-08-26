@@ -7,15 +7,11 @@ from django.utils.translation import ugettext as _, ugettext_noop
 
 from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
-<<<<<<< HEAD
-from student.models import CourseEnrollment, EntranceExamConfiguration
 from student.models import UserProfile
-from xmodule.tabs import CourseTabList
-=======
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
->>>>>>> hotfix-2015-08-20
+from xmodule.tabs import StaticTab
 
 
 class EnrolledTab(CourseTab):
@@ -293,31 +289,22 @@ def get_course_tab_list(request, course):
     """
     Retrieves the course tab list from xmodule.tabs and manipulates the set as necessary
     """
-<<<<<<< HEAD
-    user_is_enrolled = user.is_authenticated() and CourseEnrollment.is_enrolled(user, course.id)
+    user = request.user
+    is_user_enrolled = user.is_authenticated() and CourseEnrollment.is_enrolled(user, course.id)
     xmodule_tab_list = CourseTabList.iterate_displayable(
         course,
-        settings,
-        user.is_authenticated(),
-        has_access(user, 'staff', course, course.id),
-        user_is_enrolled,
-        not UserProfile.has_registered(user),
+        user=user,
+        settings=settings,
+        is_user_authenticated=user.is_authenticated(),
+        is_user_staff=has_access(user, 'staff', course, course.id),
+        is_user_enrolled=is_user_enrolled,
+        is_user_sneakpeek=not UserProfile.has_registered(user),
+        sneakpeek_tab_types=SNEAKPEEK_TAB_TYPES,
     )
-
-    # Now that we've loaded the tabs for this course, perform the Entrance Exam work
-    # If the user has to take an entrance exam, we'll need to hide away all of the tabs
-    # except for the Courseware and Instructor tabs (latter is only viewed if applicable)
-    # We don't have access to the true request object in this context, but we can use a mock
-    request = RequestFactory().request()
-    request.user = user
-=======
-    user = request.user
-    xmodule_tab_list = CourseTabList.iterate_displayable(course, user=user)
 
     # Now that we've loaded the tabs for this course, perform the Entrance Exam work.
     # If the user has to take an entrance exam, we'll need to hide away all but the
     # "Courseware" tab. The tab is then renamed as "Entrance Exam".
->>>>>>> hotfix-2015-08-20
     course_tab_list = []
     for tab in xmodule_tab_list:
         if user_must_complete_entrance_exam(request, user, course):
@@ -348,3 +335,11 @@ def _get_dynamic_tabs(course, user):
                 dynamic_tabs.append(tab)
     dynamic_tabs.sort(key=lambda dynamic_tab: dynamic_tab.name)
     return dynamic_tabs
+
+
+SNEAKPEEK_TAB_TYPES = [
+    CoursewareTab,
+    CourseInfoTab,
+    StaticTab,
+    SyllabusTab,
+]

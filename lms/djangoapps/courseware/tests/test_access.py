@@ -191,13 +191,10 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         expected_access = expected_error_type is None
         mock_unit = Mock(user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
-<<<<<<< HEAD
         mock_unit.category = "problem"
-=======
         mock_unit.visible_to_staff_only = visible_to_staff_only
         mock_unit.start = start
         self.verify_access(mock_unit, expected_access, expected_error_type)
->>>>>>> hotfix-2015-08-20
 
     def test__has_access_descriptor_beta_user(self):
         mock_unit = Mock(user_partitions=[])
@@ -234,30 +231,12 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         Tests that descriptor has no access when start date in future & without preview.
         """
-<<<<<<< HEAD
-
-        # I've changed the logic of this test since it would otherwise fail due to an
-        # unauthenticated access check in access.py. (dcadams 8/13/2015)
-=======
         expected_access = expected_error_type is None
->>>>>>> hotfix-2015-08-20
         mock_unit = Mock(user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
         mock_unit.visible_to_staff_only = False
-<<<<<<< HEAD
-        self.verify_access(mock_unit, False)
-
-        # Start date in the past.
-        mock_unit.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
-        self.verify_access(mock_unit, False)
-
-        # Start date in the future.
-        mock_unit.start = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)  # release date in the future
-        self.verify_access(mock_unit, False)
-=======
         mock_unit.start = start
         self.verify_access(mock_unit, expected_access, expected_error_type)
->>>>>>> hotfix-2015-08-20
 
     def test__has_access_course_desc_can_enroll(self):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)

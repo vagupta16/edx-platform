@@ -13,6 +13,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
+from django.test.client import RequestFactory
 from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -872,41 +873,6 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         self.assertEqual(enrollment_mode, u'honor')
 
 
-<<<<<<< HEAD
-class PaidRegistrationTest(ModuleStoreTestCase):
-    """
-    Tests for paid registration functionality (not verified student), involves shoppingcart
-    """
-    def setUp(self):
-        super(PaidRegistrationTest, self).setUp()
-        # Create course
-        self.course = CourseFactory.create()
-        self.req_factory = RequestFactory()
-        self.user = UserFactory(username="jack", email="jack@fake.edx.org")
-
-    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
-    def test_change_enrollment_add_to_cart(self):
-        request = self.req_factory.post(
-            reverse('change_enrollment'), {
-                'course_id': self.course.id.to_deprecated_string(),
-                'enrollment_action': 'add_to_cart'
-            }
-        )
-
-        # Add a session to the request
-        SessionMiddleware().process_request(request)
-        request.session.save()
-
-        request.user = self.user
-        response = change_enrollment(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, reverse('shoppingcart.views.show_cart'))
-        self.assertTrue(shoppingcart.models.PaidCourseRegistration.contained_in_order(
-            shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
-
-
-=======
->>>>>>> hotfix-2015-08-20
 class AnonymousLookupTable(ModuleStoreTestCase):
     """
     Tests for anonymous_id_functions

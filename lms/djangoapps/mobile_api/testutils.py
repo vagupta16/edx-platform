@@ -13,11 +13,6 @@ Test utilities for mobile API tests:
 import ddt
 from mock import patch
 from unittest import skip
-<<<<<<< HEAD
-=======
-
-from django.core.urlresolvers import reverse
->>>>>>> hotfix-2015-08-20
 
 from rest_framework.test import APITestCase
 

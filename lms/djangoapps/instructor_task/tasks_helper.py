@@ -47,11 +47,8 @@ from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
-<<<<<<< HEAD
-from instructor_analytics.basic import student_response_rows, enrolled_students_features
-=======
+from instructor_analytics.basic import student_response_rows
 from instructor_analytics.basic import enrolled_students_features, list_may_enroll, get_proctored_exam_results
->>>>>>> hotfix-2015-08-20
 from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
@@ -60,12 +57,8 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
-<<<<<<< HEAD
-from student.models import CourseEnrollment
 from instructor.utils import collect_anonymous_ora2_data, collect_email_ora2_data, collect_course_forums_data, collect_student_forums_data
-=======
 from student.models import CourseEnrollment, CourseAccessRole
->>>>>>> hotfix-2015-08-20
 from verify_student.models import SoftwareSecurePhotoVerification
 
 # define different loggers for use within tasks and on client side

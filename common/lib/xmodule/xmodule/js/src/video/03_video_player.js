@@ -513,12 +513,9 @@ function (HTML5Video, Resizer) {
             }
         }
 
-<<<<<<< HEAD
         this.videoPlayer.updatePlayTime(time, duration);
-        this.el.trigger('seek', arguments);
-=======
-        this.videoPlayer.updatePlayTime(time, true);
->>>>>>> hotfix-2015-08-20
+        // TODO:FUNK this.videoPlayer.updatePlayTime(time, true);
+        // TODO:FUNK this.el.trigger('seek', arguments);
 
         // the timer is stopped above; restart it.
         if (this.videoPlayer.isPlaying()) {
@@ -815,13 +812,8 @@ function (HTML5Video, Resizer) {
         var videoPlayer = this.videoPlayer,
             youTubeId;
 
-// TODO:FUNK <<<<<<< HEAD
-//       if (this.config.endTime !== null) {
-//           duration = Math.min(this.config.endTime, duration);
-// TODO:FUNK =======
         if (this.config.endTime) {
             endTime = Math.min(this.config.endTime, endTime);
-// TODO:FUNK >>>>>>> 00b75f0119b981641833240be214ef2076329747
         }
 
         this.trigger(

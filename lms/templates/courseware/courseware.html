@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-<%!
-  from django.utils.translation import ugettext as _
-  from student.models import UserProfile
-%>
-<%! from django.template.defaultfilters import escapejs %>
-<%! from microsite_configuration import page_title_breadcrumbs %>
-<%! from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled %>
-=======
->>>>>>> hotfix-2015-08-20
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%!
@@ -16,6 +6,7 @@ from django.template.defaultfilters import escapejs
 from microsite_configuration import page_title_breadcrumbs
 from django.conf import settings
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
+from student.models import UserProfile
 %>
 <%
   include_proctoring = settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False) and course.enable_proctored_exams

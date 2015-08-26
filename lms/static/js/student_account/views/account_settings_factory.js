@@ -21,7 +21,7 @@
             userPreferencesModel.url = userPreferencesApiUrl;
 
             var sectionsData = [
-                 {
+                {
                     title: gettext('Basic Account Information (required)'),
                     fields: [
                         {
@@ -33,65 +33,6 @@
                                     gettext('The name that identifies you throughout {platform_name}. You cannot change your username.'), {platform_name: platformName}
                                 )
                             })
-<<<<<<< HEAD
-=======
-                        },
-                        {
-                            view: new FieldViews.TextFieldView({
-                                model: userAccountModel,
-                                title: gettext('Full Name'),
-                                valueAttribute: 'name',
-                                helpMessage: gettext('The name that appears on your certificates. Other learners never see your full name.'),
-                                persistChanges: true
-                            })
-                        },
-                        {
-                            view: new AccountSettingsFieldViews.EmailFieldView({
-                                model: userAccountModel,
-                                title: gettext('Email Address'),
-                                valueAttribute: 'email',
-                                helpMessage: interpolate_text(
-                                    gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'), {platform_name: platformName}
-                                ),
-                                persistChanges: true
-                            })
-                        },
-                        {
-                            view: new AccountSettingsFieldViews.PasswordFieldView({
-                                model: userAccountModel,
-                                title: gettext('Password'),
-                                screenReaderTitle: gettext('Reset your Password'),
-                                valueAttribute: 'password',
-                                emailAttribute: 'email',
-                                linkTitle: gettext('Reset Password'),
-                                linkHref: fieldsData.password.url,
-                                helpMessage: gettext('When you click "Reset Password", a message will be sent to your email address. Click the link in the message to reset your password.')
-                            })
-                        },
-                        {
-                            view: new AccountSettingsFieldViews.LanguagePreferenceFieldView({
-                                model: userPreferencesModel,
-                                title: gettext('Language'),
-                                valueAttribute: 'pref-lang',
-                                required: true,
-                                refreshPageOnSave: true,
-                                helpMessage: interpolate_text(
-                                    gettext('The language used throughout this site. This site is currently available in a limited number of languages.'), {platform_name: platformName}
-                                ),
-                                options: fieldsData.language.options,
-                                persistChanges: true
-                            })
-                        },
-                        {
-                            view: new FieldViews.DropdownFieldView({
-                                model: userAccountModel,
-                                required: true,
-                                title: gettext('Country or Region'),
-                                valueAttribute: 'country',
-                                options: fieldsData['country']['options'],
-                                persistChanges: true
-                            })
->>>>>>> hotfix-2015-08-20
                         }
                     ]
                 },
@@ -145,7 +86,8 @@
                             model: userAccountModel,
                             title: gettext('Full Name'),
                             valueAttribute: 'name',
-                            helpMessage: gettext('The name that appears on your Statements of Accomplishment. Other learners never see your full name.')
+                            helpMessage: gettext('The name that appears on your Statements of Accomplishment. Other learners never see your full name.'),
+                            persistChanges: true
                         })
                     },
                     {
@@ -153,7 +95,10 @@
                             model: userAccountModel,
                             title: gettext('Email Address'),
                             valueAttribute: 'email',
-                            helpMessage: gettext('The email address you use to sign in to this site. Communications from us and your courses are sent to this address.')
+                            helpMessage: interpolate_text(
+                                gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'), {platform_name: platformName}
+                            ),
+                            persistChanges: true
                         })
                     },
                     {
@@ -176,7 +121,8 @@
                             model: userAccountModel,
                             title: gettext('Full Name'),
                             valueAttribute: 'name',
-                            helpMessage: gettext('The name that appears on your Statements of Accomplishment. Other learners never see your full name.')
+                            helpMessage: gettext('The name that appears on your Statements of Accomplishment. Other learners never see your full name.'),
+                            persistChanges: true
                         })
                     },
                     {
@@ -184,7 +130,10 @@
                             model: userAccountModel,
                             title: gettext('Email Address'),
                             valueAttribute: 'email',
-                            helpMessage: gettext('The email address you use to sign in to this site. Communications from us and your courses are sent to this address.')
+                            helpMessage: interpolate_text(
+                                gettext('The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.'), {platform_name: platformName}
+                            ),
+                            persistChanges: true
                         })
                     }
                 )
@@ -198,9 +147,11 @@
                         valueAttribute: 'pref-lang',
                         required: true,
                         refreshPageOnSave: true,
-                        helpMessage:
-                            gettext('The language used for this site. The site is currently available in a limited number of languages.'),
-                        options: fieldsData.language.options
+                        helpMessage: interpolate_text(
+                            gettext('The language used throughout this site. This site is currently available in a limited number of languages.'), {platform_name: platformName}
+                        ),
+                        options: fieldsData.language.options,
+                        persistChanges: true
                     })
                 },
                 {
@@ -209,7 +160,8 @@
                         required: true,
                         title: gettext('Country or Region'),
                         valueAttribute: 'country',
-                        options: fieldsData['country']['options']
+                        options: fieldsData['country']['options'],
+                        persistChanges: true
                     })
                 }
             )

@@ -27,10 +27,7 @@ require.config({
         "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
         "datepair": "js/vendor/timepicker/datepair",
         "date": "js/vendor/date",
-<<<<<<< HEAD:cms/static/require-config.js
-=======
         "text": 'js/vendor/requirejs/text',
->>>>>>> hotfix-2015-08-20:cms/static/cms/js/require-config.js
         "moment": "js/vendor/moment.min",
         "underscore": "js/vendor/underscore-min",
         "underscore.string": "js/vendor/underscore.string.min",

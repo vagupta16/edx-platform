@@ -54,12 +54,8 @@ from openedx.core.lib.xblock_utils import (
     replace_static_urls,
     add_staff_markup,
     wrap_xblock,
-<<<<<<< HEAD
-    request_token,
     add_inline_analytics,
-=======
     request_token as xblock_request_token,
->>>>>>> hotfix-2015-08-20
 )
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id

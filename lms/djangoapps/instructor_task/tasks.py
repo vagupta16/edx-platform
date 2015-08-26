@@ -40,17 +40,13 @@ from instructor_task.tasks_helper import (
     upload_grades_csv,
     upload_problem_grade_report,
     upload_students_csv,
-<<<<<<< HEAD
     push_student_forums_data_to_s3,
-    cohort_students_and_upload
-=======
     cohort_students_and_upload,
     upload_enrollment_report,
     upload_may_enroll_csv,
     upload_exec_summary_report,
     generate_students_certificates,
     upload_proctored_exam_results_report
->>>>>>> hotfix-2015-08-20
 )
 
 
@@ -198,7 +194,6 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-<<<<<<< HEAD
 @task(base=BaseInstructorTask, routing_key=settings.STUDENT_RESPONSES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
 def get_student_responses(entry_id, xmodule_instance_args):
     """
@@ -238,7 +233,9 @@ def get_student_forums_usage(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_student_forums_data_to_s3, xmodule_instance_args)
-=======
+    return run_main_task(entry_id, task_fn, action_name)
+
+
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def enrollment_report_features_csv(entry_id, xmodule_instance_args):
     """
@@ -300,7 +297,6 @@ def generate_certificates(entry_id, xmodule_instance_args):
     )
 
     task_fn = partial(generate_students_certificates, xmodule_instance_args)
->>>>>>> hotfix-2015-08-20
     return run_main_task(entry_id, task_fn, action_name)
 
 

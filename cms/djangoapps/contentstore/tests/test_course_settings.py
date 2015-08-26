@@ -51,12 +51,9 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
-<<<<<<< HEAD
         self.assertFalse(details.enable_enrollment_email, "Enrollment Email should be initialized as false")
-=======
         self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
         self.assertIsNone(details.has_cert_config)
->>>>>>> hotfix-2015-08-20
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)

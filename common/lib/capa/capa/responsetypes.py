@@ -145,15 +145,9 @@ class LoncapaResponse(object):
     required_attributes = []
 
     # Overridable field that specifies whether this capa response type has support for
-<<<<<<< HEAD
-    # responsive UI, for rendering on devices of different sizes and shapes.
-    # By default, we set this to False, allowing subclasses to override as appropriate.
-    has_responsive_ui = False
-=======
     # for rendering on devices of different sizes and shapes.
     # By default, we set this to False, allowing subclasses to override as appropriate.
     multi_device_support = False
->>>>>>> hotfix-2015-08-20
 
     def __init__(self, xml, inputfields, context, system, capa_module):
         """
@@ -866,11 +860,7 @@ class ChoiceResponse(LoncapaResponse):
         The hint information goes into the msg= in new_cmap for display.
         Each choice in the checkboxgroup can have 2 extended hints, matching the
         case that the student has or has not selected that choice:
-<<<<<<< HEAD
-          <checkboxgroup label="Select the best snack" direction="vertical">
-=======
           <checkboxgroup label="Select the best snack">
->>>>>>> hotfix-2015-08-20
              <choice correct="true">Donut
                <choicehint selected="tRuE">A Hint!</choicehint>
                <choicehint selected="false">Another hint!</choicehint>

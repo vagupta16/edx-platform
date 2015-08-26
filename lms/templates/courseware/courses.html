@@ -6,20 +6,8 @@
 %>
 <%inherit file="../main.html" />
 <%
-<<<<<<< HEAD
-  platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
-
-  if self.is_non_microsite_theme():
-    course_index_overlay_text = _("Explore free courses from {university_name}.").format(university_name="Stanford University")
-    logo_file = settings.STATIC_URL + 'themes/stanford/images/seal.png'
-    logo_alt_text = "Stanford Seal Logo"
-
-  else:
-    course_index_overlay_text = microsite.get_value('course_index_overlay_text', _("Explore courses from {platform_name}.").format(platform_name=platform_name))
-=======
   course_discovery_enabled = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
 %>
->>>>>>> hotfix-2015-08-20
 
 <%namespace name='static' file='../static_content.html'/>
 
@@ -60,22 +48,7 @@
       </form>
     </div>
 
-<<<<<<< HEAD
-  <header class="search">
-    <div class="inner-wrapper main-search">
-      <hgroup>
-        % if self.course_index_overlay_file:
-          <%include file="${self.course_index_overlay_file}" />
-        % else:
-        <div class="logo">
-          <img src="${logo_file}" alt="${logo_alt_text}" />
-        </div>
-        <h2>${course_index_overlay_text}</h2>
-        % endif
-      </hgroup>
-=======
     <div id="filter-bar" class="filters hide-phone is-collapsed">
->>>>>>> hotfix-2015-08-20
     </div>
     % endif
 

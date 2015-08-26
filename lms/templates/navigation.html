@@ -124,8 +124,6 @@ site_status_msg = get_site_status_msg(course_id)
           </li>
         % endif
       </%block>
-<<<<<<< HEAD
-=======
       % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
           % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
           <li class="nav-global-05">
@@ -143,7 +141,6 @@ site_status_msg = get_site_status_msg(course_id)
           % endif
 
       % endif
->>>>>>> hotfix-2015-08-20
     </ol>
 
     <ol class="right nav-courseware">
@@ -178,13 +175,10 @@ site_status_msg = get_site_status_msg(course_id)
 <![endif]-->
 % endif
 
-<<<<<<< HEAD
 %if not UserProfile.has_registered(user):
   <%include file="forgot_password_modal.html" />
 %endif
 
-=======
->>>>>>> hotfix-2015-08-20
 <%include file="help_modal.html"/>
 % if course and settings.FEATURES.get('ENABLE_PROBLEM_REPORTING'):
   <%include file="report_modal.html"/>

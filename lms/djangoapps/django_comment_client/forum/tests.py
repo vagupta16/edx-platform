@@ -336,21 +336,12 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     @ddt.data(
-<<<<<<< HEAD
-        # old mongo with cache: 15
-        (ModuleStoreEnum.Type.mongo, 1, 21, 15, 41, 27),
-        (ModuleStoreEnum.Type.mongo, 50, 315, 15, 629, 27),
-        # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 3, 41, 27),
-        (ModuleStoreEnum.Type.split, 50, 3, 3, 629, 27),
-=======
         # old mongo with cache
         (ModuleStoreEnum.Type.mongo, 1, 6, 4, 14, 8),
         (ModuleStoreEnum.Type.mongo, 50, 6, 4, 14, 8),
         # split mongo: 3 queries, regardless of thread response size.
         (ModuleStoreEnum.Type.split, 1, 3, 3, 14, 8),
         (ModuleStoreEnum.Type.split, 50, 3, 3, 14, 8),
->>>>>>> hotfix-2015-08-20
     )
     @ddt.unpack
     def test_number_of_mongo_queries(

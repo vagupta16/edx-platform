@@ -181,13 +181,9 @@ class XQueueCertInterface(object):
 
         raise NotImplementedError
 
-<<<<<<< HEAD
-    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, title='None', keep_current=False):
-=======
     # pylint: disable=too-many-statements
     def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None,
                  title='None', generate_pdf=True):
->>>>>>> hotfix-2015-08-20
         """
         Request a new certificate for a student.
 
@@ -197,12 +193,7 @@ class XQueueCertInterface(object):
           forced_grade - a string indicating a grade parameter to pass with
                          the certificate request. If this is given, grading
                          will be skipped.
-<<<<<<< HEAD
-          keep_current - whether students who no longer meet grade standards
-                         should keep any pre-existing certs.
-=======
           generate_pdf - Boolean should a message be sent in queue to generate certificate PDF
->>>>>>> hotfix-2015-08-20
 
         Will change the certificate status to 'generating' or
         `downloadable` in case of web view certificates.
@@ -230,9 +221,6 @@ class XQueueCertInterface(object):
             status.notpassing,
             status.downloadable
         ]
-
-        if keep_current:
-            VALID_STATUSES.append(status.downloadable)
 
         cert_status = certificate_status_for_student(student, course_id)['status']
         new_status = cert_status
@@ -283,11 +271,7 @@ class XQueueCertInterface(object):
             if forced_grade:
                 grade['grade'] = forced_grade
 
-<<<<<<< HEAD
-            cert, dummy0 = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
-=======
             cert, __ = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
->>>>>>> hotfix-2015-08-20
 
             cert.mode = cert_mode
             cert.user = student
@@ -398,10 +382,9 @@ class XQueueCertInterface(object):
                                 key
                             )
             else:
-                if not keep_current:
-                    cert_status = status.notpassing
-                    cert.status = cert_status
-                    cert.save()
+                new_status = status.notpassing
+                cert.status = new_status
+                cert.save()
 
                 LOGGER.info(
                     (

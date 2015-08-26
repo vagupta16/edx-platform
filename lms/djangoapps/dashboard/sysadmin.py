@@ -43,19 +43,14 @@ from dashboard.models import CourseImportLog
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
 from instructor_task.models import InstructorTask
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment, UserProfile, Registration
 from student.roles import CourseStaffRole, CourseInstructorRole
 import track.views
 from util.json_request import JsonResponse
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-<<<<<<< HEAD
-from xmodule.modulestore.xml import XMLModuleStore
-=======
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
->>>>>>> hotfix-2015-08-20
 
 log = logging.getLogger(__name__)
 

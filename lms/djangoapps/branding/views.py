@@ -16,11 +16,7 @@ from edxmako.shortcuts import render_to_response
 import student.views
 from student.models import CourseEnrollment
 import courseware.views
-<<<<<<< HEAD
 from student.models import UserProfile
-
-=======
->>>>>>> hotfix-2015-08-20
 from microsite_configuration import microsite
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous

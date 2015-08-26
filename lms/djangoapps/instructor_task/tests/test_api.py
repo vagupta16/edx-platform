@@ -219,7 +219,6 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         )
         self._test_resubmission(api_call)
 
-<<<<<<< HEAD
     def test_submit_ora2_request_task(self):
         request = self.create_task_request(self.instructor)
 
@@ -255,7 +254,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             submit_student_forums_usage_task(request, self.course.id)
 
             mock_submit_task.assert_called_once_with(request, 'student_forums', get_student_forums_usage, self.course.id, {}, '')
-=======
+
     def test_submit_enrollment_report_features_csv(self):
         api_call = lambda: submit_detailed_enrollment_features_csv(self.create_task_request(self.instructor),
                                                                    self.course.id)
@@ -274,7 +273,6 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             features=[]
         )
         self._test_resubmission(api_call)
->>>>>>> hotfix-2015-08-20
 
     def test_submit_cohort_students(self):
         api_call = lambda: submit_cohort_students(

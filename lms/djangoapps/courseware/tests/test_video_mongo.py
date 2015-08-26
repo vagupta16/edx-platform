@@ -74,14 +74,6 @@ class TestVideoYouTube(TestVideo):
                 "autohideHtml5": False,
             })),
             'track': None,
-<<<<<<< HEAD
-            'youtube_streams': create_youtube_string(self.item_descriptor),
-            'yt_test_timeout': 1500,
-            'yt_api_url': 'https://www.youtube.com/iframe_api',
-            'yt_test_url': 'https://www.googleapis.com/youtube/v3/videos/',
-            'yt_key': None,
-=======
->>>>>>> hotfix-2015-08-20
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
@@ -160,15 +152,6 @@ class TestVideoNonYouTube(TestVideo):
                 "autohideHtml5": False,
             })),
             'track': None,
-<<<<<<< HEAD
-            'youtube_streams': '1.00:3_yD_cEKoCk',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-            'yt_test_timeout': 1500,
-            'yt_api_url': 'https://www.youtube.com/iframe_api',
-            'yt_test_url': 'https://www.googleapis.com/youtube/v3/videos/',
-            'yt_key': None,
-=======
->>>>>>> hotfix-2015-08-20
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
@@ -284,24 +267,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'cdn_exp_group': None,
             'display_name': u'A Name',
             'download_video_link': u'example.mp4',
-<<<<<<< HEAD
-            'end': 3610.0,
-            'id': None,
-            'sources': sources,
-            'start': 3603.0,
-            'saved_video_position': 0.0,
-            'sub': u'a_sub_file.srt.sjson',
-            'speed': 'null',
-            'general_speed': 1.0,
-            'track': u'http://www.example.com/track',
-            'youtube_streams': '1.00:3_yD_cEKoCk',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-            'yt_test_timeout': 1500,
-            'yt_api_url': 'https://www.youtube.com/iframe_api',
-            'yt_test_url': 'https://www.googleapis.com/youtube/v3/videos/',
-            'yt_key': None,
-            'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
-=======
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'metadata': '',
@@ -312,7 +277,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
->>>>>>> hotfix-2015-08-20
         }
 
         for data in cases:
@@ -429,15 +393,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'id': self.item_descriptor.location.html_id(),
             'metadata': self.default_metadata_dict,
             'track': None,
-<<<<<<< HEAD
-            'youtube_streams': '1.00:3_yD_cEKoCk',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-            'yt_test_timeout': 1500,
-            'yt_api_url': 'https://www.youtube.com/iframe_api',
-            'yt_test_url': 'https://www.googleapis.com/youtube/v3/videos/',
-            'yt_key': None,
-=======
->>>>>>> hotfix-2015-08-20
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
@@ -577,15 +532,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
-<<<<<<< HEAD
-            'youtube_streams': '1.00:3_yD_cEKoCk',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-            'yt_test_timeout': 1500,
-            'yt_api_url': 'https://www.youtube.com/iframe_api',
-            'yt_test_url': 'https://www.googleapis.com/youtube/v3/videos/',
-            'yt_key': None,
-=======
->>>>>>> hotfix-2015-08-20
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
@@ -693,15 +639,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
-<<<<<<< HEAD
-            'youtube_streams': '1.00:3_yD_cEKoCk',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-            'yt_test_timeout': 1500,
-            'yt_api_url': 'https://www.youtube.com/iframe_api',
-            'yt_test_url': 'https://www.googleapis.com/youtube/v3/videos/',
-            'yt_key': None,
-=======
->>>>>>> hotfix-2015-08-20
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
@@ -817,15 +754,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'id': None,
             'metadata': self.default_metadata_dict,
             'track': None,
-<<<<<<< HEAD
-            'youtube_streams': '1.00:3_yD_cEKoCk',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-            'yt_test_timeout': 1500,
-            'yt_api_url': 'https://www.youtube.com/iframe_api',
-            'yt_test_url': 'https://www.googleapis.com/youtube/v3/videos/',
-            'yt_key': None,
-=======
->>>>>>> hotfix-2015-08-20
             'transcript_download_format': 'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},

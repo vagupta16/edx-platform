@@ -35,11 +35,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-<<<<<<< HEAD
 from instructor_task.tests.factories import InstructorTaskFactory
-from xmodule.modulestore.xml import XMLModuleStore
-=======
->>>>>>> hotfix-2015-08-20
 
 
 TEST_MONGODB_LOG = {

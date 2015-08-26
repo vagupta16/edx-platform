@@ -411,7 +411,6 @@ def submit_calculate_students_features_csv(request, course_key, features):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-<<<<<<< HEAD
 def submit_student_forums_usage_task(request, course_key):
     """
     AlreadyRunningError is raised if a student forums usage report is already being generated.
@@ -420,7 +419,10 @@ def submit_student_forums_usage_task(request, course_key):
     task_class = get_student_forums_usage
     task_input = {}
     task_key = ''
-=======
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
 def submit_detailed_enrollment_features_csv(request, course_key):  # pylint: disable=invalid-name
     """
     Submits a task to generate a CSV containing detailed enrollment info.
@@ -474,7 +476,6 @@ def submit_proctored_exam_results_report(request, course_key, features):  # pyli
     task_class = proctored_exam_results_csv
     task_input = {'features': features}
     task_key = ""
->>>>>>> hotfix-2015-08-20
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 

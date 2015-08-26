@@ -444,11 +444,7 @@ def get_d3_section_grade_distrib(course_id, section, enrollment):
             c_unit += 1
             c_problem = 0
             for child in unit.get_children():
-<<<<<<< HEAD
                 if child.location.category in PROB_TYPE_LIST:
-=======
-                if child.location.category == 'problem':
->>>>>>> hotfix-2015-08-20
                     c_problem += 1
                     problem_set.append(child.location)
                     problem_info[child.location] = {

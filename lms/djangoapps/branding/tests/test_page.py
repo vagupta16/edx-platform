@@ -200,9 +200,6 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
     @patch('student.views.render_to_response', RENDER_MOCK)
     @patch('courseware.views.render_to_response', RENDER_MOCK)
-<<<<<<< HEAD
-    @patch.dict(settings.FEATURES, {'ENABLE_COURSE_SORTING_BY_START_DATE': True})
-=======
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_discovery_off(self):
         """
@@ -250,7 +247,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     @patch('student.views.render_to_response', RENDER_MOCK)
     @patch('courseware.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
->>>>>>> hotfix-2015-08-20
+    @patch.dict(settings.FEATURES, {'ENABLE_COURSE_SORTING_BY_START_DATE': True})
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)

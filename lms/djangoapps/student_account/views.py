@@ -39,14 +39,7 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
-<<<<<<< HEAD
-from util.bad_request_rate_limiter import BadRequestRateLimiter
 
-from student_account.helpers import auth_pipeline_urls
-from student.models import UserProfile
-=======
-
->>>>>>> hotfix-2015-08-20
 
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -67,13 +60,8 @@ def login_and_registration_form(request, initial_mode="login"):
     redirect_to = get_next_url_for_login_page(request)
 
     # If we're already logged in, redirect to the dashboard
-<<<<<<< HEAD
     if UserProfile.has_registered(request.user):
-        return redirect(reverse('dashboard'))
-=======
-    if request.user.is_authenticated():
         return redirect(redirect_to)
->>>>>>> hotfix-2015-08-20
 
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)

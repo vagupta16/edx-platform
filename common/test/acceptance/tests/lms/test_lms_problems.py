@@ -11,10 +11,6 @@ from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.problem import ProblemPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-<<<<<<< HEAD
-from textwrap import dedent
-=======
->>>>>>> hotfix-2015-08-20
 from ..helpers import EventsTestMixin
 
 
@@ -99,10 +95,7 @@ class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
     """
     Test that extended hint features plumb through to the page html and tracking log.
     """
-<<<<<<< HEAD
-=======
 
->>>>>>> hotfix-2015-08-20
     def get_problem(self):
         """
         Problem with extended hint features.
@@ -171,8 +164,6 @@ class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
                 {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'demand-hint1'}}
             ],
             actual_events)
-<<<<<<< HEAD
-=======
 
 
 class ProblemWithMathjax(ProblemsTest):
@@ -222,4 +213,3 @@ class ProblemWithMathjax(ProblemsTest):
 
         self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.hint_text)
         self.assertTrue(problem_page.mathjax_rendered_in_hint, "MathJax did not rendered in problem hint")
->>>>>>> hotfix-2015-08-20
