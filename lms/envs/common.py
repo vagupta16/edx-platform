@@ -2406,28 +2406,28 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 ENABLE_DATA_DOWNLOADS = [
     {
-        'name':'get-student-responses',
-        'value':_('Get Student Responses Report'),
-        'data-endpoint':'get_student_responses_url',
+        'name': 'get-student-responses',
+        'value': _('Get Student Responses Report'),
+        'data-endpoint': 'get_student_responses_url',
     },
     {
-        'name':'ora2-response-btn',
-        'value':_('Download Ora2 Responses (no email addresses)'),
-        'data-endpoint':'get_ora2_responses_url',
+        'name': 'ora2-response-btn',
+        'value': _('Download Ora2 Responses (no email addresses)'),
+        'data-endpoint': 'get_ora2_responses_url',
     },
     {
-        'name':'ora2-response-btn-email',
-        'value':_('Download Ora2 Responses (including email addresses)'),
-        'data-endpoint':'get_ora2_email_responses_url',
+        'name': 'ora2-response-btn-email',
+        'value': _('Download Ora2 Responses (including email addresses)'),
+        'data-endpoint': 'get_ora2_email_responses_url',
     },
     {
-        'name':'course-forums-btn',
-        'value':_('Generate Course Forums Usage Report'),
-        'data-endpoint':'get_course_forums_usage_url',
+        'name': 'course-forums-btn',
+        'value': _('Generate Course Forums Usage Report'),
+        'data-endpoint': 'get_course_forums_usage_url',
     },
     {
-        'name':'student-forums-btn',
-        'value':_('Generate Student Forums Usage Report'),
-        'data-endpoint':'get_student_forums_usage_url',
+        'name': 'student-forums-btn',
+        'value': _('Generate Student Forums Usage Report'),
+        'data-endpoint': 'get_student_forums_usage_url',
     },
 ]
