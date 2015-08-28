@@ -30,6 +30,7 @@ from instructor_task.tasks_helper import (
     cohort_students_and_upload,
     upload_grades_csv,
     upload_students_csv,
+    push_csv_responses_to_s3,
     push_student_responses_to_s3,
     push_ora2_responses_to_s3,
     push_course_forums_data_to_s3,
@@ -49,7 +50,6 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitio
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from openedx.core.lib.data_download import push_csv_responses_to_s3
 from instructor_task.models import ReportStore
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
 from django.conf import settings
@@ -434,7 +434,7 @@ class TestInstructorOra2Report(TestReportMixin, InstructorTaskCourseTestCase):
                     timestamp_str = start_time.strftime('%Y-%m-%d-%H%M')
                     course_id_string = urllib.quote(self.course.id.to_deprecated_string().replace('/', '_'))
                     filename = u'{}_ORA2_responses_anonymous_{}.csv'.format(course_id_string, timestamp_str)
-                    return_val = push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'False'}, 'generated'), push_csv_responses_to_s3
+                    return_val = push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'False'}, 'generated', push_csv_responses_to_s3)
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
                     mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
 

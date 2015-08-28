@@ -34,6 +34,7 @@ from instructor_task.tasks_helper import (
     rescore_problem_module_state,
     reset_attempts_module_state,
     delete_problem_module_state,
+    push_csv_responses_to_s3,
     push_student_responses_to_s3,
     push_ora2_responses_to_s3,
     push_course_forums_data_to_s3,
@@ -42,7 +43,6 @@ from instructor_task.tasks_helper import (
     push_student_forums_data_to_s3,
     cohort_students_and_upload
 )
-from openedx.core.lib.data_download import push_csv_responses_to_s3
 
 
 TASK_LOG = logging.getLogger('edx.celery.task')
