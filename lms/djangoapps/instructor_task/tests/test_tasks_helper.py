@@ -49,6 +49,7 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitio
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from openedx.core.lib.data_download import push_csv_responses_to_s3
 from instructor_task.models import ReportStore
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
 from django.conf import settings
@@ -412,7 +413,7 @@ class TestInstructorOra2Report(TestReportMixin, InstructorTaskCourseTestCase):
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = self.current_task
 
-                self.assertEqual(push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'False'}, 'generated'), UPDATE_STATUS_FAILED)
+                self.assertEqual(push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'False'}, 'generated', push_csv_responses_to_s3), UPDATE_STATUS_FAILED)
 
     @patch('instructor_task.tasks_helper.datetime')
     def test_report_stores_results(self, mock_time):
@@ -433,7 +434,7 @@ class TestInstructorOra2Report(TestReportMixin, InstructorTaskCourseTestCase):
                     timestamp_str = start_time.strftime('%Y-%m-%d-%H%M')
                     course_id_string = urllib.quote(self.course.id.to_deprecated_string().replace('/', '_'))
                     filename = u'{}_ORA2_responses_anonymous_{}.csv'.format(course_id_string, timestamp_str)
-                    return_val = push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'False'}, 'generated')
+                    return_val = push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'False'}, 'generated'), push_csv_responses_to_s3
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
                     mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
 
@@ -462,7 +463,7 @@ class TestInstructorOra2EmailReport(TestReportMixin, InstructorTaskCourseTestCas
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = self.current_task
 
-                self.assertEqual(push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'True'}, 'generated'), UPDATE_STATUS_FAILED)
+                self.assertEqual(push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'True'}, 'generated', push_csv_responses_to_s3), UPDATE_STATUS_FAILED)
 
     @patch('instructor_task.tasks_helper.datetime')
     def test_report_stores_results(self, mock_time):
@@ -482,7 +483,7 @@ class TestInstructorOra2EmailReport(TestReportMixin, InstructorTaskCourseTestCas
                     timestamp_str = start_time.strftime('%Y-%m-%d-%H%M')
                     course_id_string = urllib.quote(self.course.id.to_deprecated_string().replace('/', '_'))
                     filename = u'{}_ORA2_responses_including_email_{}.csv'.format(course_id_string, timestamp_str)
-                    return_val = push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'True'}, 'generated')
+                    return_val = push_ora2_responses_to_s3(None, None, self.course.id, {'include_email': 'True'}, 'generated', push_csv_responses_to_s3)
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
                     mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
 
@@ -507,7 +508,7 @@ class TestInstructorCourseForumsReport(TestReportMixin, InstructorTaskCourseTest
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = self.current_task
 
-                self.assertEqual(push_course_forums_data_to_s3(None, None, self.course.id, None, 'generated'), UPDATE_STATUS_FAILED)
+                self.assertEqual(push_course_forums_data_to_s3(None, None, self.course.id, None, 'generated', push_csv_responses_to_s3), UPDATE_STATUS_FAILED)
 
     @patch('instructor_task.tasks_helper.datetime')
     def test_report_stores_results(self, mock_time):
@@ -524,7 +525,7 @@ class TestInstructorCourseForumsReport(TestReportMixin, InstructorTaskCourseTest
                 mock_collect_data.return_value = (test_header, test_rows)
 
                 with patch('instructor_task.models.LocalFSReportStore.store_rows'):
-                    return_val = push_course_forums_data_to_s3(None, None, self.course.id, None, 'generated')
+                    return_val = push_course_forums_data_to_s3(None, None, self.course.id, None, 'generated', push_csv_responses_to_s3)
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
 
 
@@ -548,7 +549,7 @@ class TestInstructorStudentForumsReport(TestReportMixin, InstructorTaskCourseTes
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = self.current_task
 
-                self.assertEqual(push_student_forums_data_to_s3(None, None, self.course.id, None, 'generated'), UPDATE_STATUS_FAILED)
+                self.assertEqual(push_student_forums_data_to_s3(None, None, self.course.id, None, 'generated', push_csv_responses_to_s3), UPDATE_STATUS_FAILED)
 
     @patch('instructor_task.tasks_helper.datetime')
     def test_report_stores_results(self, mock_time):
@@ -565,7 +566,7 @@ class TestInstructorStudentForumsReport(TestReportMixin, InstructorTaskCourseTes
                 mock_collect_data.return_value = (test_header, test_rows)
 
                 with patch('instructor_task.models.LocalFSReportStore.store_rows'):
-                    return_val = push_student_forums_data_to_s3(None, None, self.course.id, None, 'generated')
+                    return_val = push_student_forums_data_to_s3(None, None, self.course.id, None, 'generated', push_csv_responses_to_s3)
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
 
 
