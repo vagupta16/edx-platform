@@ -220,7 +220,7 @@ class TaskProgress(object):
         return progress_dict
 
 
-def run_main_task(entry_id, task_fcn, action_name, push_csv_responses_to_s3):
+def run_main_task(entry_id, task_fcn, action_name, *args):
     """
     Applies the `task_fcn` to the arguments defined in `entry_id` InstructorTask.
 
@@ -230,6 +230,7 @@ def run_main_task(entry_id, task_fcn, action_name, push_csv_responses_to_s3):
      `course_id` : the id for the course.
      `task_input` : dict containing task-specific arguments, JSON-decoded from InstructorTask's task_input.
      `action_name` : past-tense verb to use for constructing status messages.
+     `*args` : any additional parameters needed by task_fcn
 
     If no exceptions are raised, the `task_fcn` should return a dict containing
     the task's result with the following keys:
@@ -272,7 +273,7 @@ def run_main_task(entry_id, task_fcn, action_name, push_csv_responses_to_s3):
 
     # Now do the work
     with dog_stats_api.timer('instructor_tasks.time.overall', tags=[u'action:{name}'.format(name=action_name)]):
-        task_progress = task_fcn(entry_id, course_id, task_input, action_name, push_csv_responses_to_s3)
+        task_progress = task_fcn(entry_id, course_id, task_input, action_name, *args)
 
     # Release any queries that the connection has been hanging onto
     reset_queries()
