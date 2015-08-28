@@ -19,6 +19,10 @@ def collect_course_forums_data(course_id):
     Given a SlashSeparatedCourseKey course_id, return headers and information
     related to course forums usage such as upvotes, downvotes, and number of posts
     """
+    print '====********===='
+    print 'collect_course_forums_data'
+    print '====********===='
+
     try:
         client = MongoClient(get_mongo_connection_string())
         mongodb = client[FORUMS_MONGO_PARAMS['database']]

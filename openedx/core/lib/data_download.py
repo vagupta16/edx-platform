@@ -18,6 +18,13 @@ def push_csv_responses_to_s3(csv_fn, filename, course_id, action_name):
     """
     Collect responses and upload them to S3 as a CSV
     """
+    print '==========================='
+    print csv_fn
+    print filename
+    print course_id
+    print action_name
+    print _get_current_task()
+    print '==========================='
 
     start_time = datetime.now(UTC)
     num_attempted = 1

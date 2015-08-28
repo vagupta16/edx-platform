@@ -246,6 +246,10 @@ def run_main_task(entry_id, task_fcn, action_name, *args):
 
     """
 
+    print '==={}{}{}==='
+    print 'rmt'
+    print '==={}{}{}==='
+
     # Get the InstructorTask to be updated. If this fails then let the exception return to Celery.
     # There's no point in catching it here.
     entry = InstructorTask.objects.get(pk=entry_id)
