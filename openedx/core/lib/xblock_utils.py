@@ -27,8 +27,6 @@ from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from courseware.inline_analytics_utils import get_responses_data
-
 from openedx.core.lib.inline_analytics_utils import get_responses_data
 
 log = logging.getLogger(__name__)

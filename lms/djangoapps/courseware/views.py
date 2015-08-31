@@ -432,8 +432,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'staff_access': staff_access,
             'studio_url': studio_url,
             'masquerade': masquerade,
+            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
             'reverifications': fetch_reverify_banner_info(request, course_key),
-            'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
             'analytics_url': analytics_url,
         }
 
