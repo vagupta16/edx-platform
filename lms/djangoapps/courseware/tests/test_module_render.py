@@ -33,13 +33,7 @@ from courseware.field_overrides import OverrideFieldData
 from courseware.model_data import FieldDataCache
 from courseware.module_render import hash_resource, get_module_for_descriptor
 from courseware.models import StudentModule
-from courseware.tests.factories import (
-    StudentModuleFactory,
-    UserFactory,
-    GlobalStaffFactory,
-    StaffFactory,
-    InstructorFactory
-)
+from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory, StaffFactory, InstructorFactory
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes

@@ -2279,7 +2279,6 @@ INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configurati
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
 
 ####################### In-line Analytics ######################
-ANALYTICS_ANSWER_DIST_URL = None
 INLINE_ANALYTICS_SUPPORTED_TYPES = {
     'MultipleChoiceResponse': 'radio',
     'ChoiceResponse': 'checkbox',
@@ -2425,35 +2424,3 @@ PREVIEW_DOMAIN = 'preview'
 # Sets the maximum number of courses listed on the homepage
 # If set to None, all courses will be listed on the homepage
 HOMEPAGE_COURSE_MAX = None
-
-################################ Settings for Credit Courses ################################
-# Initial delay used for retrying tasks.
-# Additional retries use longer delays.
-# Value is in seconds.
-CREDIT_TASK_DEFAULT_RETRY_DELAY = 30
-
-# Maximum number of retries per task for errors that are not related
-# to throttling.
-CREDIT_TASK_MAX_RETRIES = 5
-
-# Secret keys shared with credit providers.
-# Used to digitally sign credit requests (us --> provider)
-# and validate responses (provider --> us).
-# Each key in the dictionary is a credit provider ID, and
-# the value is the 32-character key.
-CREDIT_PROVIDER_SECRET_KEYS = {}
-
-# Maximum age in seconds of timestamps we will accept
-# when a credit provider notifies us that a student has been approved
-# or denied for credit.
-CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
-
-####################### In-line Analytics ######################
-INLINE_ANALYTICS_SUPPORTED_TYPES = {
-    'MultipleChoiceResponse': 'radio',
-    'ChoiceResponse': 'checkbox',
-    'OptionResponse': 'option',
-    'NumericalResponse': 'numerical',
-    'StringResponse': 'string',
-    'FormulaResponse': 'formula',
-}
