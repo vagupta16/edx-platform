@@ -1289,315 +1289,6 @@ def get_course_lti_endpoints(request, course_id):
 
 def get_analytics_answer_dist(request):
     """
-    Calls the the analytics answer distribution api. Retrieves answer distribution data for the in-line analytics display.
-
-    Arguments:
-        request (django request object):  the HTTP request object that triggered this view function
-
-    Returns:
-        (django response object):  JSON response.  404 if api url is not found, 500 if server error, otherwise 200 with JSON body.
-    """
-
-    all_data = json.loads(request.POST['data'])
-    module_id = all_data['module_id']
-    question_types_by_part = all_data['question_types_by_part']
-    num_options_by_part = all_data['num_options_by_part']
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(all_data['course_id'])
-
-    # Check user is enrolled as a staff member of this course
-    try:
-        course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-    except Http404:
-        return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
-
-    having_access = has_access(request.user, 'staff', course)
-
-    # Contruct API call
-    url = getattr(settings, 'ANALYTICS_ANSWER_DIST_URL')
-    if url:
-        url = url.format(module_id=module_id)
-
-    if not having_access or not url:
-        return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
-
-    api_secret = getattr(settings, 'ANALYTICS_DATA_TOKEN')
-    token = 'Token %s' % api_secret
-
-    analytics_req = urllib2.Request(url)
-    analytics_req.add_header('Authorization', token)
-
-    try:
-        response = urllib2.urlopen(analytics_req)
-        data = json.loads(response.read())
-
-    except urllib2.HTTPError, error:
-        log.warning('Analytics API error: ' + str(error))
-        if error.code == 404:
-            return HttpResponseNotFound(_('There are no student answers for this problem yet; please try again later.'))
-        else:
-            return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url="<a href=\"https://stanfordonline.zendesk.com/hc/en-us/requests/new\">here</a>"))
-
-    except urllib2.URLError, error:
-        log.warning('Analytics API error: ' + str(error))
-        return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url="<a href=\"https://stanfordonline.zendesk.com/hc/en-us/requests/new\">here</a>"))
-
-    return process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
-
-
-def process_analytics_answer_dist(data, question_types_by_part, num_options_by_part):
-    """
-    Aggregates the analytics answer dist data. From the data, gets the date/time the data was last updated and reformats to the client TZ.
-
-    Arguments:
-        data: response from the analytics api
-        question_types_by_part: dict of question types
-        num_options_by_part: dict of number of options by question
-
-    Returns:
-        A json payload of:
-          - data by part: an array of dicts of {value_id, correct, count} for each part_id
-          - count by part: an array of dicts of {totalAttemptCount, totalCorrectCount, TotalIncorrectCount} for each part_id
-          - last updated: string
-     """
-
-    # Each element in count_by_part is a dict of totalAttemptCount, totalCorrectCount, totalIncorrectCount
-    count_by_part = {}
-
-    # Each element in data_by_part is an array of dicts of {value_id, correct, count}
-    data_by_part = {}
-
-    # For errors discovered during analytics data processing use message_by_part
-    message_by_part = {}
-
-    # Count rows returned for each part for integrity check
-    num_rows_by_part = {}
-
-    for item in data:
-        part_id = item['part_id']
-
-        num_rows_by_part[part_id] = num_rows_by_part.get(part_id, 0) + 1
-
-        # If we detect an issue with the data, set error message and continue
-        if _issue_with_data(
-            item,
-            part_id,
-            message_by_part,
-            question_types_by_part,
-            num_options_by_part,
-            num_rows_by_part
-        ):
-            continue
-
-        # Add count to appropriate aggregates
-        count_dict = count_by_part.get(part_id, {
-            'totalAttemptCount': 0,
-            'totalCorrectCount': 0,
-            'totalIncorrectCount': 0,
-        })
-        count_dict['totalAttemptCount'] = count_dict.get('totalAttemptCount') + item['count']
-        if item['correct']:
-            count_dict['totalCorrectCount'] = count_dict.get('totalCorrectCount') + item['count']
-        else:
-            count_dict['totalIncorrectCount'] = count_dict.get('totalIncorrectCount') + item['count']
-
-        count_by_part[part_id] = count_dict
-
-        # Add this item's data to the data for this part_id
-        part_dict = {}
-        part_dict['value_id'] = item['value_id']
-        part_dict['correct'] = item['correct']
-        part_dict['count'] = item['count']
-
-        data_by_part[part_id] = data_by_part.get(part_id, []) + [part_dict]
-
-    # Determine the last updated date, convert to client TZ and format
-    created_date = data[0]['created']
-    obj_date = datetime.strptime(created_date, '%Y-%m-%dT%H%M%S')
-    obj_date = timezone('UTC').localize(obj_date)
-    formatted_date_string = get_time_display(obj_date, None, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
-
-    response_payload = {
-        'data_by_part': data_by_part,
-        'count_by_part': count_by_part,
-        'message_by_part': message_by_part,
-        'last_update_date': formatted_date_string,
-    }
-
-    return JsonResponse(response_payload)
-
-
-@login_required
-def course_survey(request, course_id):
-    """
-    URL endpoint to present a survey that is associated with a course_id
-    Note that the actual implementation of course survey is handled in the
-    views.py file in the Survey Djangoapp
-    """
-
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'load', course_key)
-
-    redirect_url = reverse('info', args=[course_id])
-
-    # if there is no Survey associated with this course,
-    # then redirect to the course instead
-    if not course.course_survey_name:
-        return redirect(redirect_url)
-
-    return survey.views.view_student_survey(
-        request.user,
-        course.course_survey_name,
-        course=course,
-        redirect_url=redirect_url,
-        is_required=course.course_survey_required,
-    )
-
-
-def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num_options_by_part, num_rows_by_part):
-    """
-    A function where issues with the data returned by the analytics API are detected
-    and an appropriate message formulated.
-
-    Arguments:
-        item: current row returned by the analytics API
-        part_id: the part_id of the current row
-        message_by_part: dictionary for storing error messages for parts
-        question_types_by_part: dict of question types
-        num_options_by_part: dict of number of options by question
-        num_rows_by_part: dict of count of rows returned by API
-
-    Returns:
-        True: if an error was detected
-        False: if no error was detected
-    """
-    # Check variant (randomization) and if set, generate an error message
-    if item['variant']:
-        message_by_part[part_id] = "The analytics cannot be displayed for this question as randomization was set at one time."
-        return True
-
-    # Check number of rows returned for radio question is consistent with definition
-    if question_types_by_part[part_id] == 'radio' and num_rows_by_part[part_id] > num_options_by_part[part_id]:
-        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
-        return True
-
-    # Check number of rows returned for checkbox question is consistent with definition
-    if question_types_by_part[part_id] == 'checkbox' and num_rows_by_part[part_id] > pow(2, num_options_by_part[part_id]):
-        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
-        return True
-
-    return False
-
-
-def is_course_passed(course, grade_summary=None, student=None, request=None):
-    """
-    check user's course passing status. return True if passed
-
-    Arguments:
-        course : course object
-        grade_summary (dict) : contains student grade details.
-        student : user object
-        request (HttpRequest)
-
-    Returns:
-        returns bool value
-    """
-    nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
-    success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
-
-    if grade_summary is None:
-        grade_summary = grades.grade(student, request, course)
-
-    return success_cutoff and grade_summary['percent'] > success_cutoff
-
-
-@require_POST
-def generate_user_cert(request, course_id):
-    """Start generating a new certificate for the user.
-
-    Certificate generation is allowed if:
-    * The user has passed the course, and
-    * The user does not already have a pending/completed certificate.
-
-    Note that if an error occurs during certificate generation
-    (for example, if the queue is down), then we simply mark the
-    certificate generation task status as "error" and re-run
-    the task with a management command.  To students, the certificate
-    will appear to be "generating" until it is re-run.
-
-    Args:
-        request (HttpRequest): The POST request to this view.
-        course_id (unicode): The identifier for the course.
-
-    Returns:
-        HttpResponse: 200 on success, 400 if a new certificate cannot be generated.
-
-    """
-
-    if not request.user.is_authenticated():
-        log.info(u"Anon user trying to generate certificate for %s", course_id)
-        return HttpResponseBadRequest(
-            _('You must be signed in to {platform_name} to create a certificate.').format(
-                platform_name=settings.PLATFORM_NAME
-            )
-        )
-
-    student = request.user
-    course_key = CourseKey.from_string(course_id)
-
-    course = modulestore().get_course(course_key, depth=2)
-    if not course:
-        return HttpResponseBadRequest(_("Course is not valid"))
-
-    if not is_course_passed(course, None, student, request):
-        return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
-
-    certificate_status = certs_api.certificate_downloadable_status(student, course.id)
-
-    if certificate_status["is_generating"]:
-        return HttpResponseBadRequest(_("Certificate is being created."))
-    else:
-        # If the certificate is not already in-process or completed,
-        # then create a new certificate generation task.
-        # If the certificate cannot be added to the queue, this will
-        # mark the certificate with "error" status, so it can be re-run
-        # with a management command.  From the user's perspective,
-        # it will appear that the certificate task was submitted successfully.
-        certs_api.generate_user_certificates(student, course.id)
-        _track_successful_certificate_generation(student.id, course.id)
-        return HttpResponse()
-
-
-def _track_successful_certificate_generation(user_id, course_id):  # pylint: disable=invalid-name
-    """Track an successfully certificate generation event.
-
-    Arguments:
-        user_id (str): The ID of the user generting the certificate.
-        course_id (CourseKey): Identifier for the course.
-    Returns:
-        None
-
-    """
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
-        event_name = 'edx.bi.user.certificate.generate'  # pylint: disable=no-member
-        tracking_context = tracker.get_tracker().resolve_context()  # pylint: disable=no-member
-
-        analytics.track(
-            user_id,
-            event_name,
-            {
-                'category': 'certificates',
-                'label': unicode(course_id)
-            },
-            context={
-                'Google Analytics': {
-                    'clientId': tracking_context.get('client_id')
-                }
-            }
-        )
-
-
-def get_analytics_answer_dist(request):
-    """
     Calls the the analytics answer distribution api client. Retrieves answer distribution data for the in-line
     analytics display.
 
@@ -1736,6 +1427,33 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
     return JsonResponse(response_payload)
 
 
+@login_required
+def course_survey(request, course_id):
+    """
+    URL endpoint to present a survey that is associated with a course_id
+    Note that the actual implementation of course survey is handled in the
+    views.py file in the Survey Djangoapp
+    """
+
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
+
+    redirect_url = reverse('info', args=[course_id])
+
+    # if there is no Survey associated with this course,
+    # then redirect to the course instead
+    if not course.course_survey_name:
+        return redirect(redirect_url)
+
+    return survey.views.view_student_survey(
+        request.user,
+        course.course_survey_name,
+        course=course,
+        redirect_url=redirect_url,
+        is_required=course.course_survey_required,
+    )
+
+
 def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num_options_by_part, num_rows_by_part):
     """
     A function where issues with the data returned by the analytics API are detected
@@ -1775,3 +1493,111 @@ def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num
         return True
 
     return False
+
+
+def is_course_passed(course, grade_summary=None, student=None, request=None):
+    """
+    check user's course passing status. return True if passed
+
+    Arguments:
+        course : course object
+        grade_summary (dict) : contains student grade details.
+        student : user object
+        request (HttpRequest)
+
+    Returns:
+        returns bool value
+    """
+    nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
+    success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
+
+    if grade_summary is None:
+        grade_summary = grades.grade(student, request, course)
+
+    return success_cutoff and grade_summary['percent'] > success_cutoff
+
+
+@require_POST
+def generate_user_cert(request, course_id):
+    """Start generating a new certificate for the user.
+
+    Certificate generation is allowed if:
+    * The user has passed the course, and
+    * The user does not already have a pending/completed certificate.
+
+    Note that if an error occurs during certificate generation
+    (for example, if the queue is down), then we simply mark the
+    certificate generation task status as "error" and re-run
+    the task with a management command.  To students, the certificate
+    will appear to be "generating" until it is re-run.
+
+    Args:
+        request (HttpRequest): The POST request to this view.
+        course_id (unicode): The identifier for the course.
+
+    Returns:
+        HttpResponse: 200 on success, 400 if a new certificate cannot be generated.
+
+    """
+
+    if not request.user.is_authenticated():
+        log.info(u"Anon user trying to generate certificate for %s", course_id)
+        return HttpResponseBadRequest(
+            _('You must be signed in to {platform_name} to create a certificate.').format(
+                platform_name=settings.PLATFORM_NAME
+            )
+        )
+
+    student = request.user
+    course_key = CourseKey.from_string(course_id)
+
+    course = modulestore().get_course(course_key, depth=2)
+    if not course:
+        return HttpResponseBadRequest(_("Course is not valid"))
+
+    if not is_course_passed(course, None, student, request):
+        return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
+
+    certificate_status = certs_api.certificate_downloadable_status(student, course.id)
+
+    if certificate_status["is_generating"]:
+        return HttpResponseBadRequest(_("Certificate is being created."))
+    else:
+        # If the certificate is not already in-process or completed,
+        # then create a new certificate generation task.
+        # If the certificate cannot be added to the queue, this will
+        # mark the certificate with "error" status, so it can be re-run
+        # with a management command.  From the user's perspective,
+        # it will appear that the certificate task was submitted successfully.
+        certs_api.generate_user_certificates(student, course.id)
+        _track_successful_certificate_generation(student.id, course.id)
+        return HttpResponse()
+
+
+def _track_successful_certificate_generation(user_id, course_id):  # pylint: disable=invalid-name
+    """Track an successfully certificate generation event.
+
+    Arguments:
+        user_id (str): The ID of the user generting the certificate.
+        course_id (CourseKey): Identifier for the course.
+    Returns:
+        None
+
+    """
+    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+        event_name = 'edx.bi.user.certificate.generate'  # pylint: disable=no-member
+        tracking_context = tracker.get_tracker().resolve_context()  # pylint: disable=no-member
+
+        analytics.track(
+            user_id,
+            event_name,
+            {
+                'category': 'certificates',
+                'label': unicode(course_id)
+            },
+            context={
+                'Google Analytics': {
+                    'clientId': tracking_context.get('client_id')
+                }
+            }
+        )

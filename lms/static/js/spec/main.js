@@ -296,10 +296,6 @@
                 exports: 'js/shoppingcart/shoppingcart',
                 deps: ['jquery', 'underscore', 'gettext']
             },
-            'js/ccx/schedule': {
-                exports: 'js/ccx/schedule',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext']
-            },
             'js/inline_analytics': {
             	exports: 'js/inline_analytics',
             	deps: ['gettext']
@@ -636,9 +632,7 @@
         'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js',
-        'lms/include/js/spec/discovery/discovery_spec.js',
-        'lms/include/js/spec/ccx/schedule_spec.js',
-        'lms/include/js/spec/inline_analytics_spec.js'
+        'lms/include/js/spec/inline_analytics_spec.js',
     ]);
 
 }).call(this, requirejs, define);
