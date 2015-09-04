@@ -841,7 +841,7 @@ def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _
     course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
 
     # Perform the actual upload
-    report_store = ReportStore.from_config()
+    report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
     report_store.store_rows(
         course_id,
         u"{}_responses_report_{}.csv".format(course_id_prefix, timestamp_str),

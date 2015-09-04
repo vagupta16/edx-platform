@@ -759,7 +759,7 @@ class TestReportStore(TestReportMixin, InstructorTaskCourseTestCase):
         self.course = CourseFactory.create()
 
     def test_delete_report(self):
-        report_store = ReportStore.from_config()
+        report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         task_input = {'features': []}
 
         links = report_store.links_for(self.course.id)

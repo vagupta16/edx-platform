@@ -2705,7 +2705,7 @@ def delete_report_download(request, course_id):
     """
     course_id = SlashSeparatedCourseKey.from_string(course_id)
     filename = request.POST.get('filename')
-    report_store = ReportStore.from_config()
+    report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
     report_store.delete_file(course_id, filename)
     message = {
         'status': _('The report was successfully deleted!'),
@@ -2797,7 +2797,7 @@ def graph_course_forums_usage(request, course_id):
     """
     clicked_text = request.GET.get('clicked_on')
     course_key = CourseKey.from_string(course_id)
-    report_store = ReportStore.from_config()
+    report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
     graph = None
     if clicked_text:
         for name, url in report_store.links_for(course_key):
