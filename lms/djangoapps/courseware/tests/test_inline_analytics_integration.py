@@ -12,33 +12,36 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from analyticsclient.exceptions import NotFoundError, InvalidRequestError, TimeoutError
 
+ZENDESK_URL = 'https://zendesk.com'
 
-class InlineAnalyticsTest1(ModuleStoreTestCase):
-    """ unittest class """
+
+class InlineAnalyticsAnswerDistribution(ModuleStoreTestCase):
 
     def setUp(self):
-        super(InlineAnalyticsTest1, self).setUp()
+        super(InlineAnalyticsAnswerDistribution, self).setUp()
         self.user = UserFactory.create()
         self.factory = RequestFactory()
         self.course = CourseFactory.create(
-            org="A",
-            number="B",
-            display_name="C",
+            org='A',
+            number='B',
+            display_name='C',
         )
         self.instructor = InstructorFactory(course_key=self.course.id)
 
         analytics_data = {
-            "module_id": "123",
-            "question_types_by_part": "radio",
-            "num_options_by_part": 6,
-            "course_id": "A/B/C",
+            'module_id': '123',
+            'question_types_by_part': 'radio',
+            'num_options_by_part': 6,
+            'course_id': 'A/B/C',
         }
         json_analytics_data = json.dumps(analytics_data)
-        self.data = {"data": json_analytics_data}
-        self.zendesk_response = ('A problem has occurred retrieving the data, to report the problem click '
-                                 '<a href="https://zendesk.com/hc/en-us/requests/new">here</a>')
+        self.data = {'data': json_analytics_data}
+        self.zendesk_response = (
+            'A problem has occurred retrieving the data, to report the problem click '
+            '<a href="{ZENDESK_URL}/hc/en-us/requests/new">here</a>'
+        ).format(ZENDESK_URL=ZENDESK_URL)
 
-    @override_settings(ZENDESK_URL='https://zendesk.com')
+    @override_settings(ZENDESK_URL=ZENDESK_URL)
     def test_no_url(self):
 
         request = self.factory.post('', self.data)
@@ -56,217 +59,222 @@ class InlineAnalyticsTest1(ModuleStoreTestCase):
         self.assertEquals(response.content, 'A problem has occurred retrieving the data.')
 
     def test_process_analytics_answer_dist(self):
-
-        # Data that is complete.
+        """
+        Test with data that is complete.
+        """
         data = [
             {
-                "course_id": "A/B/C",
-                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                "correct": False,
-                "count": 7,
-                "value_id": "choice_0",
-                "answer_value_text": "Option 1",
-                "answer_value_numeric": "null",
-                "variant": None,
-                "created": "2014-10-15T101351",
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': False,
+                'count': 7,
+                'value_id': 'choice_0',
+                'answer_value_text': 'Option 1',
+                'answer_value_numeric': 'null',
+                'variant': None,
+                'created': '2014-10-15T101351',
             },
             {
-                "course_id": "A/B/C",
-                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                "correct": True,
-                "count": 23,
-                "value_id": "choice_1",
-                "answer_value_text": "Option 2",
-                "answer_value_numeric": "null",
-                "variant": None,
-                "created": "2014-10-15T101351",
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': True,
+                'count': 23,
+                'value_id': 'choice_1',
+                'answer_value_text': 'Option 2',
+                'answer_value_numeric': 'null',
+                'variant': None,
+                'created': '2014-10-15T101351',
             },
         ]
 
         question_types_by_part = {
-            "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "radio",
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': 'radio',
         }
 
         num_options_by_part = {
-            "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": 4,
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': 4,
         }
 
         processed_data = {
-            "count_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
-                    "totalIncorrectCount": 7,
-                    "totalAttemptCount": 30,
-                    "totalCorrectCount": 23,
+            'count_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': {
+                    'totalIncorrectCount': 7,
+                    'totalAttemptCount': 30,
+                    'totalCorrectCount': 23,
                 },
             },
-            "data_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
+            'data_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': [
                     {
-                        "count": 7,
-                        "value_id": "choice_0",
-                        "correct": False,
+                        'count': 7,
+                        'value_id': 'choice_0',
+                        'correct': False,
                     },
                     {
-                        "count": 23,
-                        "value_id": "choice_1",
-                        "correct": True,
+                        'count': 23,
+                        'value_id': 'choice_1',
+                        'correct': True,
                     },
                 ]
             },
-            "message_by_part": {
+            'message_by_part': {
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            'last_update_date': 'Oct 15, 2014 at 10:13 UTC'
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
         self.assertEquals(json.loads(return_json.content), processed_data)
 
     def test_process_analytics_answer_dist_missing_correct(self):
-
-        # Data with correct answer missing.
+        """
+        Test with data that has correct answer missing.
+        """
         data = [
             {
-                "course_id": "A/B/C",
-                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                "correct": False,
-                "count": 7,
-                "value_id": "choice_0",
-                "answer_value_text": "Option 1",
-                "answer_value_numeric": "null",
-                "variant": None,
-                "created": "2014-10-15T101351",
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': False,
+                'count': 7,
+                'value_id': 'choice_0',
+                'answer_value_text': 'Option 1',
+                'answer_value_numeric': 'null',
+                'variant': None,
+                'created': '2014-10-15T101351',
             },
         ]
 
         question_types_by_part = {
-            "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "radio",
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': 'radio',
         }
 
         num_options_by_part = {
-            "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": 4,
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': 4,
         }
 
         processed_data = {
-            "count_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
-                    "totalIncorrectCount": 7,
-                    "totalAttemptCount": 7,
-                    "totalCorrectCount": 0,
+            'count_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': {
+                    'totalIncorrectCount': 7,
+                    'totalAttemptCount': 7,
+                    'totalCorrectCount': 0,
                 },
             },
-            "data_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
+            'data_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': [
                     {
-                        "count": 7,
-                        "value_id": "choice_0",
-                        "correct": False,
+                        'count': 7,
+                        'value_id': 'choice_0',
+                        'correct': False,
                     },
                 ]
             },
-            "message_by_part": {
+            'message_by_part': {
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            'last_update_date': 'Oct 15, 2014 at 10:13 UTC'
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
         self.assertEquals(json.loads(return_json.content), processed_data)
 
     def test_process_analytics_answer_dist_variant(self):
-
-        # Data with variant (radomization) set.
+        """
+        Test with data that has variant (radomization) set.
+        """
         data = [
             {
-                "course_id": "A/B/C",
-                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                "correct": False,
-                "count": 7,
-                "value_id": "choice_0",
-                "answer_value_text": "Option 1",
-                "answer_value_numeric": "null",
-                "variant": "123",
-                "created": "2014-10-15T101351",
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': False,
+                'count': 7,
+                'value_id': 'choice_0',
+                'answer_value_text': 'Option 1',
+                'answer_value_numeric': 'null',
+                'variant': '123',
+                'created': '2014-10-15T101351',
             },
             {
-                "course_id": "A/B/C",
-                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                "correct": True,
-                "count": 23,
-                "value_id": "choice_1",
-                "answer_value_text": "Option 2",
-                "answer_value_numeric": "null",
-                "variant": None,
-                "created": "2014-10-15T101351",
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': True,
+                'count': 23,
+                'value_id': 'choice_1',
+                'answer_value_text': 'Option 2',
+                'answer_value_numeric': 'null',
+                'variant': None,
+                'created': '2014-10-15T101351',
             },
         ]
 
         question_types_by_part = {
-            "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "radio",
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': 'radio',
         }
 
         num_options_by_part = {
-            "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": 4,
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': 4,
         }
 
         processed_data = {
-            "count_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
-                    "totalIncorrectCount": 0,
-                    "totalAttemptCount": 23,
-                    "totalCorrectCount": 23,
+            'count_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': {
+                    'totalIncorrectCount': 0,
+                    'totalAttemptCount': 23,
+                    'totalCorrectCount': 23,
                 },
             },
-            "data_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
+            'data_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': [
                     {
-                        "count": 23,
-                        "value_id": "choice_1",
-                        "correct": True,
+                        'count': 23,
+                        'value_id': 'choice_1',
+                        'correct': True,
                     },
                 ]
             },
-            "message_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "The analytics cannot be displayed for this "
-                                                                        "question as randomization was set at "
-                                                                        "one time."
+            'message_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': (
+                    'The analytics cannot be displayed for this question as randomization was set at '
+                    'one time.'
+                )
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            'last_update_date': 'Oct 15, 2014 at 10:13 UTC'
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
         self.assertEquals(json.loads(return_json.content), processed_data)
 
     def test_process_analytics_answer_dist_radio(self):
-
-        # Data having more rows than choices for radio type.
+        """
+        Test with data having more rows than choices for radio type.
+        """
         data = [
             {
-                "course_id": "A/B/C",
-                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                "correct": False,
-                "count": 7,
-                "value_id": "choice_0",
-                "answer_value_text": "Option 1",
-                "answer_value_numeric": "null",
-                "variant": "123",
-                "created": "2014-10-15T101351",
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': False,
+                'count': 7,
+                'value_id': 'choice_0',
+                'answer_value_text': 'Option 1',
+                'answer_value_numeric': 'null',
+                'variant': '123',
+                'created': '2014-10-15T101351',
             },
             {
-                "course_id": "A/B/C",
-                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                "correct": True,
-                "count": 23,
-                "value_id": "choice_1",
-                "answer_value_text": "Option 2",
-                "answer_value_numeric": "null",
-                "variant": None,
-                "created": "2014-10-15T101351",
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': True,
+                'count': 23,
+                'value_id': 'choice_1',
+                'answer_value_text': 'Option 2',
+                'answer_value_numeric': 'null',
+                'variant': None,
+                'created': '2014-10-15T101351',
             },
         ]
 
@@ -275,74 +283,77 @@ class InlineAnalyticsTest1(ModuleStoreTestCase):
         }
 
         num_options_by_part = {
-            "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": 1,
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': 1,
         }
 
         processed_data = {
-            "count_by_part": {
+            'count_by_part': {
             },
-            "data_by_part": {
+            'data_by_part': {
             },
-            "message_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "The analytics cannot be displayed for this "
-                                                                        "question as the number of rows returned did "
-                                                                        "not match the question definition."
+            'message_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': (
+                    'The analytics cannot be displayed for this question as the number of rows returned did '
+                    'not match the question definition.'
+                )
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            'last_update_date': 'Oct 15, 2014 at 10:13 UTC'
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
         self.assertEquals(json.loads(return_json.content), processed_data)
 
     def test_process_analytics_answer_dist_checkbox(self):
-
-        # Data having more rows than is possible for checkbox type.
+        """
+        Test with data having more rows than is possible for checkbox type.
+        """
         data = [
             {
-                "course_id": "A/B/C",
-                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                "correct": False,
-                "count": 7,
-                "value_id": "choice_0",
-                "answer_value_text": "Option 1",
-                "answer_value_numeric": "null",
-                "variant": "123",
-                "created": "2014-10-15T101351",
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': False,
+                'count': 7,
+                'value_id': 'choice_0',
+                'answer_value_text': 'Option 1',
+                'answer_value_numeric': 'null',
+                'variant': '123',
+                'created': '2014-10-15T101351',
             },
             {
-                "course_id": "A/B/C",
-                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                "correct": True,
-                "count": 23,
-                "value_id": "choice_1",
-                "answer_value_text": "Option 2",
-                "answer_value_numeric": "null",
-                "variant": None,
-                "created": "2014-10-15T101351",
+                'course_id': 'A/B/C',
+                'module_id': 'i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2',
+                'part_id': 'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1',
+                'correct': True,
+                'count': 23,
+                'value_id': 'choice_1',
+                'answer_value_text': 'Option 2',
+                'answer_value_numeric': 'null',
+                'variant': None,
+                'created': '2014-10-15T101351',
             },
         ]
 
         question_types_by_part = {
-            "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "checkbox",
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': 'checkbox',
         }
 
         num_options_by_part = {
-            "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": 0,
+            'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': 0,
         }
 
         processed_data = {
-            "count_by_part": {
+            'count_by_part': {
             },
-            "data_by_part": {
+            'data_by_part': {
             },
-            "message_by_part": {
-                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": "The analytics cannot be displayed for this "
-                                                                        "question as the number of rows returned did "
-                                                                        "not match the question definition."
+            'message_by_part': {
+                'i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1': (
+                    'The analytics cannot be displayed for this question as the number of rows returned did '
+                    'not match the question definition.'
+                )
             },
-            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+            'last_update_date': 'Oct 15, 2014 at 10:13 UTC'
         }
 
         return_json = process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
@@ -350,32 +361,33 @@ class InlineAnalyticsTest1(ModuleStoreTestCase):
 
 
 @override_settings(ANALYTICS_DATA_URL='dummy_url',
-                   ZENDESK_URL='https://zendesk.com')
-class InlineAnalyticsTest2(ModuleStoreTestCase):
-    """ unittest class """
+                   ZENDESK_URL=ZENDESK_URL)
+class InlineAnalyticsAnswerDistributionWithOverrides(ModuleStoreTestCase):
 
     def setUp(self):
-        super(InlineAnalyticsTest2, self).setUp()
+        super(InlineAnalyticsAnswerDistributionWithOverrides, self).setUp()
         self.user = UserFactory.create()
         self.factory = RequestFactory()
         self.course = CourseFactory.create(
-            org="A",
-            number="B",
-            display_name="C",
+            org='A',
+            number='B',
+            display_name='C',
         )
         self.staff = StaffFactory(course_key=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
 
         analytics_data = {
-            "module_id": "123",
-            "question_types_by_part": "radio",
-            "num_options_by_part": 6,
-            "course_id": "A/B/C",
+            'module_id': '123',
+            'question_types_by_part': 'radio',
+            'num_options_by_part': 6,
+            'course_id': 'A/B/C',
         }
         json_analytics_data = json.dumps(analytics_data)
-        self.data = {"data": json_analytics_data}
-        self.zendesk_response = ('A problem has occurred retrieving the data, to report the problem click '
-                                 '<a href="https://zendesk.com/hc/en-us/requests/new">here</a>')
+        self.data = {'data': json_analytics_data}
+        self.zendesk_response = (
+            'A problem has occurred retrieving the data, to report the problem click '
+            '<a href="{ZENDESK_URL}/hc/en-us/requests/new">here</a>'
+        ).format(ZENDESK_URL=ZENDESK_URL)
 
     def test_regular_user(self):
 
@@ -390,7 +402,6 @@ class InlineAnalyticsTest2(ModuleStoreTestCase):
     def test_staff_and_url(self, mock_client, mock_process_analytics):
 
         mock_client.return_value.modules.return_value.answer_distribution.return_value = [{}]
-
         factory = self.factory
         request = factory.post('', self.data)
         request.user = self.staff
@@ -424,8 +435,7 @@ class InlineAnalyticsTest2(ModuleStoreTestCase):
 
         response = get_analytics_answer_dist(request)
         self.assertEquals(response.status_code, 404)
-        self.assertEquals(response.content, 'There are no student answers for this problem yet; '
-                          'please try again later.')
+        self.assertEquals(response.content, 'There are no student answers for this problem yet; please try again later.')
 
     @patch('courseware.views.Client')
     def test_invalid_request_error(self, mock_client):

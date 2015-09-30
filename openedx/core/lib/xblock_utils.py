@@ -27,7 +27,6 @@ from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from openedx.core.lib.inline_analytics_utils import get_responses_data
 
 log = logging.getLogger(__name__)
 
@@ -312,33 +311,6 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 
 
-def add_inline_analytics(user, block, view, frag, context):  # pylint: disable=unused-argument
-    """
-    Adds a fragment for in-line analytics.
-
-    Fragment consists of a button and some placeholder divs.
-
-    Returns the wrapped fragment if the problem has a valid question (response). See get_responses_data function
-    for valid responses.
-
-    Otherwise, returns the fragment unchanged.
-    """
-    responses_data = get_responses_data(block)
-    if responses_data:
-        analytics_context = {
-            'block_content': frag.content,
-            'location': block.location.to_deprecated_string(),
-            'element_id': block.location.html_id().replace('-', '_'),
-            'answer_dist_url': reverse('get_analytics_answer_dist'),
-            'responses_data': responses_data,
-            'course_id': block.course_id.to_deprecated_string(),
-        }
-        return wrap_fragment(frag, render_to_string("inline_analytics.html", analytics_context))
-
-    else:
-        return frag
-
-
 def get_course_update_items(course_updates, provided_index=0):
     """
     Returns list of course_updates data dictionaries either from new format if available or
@@ -397,29 +369,3 @@ def get_course_update_items(course_updates, provided_index=0):
                         return payload
 
     return course_update_items
-
-
-def add_inline_analytics(user, block, view, frag, context):  # pylint: disable=unused-argument
-    """
-    Adds a fragment for in-line analytics.
-    Fragment consists of a button and some placeholder divs.
-
-    Returns the wrapped fragment if the problem has a valid question (response). See get_responses_data function
-    for valid responses.
-
-    Otherwise, returns the fragment unchanged.
-    """
-    responses_data = get_responses_data(block)
-    if responses_data:
-        analytics_context = {
-            'block_content': frag.content,
-            'location': block.location.to_deprecated_string(),
-            'element_id': block.location.html_id().replace('-', '_'),
-            'answer_dist_url': reverse('get_analytics_answer_dist'),
-            'responses_data': responses_data,
-            'course_id': block.course_id.to_deprecated_string(),
-        }
-        return wrap_fragment(frag, render_to_string("inline_analytics.html", analytics_context))
-
-    else:
-        return frag

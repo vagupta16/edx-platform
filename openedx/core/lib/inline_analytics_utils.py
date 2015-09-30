@@ -8,8 +8,11 @@ from collections import namedtuple
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from edxmako.shortcuts import render_to_string
 
 from xmodule.capa_module import CapaModule
+from xblock_utils import wrap_fragment
 
 ValidResponse = namedtuple(
     'ValidResponse',
@@ -111,3 +114,29 @@ def get_responses_data(block):
                                                                    None,
                                                                    return_data))
     return responses_data
+
+
+def add_inline_analytics(_user, block, _view, frag, _context):  # pylint: disable=unused-argument
+    """
+    Adds a fragment for in-line analytics.
+    Fragment consists of a button and some placeholder divs.
+
+    Returns the wrapped fragment if the problem has a valid question (response). See get_responses_data function
+    for valid responses.
+
+    Otherwise, returns the fragment unchanged.
+    """
+    responses_data = get_responses_data(block)
+    if responses_data:
+        analytics_context = {
+            'block_content': frag.content,
+            'location': unicode(block.location),
+            'element_id': block.location.html_id().replace('-', '_'),
+            'answer_dist_url': reverse('get_analytics_answer_dist'),
+            'responses_data': responses_data,
+            'course_id': unicode(block.course_id),
+        }
+        return wrap_fragment(frag, render_to_string('inline_analytics.html', analytics_context))
+
+    else:
+        return frag
