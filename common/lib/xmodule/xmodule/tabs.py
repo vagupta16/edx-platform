@@ -394,8 +394,8 @@ class CourseTabList(List):
             # TODO:FUNK <<<<<<< HEAD
             if (
                 tab.is_enabled(course, user=user) and
-                (not tab.is_hideable or not tab.is_hidden) and
-                (not is_user_sneakpeek or any([isinstance(tab, t) for t in sneakpeek_tab_types]))
+                (not (user and tab.is_hidden)) and
+                (not is_user_sneakpeek or any([t for t in sneakpeek_tab_types if t == tab.type]))
             ):
                 if tab.is_collection:
                     # If rendering inline that add each item in the collection,

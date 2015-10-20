@@ -338,8 +338,8 @@ def _get_dynamic_tabs(course, user):
 
 
 SNEAKPEEK_TAB_TYPES = [
-    CoursewareTab,
-    CourseInfoTab,
-    StaticTab,
-    SyllabusTab,
+    'courseware', # CoursewareTab,
+    'course_info', # CourseInfoTab,
+    'static_tab', # StaticTab,
+    'syllabus', # SyllabusTab,
 ]
