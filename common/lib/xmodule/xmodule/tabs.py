@@ -61,6 +61,9 @@ class CourseTab(object):
     # If there is a single view associated with this tab, this is the name of it
     view_name = None
 
+    # True if this tab can be displaed to sneak peek users
+    is_visible_to_sneak_peek = False
+
     def __init__(self, tab_dict):
         """
         Initializes class members with values passed in by subclasses.
@@ -232,6 +235,7 @@ class StaticTab(CourseTab):
     type = 'static_tab'
     is_default = False  # A static tab is never added to a course by default
     allow_multiple = True
+    is_visible_to_sneak_peek = True
 
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):

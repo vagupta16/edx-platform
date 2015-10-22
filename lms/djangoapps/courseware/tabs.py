@@ -35,6 +35,7 @@ class CoursewareTab(EnrolledTab):
     view_name = 'courseware'
     is_movable = False
     is_default = False
+    is_visible_to_sneak_peek = True
 
 
 class CourseInfoTab(CourseTab):
@@ -48,6 +49,7 @@ class CourseInfoTab(CourseTab):
     tab_id = 'info'
     is_movable = False
     is_default = False
+    is_visible_to_sneak_peek = True
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -64,6 +66,7 @@ class SyllabusTab(EnrolledTab):
     view_name = 'syllabus'
     allow_multiple = True
     is_default = False
+    is_visible_to_sneak_peek = True
 
     @classmethod
     def is_enabled(cls, course, user=None):
