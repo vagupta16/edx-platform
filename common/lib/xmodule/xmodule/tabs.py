@@ -395,7 +395,6 @@ class CourseTabList(List):
         """
         sneakpeek_tab_types = sneakpeek_tab_types or []
         for tab in course.tabs:
-            # TODO:FUNK <<<<<<< HEAD
             if (
                 tab.is_enabled(course, user=user) and
                 (not (user and tab.is_hidden)) and
