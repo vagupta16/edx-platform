@@ -621,14 +621,14 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         if user.is_authenticated():
             if not UserProfile.has_registered(user):
                 if _can_load_descriptor_nonregistered(descriptor):
-                    log.error('Grant direct access to %s', descriptor)
+                    log.error('Grant direct access to %s', descriptor.category)
                     return ACCESS_GRANTED
                 else:
-                    log.error('Deny direct access to %s', descriptor)
+                    log.error('Deny direct access to %s', descriptor.category)
             else:
-                log.error('Defer registered access to %s', descriptor)
+                log.error('Defer registered access to %s', descriptor.category)
         else:
-            log.error('Defer anonymous access to %s', descriptor)
+            log.error('Defer anonymous access to %s', descriptor.category)
         response = (
             _visible_to_nonstaff_users(descriptor)
             and _has_group_access(descriptor, user, course_key)
