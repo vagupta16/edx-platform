@@ -1,6 +1,7 @@
 from pkg_resources import resource_string
 
 import json
+from student.models import UserProfile
 from xblock.core import XBlock
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
@@ -73,7 +74,7 @@ class DiscussionModule(DiscussionFields, XModule):
         user_service = self.runtime.service(self, 'user')
         if user_service:
             user = user_service._django_user  # pylint: disable=protected-access
-        if user:
+        if user and UserProfile.has_registered(user):
             course_key = course.id  # pylint: disable=no-member
             can_create_comment = has_permission(user, "create_comment", course_key)
             can_create_subcomment = has_permission(user, "create_sub_comment", course_key)
