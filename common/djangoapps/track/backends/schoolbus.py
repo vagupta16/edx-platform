@@ -5,11 +5,10 @@ from __future__ import absolute_import
 
 import logging
 from urlparse import urljoin
-import urllib
 import urllib2
+import json
 
 from django.contrib.auth.models import User
-from requests_oauthlib import OAuth1Session
 
 from student.models import anonymous_id_for_user
 from track.backends import BaseBackend
@@ -49,15 +48,10 @@ class SchoolBusAnalyticsBackend(BaseBackend):
         if events is not None:
             self.events = set(events)
 
-        self.oauth = OAuth1Session(self.key, client_secret=self.secret)
-
     def send(self, event):
         """
-        Forward the event to the SchoolBus analytics server
-        Exact API here: https://docs.google.com/document/d/1ZB-qwP0bV7ko_xJdJNX1PYKvTyYd4I8CBltfac4dlfw/edit?pli=1#
-        OAuth 1 with nonce and body signing
+        Forward the event to the SchoolBus service
         """
-
         if not (self.url and self.secret and self.key):
             return None
 
@@ -104,7 +98,7 @@ class SchoolBusAnalyticsBackend(BaseBackend):
             LOG.warning('Can not find a user with user_id: %s', user_id)
             return None
 
-        payload = {
+        event_data = {
             'course_id': course_id,
             'resource_id': problem_id,
             'student_id': anonymous_id_for_user(user, None),
@@ -112,18 +106,18 @@ class SchoolBusAnalyticsBackend(BaseBackend):
             'result': is_correct,
             'event_type': event_type,
         }
-
         endpoint = urljoin(self.url, self.path)
+        message_string = json.dumps({
+            'ltiKey': self.key,
+            'ltiSecret': self.secret,
+            'action': 'publish',
+            'bus_topic': 'studentAction',
+            'payload': event_data,
+        })
 
-        data = urllib.urlencode(payload)
-        req = urllib2.Request(endpoint, data)
+        request = urllib2.Request(endpoint, message_string)
         try:
-            response = urllib2.urlopen(req)
-            data = response.read()
-
-            print "++++++++++++++++++++++"
-            print data
-
+            response = urllib2.urlopen(request)
             message = response.code
             if message == 200:
                 return 'OK'
@@ -135,7 +129,7 @@ class SchoolBusAnalyticsBackend(BaseBackend):
             LOG.warning(
                 "Unable to send event to SchoolBus analytics service: %s: %s: %s",
                 endpoint,
-                payload,
+                event_data,
                 error,
             )
             return None
@@ -144,7 +138,7 @@ class SchoolBusAnalyticsBackend(BaseBackend):
             LOG.warning(
                 "Unable to send event to SchoolBus analytics service: %s: %s: %s",
                 endpoint,
-                payload,
+                event_data,
                 error,
             )
             return None
