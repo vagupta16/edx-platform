@@ -7,6 +7,7 @@ import logging
 from urlparse import urljoin
 import urllib2
 import json
+from httplib import BadStatusLine
 
 from django.contrib.auth.models import User
 
@@ -140,5 +141,23 @@ class SchoolBusAnalyticsBackend(BaseBackend):
                 endpoint,
                 event_data,
                 error,
+            )
+            return None
+
+        except BadStatusLine:
+            LOG.warning(
+                "Unable to send event to SchoolBus analytics service: %s: %s: %s",
+                endpoint,
+                event_data,
+                'Bad Status Line',
+            )
+            return None
+
+        except:
+            LOG.warning(
+                "Unable to send event to SchoolBus analytics service: %s: %s: %s",
+                endpoint,
+                event_data,
+                'Catch all exception',
             )
             return None
