@@ -15,7 +15,7 @@ from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from class_dashboard.dashboard_data import (
     get_problem_grade_distribution, get_sequential_open_distrib,
@@ -33,10 +33,44 @@ USER_COUNT = 11
 
 
 @attr('shard_1')
-class TestGetProblemGradeDistribution(ModuleStoreTestCase):
+class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestGetProblemGradeDistribution, cls).setUpClass()
+        cls.course = CourseFactory.create(
+            display_name=u"test course omega \u03a9",
+        )
+        with cls.store.bulk_operations(cls.course.id, emit_signals=False):
+            section = ItemFactory.create(
+                parent_location=cls.course.location,
+                category="chapter",
+                display_name=u"test factory section omega \u03a9",
+            )
+            cls.sub_section = ItemFactory.create(
+                parent_location=section.location,
+                category="sequential",
+                display_name=u"test subsection omega \u03a9",
+            )
+            cls.unit = ItemFactory.create(
+                parent_location=cls.sub_section.location,
+                category="vertical",
+                metadata={'graded': True, 'format': 'Homework'},
+                display_name=u"test unit omega \u03a9",
+            )
+            cls.items = []
+            for i in xrange(USER_COUNT - 1):
+                item = ItemFactory.create(
+                    parent_location=cls.unit.location,
+                    category="problem",
+                    data=StringResponseXMLFactory().build_xml(answer='foo'),
+                    metadata={'rerandomize': 'always'},
+                    display_name=u"test problem omega \u03a9 " + str(i)
+                )
+                cls.items.append(item)
+                cls.item = item
 
     def setUp(self):
         super(TestGetProblemGradeDistribution, self).setUp()
@@ -45,33 +79,15 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password='test')
         self.attempts = 3
-        self.course = CourseFactory.create(
-            display_name=u"test course omega \u03a9",
-        )
-
-        section = ItemFactory.create(
-            parent_location=self.course.location,
-            category="chapter",
-            display_name=u"test factory section omega \u03a9",
-        )
-        self.sub_section = ItemFactory.create(
-            parent_location=section.location,
-            category="sequential",
-            display_name=u"test subsection omega \u03a9",
-        )
-
-        unit = ItemFactory.create(
-            parent_location=self.sub_section.location,
-            category="vertical",
-            metadata={'graded': True, 'format': 'Homework'},
-            display_name=u"test unit omega \u03a9",
-        )
-
-        self.users = [UserFactory.create(username="metric" + str(__)) for __ in xrange(USER_COUNT)]
+        self.users = [
+            UserFactory.create(username="metric" + str(__))
+            for __ in xrange(USER_COUNT)
+        ]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
+<<<<<<< HEAD
         #  Adding an instructor and a staff to the site.  These should not be included in any reports.
         instructor_member = InstructorFactory(course_key=self.course.id)
         CourseEnrollment.enroll(instructor_member, self.course.id)
@@ -89,15 +105,19 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                 display_name=u"test problem omega \u03a9 " + str(i)
             )
 
+=======
+        for i, item in enumerate(self.items):
+>>>>>>> upstream/hotfix/2015-11-10
             for j, user in enumerate(self.users):
                 StudentModuleFactory.create(
                     grade=1 if i < j else 0,
                     max_grade=1 if i < j else 0.5,
                     student=user,
                     course_id=self.course.id,
-                    module_state_key=self.item.location,
+                    module_state_key=item.location,
                     state=json.dumps({'attempts': self.attempts}),
                 )
+<<<<<<< HEAD
 
             StudentModuleFactory.create(
                 grade=1,
@@ -157,6 +177,14 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         for problem in prob_grade_distrib:
             max_grade = prob_grade_distrib[problem]['max_grade']
             self.assertEquals(1, max_grade)
+=======
+            for j, user in enumerate(self.users):
+                StudentModuleFactory.create(
+                    course_id=self.course.id,
+                    module_type='sequential',
+                    module_state_key=item.location,
+                )
+>>>>>>> upstream/hotfix/2015-11-10
 
         for val in total_student_count.values():
             self.assertEquals(USER_COUNT, val)

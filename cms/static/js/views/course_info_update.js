@@ -1,6 +1,12 @@
 define(["js/views/baseview", "codemirror", "js/models/course_update",
+<<<<<<< HEAD
     "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal", "js/views/utils/view_utils"],
     function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils, ViewUtils) {
+=======
+        "common/js/components/views/feedback_prompt", "common/js/components/views/feedback_notification",
+        "js/views/course_info_helper", "js/utils/modal"],
+    function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
+>>>>>>> upstream/hotfix/2015-11-10
 
     var CourseInfoUpdateView = BaseView.extend({
 
