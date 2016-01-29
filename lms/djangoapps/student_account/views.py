@@ -98,7 +98,6 @@ def login_and_registration_form(request, initial_mode="login"):
 
     # Otherwise, render the combined login/registration page
     context = {
-<<<<<<< HEAD
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
         'disable_courseware_js': True,
         'initial_mode': initial_mode,
@@ -106,7 +105,6 @@ def login_and_registration_form(request, initial_mode="login"):
         'third_party_auth_hint': third_party_auth_hint or '',
         'platform_name': settings.PLATFORM_NAME,
         'account_name': settings.ACCOUNT_NAME,
-=======
         'data': {
             'login_redirect_url': redirect_to,
             'initial_mode': initial_mode,
@@ -123,7 +121,6 @@ def login_and_registration_form(request, initial_mode="login"):
             'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
->>>>>>> upstream/hotfix/2015-11-10
         'responsive': True,
         'allow_iframing': True,
         'disable_courseware_js': True,

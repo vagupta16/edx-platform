@@ -1160,7 +1160,6 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
 
-<<<<<<< HEAD
 class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
     Tests that CSV student responses report generation works.
@@ -1366,7 +1365,8 @@ class TestInstructorStudentForumsReport(TestReportMixin, InstructorTaskCourseTes
                 with patch('instructor_task.models.LocalFSReportStore.store_rows'):
                     return_val = push_student_forums_data_to_s3(None, None, self.course.id, None, 'generated')
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
-=======
+
+
 class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     "Test the student report when including teams information. "
 
@@ -1425,7 +1425,6 @@ class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
 
         self._generate_and_verify_teams_column(self.student1.username, UNAVAILABLE)
         self._generate_and_verify_teams_column(self.student2.username, team2.name)
->>>>>>> upstream/hotfix/2015-11-10
 
 
 @ddt.ddt
@@ -1883,13 +1882,9 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         current_task = Mock()
         current_task.update_state = Mock()
-<<<<<<< HEAD
-        with self.assertNumQueries(136):
-=======
         instructor_task = Mock()
         instructor_task.task_input = json.dumps({'students': None})
         with self.assertNumQueries(125):
->>>>>>> upstream/hotfix/2015-11-10
             with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = current_task
                 with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:

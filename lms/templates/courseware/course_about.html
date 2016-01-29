@@ -197,7 +197,7 @@ from edxmako.shortcuts import marketing_link
             ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default) | h}
           </a>
           % if sneakpeek_allowed and not regularly_registered:
-            <a href="#" class="course_sneakpeek"</a>
+            <a href="#" class="course_sneakpeek">
               <span class="sneakpeek" title="${_("By exploring the course, you are agreeing to our Terms of Service. Please read them carefully.")}">${_("Explore Course")} *</span>
             </a>
           % endif
@@ -263,10 +263,8 @@ from edxmako.shortcuts import marketing_link
           % if microsite.get_value('course_about_show_social_links', True):
           <div class="social-sharing">
             <div class="sharing-message">${_("Share with friends and family!")}</div>
-<<<<<<< HEAD
             % if self.course_about_social_sharing_file:
               <%include file="${self.course_about_social_sharing_file}" />
-=======
             ## TODO: this should probably be an overrideable block,
             ##       or something allowing themes to do whatever they
             ##       want here (and on this whole page, really).
@@ -277,7 +275,6 @@ from edxmako.shortcuts import marketing_link
               <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20enrolled%20in%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
                 <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
               </a>
->>>>>>> upstream/hotfix/2015-11-10
             % else:
               <%
                 site_domain = microsite.get_value('site_domain', settings.SITE_NAME)

@@ -12,13 +12,6 @@
 
 .modal {
   @extend %ui-depth1;
-<<<<<<< HEAD
-  background: $gray-d2;
-  border-radius: 3px;
-  box-shadow: 0 0px 5px 0 $shadow-d1;
-  color: $base-font-color;
-=======
->>>>>>> upstream/hotfix/2015-11-10
   display: none;
   position: absolute;
   left: 50%;

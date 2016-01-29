@@ -352,7 +352,7 @@
                     thirdPartyAuth: THIRD_PARTY_AUTH,
                     platformName: PLATFORM_NAME
                 });
->>>>>>> upstream/hotfix/2015-11-10
+>>>>>>> hotfix-2015-11-10
 
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(that);

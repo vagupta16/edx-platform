@@ -386,7 +386,6 @@ FEATURES = {
     # Batch-Generated Certificates from Instructor Dashboard
     'CERTIFICATES_INSTRUCTOR_GENERATION': False,
 
-<<<<<<< HEAD
     # Social Media Sharing on Student Dashboard
     'SOCIAL_SHARING_SETTINGS': {
         # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in cms/envs/common.py
@@ -402,8 +401,6 @@ FEATURES = {
 
     'ENABLE_PROGRESS_SUMMARY': True,
 
-=======
->>>>>>> upstream/hotfix/2015-11-10
     # Course discovery feature
     'ENABLE_COURSE_DISCOVERY': False,
 
@@ -2085,13 +2082,12 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
-<<<<<<< HEAD
 ######################### VISIBLE SETTINGS ###########################
 # These settings' values will be exposed to all templates
 TEMPLATE_VISIBLE_SETTINGS = [
     'FEATURES',
 ]
-=======
+
 ############################# SOCIAL MEDIA SHARING #############################
 # Social Media Sharing on Student Dashboard
 SOCIAL_SHARING_SETTINGS = {
@@ -2105,7 +2101,6 @@ SOCIAL_SHARING_SETTINGS = {
     'DASHBOARD_TWITTER': False,
     'DASHBOARD_TWITTER_TEXT': None
 }
->>>>>>> upstream/hotfix/2015-11-10
 
 ################# Social Media Footer Links #######################
 # The names list controls the order of social media

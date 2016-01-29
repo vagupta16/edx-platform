@@ -106,7 +106,6 @@ class HtmlModuleMixin(HtmlBlock, XModule):
     js_module_name = "HTMLModule"
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
-<<<<<<< HEAD
     def get_html(self):
         if self.system.substitute_keywords_with_data:
             course = self.descriptor.runtime.modulestore.get_course(self.course_id)
@@ -122,8 +121,6 @@ class HtmlModuleMixin(HtmlBlock, XModule):
             return self.system.substitute_keywords_with_data(self.data, context)
         return self.data
 
-=======
->>>>>>> upstream/hotfix/2015-11-10
 
 @edxnotes
 class HtmlModule(HtmlModuleMixin):

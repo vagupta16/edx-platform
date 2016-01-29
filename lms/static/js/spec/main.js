@@ -71,11 +71,8 @@
             'history': 'js/vendor/history',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
-<<<<<<< HEAD
             'js/inline_analytics': 'js/inline_analytics',
-=======
             'js/utils/navigation': 'js/utils/navigation',
->>>>>>> upstream/hotfix/2015-11-10
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',

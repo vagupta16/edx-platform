@@ -87,7 +87,6 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
-<<<<<<< HEAD
         #  Adding an instructor and a staff to the site.  These should not be included in any reports.
         instructor_member = InstructorFactory(course_key=self.course.id)
         CourseEnrollment.enroll(instructor_member, self.course.id)
@@ -105,9 +104,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                 display_name=u"test problem omega \u03a9 " + str(i)
             )
 
-=======
         for i, item in enumerate(self.items):
->>>>>>> upstream/hotfix/2015-11-10
             for j, user in enumerate(self.users):
                 StudentModuleFactory.create(
                     grade=1 if i < j else 0,
@@ -117,7 +114,6 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                     module_state_key=item.location,
                     state=json.dumps({'attempts': self.attempts}),
                 )
-<<<<<<< HEAD
 
             StudentModuleFactory.create(
                 grade=1,
@@ -177,14 +173,12 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         for problem in prob_grade_distrib:
             max_grade = prob_grade_distrib[problem]['max_grade']
             self.assertEquals(1, max_grade)
-=======
             for j, user in enumerate(self.users):
                 StudentModuleFactory.create(
                     course_id=self.course.id,
                     module_type='sequential',
                     module_state_key=item.location,
                 )
->>>>>>> upstream/hotfix/2015-11-10
 
         for val in total_student_count.values():
             self.assertEquals(USER_COUNT, val)

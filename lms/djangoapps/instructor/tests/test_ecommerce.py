@@ -42,12 +42,10 @@ class TestECommerceDashboardViews(SharedModuleStoreTestCase):
             mode_display_name='honor', min_price=10, currency='usd'
         )
         mode.save()
-<<<<<<< HEAD
+
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         self.e_commerce_link = '<li class="nav-item"><a href="" data-section="e-commerce">E-Commerce</a></li>'
-=======
->>>>>>> upstream/hotfix/2015-11-10
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
 
     def test_pass_e_commerce_tab_in_instructor_dashboard(self):

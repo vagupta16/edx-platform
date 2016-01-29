@@ -1128,7 +1128,6 @@ def change_enrollment(request, check_access=True):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
-<<<<<<< HEAD
 def notify_enrollment_by_email(course, user, request):
     """
     Updates the user about the course enrollment by email.
@@ -1216,8 +1215,6 @@ def accounts_login(request):
     return render_to_response('login.html', context)
 
 
-=======
->>>>>>> upstream/hotfix/2015-11-10
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument

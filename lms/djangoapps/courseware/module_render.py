@@ -74,11 +74,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mixin import wrap_with_license
 from util.json_request import JsonResponse
-<<<<<<< HEAD
 from util.keyword_substitution import substitute_keywords_with_data
-=======
 from util.model_utils import slugify
->>>>>>> upstream/hotfix/2015-11-10
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
 from verify_student.services import ReverificationService

@@ -56,11 +56,6 @@ git+https://github.com/edx/nose.git@99c2aff0ff51bf228bfa5482e97e612c97a23245#egg
 -e git+https://github.com/Stanford-Online/xblock-submit-and-compare.git@2d5d0f7156ab35abe4bb3a51927cc447511b8d98#egg=xblock-submit-and-compare
 -e git+https://github.com/Stanford-Online/xblock-mufi.git@ee853b8a7668a87c27d13d55c0d149a04b8657b8#egg=xblock_mufi-master
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
-<<<<<<< HEAD
-=======
--e git+https://github.com/edx/edx-ora2.git@release-2015-09-22T15.43#egg=edx-ora2
--e git+https://github.com/edx/edx-submissions.git@0.1.0#egg=edx-submissions
->>>>>>> upstream/hotfix/2015-11-10
 -e git+https://github.com/edx/opaque-keys.git@27dc382ea587483b1e3889a3d19cbd90b9023a06#egg=opaque-keys
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
 git+https://github.com/edx/i18n-tools.git@v0.1.3#egg=i18n-tools==v0.1.3
@@ -81,10 +76,9 @@ git+https://github.com/edx/edx-proctoring.git@0.10.20#egg=edx-proctoring==0.10.2
 
 
 # Third Party XBlocks
-<<<<<<< HEAD
 -e git+https://github.com/Stanford-Online/xblock-grademe.git@v0.1.0#egg=grademebutton
 -e git+https://github.com/Stanford-Online/edx-sga@0fb3a0e8887c6856f13c1c388661dcc255710b1d#egg=edx-sga
--e git+https://github.com/open-craft/xblock-poll@v1.0#egg=xblock-poll
+-e git+https://github.com/open-craft/xblock-poll@e7a6c95c300e95c51e42bfd1eba70489c05a6527#egg=xblock-poll
 
 # OLI XBlocks
 -e git+https://github.com/openlearninginitiative/xblock-image-coding.git@cee23e3d59943066159ca13839c82a12d9ccf749#egg=xblock_image_coding
@@ -92,7 +86,3 @@ git+https://github.com/edx/edx-proctoring.git@0.10.20#egg=edx-proctoring==0.10.2
 # Stanford XBlocks
 -e git+https://github.com/Stanford-Online/xblock-qualtrics-survey@653400485196f8bb05b859c9d89de378a22e0503#egg=xblock-qualtrics-survey
 -e git+https://github.com/Stanford-Online/xblock-free-text-response@01cb026337f4fdd97e89b017142be06506e56afa#egg=xblock-free-text-response
-=======
--e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
--e git+https://github.com/open-craft/xblock-poll@e7a6c95c300e95c51e42bfd1eba70489c05a6527#egg=xblock-poll
->>>>>>> upstream/hotfix/2015-11-10

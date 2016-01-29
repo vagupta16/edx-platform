@@ -34,13 +34,10 @@ from instructor_task.tasks_helper import (
     rescore_problem_module_state,
     reset_attempts_module_state,
     delete_problem_module_state,
-<<<<<<< HEAD
     push_student_responses_to_s3,
     push_ora2_responses_to_s3,
     push_course_forums_data_to_s3,
-=======
     upload_problem_responses_csv,
->>>>>>> upstream/hotfix/2015-11-10
     upload_grades_csv,
     upload_problem_grade_report,
     upload_students_csv,
@@ -211,7 +208,6 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-<<<<<<< HEAD
 @task(base=BaseInstructorTask, routing_key=settings.STUDENT_RESPONSES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
 def get_student_responses(entry_id, xmodule_instance_args):
     """
@@ -255,9 +251,6 @@ def get_student_forums_usage(entry_id, xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
-=======
-@task(base=BaseInstructorTask)  # pylint: disable=not-callable
->>>>>>> upstream/hotfix/2015-11-10
 def enrollment_report_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
