@@ -375,7 +375,6 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </ol>
             </section>
 
-<<<<<<< HEAD
         % if settings.FEATURES.get('ENABLE_ENROLLMENT_EMAIL'):
         <hr class="divide" />
         <section class="group-settings enrollment-email">
@@ -444,10 +443,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
         </section>
         % endif
 
-          % if about_page_editable:
-=======
           % if about_page_editable or is_prerequisite_courses_enabled or is_entrance_exams_enabled:
->>>>>>> hotfix-2015-11-10
             <hr class="divide" />
 
             <section class="group-settings requirements">

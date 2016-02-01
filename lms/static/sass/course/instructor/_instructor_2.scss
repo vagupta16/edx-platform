@@ -2430,7 +2430,6 @@ input[name="subject"] {
   @include right(auto);
 }
 
-<<<<<<< HEAD
 .course-specific-container {
 
   .upload {
@@ -2490,7 +2489,10 @@ input[name="subject"] {
     .loading {
       font-size: 2em;
       margin-bottom: $baseline;
-=======
+    }
+  }
+}
+
 #certificate-white-list-editor{
   .msg-success{
     border-top: 2px solid $confirm-color;
@@ -2568,7 +2570,6 @@ input[name="subject"] {
           background-color: $blue-l5;
         }
       }
->>>>>>> hotfix-2015-11-10
     }
   }
 }
