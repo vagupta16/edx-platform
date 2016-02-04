@@ -1195,24 +1195,24 @@ def _check_can_enroll_in_course(user, course_key, access_type="enroll"):
 
     return True, ""
 
-
-@never_cache
-@ensure_csrf_cookie
-def accounts_login(request):
-    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
-    external_auth_response = external_auth_login(request)
-    if external_auth_response is not None:
-        return external_auth_response
-
-    redirect_to = get_next_url_for_login_page(request)
-    context = {
-        'login_redirect_url': redirect_to,
-        'pipeline_running': 'false',
-        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
-        'platform_name': settings.PLATFORM_NAME,
-        'account_name': settings.ACCOUNT_NAME,
-    }
-    return render_to_response('login.html', context)
+###DCA Removed for now
+# @never_cache
+# @ensure_csrf_cookie
+# def accounts_login(request):
+#     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
+#     external_auth_response = external_auth_login(request)
+#     if external_auth_response is not None:
+#         return external_auth_response
+# 
+#     redirect_to = get_next_url_for_login_page(request)
+#     context = {
+#         'login_redirect_url': redirect_to,
+#         'pipeline_running': 'false',
+#         'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
+#         'platform_name': settings.PLATFORM_NAME,
+#         'account_name': settings.ACCOUNT_NAME,
+#     }
+#     return render_to_response('login.html', context)
 
 
 # Need different levels of logging
