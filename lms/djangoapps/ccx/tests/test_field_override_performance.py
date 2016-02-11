@@ -24,7 +24,7 @@ from xblock.core import XBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
     TEST_DATA_SPLIT_MODULESTORE, TEST_DATA_MONGO_MODULESTORE
-from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, check_sum_of_calls
+from xmodule.modulestore.tests.factories import check_mongo_calls_range, CourseFactory, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from ccx_keys.locator import CCXLocator
 from ccx.tests.factories import CcxFactory
@@ -142,7 +142,7 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
         Assert that mongodb is queried ``calls`` times in the surrounded
         context.
         """
-        return check_mongo_calls(calls)
+        return check_mongo_calls_range(max_finds=calls)
 
     def assertXBlockInstantiations(self, instantiations):
         """
