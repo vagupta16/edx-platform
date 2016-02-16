@@ -25,18 +25,11 @@ from django.core.urlresolvers import reverse
 
         is_edx_domain = settings.FEATURES.get('IS_EDX_DOMAIN', False)
         partner_email = settings.FEATURES.get('PARTNER_SUPPORT_EMAIL', '')
-
+        %>
       <ul class="list-actions">
           <li class="action-item js-help-pdf">
             <a href="${get_online_help_info(online_help_token)['pdf_url']}" target="_blank" rel="external" class="action action-primary">${_("Building and Running an {platform_name} Course PDF").format(platform_name=settings.PLATFORM_NAME)}</a>
           </li>
-
-        % if settings.TENDER_DOMAIN:
-          <li class="action-item">
-            <a href="http://${settings.TENDER_DOMAIN}" rel="external" class="action action-primary">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</a>
-            <span class="tip">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</span>
-          </li>
-        % endif
 
         <li class="action-item">
           <a href="https://stanfordonline.zendesk.com/hc" rel="external" class="action action-primary">${_("Help Center")}</a>
@@ -49,26 +42,7 @@ from django.core.urlresolvers import reverse
       </ul>
       </div>
 
-    % if settings.TENDER_DOMAIN:
-      <div class="feedback">
-        <h3 class="title">${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h3>
-
-        <div class="copy">
-           <p>${_("Have problems, questions, or suggestions about {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</p>
-        </div>
-
-        <ul class="list-actions">
-          % for link in links:
-            % if link['condition']:
-              <li class="action-item">
-                <a href="${link['href']}" title="${link['sr_mouseover_text']}" rel="external" class="action action-primary">${link['text']}</a>
-                <span class="tip">${link['sr_mouseover_text']}</span>
-              </li>
-            %endif
-          % endfor
-        </ul>
       </div>
-    % endif
     </section>
   </div>
 </div>
