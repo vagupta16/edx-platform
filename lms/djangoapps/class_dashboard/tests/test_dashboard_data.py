@@ -7,12 +7,12 @@ import json
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from courseware.tests.factories import StaffFactory, InstructorFactory
 from mock import patch
 from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
+from courseware.tests.factories import StaffFactory, InstructorFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -84,9 +84,6 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             for __ in xrange(USER_COUNT)
         ]
 
-        for user in self.users:
-            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
-
         #  Adding an instructor and a staff to the site.  These should not be included in any reports.
         instructor_member = InstructorFactory(course_key=self.course.id)
         CourseEnrollment.enroll(instructor_member, self.course.id)
@@ -94,15 +91,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         staff_member = StaffFactory(course_key=self.course.id)
         CourseEnrollment.enroll(staff_member, self.course.id)
 
-        for i in xrange(USER_COUNT - 1):
-            category = "problem"
-            self.item = ItemFactory.create(
-                parent_location=unit.location,
-                category=category,
-                data=StringResponseXMLFactory().build_xml(answer='foo'),
-                metadata={'rerandomize': 'always'},
-                display_name=u"test problem omega \u03a9 " + str(i)
-            )
+        for user in self.users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
         for i, item in enumerate(self.items):
             for j, user in enumerate(self.users):
@@ -114,46 +104,46 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                     module_state_key=item.location,
                     state=json.dumps({'attempts': self.attempts}),
                 )
-
-            StudentModuleFactory.create(
-                grade=1,
-                max_grade=1,
-                student=instructor_member,
-                course_id=self.course.id,
-                module_state_key=self.item.location,
-                state=json.dumps({'attempts': self.attempts}),
-            )
-
-            StudentModuleFactory.create(
-                grade=1,
-                max_grade=1,
-                student=staff_member,
-                course_id=self.course.id,
-                module_state_key=self.item.location,
-                state=json.dumps({'attempts': self.attempts}),
-            )
-
         for j, user in enumerate(self.users):
             StudentModuleFactory.create(
                 course_id=self.course.id,
-                student=user,
                 module_type='sequential',
                 module_state_key=self.sub_section.location,
             )
 
         StudentModuleFactory.create(
-            course_id=self.course.id,
+            grade=1,
+            max_grade=1,
             student=instructor_member,
-            module_type='sequential',
-            module_state_key=self.sub_section.location,
+            course_id=self.course.id,
+            module_state_key=self.item.location,
+            state=json.dumps({'attempts': self.attempts}),
         )
 
         StudentModuleFactory.create(
-            course_id=self.course.id,
+            grade=1,
+            max_grade=1,
             student=staff_member,
+            course_id=self.course.id,
+            module_state_key=self.item.location,
+            state=json.dumps({'attempts': self.attempts}),
+        )
+
+        StudentModuleFactory.create(
+            student=instructor_member,
+            course_id=self.course.id,
             module_type='sequential',
             module_state_key=self.sub_section.location,
+            state=json.dumps({'attempts': self.attempts}),
         )
+  
+        StudentModuleFactory.create(
+            student=staff_member,
+            course_id=self.course.id,
+            module_type='sequential',
+            module_state_key=self.sub_section.location,
+            state=json.dumps({'attempts': self.attempts}),
+       )
 
     def test_instructor_staff_studentmodules(self):
         non_students = get_non_student_list(self.course.id)
@@ -173,12 +163,6 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         for problem in prob_grade_distrib:
             max_grade = prob_grade_distrib[problem]['max_grade']
             self.assertEquals(1, max_grade)
-            for j, user in enumerate(self.users):
-                StudentModuleFactory.create(
-                    course_id=self.course.id,
-                    module_type='sequential',
-                    module_state_key=item.location,
-                )
 
         for val in total_student_count.values():
             self.assertEquals(USER_COUNT, val)
@@ -255,54 +239,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                 sum_attempts += item[1]
             self.assertEquals(USER_COUNT, sum_attempts)
 
-    @patch('class_dashboard.dashboard_data.Client')
-    @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT - 1))
-    def test_get_problem_set_grade_distrib_from_client(self, mock_client):
-        mock_client.return_value.modules.return_value.grade_distribution.return_value = [
-            {
-                'grade': 1,
-                'max_grade': 1,
-                'count': USER_COUNT,
-            },
-        ]
-
-        prob_grade_distrib, __ = get_problem_grade_distribution(self.course.id, USER_COUNT)
-        probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib, USER_COUNT)
-
-        for problem in probset_grade_distrib:
-            max_grade = probset_grade_distrib[problem]['max_grade']
-            self.assertEquals(1, max_grade)
-
-            grade_distrib = probset_grade_distrib[problem]['grade_distrib']
-            sum_attempts = 0
-            for item in grade_distrib:
-                sum_attempts += item[1]
-            self.assertEquals(USER_COUNT, sum_attempts)
-
-    @override_settings(ANALYTICS_DATA_URL='', MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT - 1))
-    def test_get_problem_set_grade_distrib_api_not_set(self):
-        prob_grade_distrib, __ = get_problem_grade_distribution(self.course.id, USER_COUNT)
-        probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib, USER_COUNT)
-
-        for problem in probset_grade_distrib:
-            max_grade = probset_grade_distrib[problem]['max_grade']
-            self.assertEquals(1, max_grade)
-
-            grade_distrib = probset_grade_distrib[problem]['grade_distrib']
-            sum_attempts = 0
-            for item in grade_distrib:
-                sum_attempts += item[1]
-            self.assertEquals(USER_COUNT, sum_attempts)
-
-    @patch('class_dashboard.dashboard_data.Client')
-    def test_get_d3_problem_grade_distrib(self, mock_client):
-        mock_client.return_value.modules.return_value.grade_distribution.return_value = [
-            {
-                'grade': 1,
-                'max_grade': 1,
-                'count': USER_COUNT,
-            },
-        ]
+    def test_get_d3_problem_grade_distrib(self):
 
         d3_data = get_d3_problem_grade_distrib(self.course.id, USER_COUNT)
         for data in d3_data:
@@ -312,9 +249,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                     sum_values += problem['value']
                 self.assertEquals(USER_COUNT, sum_values)
 
-    @patch('class_dashboard.dashboard_data.Client')
-    def test_get_d3_sequential_open_distrib(self, mock_client):
-        mock_client.return_value.modules.return_value.sequential_open_distribution.return_value = [{'count': 0}]
+    def test_get_d3_sequential_open_distrib(self):
 
         d3_data = get_d3_sequential_open_distrib(self.course.id, USER_COUNT)
 
@@ -324,15 +259,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                     value = problem['value']
                 self.assertEquals(USER_COUNT, value)
 
-    @patch('class_dashboard.dashboard_data.Client')
-    def test_get_d3_section_grade_distrib(self, mock_client):
-        mock_client.return_value.modules.return_value.grade_distribution.return_value = [
-            {
-                'grade': 1,
-                'max_grade': 1,
-                'count': USER_COUNT,
-            },
-        ]
+    def test_get_d3_section_grade_distrib(self):
 
         d3_data = get_d3_section_grade_distrib(self.course.id, 0, USER_COUNT)
 
