@@ -8,7 +8,7 @@ from mock import patch, MagicMock
 from student.tests.factories import UserFactory
 
 from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
-import lti_provider.tasks as tasks
+from lti_provider.tasks import send_composite_outcome, send_leaf_outcome
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 
@@ -78,7 +78,7 @@ class SendLeafOutcomeTest(BaseOutcomeTest):
     )
     @ddt.unpack
     def test_outcome_with_score(self, earned, possible, expected):
-        tasks.send_leaf_outcome(
+        send_leaf_outcome(
             self.assignment.id,   # pylint: disable=no-member
             earned,
             possible
@@ -118,7 +118,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     @ddt.unpack
     def test_outcome_with_score_score(self, earned, possible, expected):
         self.weighted_scores.score_for_module = MagicMock(return_value=(earned, possible))
-        tasks.send_composite_outcome(
+        send_composite_outcome(
             self.user.id, unicode(self.course_key), self.assignment.id, 1  # pylint: disable=no-member
         )
         self.send_score_update_mock.assert_called_once_with(self.assignment, expected)
@@ -126,7 +126,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     def test_outcome_with_outdated_version(self):
         self.assignment.version_number = 2
         self.assignment.save()
-        tasks.send_composite_outcome(
+        send_composite_outcome(
             self.user.id, unicode(self.course_key), self.assignment.id, 1  # pylint: disable=no-member
         )
         self.assertEqual(self.weighted_scores_mock.call_count, 0)
