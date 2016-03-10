@@ -17,12 +17,6 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
-<<<<<<< HEAD
-from django.test.client import RequestFactory
-from mock import Mock, patch
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-=======
->>>>>>> hotfix-2015-11-10
 
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
