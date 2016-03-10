@@ -6,12 +6,8 @@ import logging
 import urllib
 import urllib2
 import json
-<<<<<<< HEAD
 from util.json_request import JsonResponse
 from pytz import timezone
-import cgi
-=======
->>>>>>> hotfix-2015-11-10
 
 from datetime import datetime
 from django.utils.translation import ugettext as _
