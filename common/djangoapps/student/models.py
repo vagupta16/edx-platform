@@ -30,12 +30,7 @@ from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-<<<<<<< HEAD
-from django.db import models, IntegrityError
-from django.db import transaction
-=======
 from django.db import models, IntegrityError, transaction
->>>>>>> hotfix-2015-11-10
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
@@ -293,10 +288,9 @@ class UserProfile(models.Model):
         """
         return self.profile_image_uploaded_at is not None
 
-<<<<<<< HEAD
     # "nonregistered" users are auto-created and have no meaningful profile info
     nonregistered = models.BooleanField(default=False)
-=======
+
     @property
     def age(self):
         """ Convenience method that returns the age given a year_of_birth. """
@@ -316,7 +310,6 @@ class UserProfile(models.Model):
         """ Convenience method that returns the human readable gender. """
         if self.gender:
             return self.__enumerable_to_display(self.GENDER_CHOICES, self.gender)
->>>>>>> hotfix-2015-11-10
 
     def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta
