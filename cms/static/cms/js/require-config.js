@@ -83,19 +83,7 @@ require.config({
         // end of Annotation tool files
 
         // externally hosted files
-<<<<<<< HEAD
-        "tender": [
-            // if TENDER_SUBDOMAIN is defined, use that; otherwise, use a dummy value
-            // (the application JS will never `require(['tender'])` if it's not defined)
-            "//" + (typeof TENDER_SUBDOMAIN === "string" ? TENDER_SUBDOMAIN : "example") + ".tenderapp.com/tender_widget",
-            // if tender fails to load, fallback on a local file
-            // so that require doesn't fall over
-            "js/src/tender_fallback"
-        ],
         "mathjax": "//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured",
-=======
-        "mathjax": "//cdn.mathjax.org/mathjax/2.5-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
->>>>>>> hotfix-2015-11-10
         "youtube": [
             // youtube URL does not end in ".js". We add "?noext" to the path so
             // that require.js adds the ".js" to the query component of the URL,
