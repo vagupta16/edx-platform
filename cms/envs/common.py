@@ -36,12 +36,8 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, DATA_DIR, ALL_LANGUAGES, WIKI_ENABLED,
-<<<<<<< HEAD
-    update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT,
-    MODULESTORE, ACCOUNT_NAME,
-=======
     update_module_store_settings, ASSET_IGNORE_REGEX, COPYRIGHT_YEAR, PARENTAL_CONSENT_AGE_LIMIT, COMP_THEME_DIR,
->>>>>>> hotfix-2015-11-10
+    ACCOUNT_NAME,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
@@ -50,13 +46,10 @@ from lms.envs.common import (
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
-<<<<<<< HEAD
     DEFAULT_COURSE_ABOUT_IMAGE_URL,
-=======
 
     # Django REST framework configuration
     REST_FRAMEWORK,
->>>>>>> hotfix-2015-11-10
 )
 from path import Path as path
 from warnings import simplefilter
@@ -1061,17 +1054,12 @@ ADVANCED_COMPONENT_TYPES = [
     'ubcpi',
 ]
 
-<<<<<<< HEAD
 # XBlock types listed here will _always_ be selectable as Studio components
 XBLOCKS_ALWAYS_IN_STUDIO = [
 ]
-# Adding components in this list will disable the creation of new problem for those
-# compoenents in studio. Existing problems will work fine and one can edit them in studio
-=======
 # Adding components in this list will disable the creation of new problem for
 # those components in Studio. Existing problems will work fine and one can edit
 # them in Studio.
->>>>>>> hotfix-2015-11-10
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 # Specify XBlocks that should be treated as advanced problems. Each entry is a
