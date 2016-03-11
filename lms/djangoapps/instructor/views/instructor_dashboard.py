@@ -373,11 +373,7 @@ def _section_course_info(course, access):
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'start_date': get_default_time_display(course.start),
-<<<<<<< HEAD
-        'end_date': get_default_time_display(course.end),
-=======
         'end_date': get_default_time_display(course.end) or _('No end date set'),
->>>>>>> hotfix-2015-11-10
         'num_sections': len(course.children),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
     }
@@ -542,7 +538,6 @@ def _section_data_download(course, access):
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
         'access': access,
-<<<<<<< HEAD
         'delete_report_download_url': reverse('delete_report_download', kwargs={'course_id': unicode(course_key)}),
         'get_student_responses_url': reverse('get_student_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_student_forums_usage_url': reverse('get_student_forums_usage', kwargs={'course_id': unicode(course_key)}),
@@ -551,11 +546,8 @@ def _section_data_download(course, access):
         'get_course_forums_usage_url': reverse('get_course_forums_usage', kwargs={'course_id': course_key.to_deprecated_string()}),
         'graph_course_forums_usage_url': reverse('graph_course_forums_usage',
                                                  kwargs={'course_id': unicode(course_key)}),
-        'show_generate_proctored_exam_report_button': settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False),
-=======
         'show_generate_proctored_exam_report_button': show_proctored_report_button,
         'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': unicode(course_key)}),
->>>>>>> hotfix-2015-11-10
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
         'get_issued_certificates_url': reverse(
