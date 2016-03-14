@@ -136,14 +136,14 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             module_state_key=self.sub_section.location,
             state=json.dumps({'attempts': self.attempts}),
         )
-  
+
         StudentModuleFactory.create(
             student=staff_member,
             course_id=self.course.id,
             module_type='sequential',
             module_state_key=self.sub_section.location,
             state=json.dumps({'attempts': self.attempts}),
-       )
+        )
 
     def test_instructor_staff_studentmodules(self):
         non_students = get_non_student_list(self.course.id)
