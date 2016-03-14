@@ -198,10 +198,12 @@ def donottrack(*entities_not_to_be_tracked):
                         return_value = next(wrapped_generator)
                         yield return_value
                 finally:
-                    HALT_TRACKING.pop()
+                    if HALT_TRACKING:
+                        HALT_TRACKING.pop()
             return generator_wrapper(return_value)
         else:
-            HALT_TRACKING.pop()
+            if HALT_TRACKING:
+                HALT_TRACKING.pop()
             return return_value
     return real_donottrack
 
