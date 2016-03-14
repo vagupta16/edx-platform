@@ -263,21 +263,8 @@ from edxmako.shortcuts import marketing_link
           % if microsite.get_value('course_about_show_social_links', True):
           <div class="social-sharing">
             <div class="sharing-message">${_("Share with friends and family!")}</div>
-<<<<<<< HEAD
             % if self.course_about_social_sharing_file:
               <%include file="${self.course_about_social_sharing_file}" />
-=======
-            ## TODO: this should probably be an overrideable block,
-            ##       or something allowing themes to do whatever they
-            ##       want here (and on this whole page, really).
-            % if self.stanford_theme_enabled():
-              <a href="http://twitter.com/intent/tweet?text=I+just+enrolled+in+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
-              </a>
-              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20enrolled%20in%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
-              </a>
->>>>>>> hotfix-2015-11-10
             % else:
               <%
                 site_domain = microsite.get_value('site_domain', settings.SITE_NAME)
