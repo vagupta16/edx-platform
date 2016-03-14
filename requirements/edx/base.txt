@@ -17,22 +17,11 @@ django-babel-underscore==0.3.0
 django-celery==3.1.16
 django-countries==3.3
 django-extensions==1.5.5
-<<<<<<< HEAD
-django-filter==0.6.0
-django-followit==0.0.3
-django-keyedcache==1.4-6
-django-kombu==0.9.4
-django-mako==0.1.5pre
-django-model-utils==2.3.1
-django-masquerade==0.1.6
-django-mptt==0.5.5
-=======
 django-filter==0.11.0
 django-ipware==1.1.0
 django-mako==0.1.5pre
 django-model-utils==2.3.1
 django-mptt==0.7.4
->>>>>>> hotfix-2015-11-10
 django-openid-auth==0.4
 django-sekizai==0.8.2
 django-ses==0.7.0
