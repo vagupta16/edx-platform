@@ -16,13 +16,10 @@ from instructor_task.api import (
     submit_reset_problem_attempts_for_all_students,
     submit_delete_problem_state_for_all_students,
     submit_bulk_course_email,
-<<<<<<< HEAD
     submit_ora2_request_task,
     submit_student_forums_usage_task,
     submit_course_forums_usage_task,
-=======
     submit_calculate_problem_responses_csv,
->>>>>>> hotfix-2015-11-10
     submit_calculate_students_features_csv,
     submit_cohort_students,
     submit_detailed_enrollment_features_csv,
