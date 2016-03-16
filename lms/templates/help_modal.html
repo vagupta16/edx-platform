@@ -9,6 +9,8 @@ from django.core.urlresolvers import reverse
 from xmodule.tabs import CourseTabList
 from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
+from student.models import UserProfile
+platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
 %>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
@@ -40,9 +42,10 @@ from microsite_configuration.templatetags.microsite import platform_name
 <%
   discussion_tab = CourseTabList.get_discussion(course) if course else None
   discussion_link = discussion_tab.link_func(course, reverse) if (discussion_tab and discussion_tab.is_enabled(course, user=user)) else None
+  has_user_registered = UserProfile.has_registered(user)
 %>
 
-% if discussion_link:
+% if discussion_link and has_user_registered:
     <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the course discussion forum.')}</p>
 	<ul class="help-buttons">
 	  <li><a class="help-modal-button"  href="${discussion_link}">
