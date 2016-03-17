@@ -1,6 +1,6 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
     "js/views/uploads", "js/utils/change_on_enter", "js/views/license", "js/models/license",
-	"common/js/components/utils/view_utils",
+    "common/js/components/utils/view_utils",
     "common/js/components/views/feedback_notification", "jquery.timepicker", "date", "gettext"],
        function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 FileUploadDialog, TriggerChangeEventOnEnter, LicenseView, LicenseModel, ViewUtils, NotificationView,
