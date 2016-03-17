@@ -546,7 +546,6 @@ def _section_data_download(course, access):
         'get_course_forums_usage_url': reverse('get_course_forums_usage', kwargs={'course_id': course_key.to_deprecated_string()}),
         'graph_course_forums_usage_url': reverse('graph_course_forums_usage',
                                                  kwargs={'course_id': unicode(course_key)}),
-        'show_generate_proctored_exam_report_button': settings.FEATURES.get('ENABLE_PROCTORED_EXAMS', False),
         'show_generate_proctored_exam_report_button': show_proctored_report_button,
         'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': unicode(course_key)}),
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),

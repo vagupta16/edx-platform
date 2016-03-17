@@ -100,7 +100,6 @@ def login_and_registration_form(request, initial_mode="login"):
     context = {
         'data': {
             'login_redirect_url': redirect_to,
-            'disable_courseware_js': True,
             'initial_mode': initial_mode,
             'third_party_auth': _third_party_auth_context(request, redirect_to),
             'third_party_auth_hint': third_party_auth_hint or '',
@@ -115,7 +114,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'registration_form_desc': json.loads(form_descriptions['registration']),
             'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
         },
-        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
+        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
         'allow_iframing': True,
         'disable_courseware_js': True,

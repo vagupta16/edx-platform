@@ -8,7 +8,6 @@ import urllib2
 import json
 from util.json_request import JsonResponse
 from pytz import timezone
-import cgi
 
 from datetime import datetime
 from django.utils.translation import ugettext as _
