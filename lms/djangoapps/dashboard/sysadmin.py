@@ -31,8 +31,8 @@ from django.views.decorators.http import condition
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 import mongoengine
-import sys
 from path import Path as path
+import sys
 
 from courseware.courses import get_course_by_id
 import dashboard.git_import as git_import

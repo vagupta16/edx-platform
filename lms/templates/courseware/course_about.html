@@ -265,10 +265,7 @@ from edxmako.shortcuts import marketing_link
             <div class="sharing-message">${_("Share with friends and family!")}</div>
             % if self.course_about_social_sharing_file:
               <%include file="${self.course_about_social_sharing_file}" />
-            % endif
-            ## TODO: this should probably be an overrideable block,
-            ##       or something allowing themes to do whatever they
-            ##       want here (and on this whole page, really).
+            % else:
               <%
                 site_domain = microsite.get_value('site_domain', settings.SITE_NAME)
                 platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
@@ -310,6 +307,7 @@ from edxmako.shortcuts import marketing_link
               <a href="${email_subject}" class="share">
                 <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
               </a>
+            % endif
           </div>
           % endif
         </header>

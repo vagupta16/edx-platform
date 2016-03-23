@@ -10,7 +10,6 @@ from xmodule.tabs import CourseTabList
 from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
 from student.models import UserProfile
-platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
 %>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):

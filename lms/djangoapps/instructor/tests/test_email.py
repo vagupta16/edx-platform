@@ -41,11 +41,6 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password="test")
 
-        # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        # URL for email view
-        self.email_link = '<li class="nav-item"><a href="" data-section="send_email">Email</a></li>'
-
     # In order for bulk email to work, we must have both the ENABLE_INSTRUCTOR_EMAIL_FLAG
     # set to True and for the course to be Mongo-backed.
     # The flag is enabled and the course is Mongo-backed (should work)

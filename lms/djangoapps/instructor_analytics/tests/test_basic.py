@@ -2,12 +2,6 @@
 Tests for instructor.basic
 """
 
-from courseware.courses import get_course
-from courseware.tests.factories import StudentModuleFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_GRADED_MODULESTORE
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import Location
-
 import datetime
 import json
 import pytz
@@ -16,12 +10,17 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 
 from course_modes.models import CourseMode
+from courseware.courses import get_course
 from courseware.tests.factories import InstructorFactory
+from courseware.tests.factories import StudentModuleFactory
 from instructor_analytics.basic import (
     StudentModule, sale_record_features, sale_order_record_features, enrolled_students_features,
     course_registration_features, coupon_codes_features, get_proctored_exam_results, list_may_enroll,
     list_problem_responses, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 )
+from instructor_analytics.basic import student_responses
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
 from opaque_keys.edx.locator import UsageKey
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -31,16 +30,8 @@ from shoppingcart.models import (
     CourseRegistrationCode, RegistrationCodeRedemption, Order,
     Invoice, Coupon, CourseRegCodeItem, CouponRedemption, CourseRegistrationCodeInvoiceItem
 )
-from course_modes.models import CourseMode
-from instructor_analytics.basic import (
-    sale_record_features, sale_order_record_features, enrolled_students_features,
-    course_registration_features, coupon_codes_features, list_may_enroll,
-    AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
-    get_proctored_exam_results)
-from instructor_analytics.basic import student_responses
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_GRADED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
