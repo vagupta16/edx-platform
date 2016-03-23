@@ -157,7 +157,7 @@
                             defaultValue: '',
                             type: 'textarea',
                             required: false,
-                            instructions: "If you'd like, tell us why you're interested in edX.",
+                            instructions: "If you'd like, tell us why you're interested in taking online courses.",
                             restrictions: {}
                         },
                         {
