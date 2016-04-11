@@ -8,6 +8,7 @@ import ddt
 import json
 import itertools
 import unittest
+import pytz
 from datetime import datetime
 from HTMLParser import HTMLParser
 from nose.plugins.attrib import attr
@@ -18,6 +19,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.test.client import Client
 from django.test.utils import override_settings
 from mock import MagicMock, patch, create_autospec, Mock
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
@@ -434,7 +436,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         })
         response = self.client.get(url)
         response_content = HTMLParser().unescape(response.content)
-
         # We have update the state 4 times: twice to change content, and twice
         # to set the scores. We'll check that the identifying content from each is
         # displayed (but not the order), and also the indexes assigned in the output
@@ -446,6 +447,34 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertIn(json.dumps({'field_a': 'x', 'field_b': 'y'}, sort_keys=True, indent=2), response_content)
         self.assertIn("Score: 3.0 / 3.0", response_content)
         self.assertIn('#4', response_content)
+
+    @ddt.data('America/New_York',  # UTC - 5
+              'Asia/Pyongyang',      # UTC + 9
+              'Europe/London',       # UTC
+              'Canada/Yukon',        # UTC - 8
+              'Europe/Moscow',)      # UTC + 3
+    def test_submission_history_timezone(self, timezone):
+        with (override_settings(TIME_ZONE=timezone)):
+            course = CourseFactory.create()
+            course_key = course.id
+            client = Client()
+            admin = AdminFactory.create()
+            client.login(username=admin.username, password='test')
+            state_client = DjangoXBlockUserStateClient(admin)
+            usage_key = course_key.make_usage_key('problem', 'test-history')
+            state_client.set(
+                username=admin.username,
+                block_key=usage_key,
+                state={'field_a': 'x', 'field_b': 'y'}
+            )
+            url = reverse('submission_history', kwargs={
+                'course_id': unicode(course_key),
+                'student_username': admin.username,
+                'location': unicode(usage_key),
+            })
+            response = client.get(url)
+            response_content = HTMLParser().unescape(response.content)
+            self.assertIn(settings.TIME_ZONE, response_content)
 
     def _email_opt_in_checkbox(self, response, org_name_string=None):
         """Check if the email opt-in checkbox appears in the response content."""

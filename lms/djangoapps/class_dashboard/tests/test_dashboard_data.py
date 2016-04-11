@@ -123,7 +123,6 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                 state=json.dumps({'attempts': self.attempts}),
             )
 
-
         for j, user in enumerate(self.users):
             StudentModuleFactory.create(
                 course_id=self.course.id,
