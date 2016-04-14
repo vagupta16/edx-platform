@@ -196,10 +196,10 @@ def compile_sass(options):
     parts.append("--update")
     parts.append("--cache-location {cache}".format(cache=SASS_CACHE_PATH))
     parts.append("--default-encoding utf-8")
-    if debug:
-        parts.append("--sourcemap")
-    else:
-        parts.append("--style compressed --quiet")
+#     if debug:
+#         parts.append("--sourcemap")
+#     else:
+#         parts.append("--style compressed --quiet")
     if options.get('force'):
         parts.append("--force")
     parts.append("--load-path .")
