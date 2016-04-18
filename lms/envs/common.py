@@ -550,6 +550,9 @@ TEMPLATES = [
                 # Hack to get required link URLs to password reset templates
                 'edxmako.shortcuts.marketing_link_context_processor',
 
+                # Include TEMPLATE_VISIBLE_SETTINGS in templates
+                'settings_context_processor.context_processors.settings',
+
                 # Allows the open edX footer to be leveraged in Django Templates.
                 'edxmako.shortcuts.open_source_footer_context_processor',
 
@@ -566,39 +569,7 @@ TEMPLATES = [
 ]
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
-<<<<<<< HEAD
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.i18n',
-    'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',
-
-    # Added for django-wiki
-    'django.core.context_processors.media',
-    'django.core.context_processors.tz',
-    'django.contrib.messages.context_processors.messages',
-    'sekizai.context_processors.sekizai',
-
-    # Hack to get required link URLs to password reset templates
-    'edxmako.shortcuts.marketing_link_context_processor',
-
-    # Include TEMPLATE_VISIBLE_SETTINGS in templates
-    'settings_context_processor.context_processors.settings',
-
-    # Allows the open edX footer to be leveraged in Django Templates.
-    'edxmako.shortcuts.open_source_footer_context_processor',
-
-    # Shoppingcart processor (detects if request.user has a cart)
-    'shoppingcart.context_processor.user_has_cart_context_processor',
-
-    # Allows the open edX footer to be leveraged in Django Templates.
-    'edxmako.shortcuts.microsite_footer_context_processor',
-)
-=======
 ###############################################################################################
->>>>>>> 270ab7f
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = (
@@ -1876,11 +1847,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'djcelery',
-<<<<<<< HEAD
     'settings_context_processor',
-    'south',
-=======
->>>>>>> 270ab7f
 
     # Common views
     'openedx.core.djangoapps.common_views',
