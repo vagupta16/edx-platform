@@ -78,8 +78,12 @@ from util.keyword_substitution import substitute_keywords_with_data
 from util.model_utils import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
+<<<<<<< HEAD
 from verify_student.services import ReverificationService
 from openedx.core.lib.inline_analytics_utils import add_inline_analytics
+=======
+from lms.djangoapps.verify_student.services import ReverificationService
+>>>>>>> 270ab7f
 
 from edx_proctoring.services import ProctoringService
 from openedx.core.djangoapps.credit.services import CreditService
@@ -1036,7 +1040,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     files = request.FILES or {}
     error_msg = _check_files_limits(files)
     if error_msg:
-        return JsonResponse(object={'success': error_msg}, status=413)
+        return JsonResponse({'success': error_msg}, status=413)
 
     # Make a CourseKey from the course_id, raising a 404 upon parse error.
     try:
@@ -1079,7 +1083,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         except ProcessingError as err:
             log.warning("Module encountered an error while processing AJAX call",
                         exc_info=True)
-            return JsonResponse(object={'success': err.args[0]}, status=200)
+            return JsonResponse({'success': err.args[0]}, status=200)
 
         # If any other error occurred, re-raise it to trigger a 500 response
         except Exception:
