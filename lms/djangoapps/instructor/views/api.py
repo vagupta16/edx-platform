@@ -2736,6 +2736,7 @@ def get_student_responses(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2824,7 +2825,6 @@ def list_forum_members(request, course_id):
     return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2842,6 +2842,7 @@ def delete_report_download(request, course_id):
     return JsonResponse(message)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2867,6 +2868,7 @@ def get_student_forums_usage(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2892,6 +2894,7 @@ def get_ora2_responses(request, course_id, include_email):
         })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2946,6 +2949,7 @@ def graph_course_forums_usage(request, course_id):
         return JsonResponse({'data': 'failure'})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
