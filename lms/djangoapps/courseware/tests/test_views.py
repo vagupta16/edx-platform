@@ -498,7 +498,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
     """
     __test__ = False
 
-    def get_text(self, course):  # pylint: disable=unused-argument
+    def get_text(self, course):
         """Return the rendered text for the page to be verified"""
         raise NotImplementedError
 
@@ -711,7 +711,6 @@ class ProgressPageTests(ModuleStoreTestCase):
             **options
         )
 
-        # pylint: disable=attribute-defined-outside-init
         self.course = modulestore().get_course(course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
@@ -869,7 +868,11 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
+<<<<<<< HEAD
         *itertools.product(((21, 4, True), (21, 4, False)), (True, False))
+=======
+        *itertools.product(((38, 4, True), (38, 4, False)), (True, False))
+>>>>>>> kluo/2015-12-01
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
