@@ -1284,9 +1284,12 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     user_found_by_email_lookup = user
     if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
+            overest_lockout_mins=str(int(settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS*.0222+1)) #cl .0222 is 33% more with the conversion into minutes.  1.33/60=0.02216
             return JsonResponse({
                 "success": False,
-                "value": _('This account has been temporarily locked due to excessive login failures. Try again later.'),
+                "value": _('This account has been temporarily locked due to excessive login failures. '
+                            'Try again in '+overest_lockout_mins+' minutes.  For security reasons, '
+                            'reseting the password will NOT lift the lockout. Please wait for '+overest_lockout_mins+' minutes.'),
             })  # TODO: this should be status code 429  # pylint: disable=fixme
 
     # see if the user must reset his/her password due to any policy settings

@@ -794,7 +794,7 @@ class LoginFailures(models.Model):
             now = datetime.now(UTC)
             until = record.lockout_until
             is_locked_out = until and now < until
-
+            print 'is_locked_out', until and now < until #cl
             return is_locked_out
         except ObjectDoesNotExist:
             return False
@@ -807,9 +807,10 @@ class LoginFailures(models.Model):
         record, _ = LoginFailures.objects.get_or_create(user=user)
         record.failure_count = record.failure_count + 1
         max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
-
+        print 'record.failure_count', record.failure_count  #cl
         # did we go over the limit in attempts
         if record.failure_count >= max_failures_allowed:
+            print 'locked out' #cl
             # yes, then store when this account is locked out until
             lockout_period_secs = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
             record.lockout_until = datetime.now(UTC) + timedelta(seconds=lockout_period_secs)
