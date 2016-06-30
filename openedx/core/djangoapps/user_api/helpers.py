@@ -422,6 +422,7 @@ def shim_student_view(view_func, check_logged_in=False):
 
         redirect_url = response_dict.get('redirect')
         if redirect_url == '/shib-login/':
+            # Hijack the response for Shibboleth redirects
             response.status_code = 418
             response.content = redirect_url
             return response

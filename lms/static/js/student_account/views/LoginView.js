@@ -102,7 +102,7 @@
             },
 
             saveError: function( error ) {
-                // http://stackoverflow.com/a/4656873
+                var url;
                 var queryParameters = (function getUrlVars() {
                     var vars = [], hash;
                     var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
@@ -114,8 +114,9 @@
                     }
                     return vars;
                 }());
-                var url;
                 if(error.status === 418) {
+                    // Hijack the response for Shibboleth redirects
+                    // http://stackoverflow.com/a/4656873
                     url = error.responseText;
                     if(url) {
                         if(queryParameters['next']) {
