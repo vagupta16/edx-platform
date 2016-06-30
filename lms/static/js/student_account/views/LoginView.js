@@ -102,10 +102,25 @@
             },
 
             saveError: function( error ) {
+                // http://stackoverflow.com/a/4656873
+                var queryParameters = (function getUrlVars() {
+                    var vars = [], hash;
+                    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+                    for(var i = 0; i < hashes.length; i++)
+                    {
+                        hash = hashes[i].split('=');
+                        vars.push(hash[0]);
+                        vars[hash[0]] = hash[1];
+                    }
+                    return vars;
+                }());
                 var url;
                 if(error.status === 418) {
                     url = error.responseText;
                     if(url) {
+                        if(queryParameters['next']) {
+                            url = url + '?next=' + queryParameters['next'];
+                        }
                         window.location = url;
                         return;
                     }
