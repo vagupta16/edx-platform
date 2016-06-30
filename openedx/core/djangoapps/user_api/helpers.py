@@ -419,6 +419,11 @@ def shim_student_view(view_func, check_logged_in=False):
             msg = response.content
             success = True
 
+        if 'redirect' in response_dict:
+            response.status_code = 418
+            response.content = response_dict['redirect']
+            return response
+
         # If the user is not authenticated when we expect them to be
         # send the appropriate status code.
         # We check whether the user attribute is set to make

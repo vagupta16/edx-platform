@@ -102,6 +102,14 @@
             },
 
             saveError: function( error ) {
+                var url;
+                if(error.status === 418) {
+                    url = error.responseText;
+                    if(url) {
+                        window.location = url;
+                        return;
+                    }
+                }
                 this.errors = ['<li>' + error.responseText + '</li>'];
                 this.setErrors();
                 this.element.hide( this.$resetSuccess );
