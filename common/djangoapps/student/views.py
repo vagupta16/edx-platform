@@ -27,14 +27,9 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          HttpResponseServerError, Http404)
 from django.shortcuts import redirect
-<<<<<<< HEAD
-from django.utils.translation import ungettext, ngettext
-from django.utils.http import base36_to_int
-=======
 from django.utils.encoding import force_bytes, force_text
-from django.utils.translation import ungettext
+from django.utils.translation import ungettext, ngettext
 from django.utils.http import base36_to_int, urlsafe_base64_encode
->>>>>>> kluo/2015-12-01
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
