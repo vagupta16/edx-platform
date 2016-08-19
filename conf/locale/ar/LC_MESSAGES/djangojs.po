@@ -5656,7 +5656,7 @@ msgstr "الصفحة الرئيسية للمناقشة:"
 #: common/static/common/templates/discussion/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
-msgstr ""
+msgstr "كيفية استخدام نقاشات %(platform_name)s"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Find discussions"
@@ -5680,7 +5680,7 @@ msgstr "شارك في المنشورات"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Upvote posts and good responses"
-msgstr ""
+msgstr "صوِّت لتحسين تقييم المنشورات والردود الجيّدة"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Report Forum Misuse"
@@ -5926,12 +5926,12 @@ msgstr "مصادقة عليها %(time_ago)s"
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "إظهار التعليق (%(num_comments)s)"
+msgstr[1] "إظهار التعليق (%(num_comments)s)"
+msgstr[2] "إظهار التعليقات (%(num_comments)s)"
+msgstr[3] "إظهار التعليقات (%(num_comments)s)"
+msgstr[4] "إظهار التعليقات (%(num_comments)s)"
+msgstr[5] "إظهار التعليقات (%(num_comments)s)"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 msgid "fmts"
@@ -6538,16 +6538,9 @@ msgid ""
 "There must be one cohort to which students can automatically be assigned."
 msgstr "يجب أن تتوفّر مجموعة واحدة يتعيَّن فيها الطلّاب تلقائيًا."
 
-<<<<<<< HEAD
-#: common/static/common/templates/discussion/discussion-home.underscore
-#, python-format
-msgid "How to use %(platform_name)s discussions"
-msgstr "كيفية استخدام نقاشات %(platform_name)s"
-=======
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Associated Content Group"
 msgstr "مجموعة محتوى تابعة"
->>>>>>> kluo/2015-12-01
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "No Content Group"
@@ -6569,18 +6562,12 @@ msgstr "غير منتقاة"
 msgid "Deleted Content Group"
 msgstr "مجموعة محتوى محذوفة"
 
-<<<<<<< HEAD
-#: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Upvote posts and good responses"
-msgstr "صوِّت لتحسين تقييم المنشورات والردود الجيّدة"
-=======
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #, python-format
 msgid ""
 "%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected"
 " content group was deleted. Select another content group."
 msgstr ""
->>>>>>> kluo/2015-12-01
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #, python-format
@@ -6648,64 +6635,9 @@ msgstr "توزيع الطلّاب على المجموعات عبر تحميل م
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
 #, python-format
 msgid ""
-<<<<<<< HEAD
-"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
-"unread comments)%(span_close)s"
-msgstr ""
-"%(comments_count)s %(span_sr_open)sتعليقات (%(unread_comments_count)s "
-"تعليقات غير مقروءة)%(span_close)s"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#, python-format
-msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr "%(comments_count)s %(span_sr_open)sتعليقات %(span_close)s"
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Editing response"
-msgstr "تعديل الرد "
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Update response"
-msgstr "تحديث الرد "
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr "موسومة كإجابة %(time_ago)s للمستخدم %(user)s"
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s"
-msgstr "موسومة كإجابة %(time_ago)s"
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s by %(user)s"
-msgstr "مصادقة عليها %(time_ago)s من قِبل %(user)s"
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s"
-msgstr "مصادقة عليها %(time_ago)s"
-
-#: common/static/common/templates/discussion/thread-response.underscore
-#, python-format
-msgid "Show Comment (%(num_comments)s)"
-msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] "إظهار التعليق (%(num_comments)s)"
-msgstr[1] "إظهار التعليق (%(num_comments)s)"
-msgstr[2] "إظهار التعليقات (%(num_comments)s)"
-msgstr[3] "إظهار التعليقات (%(num_comments)s)"
-msgstr[4] "إظهار التعليقات (%(num_comments)s)"
-msgstr[5] "إظهار التعليقات (%(num_comments)s)"
-
-#: common/static/common/templates/discussion/thread-response.underscore
-msgid "fmts"
-=======
 "To review student cohort assignments or see the results of uploading a CSV "
 "file, download course profile information or cohort results on "
 "%(link_start)s the Data Download page. %(link_end)s"
->>>>>>> kluo/2015-12-01
 msgstr ""
 "لمراجعة الواجبات المسندة إلى الطلّاب في كل مجموعة أو رؤية نتائج تحميل ملف "
 "CSV، يُرجى تنزيل معلومات ملفّ المساق أو نتائج المجموعات عن طريق "
