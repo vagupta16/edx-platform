@@ -417,6 +417,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'course': course,
             'init': '',
             'fragment': Fragment(),
+            'course_ga_tag': course.course_google_analytics_tag,
             'staff_access': staff_access,
             'studio_url': studio_url,
             'masquerade': masquerade,

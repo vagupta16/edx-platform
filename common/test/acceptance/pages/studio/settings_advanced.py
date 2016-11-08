@@ -173,6 +173,7 @@ class AdvancedSettingsPage(CoursePage):
             'certificates_display_behavior',
             'course_image',
             'cosmetic_display_price',
+            'course_google_analytics_tag',
             'advertised_start',
             'announcement',
             'display_name',
