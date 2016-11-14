@@ -203,7 +203,7 @@ class CourseFields(object):
         scope=Scope.settings,
     )
     course_google_analytics_tag = String(
-        display_name=_("Course Google Analytics Tag"),
+        display_name=_("Google Analytics Tag"),
         help=_(
             "Google Analytics tag with which course administrators can monitor the use of their course. "
             "Format: UA-XXXXX-Y"

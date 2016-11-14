@@ -232,4 +232,6 @@ ${fragment.foot_html()}
 
 <%include file="../modal/accessible_confirm.html" />
 
-<%include file="../stanford/_course_ga_tag.html" args="course_ga_tag=course_ga_tag" />
+% if course_ga_tag:
+    <%include file="../stanford/_course_ga_tag.html" args="course_ga_tag=course_ga_tag" />
+% endif
