@@ -1609,7 +1609,6 @@ REQUIRE_EXCLUDE = ("build.txt",)
 # and defines some "args" function that returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
 
-<<<<<<< HEAD
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
 # We don't enable Django Debug Toolbar universally, but whenever we do, we want
@@ -1618,7 +1617,6 @@ REQUIRE_ENVIRONMENT = "node"
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
-=======
 # In production, the Django pipeline appends a file hash to JavaScript file names.
 # This makes it difficult for RequireJS to load its requirements, since module names
 # specified in JavaScript code do not include the hash.
@@ -1633,7 +1631,6 @@ REQUIRE_JS_PATH_OVERRIDES = [
     'js/bookmarks/views/bookmark_button.js',
     'js/views/message_banner.js'
 ]
->>>>>>> release-2016-02-09
 ################################# CELERY ######################################
 
 # Message configuration
