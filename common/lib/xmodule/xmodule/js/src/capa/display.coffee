@@ -40,15 +40,9 @@ class @Problem
     @showButton.click @show
     @saveButton = @$('div.action button.save')
     @saveButton.click @save
+    @startInput = @$('div.action input.start')
+    @startInput.click @start
 
-<<<<<<< HEAD
-    @$('div.action button.hint-button').click @hint_button
-    @$('div.action button.reset').click @reset
-    @$('div.action button.show').click @show
-    @$('div.action input.start').click @start
-    @$('div.action button.save').click @save
-=======
->>>>>>> release-2016-02-09
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
     @$('.clarification').focus (ev) =>
       icon = $(ev.target).children "i"
@@ -427,13 +421,9 @@ class @Problem
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
-<<<<<<< HEAD
       # Remove timer on successful student submission
       if @getSecondsLeft() >= 0
         @removeTimer()
-    ).always(@enableCheckButtonAfterResponse)
-=======
->>>>>>> release-2016-02-09
 
   reset: =>
     @disableAllButtonsWhileRunning @reset_internal, false
