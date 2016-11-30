@@ -89,129 +89,6 @@
             "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
             // end of Annotation tool files
 
-<<<<<<< HEAD
-        // externally hosted files
-        "mathjax": "//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured",
-
-        "youtube": [
-            // youtube URL does not end in ".js". We add "?noext" to the path so
-            // that require.js adds the ".js" to the query component of the URL,
-            // and leaves the path component intact.
-            "//www.youtube.com/player_api?noext",
-            // if youtube fails to load, fallback on a local file
-            // so that require doesn't fall over
-            "js/src/youtube_fallback"
-        ]
-    },
-    shim: {
-        "gettext": {
-            exports: "gettext"
-        },
-        "date": {
-            exports: "Date"
-        },
-        "jquery.ui": {
-            deps: ["jquery"],
-            exports: "jQuery.ui"
-        },
-        "jquery.form": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.ajaxForm"
-        },
-        "jquery.markitup": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.markitup"
-        },
-        "jquery.leanmodal": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.leanModal"
-        },
-        "jquery.ajaxQueue": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.ajaxQueue"
-        },
-        "jquery.smoothScroll": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.smoothScroll"
-        },
-        "jquery.cookie": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.cookie"
-        },
-        "jquery.qtip": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.qtip"
-        },
-        "jquery.scrollTo": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.scrollTo",
-        },
-        "jquery.flot": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.plot"
-        },
-        "jquery.fileupload": {
-            deps: ["jquery.ui", "jquery.iframe-transport"],
-            exports: "jQuery.fn.fileupload"
-        },
-        "jquery.fileupload-process": {
-            deps: ["jquery.fileupload"]
-        },
-        "jquery.fileupload-validate": {
-            deps: ["jquery.fileupload"]
-        },
-        "jquery.inputnumber": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.inputNumber"
-        },
-        "jquery.tinymce": {
-            deps: ["jquery", "tinymce"],
-            exports: "jQuery.fn.tinymce"
-        },
-        "datepair": {
-            deps: ["jquery.ui", "jquery.timepicker"]
-        },
-        "underscore": {
-            exports: "_"
-        },
-        "backbone": {
-            deps: ["underscore", "jquery"],
-            exports: "Backbone"
-        },
-        "backbone.associations": {
-            deps: ["backbone"],
-            exports: "Backbone.Associations"
-        },
-        "backbone.paginator": {
-            deps: ["backbone"],
-            exports: "Backbone.Paginator"
-        },
-        "youtube": {
-            exports: "YT"
-        },
-        "codemirror": {
-            exports: "CodeMirror"
-        },
-        "codemirror/stex": {
-            deps: ["codemirror"]
-        },
-        "tinymce": {
-            exports: "tinymce"
-        },
-        "mathjax": {
-            exports: "MathJax",
-            init: function() {
-              MathJax.Hub.Config({
-                tex2jax: {
-                  inlineMath: [
-                    ["\\(","\\)"],
-                    ['[mathjaxinline]','[/mathjaxinline]']
-                  ],
-                  displayMath: [
-                    ["\\[","\\]"],
-                    ['[mathjax]','[/mathjax]']
-                  ]
-=======
             // externally hosted files
             "mathjax": "//cdn.mathjax.org/mathjax/2.5-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured", // jshint ignore:line
             "youtube": [
@@ -341,7 +218,6 @@
                 // the fast preview setting as shown in the context menu.
                 window.MathJax.Hub.processSectionDelay = 0;
                 window.MathJax.Hub.Configured();
->>>>>>> release-2016-02-09
                 }
             },
             "URI": {
