@@ -6,8 +6,6 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.utils import html
 from django_countries import countries
-from django.utils.translation import ugettext as _
-from microsite_configuration import microsite
 from student.models import UserProfile
 from datetime import date
 import third_party_auth
@@ -111,6 +109,7 @@ import calendar
 <section class="register container">
   <section role="main" class="content">
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account" novalidate>
+<<<<<<< HEAD
       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
 
       <!-- status messages -->
@@ -372,14 +371,21 @@ import calendar
       <div class="form-actions">
         <button name="submit" type="submit" id="submit" class="action action-primary action-update register-button">${_('Register')} <span class="orn-plus">+</span> ${_('Create My Account')}</button>
       </div>
+=======
+<%
+  # allow for theming override on the registration form
+  registration_form = static.get_template_path('register-form.html')
+%>
+      <%include file="${registration_form}" />
+>>>>>>> release-2016-02-09
     </form>
   </section>
 
   <aside role="complementary">
 
 <%
-  # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
-  sidebar_file = microsite.get_template_path('register-sidebar.html')
+  # allow for theming overrides on the registration sidebars, otherwise default to pre-existing ones
+  sidebar_file = static.get_template_path('register-sidebar.html')
 %>
 
     <%include file="${sidebar_file}" />

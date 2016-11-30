@@ -103,6 +103,7 @@
             },
 
             saveError: function( error ) {
+<<<<<<< HEAD
                 var url;
                 var queryParameters = (function getUrlVars() {
                     // http://stackoverflow.com/a/4656873
@@ -127,12 +128,15 @@
                         return;
                     }
                 }
+=======
+                var msg = error.responseText;
+>>>>>>> release-2016-02-09
                 if (error.status === 0) {
-                    this.errors = ['<li>' + gettext('Please check your internet connection and try again.') + '</li>'];
+                    msg = gettext('An error has occurred. Check your Internet connection and try again.');
+                } else if(error.status === 500){
+                    msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.');
                 }
-                else {
-                    this.errors = ['<li>' + error.responseText + '</li>'];
-                }
+                this.errors = ['<li>' + msg + '</li>'];
                 this.setErrors();
                 this.element.hide( this.$resetSuccess );
 
