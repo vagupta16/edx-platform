@@ -11,21 +11,13 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-<<<<<<< HEAD
-from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
-from smtplib import SMTPException
-from util.json_request import JsonResponse, JsonResponseBadRequest
-from util.date_utils import get_default_time_display
-from edxmako.shortcuts import render_to_response
-from edxmako.shortcuts import render_to_string
-=======
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, Http404
 from django.shortcuts import redirect
 import django.utils
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
->>>>>>> release-2016-02-09
+from smtplib import SMTPException
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -56,21 +48,6 @@ from contentstore.utils import (
     reverse_library_url,
     reverse_usage_url,
     reverse_url,
-<<<<<<< HEAD
-    remove_all_instructors,
-)
-from models.settings.course_details import CourseDetails, CourseSettingsEncoder
-from models.settings.course_grading import CourseGradingModel
-from models.settings.course_metadata import CourseMetadata
-from util.json_request import expect_json
-from util.keyword_substitution import get_keywords_supported, substitute_keywords_with_data
-from util.string_utils import _has_non_ascii_characters
-from student.auth import has_studio_write_access, has_studio_read_access
-from .component import (
-    SPLIT_TEST_COMPONENT_TYPE,
-    ADVANCED_COMPONENT_TYPES,
-=======
->>>>>>> release-2016-02-09
 )
 from contentstore.views.entrance_exam import (
     create_entrance_exam,
@@ -81,6 +58,7 @@ from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_string
 from microsite_configuration import microsite
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
@@ -102,6 +80,7 @@ from student.roles import (
 )
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from util.keyword_substitution import get_keywords_supported, substitute_keywords_with_data
 from util.milestones_helpers import (
     is_entrance_exams_enabled,
     is_prerequisite_courses_enabled,
