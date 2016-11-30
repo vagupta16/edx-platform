@@ -141,12 +141,10 @@ AUDIT_LOG = logging.getLogger("audit")
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
-<<<<<<< HEAD
 LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES = int((5 * 60 + settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS) / 60)
-=======
+
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
->>>>>>> release-2016-02-09
 
 
 def csrf_token(context):
@@ -1331,23 +1329,20 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     user_found_by_email_lookup = user
     if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
-            lockout_message = _('This account has been temporarily locked due '
-                                'to excessive login failures. Try again later.')
-            return JsonResponse({
-                "success": False,
-<<<<<<< HEAD
-                "value": ngettext(
+            lockout_message = ngettext(
                     "This account has been temporarily locked due to excessive login failures. "
                     "Try again in {minutes} minute.  For security reasons, "
                     "resetting the password will NOT lift the lockout. Please wait for {minutes} minute.",
                     "This account has been temporarily locked due to excessive login failures. "
                     "Try again in {minutes} minutes.  For security reasons, "
                     "resetting the password will NOT lift the lockout. Please wait for {minutes} minutes.",
-                    LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES).format(
-                        minutes=LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES,),
-=======
+                    LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES
+            ).format(
+                minutes=LOGIN_LOCKOUT_PERIOD_PLUS_FIVE_MINUTES,
+            )
+            return JsonResponse({
+                "success": False,
                 "value": lockout_message,
->>>>>>> release-2016-02-09
             })  # TODO: this should be status code 429  # pylint: disable=fixme
 
     # see if the user must reset his/her password due to any policy settings
