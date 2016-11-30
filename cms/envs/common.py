@@ -61,12 +61,10 @@ from lms.envs.common import (
     # Django REST framework configuration
     REST_FRAMEWORK,
 
-<<<<<<< HEAD
     # django-debug-toolbar
     DEBUG_TOOLBAR_PATCH_SETTINGS,
-=======
+
     STATICI18N_OUTPUT_DIR
->>>>>>> release-2016-02-09
 )
 from path import Path as path
 from warnings import simplefilter
