@@ -2,11 +2,6 @@ import copy
 from datetime import datetime
 from fs.errors import ResourceNotFoundError
 import logging
-<<<<<<< HEAD
-import textwrap
-from django.contrib.auth.models import User
-=======
->>>>>>> release-2016-02-09
 from lxml import etree
 import os
 from path import Path as path
