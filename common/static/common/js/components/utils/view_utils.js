@@ -201,54 +201,45 @@
                 return false;
             };
 
-<<<<<<< HEAD
-        var keywordValidator = (function () {
-            var regexp = /%%[^%\s]+%%/g;
-            var keywordsSupported = [
-                '%%USERNAME%%',
-                '%%USER_ID%%',
-                '%%USER_FULLNAME%%',
-                '%%COURSE_DISPLAY_NAME%%',
-                '%%COURSE_ID%%',
-                '%%COURSE_START_DATE%%',
-                '%%COURSE_END_DATE%%'
-            ];
-            function validate(string) {
-                var keywordsFound = string.match(regexp) || [];
-                var keywordsInvalid = $.map(keywordsFound, function (keyword) {
-                    if ($.inArray(keyword, keywordsSupported) === -1) {
-                        return keyword;
-                    } else {
-                        // return `null` or `undefined` to remove an element
-                        return undefined;
+            var keywordValidator = (function () {
+                var regexp = /%%[^%\s]+%%/g;
+                var keywordsSupported = [
+                    '%%USERNAME%%',
+                    '%%USER_ID%%',
+                    '%%USER_FULLNAME%%',
+                    '%%COURSE_DISPLAY_NAME%%',
+                    '%%COURSE_ID%%',
+                    '%%COURSE_START_DATE%%',
+                    '%%COURSE_END_DATE%%'
+                ];
+                function validate(string) {
+                    var keywordsFound = string.match(regexp) || [];
+                    var keywordsInvalid = $.map(keywordsFound, function (keyword) {
+                        if ($.inArray(keyword, keywordsSupported) === -1) {
+                            return keyword;
+                        } else {
+                            // return `null` or `undefined` to remove an element
+                            return undefined;
+                        }
+                    });
+
+                    return {
+                        'isValid': keywordsInvalid.length === 0,
+                        'keywordsInvalid': keywordsInvalid
                     }
-                });
 
-                return {
-                    'isValid': keywordsInvalid.length === 0,
-                    'keywordsInvalid': keywordsInvalid
                 }
+                return {
+                    'validateString': validate
+                };
+            }());
 
-            }
-            return {
-                'validateString': validate
-            };
-        }());
-
-        /**
-         * Helper method for course/library creation - verifies a required field is not blank.
-         */
-        validateRequiredField = function (msg) {
-            return msg.length === 0 ? gettext('Required field.') : '';
-        };
-=======
             /**
              * Helper method for course/library creation - verifies a required field is not blank.
              */
             validateRequiredField = function (msg) {
                 return msg.length === 0 ? gettext('Required field.') : '';
             };
->>>>>>> release-2016-02-09
 
             /**
              * Helper method for course/library creation.
@@ -294,31 +285,6 @@
                 }
             };
 
-<<<<<<< HEAD
-        return {
-            'toggleExpandCollapse': toggleExpandCollapse,
-            'showLoadingIndicator': showLoadingIndicator,
-            'hideLoadingIndicator': hideLoadingIndicator,
-            'confirmThenRunOperation': confirmThenRunOperation,
-            'runOperationShowingMessage': runOperationShowingMessage,
-            'withDisabledElement': withDisabledElement,
-            'disableElementWhileRunning': disableElementWhileRunning,
-            'deleteNotificationHandler': deleteNotificationHandler,
-            'setScrollTop': setScrollTop,
-            'getScrollOffset': getScrollOffset,
-            'setScrollOffset': setScrollOffset,
-            'redirect': redirect,
-            'reload': reload,
-            'hasChangedAttributes': hasChangedAttributes,
-            'keywordValidator': keywordValidator,
-            'validateRequiredField': validateRequiredField,
-            'validateURLItemEncoding': validateURLItemEncoding,
-            'validateTotalKeyLength': validateTotalKeyLength,
-            'checkTotalKeyLengthViolations': checkTotalKeyLengthViolations
-        };
-    });
-}).call(this, define || RequireJS.define);
-=======
             /**
              * Dynamically loads the specified JavaScript file.
              * @param url The URL to a JavaScript file.
@@ -337,6 +303,7 @@
             };
 
             return {
+                'keywordValidator': keywordValidator,
                 'toggleExpandCollapse': toggleExpandCollapse,
                 'showLoadingIndicator': showLoadingIndicator,
                 'hideLoadingIndicator': hideLoadingIndicator,
@@ -359,4 +326,3 @@
             };
         });
 }).call(this, define || RequireJS.define, require || RequireJS.require);
->>>>>>> release-2016-02-09
