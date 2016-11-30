@@ -10,10 +10,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse, HttpResponseRedirect, SimpleCookie
 from django.test import TestCase
 from django.test.client import RequestFactory
-<<<<<<< HEAD
-=======
 from django.test.utils import override_settings
->>>>>>> release-2016-02-09
 from mock import patch
 
 from student.tests.factories import UserFactory
@@ -22,8 +19,6 @@ from ..middleware import SafeSessionMiddleware, SafeCookieData
 from .test_utils import TestSafeSessionsLogMixin
 
 
-<<<<<<< HEAD
-=======
 def create_mock_request():
     """
     Creates and returns a mock request object for testing.
@@ -35,7 +30,6 @@ def create_mock_request():
     return request
 
 
->>>>>>> release-2016-02-09
 class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware.process_request
@@ -43,13 +37,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     def setUp(self):
         super(TestSafeSessionProcessRequest, self).setUp()
         self.user = UserFactory.create()
-<<<<<<< HEAD
-        self.request = RequestFactory()
-        self.request.COOKIES = {}
-        self.request.path = '/'
-=======
         self.request = create_mock_request()
->>>>>>> release-2016-02-09
 
     def assert_response(self, safe_cookie_data=None, success=True):
         """
@@ -150,13 +138,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     def setUp(self):
         super(TestSafeSessionProcessResponse, self).setUp()
         self.user = UserFactory.create()
-<<<<<<< HEAD
-        self.request = RequestFactory()
-        self.request.COOKIES = {}
-        self.request.path = '/'
-=======
         self.request = create_mock_request()
->>>>>>> release-2016-02-09
         self.request.session = {}
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()
@@ -256,13 +238,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     def setUp(self):
         super(TestSafeSessionMiddleware, self).setUp()
         self.user = UserFactory.create()
-<<<<<<< HEAD
-        self.request = RequestFactory()
-        self.request.COOKIES = {}
-        self.request.path = '/'
-=======
         self.request = create_mock_request()
->>>>>>> release-2016-02-09
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()
 
@@ -276,14 +252,10 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
                 settings.SESSION_COOKIE_NAME
             ]
 
-<<<<<<< HEAD
-    def test_success(self):
-=======
     def verify_success(self):
         """
         Verifies success path.
         """
->>>>>>> release-2016-02-09
         self.client.login(username=self.user.username, password='test')
         self.request.user = self.user
 
@@ -302,13 +274,6 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
             response = SafeSessionMiddleware().process_response(self.request, self.client.response)
         self.assertEquals(response.status_code, 200)
 
-<<<<<<< HEAD
-    def test_error(self):
-        self.request.COOKIES[settings.SESSION_COOKIE_NAME] = 'not-a-safe-cookie'
-
-        with self.assert_parse_error():
-            SafeSessionMiddleware().process_request(self.request)
-=======
     def test_success(self):
         self.verify_success()
 
@@ -330,7 +295,6 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
         with self.assert_parse_error():
             request_response = SafeSessionMiddleware().process_request(self.request)
             self.assertEquals(request_response.status_code, expected_response_status)
->>>>>>> release-2016-02-09
 
         self.assertTrue(self.request.need_to_delete_cookie)
         self.cookies_from_request_to_response()
@@ -338,8 +302,6 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
         with patch('django.http.HttpResponse.set_cookie') as mock_delete_cookie:
             SafeSessionMiddleware().process_response(self.request, self.client.response)
             self.assertTrue(mock_delete_cookie.called)
-<<<<<<< HEAD
-=======
 
     def test_error(self):
         self.verify_error(302)
@@ -352,4 +314,3 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     def test_error_from_mobile_app(self):
         self.request.META = {'HTTP_USER_AGENT': 'open edX Mobile App Version 2.1'}
         self.verify_error(401)
->>>>>>> release-2016-02-09
