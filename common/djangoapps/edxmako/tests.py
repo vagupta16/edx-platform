@@ -42,7 +42,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
 
-<<<<<<< HEAD
+
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch.dict('django.conf.settings.MKTG_URL_LINK_MAP', {'COURSES': 'courses'})
     def test_marketing_link_internal_courses_url(self):
@@ -57,15 +57,6 @@ class ShortcutsTests(UrlResetMixin, TestCase):
         link = marketing_link('COURSES')
         self.assertEqual(link, expected_link)
 
-    @ddt.data((True, None), (False, None))
-    @ddt.unpack
-    def test_edx_footer(self, expected_result, _):
-        with patch.dict('django.conf.settings.FEATURES', {
-            'IS_EDX_DOMAIN': expected_result
-        }):
-            result = open_source_footer_context_processor({})
-            self.assertEquals(expected_result, result.get('IS_EDX_DOMAIN'))
-=======
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_is_marketing_link_set(self):
@@ -91,7 +82,6 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             self.assertTrue(is_any_marketing_link_set(['ABOUT']))
             self.assertTrue(is_any_marketing_link_set(['ABOUT', 'NOT_CONFIGURED']))
             self.assertFalse(is_any_marketing_link_set(['NOT_CONFIGURED']))
->>>>>>> release-2016-02-09
 
 
 class AddLookupTests(TestCase):
