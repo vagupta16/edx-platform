@@ -714,13 +714,7 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-<<<<<<< HEAD
-        label = _(
-            u"I agree to the {platform_name} {terms_of_service} and {privacy_policy}."
-        ).format(
-=======
-        label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
->>>>>>> release-2016-02-09
+        label = _(u"I agree to the {platform_name} {terms_of_service} and {privacy_policy}.").format(
             platform_name=settings.PLATFORM_NAME,
             privacy_policy=privacy_link,
             terms_of_service=terms_link
@@ -728,13 +722,7 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-<<<<<<< HEAD
-        error_msg = _(
-            u"You must agree to the {platform_name} {terms_of_service} and {privacy_policy}."
-        ).format(
-=======
-        error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
->>>>>>> release-2016-02-09
+        error_msg = _(u"You must agree to the {platform_name} {terms_of_service} and {privacy_policy}.").format(
             platform_name=settings.PLATFORM_NAME,
             privacy_policy=privacy_link,
             terms_of_service=terms_link
