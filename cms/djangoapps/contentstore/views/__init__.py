@@ -5,13 +5,9 @@
 # Disable warnings about import from wildcard
 # All files below declare exports with __all__
 from .assets import *
-<<<<<<< HEAD
-from .checklist import *
 from .utility import *
 from .utilities.captions import *
 from .utilities.bulksettings import *
-=======
->>>>>>> release-2016-02-09
 from .component import *
 from .course import *
 from .entrance_exam import *
