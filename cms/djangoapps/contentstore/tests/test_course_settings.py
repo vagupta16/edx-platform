@@ -114,6 +114,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=utc))
         self.alter_field(url, details, 'short_description', "Short Description")
+        self.alter_field(url, details, 'about_sidebar_html', "About Sidebar HTML")
         self.alter_field(url, details, 'overview', "Overview")
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
@@ -131,6 +132,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.compare_date_fields(details, encoded, context, 'enrollment_end')
         self.assertEqual(
             details['short_description'], encoded['short_description'], context + " short_description not =="
+        )
+        self.assertEqual(
+            details['about_sidebar_html'], encoded['about_sidebar_html'], context + " about_sidebar_html not =="
         )
         self.assertEqual(details['overview'], encoded['overview'], context + " overviews not ==")
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
@@ -375,181 +379,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
-
-<<<<<<< HEAD
-    def test_toggle_pacing_during_course_run(self):
-        SelfPacedConfiguration(enabled=True).save()
-        self.course.start = datetime.datetime.now()
-        modulestore().update_item(self.course, self.user.id)
-
-        details = CourseDetails.fetch(self.course.id)
-        updated_details = CourseDetails.update_from_json(
-            self.course.id,
-            dict(details.__dict__, self_paced=True),
-            self.user
-        )
-        self.assertFalse(updated_details.self_paced)
-
-
-@ddt.ddt
-class CourseDetailsViewTest(CourseTestCase):
-    """
-    Tests for modifying content on the first course settings page (course dates, overview, etc.).
-    """
-    def setUp(self):
-        super(CourseDetailsViewTest, self).setUp()
-
-    def alter_field(self, url, details, field, val):
-        """
-        Change the one field to the given value and then invoke the update post to see if it worked.
-        """
-        setattr(details, field, val)
-        # Need to partially serialize payload b/c the mock doesn't handle it correctly
-        payload = copy.copy(details.__dict__)
-        payload['start_date'] = CourseDetailsViewTest.convert_datetime_to_iso(details.start_date)
-        payload['end_date'] = CourseDetailsViewTest.convert_datetime_to_iso(details.end_date)
-        payload['enrollment_start'] = CourseDetailsViewTest.convert_datetime_to_iso(details.enrollment_start)
-        payload['enrollment_end'] = CourseDetailsViewTest.convert_datetime_to_iso(details.enrollment_end)
-        resp = self.client.ajax_post(url, payload)
-        self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
-
-    @staticmethod
-    def convert_datetime_to_iso(datetime_obj):
-        """
-        Use the xblock serializer to convert the datetime
-        """
-        return Date().to_json(datetime_obj)
-
-    def test_update_and_fetch(self):
-        SelfPacedConfiguration(enabled=True).save()
-        details = CourseDetails.fetch(self.course.id)
-
-        # resp s/b json from here on
-        url = get_url(self.course.id)
-        resp = self.client.get_json(url)
-        self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
-
-        utc = UTC()
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=utc))
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=utc))
-        self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30, tzinfo=utc))
-        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30, tzinfo=utc))
-
-        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=utc))
-        self.alter_field(url, details, 'short_description', "Short Description")
-        self.alter_field(url, details, 'about_sidebar_html', "About Sidebar HTML")
-        self.alter_field(url, details, 'overview', "Overview")
-        self.alter_field(url, details, 'intro_video', "intro_video")
-        self.alter_field(url, details, 'effort', "effort")
-        self.alter_field(url, details, 'course_image_name', "course_image_name")
-        self.alter_field(url, details, 'language', "en")
-        self.alter_field(url, details, 'self_paced', "true")
-
-    def compare_details_with_encoding(self, encoded, details, context):
-        """
-        compare all of the fields of the before and after dicts
-        """
-        self.compare_date_fields(details, encoded, context, 'start_date')
-        self.compare_date_fields(details, encoded, context, 'end_date')
-        self.compare_date_fields(details, encoded, context, 'enrollment_start')
-        self.compare_date_fields(details, encoded, context, 'enrollment_end')
-        self.assertEqual(details['short_description'], encoded['short_description'], context + " short_description not ==")
-        self.assertEqual(details['about_sidebar_html'], encoded['about_sidebar_html'], context + " about_sidebar_html not ==")
-        self.assertEqual(details['overview'], encoded['overview'], context + " overviews not ==")
-        self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
-        self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
-        self.assertEqual(details['course_image_name'], encoded['course_image_name'], context + " images not ==")
-        self.assertEqual(details['language'], encoded['language'], context + " languages not ==")
-
-    def compare_date_fields(self, details, encoded, context, field):
-        """
-        Compare the given date fields between the before and after doing json deserialization
-        """
-        if details[field] is not None:
-            date = Date()
-            if field in encoded and encoded[field] is not None:
-                dt1 = date.from_json(encoded[field])
-                dt2 = details[field]
-
-                self.assertEqual(dt1, dt2, msg="{} != {} at {}".format(dt1, dt2, context))
-            else:
-                self.fail(field + " missing from encoded but in details at " + context)
-        elif field in encoded and encoded[field] is not None:
-            self.fail(field + " included in encoding but missing from details at " + context)
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
-    def test_pre_requisite_course_list_present(self):
-        seed_milestone_relationship_types()
-        settings_details_url = get_url(self.course.id)
-        response = self.client.get_html(settings_details_url)
-        self.assertContains(response, "Prerequisite Course")
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
-    def test_pre_requisite_course_update_and_fetch(self):
-        seed_milestone_relationship_types()
-        url = get_url(self.course.id)
-        resp = self.client.get_json(url)
-        course_detail_json = json.loads(resp.content)
-        # assert pre_requisite_courses is initialized
-        self.assertEqual([], course_detail_json['pre_requisite_courses'])
-
-        # update pre requisite courses with a new course keys
-        pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
-        pre_requisite_course2 = CourseFactory.create(org='edX', course='902', run='test_run')
-        pre_requisite_course_keys = [unicode(pre_requisite_course.id), unicode(pre_requisite_course2.id)]
-        course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
-        self.client.ajax_post(url, course_detail_json)
-
-        # fetch updated course to assert pre_requisite_courses has new values
-        resp = self.client.get_json(url)
-        course_detail_json = json.loads(resp.content)
-        self.assertEqual(pre_requisite_course_keys, course_detail_json['pre_requisite_courses'])
-
-        # remove pre requisite course
-        course_detail_json['pre_requisite_courses'] = []
-        self.client.ajax_post(url, course_detail_json)
-        resp = self.client.get_json(url)
-        course_detail_json = json.loads(resp.content)
-        self.assertEqual([], course_detail_json['pre_requisite_courses'])
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
-    def test_invalid_pre_requisite_course(self):
-        seed_milestone_relationship_types()
-        url = get_url(self.course.id)
-        resp = self.client.get_json(url)
-        course_detail_json = json.loads(resp.content)
-
-        # update pre requisite courses one valid and one invalid key
-        pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
-        pre_requisite_course_keys = [unicode(pre_requisite_course.id), 'invalid_key']
-        course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
-        response = self.client.ajax_post(url, course_detail_json)
-        self.assertEqual(400, response.status_code)
-
-    @ddt.data(
-        (False, False, False),
-        (True, False, True),
-        (False, True, False),
-        (True, True, True),
-    )
-    def test_visibility_of_entrance_exam_section(self, feature_flags):
-        """
-        Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
-        feature is enabled or disabled i.e ENABLE_MKTG_SITE.
-        """
-        with patch.dict("django.conf.settings.FEATURES", {
-            'ENTRANCE_EXAMS': feature_flags[0],
-            'ENABLE_MKTG_SITE': feature_flags[1]
-        }):
-            course_details_url = get_url(self.course.id)
-            resp = self.client.get_html(course_details_url)
-            self.assertEqual(
-                feature_flags[2],
-                '<h3 id="heading-entrance-exam">' in resp.content
-            )
-
-=======
->>>>>>> release-2016-02-09
 
 @ddt.ddt
 class CourseGradingTest(CourseTestCase):
