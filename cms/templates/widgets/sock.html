@@ -49,16 +49,12 @@ from django.core.urlresolvers import reverse
             'href': 'mailto:{email}'.format(email=partner_email),
             'sr_mouseover_text': _('Send an email to {email}').format(email=partner_email),
             'text': _('Contact Us'),
-<<<<<<< HEAD
-            'condition': 'PARTNER_SUPPORT_EMAIL' in settings.FEATURES
+            'condition': bool(partner_email)
         }, {
             'href': 'https://stanfordonline.zendesk.com/hc',
             'sr_mouseover_text': _('Find answers in the FAQ or ask a new question.'),
             'text': _('Help Center'),
             'condition': True
-=======
-            'condition': bool(partner_email)
->>>>>>> release-2016-02-09
         }]
         %>
 
