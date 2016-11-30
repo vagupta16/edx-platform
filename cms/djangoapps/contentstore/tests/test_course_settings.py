@@ -99,61 +99,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
     def test_update_and_fetch(self):
         SelfPacedConfiguration(enabled=True).save()
-<<<<<<< HEAD
-        jsondetails = CourseDetails.fetch(self.course.id)
-        jsondetails.syllabus = "<a href='foo'>bar</a>"
-        # encode - decode to convert date fields and other data which changes form
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).syllabus,
-            jsondetails.syllabus, "After set syllabus"
-        )
-        jsondetails.short_description = "Short Description"
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).short_description,
-            jsondetails.short_description, "After set short_description"
-        )
-        jsondetails.about_sidebar_html = "About Sidebar HTML"
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).about_sidebar_html,
-            jsondetails.about_sidebar_html, "After set about_sidebar_html"
-        )
-        jsondetails.overview = "Overview"
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).overview,
-            jsondetails.overview, "After set overview"
-        )
-        jsondetails.intro_video = "intro_video"
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).intro_video,
-            jsondetails.intro_video, "After set intro_video"
-        )
-        jsondetails.effort = "effort"
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).effort,
-            jsondetails.effort, "After set effort"
-        )
-        jsondetails.self_paced = True
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).self_paced,
-            jsondetails.self_paced
-        )
-        jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).start_date,
-            jsondetails.start_date
-        )
-        jsondetails.end_date = datetime.datetime(2011, 10, 1, 0, tzinfo=UTC())
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).end_date,
-            jsondetails.end_date
-        )
-        jsondetails.course_image_name = "an_image.jpg"
-        self.assertEqual(
-            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).course_image_name,
-            jsondetails.course_image_name
-        )
-        jsondetails.language = "hr"
-=======
         details = CourseDetails.fetch(self.course.id)
 
         # resp s/b json from here on
@@ -184,7 +129,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.compare_date_fields(details, encoded, context, 'end_date')
         self.compare_date_fields(details, encoded, context, 'enrollment_start')
         self.compare_date_fields(details, encoded, context, 'enrollment_end')
->>>>>>> release-2016-02-09
         self.assertEqual(
             details['short_description'], encoded['short_description'], context + " short_description not =="
         )
