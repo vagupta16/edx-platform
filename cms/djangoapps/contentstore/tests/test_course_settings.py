@@ -39,27 +39,6 @@ class CourseSettingsEncoderTest(CourseTestCase):
     """
     Tests for CourseSettingsEncoder.
     """
-<<<<<<< HEAD
-    def test_virgin_fetch(self):
-        details = CourseDetails.fetch(self.course.id)
-        self.assertEqual(details.org, self.course.location.org, "Org not copied into")
-        self.assertEqual(details.course_id, self.course.location.course, "Course_id not copied into")
-        self.assertEqual(details.run, self.course.location.name, "Course name not copied into")
-        self.assertEqual(details.course_image_name, self.course.course_image)
-        self.assertIsNotNone(details.start_date.tzinfo)
-        self.assertIsNone(details.end_date, "end date somehow initialized " + str(details.end_date))
-        self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
-        self.assertIsNone(details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end))
-        self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
-        self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
-        self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
-        self.assertFalse(details.enable_enrollment_email, "Enrollment Email should be initialized as false")
-        self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
-        self.assertIsNone(details.has_cert_config)
-        self.assertFalse(details.self_paced)
-
-=======
->>>>>>> release-2016-02-09
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)

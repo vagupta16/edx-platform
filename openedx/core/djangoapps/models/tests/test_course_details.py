@@ -40,6 +40,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
+        self.assertFalse(details.enable_enrollment_email, "Enrollment Email should be initialized as false")
         self.assertIsNone(details.language, "language somehow initialized" + str(details.language))
         self.assertFalse(details.self_paced)
 
