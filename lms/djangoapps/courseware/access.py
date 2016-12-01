@@ -356,10 +356,10 @@ def _has_access_course(user, action, courselike):
         Just a time boundary check, handles if start or stop were set to None
         """
         now = datetime.now(UTC())
-        start = course.enrollment_start
+        start = courselike.enrollment_start
         if start is not None:
             start = start.replace(tzinfo=pytz.UTC)
-        end = course.enrollment_end
+        end = courselike.enrollment_end
         if end is not None:
             end = end.replace(tzinfo=pytz.UTC)
 
@@ -409,14 +409,9 @@ def _has_access_course(user, action, courselike):
         'load_mobile': lambda: can_load() and _can_load_course_on_mobile(user, courselike),
         'enroll': can_enroll,
         'see_exists': see_exists,
-<<<<<<< HEAD
         'within_enrollment_period': within_enrollment_period,
-        'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
-        'instructor': lambda: _has_instructor_access_to_descriptor(user, course, course.id),
-=======
         'staff': lambda: _has_staff_access_to_descriptor(user, courselike, courselike.id),
         'instructor': lambda: _has_instructor_access_to_descriptor(user, courselike, courselike.id),
->>>>>>> release-2016-02-09
         'see_in_catalog': can_see_in_catalog,
         'see_about_page': can_see_about_page,
     }
