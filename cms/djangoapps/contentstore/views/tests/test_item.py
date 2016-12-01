@@ -1419,6 +1419,7 @@ class TestComponentTemplates(CourseTestCase):
         self.assertIn('Advanced', button_names)
         self.assertEqual(len(templates[0]['templates']), 3)
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
+        template_display_names = sorted(template_display_names)
         self.assertEqual(template_display_names, ['Annotation', 'Poll', 'Survey'])
 
 
