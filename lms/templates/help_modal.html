@@ -7,12 +7,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from xmodule.tabs import CourseTabList
-<<<<<<< HEAD
-from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
 from student.models import UserProfile
-=======
->>>>>>> release-2016-02-09
 %>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
@@ -56,26 +52,11 @@ from student.models import UserProfile
 	</ul>
 % endif
 
-<<<<<<< HEAD
     <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} Help Center.').format(platform_name=platform_name())}</p>
 	
 	<ul class="help-buttons">
 	  <%include file="help-center-link.html" />
 	</ul>
-=======
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
-        link_start='<a href="{url}" target="_blank">'.format(
-          url=marketing_link('FAQ')
-        ),
-        link_end='</a>',
-        platform_name=static.get_platform_name())}
-      </p>
-
-    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(
-        platform_name=static.get_platform_name()
-      )}</p>
-    <hr>
->>>>>>> release-2016-02-09
 
 	<hr>
 % if course:
