@@ -116,23 +116,15 @@ def generate_user_certificates(
     if insecure:
         xqueue.use_https = False
     generate_pdf = not has_html_certificates_enabled(course_key, course)
-<<<<<<< HEAD
-    status, cert = xqueue.add_cert(student, course_key,
-                                   course=course,
-                                   designation=designation,
-                                   generate_pdf=generate_pdf,
-                                   forced_grade=forced_grade)
-    if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
-=======
     cert = xqueue.add_cert(
         student,
         course_key,
         course=course,
+        designation=designation,
         generate_pdf=generate_pdf,
         forced_grade=forced_grade
     )
     if cert.status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
->>>>>>> release-2016-02-09
         emit_certificate_event('created', student, course_key, course, {
             'user_id': student.id,
             'course_id': unicode(course_key),
