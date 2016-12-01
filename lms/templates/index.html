@@ -3,20 +3,6 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-<<<<<<< HEAD
-from microsite_configuration import microsite
-%>
-
-<%
-  homepage_overlay_html = microsite.get_value('homepage_overlay_html')
-
-  ## To display a welcome video, change False to True, and add a YouTube ID (11 chars, eg "123456789xX") in the following line
-  show_homepage_promo_video = microsite.get_value('show_homepage_promo_video', False)
-  homepage_promo_video_youtube_id = microsite.get_value('homepage_promo_video_youtube_id', "your-youtube-id")
-
-  show_partners = microsite.get_value('show_partners', True)
-=======
->>>>>>> release-2016-02-09
 %>
 
 <section class="home">
@@ -63,15 +49,6 @@ from microsite_configuration import microsite
   </header>
   <%include file="${courses_list}" />
 
-<<<<<<< HEAD
-    </section>
-
-    % if self.homepage_extra_content_file:
-        <%include file="${self.homepage_extra_content_file}" />
-    % endif
-  </section>
-=======
->>>>>>> release-2016-02-09
 </section>
 
 % if show_homepage_promo_video:
