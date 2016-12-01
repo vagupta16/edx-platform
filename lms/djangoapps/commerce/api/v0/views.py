@@ -122,12 +122,8 @@ class BasketsView(APIView):
                 username=user.username
             )
             log.info(msg)
-<<<<<<< HEAD
-            self._enroll(course_key, user)
-            notify_enrollment_by_email(courses.get_course(course_key), user, request)
-=======
             self._enroll(course_key, user, default_enrollment_mode.slug)
->>>>>>> release-2016-02-09
+            notify_enrollment_by_email(courses.get_course(course_key), user, request)
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
 
