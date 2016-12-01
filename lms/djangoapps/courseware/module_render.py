@@ -50,17 +50,11 @@ from courseware.models import SCORE_CHANGED
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-<<<<<<< HEAD
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey, CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from openedx.core.lib.inline_analytics_utils import add_inline_analytics
-=======
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.verify_student.services import ReverificationService
 from openedx.core.djangoapps.credit.services import CreditService
->>>>>>> release-2016-02-09
+from openedx.core.lib.inline_analytics_utils import add_inline_analytics
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -73,6 +67,7 @@ from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from util import milestones_helpers
 from util.json_request import JsonResponse
+from util.keyword_substitution import substitute_keywords_with_data
 from util.model_utils import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock.runtime import KvsFieldData
@@ -85,20 +80,6 @@ from xmodule.mixin import wrap_with_license
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
-<<<<<<< HEAD
-from xmodule.mixin import wrap_with_license
-from util.json_request import JsonResponse
-from util.keyword_substitution import substitute_keywords_with_data
-from util.model_utils import slugify
-from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from util import milestones_helpers
-from lms.djangoapps.verify_student.services import ReverificationService
-
-from edx_proctoring.services import ProctoringService
-from openedx.core.djangoapps.credit.services import CreditService
-
-=======
->>>>>>> release-2016-02-09
 from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
