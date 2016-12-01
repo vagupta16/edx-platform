@@ -223,7 +223,9 @@ from student.models import UserProfile
     % endif
   </ol>
 </div>
-
+% if self.theme_enabled() and not self.is_microsite():
+  <%include file='theme-register_extra.html' />
+% endif
 <div class="group group-form group-form-accountacknowledgements">
   <h2 class="sr">${_("Account Acknowledgements")}</h2>
 
@@ -233,21 +235,23 @@ from student.models import UserProfile
       % if has_extauth_info is UNDEFINED or ask_for_tos :
       <div class="field required checkbox" id="field-tos">
         <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-        <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
-          link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
-          link_end='</a>')}</label>
+        <label for="tos-yes">${_('I agree to the {link_start1}Terms of Service{link_end} and {link_start2}Privacy Policy{link_end}').format(
+          link_start1='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
+          link_end='</a>',
+          link_start2='<a href="{url}#privacy" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
+          )}</label>
       </div>
       % endif
 
       % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
       ## If the stanford theme isn't enabled, check if we have an Honor Code link in our marketing map
-      % if not stanford_theme_enabled() and marketing_link('HONOR') and marketing_link('HONOR') != '#':
+      % if self.stanford_theme_enabled() or (marketing_link('HONOR') and marketing_link('HONOR') != '#'):
       <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
         <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
         <%
           ## TODO: provide a better way to override these links
-          if stanford_theme_enabled():
-            honor_code_path = marketing_link('TOS') + "#honor"
+          if self.register_honor_link:
+            honor_code_path = self.register_honor_link
           else:
             honor_code_path = marketing_link('HONOR')
         %>
