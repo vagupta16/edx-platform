@@ -194,12 +194,7 @@ class XQueueCertInterface(object):
         raise NotImplementedError
 
     # pylint: disable=too-many-statements
-<<<<<<< HEAD
-    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None,
-                 designation=None, generate_pdf=True):
-=======
-    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
->>>>>>> release-2016-02-09
+    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, designation=None, generate_pdf=True):
         """
         Request a new certificate for a student.
 
