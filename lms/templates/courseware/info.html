@@ -74,16 +74,11 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
       </div>
       % endif
 
-<<<<<<< HEAD
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'updates')}
+      <h1>${_("Course Updates and News")}</h1>
+      ${get_course_info_section(request, masquerade_user, course, 'updates')}
       % if self.course_info_extra_file:
         <%include file="${self.course_info_extra_file}" />
       % endif
-=======
-      <h1>${_("Course Updates and News")}</h1>
-      ${get_course_info_section(request, masquerade_user, course, 'updates')}
->>>>>>> release-2016-02-09
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
       % if SelfPacedConfiguration.current().enable_course_home_improvements:
