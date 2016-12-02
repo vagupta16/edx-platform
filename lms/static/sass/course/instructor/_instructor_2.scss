@@ -2288,11 +2288,6 @@ input[name="subject"] {
   }
 
 }
-<<<<<<< HEAD
-@import 'stanford/course/instructor/email_query';
-@import 'stanford/course/instructor/data_download';
-@import 'stanford/course/instructor/lti_upload';
-=======
 
 // Custom File upload
 .customBrowseBtn {
@@ -2331,4 +2326,7 @@ input[name="subject"] {
     cursor: not-allowed;
   }
 }
->>>>>>> release-2016-02-09
+
+@import 'stanford/course/instructor/email_query';
+@import 'stanford/course/instructor/data_download';
+@import 'stanford/course/instructor/lti_upload';
