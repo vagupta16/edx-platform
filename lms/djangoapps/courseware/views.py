@@ -5,15 +5,10 @@ Courseware views functions
 import json
 import logging
 import urllib
-<<<<<<< HEAD
-import urllib2
-import json
 from util.json_request import JsonResponse
 from pytz import timezone
 
-=======
 from collections import OrderedDict
->>>>>>> release-2016-02-09
 from datetime import datetime
 
 import analytics
@@ -25,15 +20,9 @@ from django.core.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
-<<<<<<< HEAD
-from django.utils.timezone import UTC
-from django.http import HttpResponseNotFound, HttpResponseServerError
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
-from django.http import Http404, HttpResponse, HttpResponseBadRequest
-=======
 from django.db.models import Q
+from django.http import HttpResponseNotFound, HttpResponseServerError
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
->>>>>>> release-2016-02-09
 from django.shortcuts import redirect
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
@@ -72,9 +61,7 @@ from courseware.courses import (
     UserNotEnrolled
 )
 from courseware.masquerade import setup_masquerade
-<<<<<<< HEAD
 from courseware.models import CoursePreference
-=======
 from courseware.model_data import FieldDataCache, ScoresClient
 from courseware.models import StudentModuleHistory
 from courseware.url_helpers import get_redirect_url
@@ -83,34 +70,15 @@ from edxmako.shortcuts import render_to_response, render_to_string, marketing_li
 from instructor.enrollment import uses_shib
 from microsite_configuration import microsite
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
->>>>>>> release-2016-02-09
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
     is_user_eligible_for_credit,
     is_credit_course
 )
-<<<<<<< HEAD
-from courseware.models import StudentModuleHistory
-from courseware.model_data import FieldDataCache, ScoresClient
-from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
-from .entrance_exams import (
-    course_has_entrance_exam,
-    get_entrance_exam_content,
-    get_entrance_exam_score,
-    user_must_complete_entrance_exam,
-    user_has_passed_entrance_exam
-)
-from courseware.user_state_client import DjangoXBlockUserStateClient
-from course_modes.models import CourseMode
-
-from open_ended_grading import open_ended_notifications
 from student.models import UserProfile
-from open_ended_grading.views import StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
-=======
 from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
->>>>>>> release-2016-02-09
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
@@ -123,22 +91,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
-<<<<<<< HEAD
-import shoppingcart
-from shoppingcart.models import CourseRegistrationCode
-from shoppingcart.utils import is_shopping_cart_enabled
-from opaque_keys import InvalidKeyError
-from util.milestones_helpers import get_prerequisite_courses_display
-
-from microsite_configuration import microsite
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from instructor.enrollment import uses_shib
 from util.date_utils import get_time_display
 
 from analyticsclient.client import Client
 from analyticsclient.exceptions import NotFoundError, InvalidRequestError, TimeoutError
-=======
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from .entrance_exams import (
     course_has_entrance_exam,
@@ -148,7 +104,6 @@ from .entrance_exams import (
     user_has_passed_entrance_exam
 )
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
->>>>>>> release-2016-02-09
 
 from lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -483,13 +438,10 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         studio_url = get_studio_url(course, 'course')
 
-<<<<<<< HEAD
         analytics_url = getattr(settings, 'ANALYTICS_DATA_URL')
-=======
         language_preference = get_user_preference(request.user, LANGUAGE_KEY)
         if not language_preference:
             language_preference = settings.LANGUAGE_CODE
->>>>>>> release-2016-02-09
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -1012,13 +964,9 @@ def course_about(request, course_id):
             'can_add_course_to_cart': can_add_course_to_cart,
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
-<<<<<<< HEAD
             'regularly_registered': regularly_registered,
             'sneakpeek_allowed': sneakpeek_allowed,
-            'is_shopping_cart_enabled': _is_shopping_cart_enabled,
-=======
             'course_image_urls': overview.image_urls,
->>>>>>> release-2016-02-09
         })
 
 
