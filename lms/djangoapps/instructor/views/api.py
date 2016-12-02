@@ -28,11 +28,7 @@ from django.shortcuts import redirect
 import string
 import random
 import unicodecsv
-<<<<<<< HEAD
-import urllib
 import urllib2
-=======
->>>>>>> release-2016-02-09
 import decimal
 from student import auth
 from student.roles import GlobalStaff, CourseSalesAdminRole, CourseFinanceAdminRole
@@ -114,11 +110,7 @@ from .tools import (
     set_due_date_extension,
     strip_if_string,
     bulk_email_is_enabled_for_course,
-<<<<<<< HEAD
-    add_block_ids,
     generate_course_forums_d3,
-=======
->>>>>>> release-2016-02-09
 )
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
