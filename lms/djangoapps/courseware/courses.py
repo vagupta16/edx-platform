@@ -167,13 +167,7 @@ def get_course_about_section(request, course, section_key):
 
     Valid keys:
     - overview
-<<<<<<< HEAD
     - about_sidebar_html
-    - title
-    - university
-    - number
-=======
->>>>>>> release-2016-02-09
     - short_description
     - description
     - key_dates (includes start, end, exams, etc)
