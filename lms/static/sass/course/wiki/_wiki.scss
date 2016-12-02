@@ -896,34 +896,21 @@ section.wiki {
 
   .alert {
     position: relative;
-<<<<<<< HEAD
-    margin: 0 auto;
-=======
     width: auto;
     margin: 24px 0px;
->>>>>>> release-2016-02-09
     padding: 8px 12px;
     border-bottom: 1px solid #EBE8BF;
     background: $yellow;
-<<<<<<< HEAD
-    font-size: 1em;
-    color: #444011;
-=======
     color: $black;
     font-size: 0.9em;
     min-width: inherit;
->>>>>>> release-2016-02-09
 
     .close {
       position: absolute;
       right: 12px;
       font-size: 1.3em;
       top: 6px;
-<<<<<<< HEAD
-      color: #444011;
-=======
       color: $black;
->>>>>>> release-2016-02-09
       text-decoration: none;
     }
   }
