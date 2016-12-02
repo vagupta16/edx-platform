@@ -8,12 +8,7 @@ import ddt
 import json
 import itertools
 import unittest
-<<<<<<< HEAD
-import pytz
-from datetime import datetime
-=======
 from datetime import datetime, timedelta
->>>>>>> release-2016-02-09
 from HTMLParser import HTMLParser
 from nose.plugins.attrib import attr
 
@@ -443,12 +438,9 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': unicode(usage_key),
         })
         response = self.client.get(url)
-<<<<<<< HEAD
         response_content = HTMLParser().unescape(response.content)
-=======
         response_content = HTMLParser().unescape(response.content.decode('utf-8'))
 
->>>>>>> release-2016-02-09
         # We have update the state 4 times: twice to change content, and twice
         # to set the scores. We'll check that the identifying content from each is
         # displayed (but not the order), and also the indexes assigned in the output
