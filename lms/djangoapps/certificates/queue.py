@@ -327,94 +327,7 @@ class XQueueCertInterface(object):
                     student.id,
                     unicode(course_id)
                 )
-<<<<<<< HEAD
-
-                #   Despite blowing up the xml parser, bad values here are fine
-                grade_contents = None
-
-            if is_whitelisted or grade_contents is not None:
-
-                if is_whitelisted:
-                    LOGGER.info(
-                        u"Student %s is whitelisted in '%s'",
-                        student.id,
-                        unicode(course_id)
-                    )
-
-                # check to see whether the student is on the
-                # the embargoed country restricted list
-                # otherwise, put a new certificate request
-                # on the queue
-
-                if self.restricted.filter(user=student).exists():
-                    new_status = status.restricted
-                    cert.status = new_status
-                    cert.save()
-
-                    LOGGER.info(
-                        (
-                            u"Student %s is in the embargoed country restricted "
-                            u"list, so their certificate status has been set to '%s' "
-                            u"for the course '%s'. "
-                            u"No certificate generation task was sent to the XQueue."
-                        ),
-                        student.id,
-                        new_status,
-                        unicode(course_id)
-                    )
-                else:
-                    key = make_hashkey(random.random())
-                    cert.key = key
-                    contents = {
-                        'action': 'create',
-                        'username': student.username,
-                        'course_id': unicode(course_id),
-                        'course_name': course_name,
-                        'name': profile_name,
-                        'grade': grade_contents,
-                        'template_pdf': template_pdf,
-                        'designation': designation,
-                    }
-                    if template_file:
-                        contents['template_pdf'] = template_file
-                    if generate_pdf:
-                        new_status = status.generating
-                    else:
-                        new_status = status.downloadable
-                        cert.verify_uuid = uuid4().hex
-
-                    cert.status = new_status
-                    cert.save()
-
-                    if generate_pdf:
-                        try:
-                            self._send_to_xqueue(contents, key)
-                        except XQueueAddToQueueError as exc:
-                            new_status = ExampleCertificate.STATUS_ERROR
-                            cert.status = new_status
-                            cert.error_reason = unicode(exc)
-                            cert.save()
-                            LOGGER.critical(
-                                (
-                                    u"Could not add certificate task to XQueue.  "
-                                    u"The course was '%s' and the student was '%s'."
-                                    u"The certificate task status has been marked as 'error' "
-                                    u"and can be re-submitted with a management command."
-                                ), course_id, student.id
-                            )
-                        else:
-                            LOGGER.info(
-                                (
-                                    u"The certificate status has been set to '%s'.  "
-                                    u"Sent a certificate grading task to the XQueue "
-                                    u"with the key '%s'. "
-                                ),
-                                new_status,
-                                key
-                            )
-=======
                 passing = True
->>>>>>> release-2016-02-09
             else:
                 passing = False
 
@@ -490,6 +403,7 @@ class XQueueCertInterface(object):
             'name': cert.name,
             'grade': grade_contents,
             'template_pdf': template_pdf,
+            'designation': designation,
         }
         if generate_pdf:
             cert.status = status.generating
