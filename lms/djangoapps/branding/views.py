@@ -52,11 +52,7 @@ def index(request):
     Redirects to main page -- info page if user authenticated, or marketing if not
     '''
 
-<<<<<<< HEAD
-    if settings.COURSEWARE_ENABLED and UserProfile.has_registered(request.user):
-=======
-    if request.user.is_authenticated():
->>>>>>> release-2016-02-09
+    if UserProfile.has_registered(request.user):
         # For microsites, only redirect to dashboard if user has
         # courses in his/her dashboard. Otherwise UX is a bit cryptic.
         # In this case, we want to have the user stay on a course catalog
