@@ -103,7 +103,6 @@
             },
 
             saveError: function( error ) {
-<<<<<<< HEAD
                 var url;
                 var queryParameters = (function getUrlVars() {
                     // http://stackoverflow.com/a/4656873
@@ -128,9 +127,7 @@
                         return;
                     }
                 }
-=======
                 var msg = error.responseText;
->>>>>>> release-2016-02-09
                 if (error.status === 0) {
                     msg = gettext('An error has occurred. Check your Internet connection and try again.');
                 } else if(error.status === 500){
