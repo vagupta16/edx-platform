@@ -51,12 +51,7 @@ from student.models import (
 )
 from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
-<<<<<<< HEAD
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-=======
->>>>>>> release-2016-02-09
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
@@ -204,7 +199,6 @@ class TestCommonExceptions400(TestCase):
 
 
 @attr('shard_1')
-<<<<<<< HEAD
 class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensures the backend logic is sound for instructor email widget
@@ -731,10 +725,7 @@ class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr('shard_1')
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
-=======
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
->>>>>>> release-2016-02-09
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
