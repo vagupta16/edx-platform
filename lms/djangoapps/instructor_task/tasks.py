@@ -130,11 +130,7 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-<<<<<<< HEAD
-@task(base=BaseInstructorTask, routing_key=settings.BULK_EMAIL_ROUTING_KEY)
-=======
-@task(base=BaseInstructorTask)  # pylint: disable=not-callable
->>>>>>> release-2016-02-09
+@task(base=BaseInstructorTask, routing_key=settings.BULK_EMAIL_ROUTING_KEY)  # pylint: disable=not-callable
 def send_bulk_course_email(entry_id, _xmodule_instance_args):
     """Sends emails to recipients enrolled in a course.
 
@@ -212,7 +208,6 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-<<<<<<< HEAD
 @task(base=BaseInstructorTask, routing_key=settings.STUDENT_RESPONSES_DOWNLOAD_ROUTING_KEY)
 def get_student_responses(entry_id, xmodule_instance_args):
     """
@@ -253,10 +248,7 @@ def get_student_forums_usage(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask)
-=======
 @task(base=BaseInstructorTask)  # pylint: disable=not-callable
->>>>>>> release-2016-02-09
 def enrollment_report_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
