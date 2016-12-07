@@ -438,7 +438,6 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': unicode(usage_key),
         })
         response = self.client.get(url)
-        response_content = HTMLParser().unescape(response.content)
         response_content = HTMLParser().unescape(response.content.decode('utf-8'))
 
         # We have update the state 4 times: twice to change content, and twice
