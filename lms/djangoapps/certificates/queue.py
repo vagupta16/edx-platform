@@ -384,9 +384,9 @@ class XQueueCertInterface(object):
             return cert
 
         # Finally, generate the certificate and send it off.
-        return self._generate_cert(cert, course, student, grade_contents, template_pdf, generate_pdf)
+        return self._generate_cert(cert, course, student, grade_contents, template_pdf, generate_pdf, designation)
 
-    def _generate_cert(self, cert, course, student, grade_contents, template_pdf, generate_pdf):
+    def _generate_cert(self, cert, course, student, grade_contents, template_pdf, generate_pdf, designation):
         """
         Generate a certificate for the student. If `generate_pdf` is True,
         sends a request to XQueue.
