@@ -11,11 +11,6 @@ import random
 import os
 import textwrap
 import unittest
-<<<<<<< HEAD
-import ddt
-import re
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 import ddt
 import flaky
@@ -997,39 +992,33 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that we succeed
         self.assertTrue('success' in result and result['success'])
 
-<<<<<<< HEAD
-    def test_check_button_name(self):
+    def test_submit_button_name(self):
 
         # If last attempt, button name changes to "Submit"
         # Just in case, we also check what happens if we have
         # more attempts than allowed.
         attempts = random.randint(1, 10)
         module = CapaFactory.create(attempts=attempts - 1, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Submit")
+        self.assertEqual(module.submit_button_name(), "Final Submit")
 
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Submit")
+        self.assertEqual(module.submit_button_name(), "Final Submit")
 
         module = CapaFactory.create(attempts=attempts + 1, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Submit")
+        self.assertEqual(module.submit_button_name(), "Final Submit")
 
         module = CapaFactory.create(attempts=attempts - 2, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Submit")
+        self.assertEqual(module.submit_button_name(), "Submit")
 
         module = CapaFactory.create(attempts=attempts - 3, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Submit")
+        self.assertEqual(module.submit_button_name(), "Submit")
 
         # If no limit on attempts
         module = CapaFactory.create(attempts=attempts - 3)
-        self.assertEqual(module.check_button_name(), "Submit")
+        self.assertEqual(module.submit_button_name(), "Submit")
 
         module = CapaFactory.create(attempts=0)
-        self.assertEqual(module.check_button_name(), "Submit")
-=======
-    def test_submit_button_name(self):
-        module = CapaFactory.create(attempts=0)
         self.assertEqual(module.submit_button_name(), "Submit")
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
     def test_submit_button_submitting_name(self):
         module = CapaFactory.create(attempts=1, max_attempts=10)
