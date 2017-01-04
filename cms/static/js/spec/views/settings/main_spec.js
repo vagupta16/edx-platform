@@ -17,29 +17,11 @@ define([
     describe('Settings/Main', function() {
         var urlRoot = '/course/settings/org/DemoX/Demo_Course',
             modelData = {
-<<<<<<< HEAD
-                start_date: "2014-10-05T00:00:00Z",
-                end_date: "2014-11-05T20:00:00Z",
-                enrollment_start: "2014-10-00T00:00:00Z",
-                enrollment_end: "2014-11-05T00:00:00Z",
-                org : '',
-                course_id : '',
-                run : '',
-                syllabus : null,
-                short_description : '',
-                overview : '',
-                intro_video : null,
-                effort : null,
-                course_image_name : '',
-                course_image_asset_path : '',
-                enable_enrollment_email: false,
-                pre_requisite_courses : [],
-                entrance_exam_enabled : '',
-=======
                 start_date: '2014-10-05T00:00:00Z',
                 end_date: '2014-11-05T20:00:00Z',
                 enrollment_start: '2014-10-00T00:00:00Z',
                 enrollment_end: '2014-11-05T00:00:00Z',
+                enable_enrollment_email: false,
                 org: '',
                 course_id: '',
                 run: '',
@@ -60,7 +42,6 @@ define([
                 video_thumbnail_image_asset_path: '',
                 pre_requisite_courses: [],
                 entrance_exam_enabled: '',
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                 entrance_exam_minimum_score_pct: '50',
                 license: null,
                 language: '',
