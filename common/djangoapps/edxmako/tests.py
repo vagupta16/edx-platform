@@ -41,8 +41,6 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
 
-<<<<<<< HEAD
-
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch.dict('django.conf.settings.MKTG_URL_LINK_MAP', {'COURSES': 'courses'})
     def test_marketing_link_internal_courses_url(self):
@@ -57,10 +55,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
         link = marketing_link('COURSES')
         self.assertEqual(link, expected_link)
 
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
-=======
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_is_marketing_link_set(self):
         # test marketing site on
