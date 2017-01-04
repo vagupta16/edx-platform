@@ -58,13 +58,11 @@ class CourseTab(object):
     # If there is a single view associated with this tab, this is the name of it
     view_name = None
 
-<<<<<<< HEAD
     # True if this tab can be displaed to sneak peek users
     is_visible_to_sneak_peek = False
-=======
+
     # True if this tab should be displayed only for instructors
     course_staff_only = False
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
     def __init__(self, tab_dict):
         """
