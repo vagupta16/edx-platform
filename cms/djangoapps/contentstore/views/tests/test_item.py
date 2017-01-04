@@ -1692,10 +1692,6 @@ class TestComponentTemplates(CourseTestCase):
         self.assertIn('Advanced', button_names)
         self.assertEqual(len(templates[0]['templates']), len(expected_xblocks))
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
-<<<<<<< HEAD
-        template_display_names = sorted(template_display_names)
-        self.assertEqual(template_display_names, ['Annotation', 'Poll', 'Survey'])
-=======
         self.assertEqual(template_display_names, expected_xblocks)
         template_support_levels = [template['support_level'] for template in templates[0]['templates']]
         self.assertEqual(template_support_levels, expected_support_levels)
@@ -1708,8 +1704,6 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(1, len(templates))
         self.assertEqual(display_name, templates[0]['display_name'])
         self.assertEqual(support_level, templates[0]['support_level'])
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
-
 
 @ddt.ddt
 class TestXBlockInfo(ItemTest):
