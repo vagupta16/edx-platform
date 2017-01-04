@@ -29,13 +29,8 @@ from django.db import IntegrityError, transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
-<<<<<<< HEAD
-from django.utils.translation import ungettext, ngettext
-from django.utils.http import base36_to_int, urlsafe_base64_encode
-=======
 from django.utils.translation import ungettext
 from django.utils.http import base36_to_int, urlsafe_base64_encode, urlencode
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
@@ -77,12 +72,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-<<<<<<< HEAD
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 from collections import namedtuple
 
@@ -100,14 +90,9 @@ from openedx.core.djangoapps.external_auth.login_and_register import (
     register as external_auth_register
 )
 
-<<<<<<< HEAD
-from bulk_email.models import Optout, CourseAuthorization
+from bulk_email.models import Optout
 from cme_registration.views import cme_register_user, cme_create_account
 
-from lang_pref import LANGUAGE_KEY
-
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 import track.views
 
 import dogstats_wrapper as dog_stats_api
@@ -618,12 +603,9 @@ def dashboard(request):
     """
     user = request.user
 
-<<<<<<< HEAD
     if not UserProfile.has_registered(user):
         logout(request)
         return redirect(reverse('dashboard'))
-    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
-=======
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
     enable_verified_certificates = configuration_helpers.get_value(
         'ENABLE_VERIFIED_CERTIFICATES',
@@ -633,7 +615,6 @@ def dashboard(request):
         'DISPLAY_COURSE_MODES_ON_DASHBOARD',
         settings.FEATURES.get('DISPLAY_COURSE_MODES_ON_DASHBOARD', True)
     )
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
     # we want to filter and only show enrollments for courses within
     # the 'ORG' defined in configuration.
@@ -1416,7 +1397,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     user_found_by_email_lookup = user
     if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
-            lockout_message = ngettext(
+            lockout_message = ungettext(
                     "This account has been temporarily locked due to excessive login failures. "
                     "Try again in {minutes} minute.  For security reasons, "
                     "resetting the password will NOT lift the lockout. Please wait for {minutes} minute.",
