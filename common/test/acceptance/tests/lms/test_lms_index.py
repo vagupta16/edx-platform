@@ -5,11 +5,11 @@ what students see @ edx.org because we redirect requests to a separate web appli
 """
 import datetime
 
-from bok_choy.web_app_test import WebAppTest
-from ...pages.lms.index import IndexPage
+from common.test.acceptance.pages.lms.index import IndexPage
+from common.test.acceptance.tests.helpers import AcceptanceTest
 
 
-class BaseLmsIndexTest(WebAppTest):
+class BaseLmsIndexTest(AcceptanceTest):
     """ Base test suite for the LMS Index (Home) page """
 
     def setUp(self):
@@ -40,6 +40,8 @@ class LmsIndexPageTest(BaseLmsIndexTest):
         Perform a general validation of the index page, renders normally, no exceptions raised, etc.
         """
         self.assertTrue(self.page.banner_element.visible)
+        expected_links = [u'About', u'Blog', u'News', u'Help Center', u'Contact', u'Careers', u'Donate']
+        self.assertEqual(self.page.footer_links, expected_links)
 
     def test_intro_video_hidden_by_default(self):
         """

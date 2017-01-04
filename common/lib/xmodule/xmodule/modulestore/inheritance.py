@@ -3,9 +3,7 @@ Support for inheritance of fields down an XBlock hierarchy.
 """
 from __future__ import absolute_import
 
-from datetime import datetime
 from django.conf import settings
-from pytz import UTC
 
 from xmodule.partitions.partitions import UserPartition
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
@@ -127,11 +125,6 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings,
         default='',
     )
-    text_customization = Dict(
-        display_name=_("Text Customization"),
-        help=_("Enter string customization substitutions for particular locations."),
-        scope=Scope.settings,
-    )
     use_latex_compiler = Boolean(
         display_name=_("Enable LaTeX Compiler"),
         help=_("Enter true or false. If true, you can use the LaTeX templates for HTML components and advanced Problem components."),
@@ -218,6 +211,17 @@ class InheritanceMixin(XBlockMixin):
         default=False
     )
 
+    self_paced = Boolean(
+        display_name=_('Self Paced'),
+        help=_(
+            'Set this to "true" to mark this course as self-paced. Self-paced courses do not have '
+            'due dates for assignments, and students can progress through the course at any rate before '
+            'the course ends.'
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
 
 def compute_inherited_metadata(descriptor):
     """Given a descriptor, traverse all of its descendants and do metadata
@@ -274,6 +278,16 @@ class InheritingFieldData(KvsFieldData):
         super(InheritingFieldData, self).__init__(**kwargs)
         self.inheritable_names = set(inheritable_names)
 
+    def has_default_value(self, name):
+        """
+        Return whether or not the field `name` has a default value
+        """
+        has_default_value = getattr(self._kvs, 'has_default_value', False)
+        if callable(has_default_value):
+            return has_default_value(name)
+
+        return has_default_value
+
     def default(self, block, name):
         """
         The default for an inheritable name is found on a parent.
@@ -285,6 +299,15 @@ class InheritingFieldData(KvsFieldData):
             # node of the tree, the block's default will be used.
             field = block.fields[name]
             ancestor = block.get_parent()
+            # In case, if block's parent is of type 'library_content',
+            # bypass inheritance and use kvs' default instead of reusing
+            # from parent as '_copy_from_templates' puts fields into
+            # defaults.
+            if ancestor and \
+               ancestor.location.category == 'library_content' and \
+               self.has_default_value(name):
+                return super(InheritingFieldData, self).default(block, name)
+
             while ancestor is not None:
                 if field.is_set_on(ancestor):
                     return field.read_json(ancestor)

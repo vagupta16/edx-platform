@@ -1,78 +1,54 @@
 """Tests for the user API at the HTTP request level. """
 
 import datetime
-import base64
 import json
-import re
 from unittest import skipUnless, SkipTest
 
 import ddt
 import httpretty
-from pytz import UTC
 import mock
-
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.core import mail
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.core import mail
+from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
-from django.test.client import RequestFactory
-
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pytz import common_timezones_set, UTC
 from social.apps.django_app.default.models import UserSocialAuth
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
 from django_comment_common import models
+from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
+from openedx.core.lib.time_zone_utils import get_display_time_zone
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 )
 from .test_helpers import TestCaseForm
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from ..accounts.api import get_account_settings
+from xmodule.modulestore.tests.factories import CourseFactory
 from ..accounts import (
     NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
 )
+from ..accounts.api import get_account_settings
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
 from ..tests.test_constants import SORTED_COUNTRIES
 
-
-TEST_API_KEY = "test_api_key"
 USER_LIST_URI = "/user_api/v1/users/"
 USER_PREFERENCE_LIST_URI = "/user_api/v1/user_prefs/"
 ROLE_LIST_URI = "/user_api/v1/forum_roles/Moderator/users/"
 
 
-@override_settings(EDX_API_KEY=TEST_API_KEY)
-class ApiTestCase(TestCase):
+class UserAPITestCase(ApiTestCase):
     """
-    Parent test case for API workflow coverage
+    Parent test case for User API workflow coverage
     """
-
     LIST_URI = USER_LIST_URI
-
-    def basic_auth(self, username, password):
-        """
-        Returns a dictionary containing the http auth header with encoded username+password
-        """
-        return {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode('%s:%s' % (username, password))}
-
-    def request_with_auth(self, method, *args, **kwargs):
-        """Issue a get request to the given URI with the API key header"""
-        return getattr(self.client, method)(*args, HTTP_X_EDX_API_KEY=TEST_API_KEY, **kwargs)
-
-    def get_json(self, *args, **kwargs):
-        """Make a request with the given args and return the parsed JSON repsonse"""
-        resp = self.request_with_auth("get", *args, **kwargs)
-        self.assertHttpOK(resp)
-        self.assertTrue(resp["Content-Type"].startswith("application/json"))
-        return json.loads(resp.content)
 
     def get_uri_for_user(self, target_user):
         """Given a user object, get the URI for the corresponding resource"""
@@ -89,20 +65,6 @@ class ApiTestCase(TestCase):
             if pref["user"]["id"] == target_pref.user.id and pref["key"] == target_pref.key:
                 return pref["url"]
         self.fail()
-
-    def assertAllowedMethods(self, uri, expected_methods):
-        """Assert that the allowed methods for the given URI match the expected list"""
-        resp = self.request_with_auth("options", uri)
-        self.assertHttpOK(resp)
-        allow_header = resp.get("Allow")
-        self.assertIsNotNone(allow_header)
-        allowed_methods = re.split('[^A-Z]+', allow_header)
-        self.assertItemsEqual(allowed_methods, expected_methods)
-
-    def assertSelfReferential(self, obj):
-        """Assert that accessing the "url" entry in the given object returns the same object"""
-        copy = self.get_json(obj["url"])
-        self.assertEqual(obj, copy)
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
@@ -121,37 +83,8 @@ class ApiTestCase(TestCase):
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
 
-    def assertHttpOK(self, response):
-        """Assert that the given response has the status code 200"""
-        self.assertEqual(response.status_code, 200)
 
-    def assertHttpForbidden(self, response):
-        """Assert that the given response has the status code 403"""
-        self.assertEqual(response.status_code, 403)
-
-    def assertHttpBadRequest(self, response):
-        """Assert that the given response has the status code 400"""
-        self.assertEqual(response.status_code, 400)
-
-    def assertHttpMethodNotAllowed(self, response):
-        """Assert that the given response has the status code 405"""
-        self.assertEqual(response.status_code, 405)
-
-    def assertAuthDisabled(self, method, uri):
-        """
-        Assert that the Django rest framework does not interpret basic auth
-        headers for views exposed to anonymous users as an attempt to authenticate.
-
-        """
-        # Django rest framework interprets basic auth headers
-        # as an attempt to authenticate with the API.
-        # We don't want this for views available to anonymous users.
-        basic_auth_header = "Basic " + base64.b64encode('username:password')
-        response = getattr(self.client, method)(uri, HTTP_AUTHORIZATION=basic_auth_header)
-        self.assertNotEqual(response.status_code, 403)
-
-
-class EmptyUserTestCase(ApiTestCase):
+class EmptyUserTestCase(UserAPITestCase):
     """
     Test that the endpoint supports empty user result sets
     """
@@ -163,7 +96,7 @@ class EmptyUserTestCase(ApiTestCase):
         self.assertEqual(result["results"], [])
 
 
-class EmptyRoleTestCase(ApiTestCase):
+class EmptyRoleTestCase(UserAPITestCase):
     """Test that the endpoint supports empty result sets"""
     course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")
     LIST_URI = ROLE_LIST_URI + "?course_id=" + course_id.to_deprecated_string()
@@ -177,7 +110,7 @@ class EmptyRoleTestCase(ApiTestCase):
         self.assertEqual(result["results"], [])
 
 
-class UserApiTestCase(ApiTestCase):
+class UserApiTestCase(UserAPITestCase):
     """
     Generalized test case class for specific implementations below
     """
@@ -403,11 +336,13 @@ class UserViewSetTest(UserApiTestCase):
         )
 
 
-class UserPreferenceViewSetTest(UserApiTestCase):
+class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
     """
     Test cases covering the User Preference DRF view class and its various behaviors
     """
     LIST_URI = USER_PREFERENCE_LIST_URI
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(UserPreferenceViewSetTest, self).setUp()
@@ -607,7 +542,7 @@ class PreferenceUsersListViewTest(UserApiTestCase):
 
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class LoginSessionViewTest(ApiTestCase):
+class LoginSessionViewTest(UserAPITestCase):
     """Tests for the login end-points of the user API. """
 
     USERNAME = "bob"
@@ -653,7 +588,7 @@ class LoginSessionViewTest(ApiTestCase):
                 "required": True,
                 "label": "Email",
                 "placeholder": "username@domain.com",
-                "instructions": "The email address you used to register with {platform_name}".format(
+                "instructions": u"The email address you used to register with {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
@@ -661,6 +596,8 @@ class LoginSessionViewTest(ApiTestCase):
                     "max_length": EMAIL_MAX_LENGTH
                 },
                 "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
             },
             {
                 "name": "password",
@@ -675,6 +612,8 @@ class LoginSessionViewTest(ApiTestCase):
                     "max_length": PASSWORD_MAX_LENGTH
                 },
                 "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
             },
             {
                 "name": "remember",
@@ -686,6 +625,8 @@ class LoginSessionViewTest(ApiTestCase):
                 "instructions": "",
                 "restrictions": {},
                 "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
             },
         ])
 
@@ -773,7 +714,7 @@ class LoginSessionViewTest(ApiTestCase):
 
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class PasswordResetViewTest(ApiTestCase):
+class PasswordResetViewTest(UserAPITestCase):
     """Tests of the user API's password reset endpoint. """
 
     def setUp(self):
@@ -815,7 +756,7 @@ class PasswordResetViewTest(ApiTestCase):
                 "required": True,
                 "label": "Email",
                 "placeholder": "username@domain.com",
-                "instructions": "The email address you used to register with {platform_name}".format(
+                "instructions": u"The email address you used to register with {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
@@ -823,13 +764,15 @@ class PasswordResetViewTest(ApiTestCase):
                     "max_length": EMAIL_MAX_LENGTH
                 },
                 "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
             }
         ])
 
 
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
+class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     """Tests for the registration end-points of the User API. """
 
     maxDiff = None
@@ -1077,8 +1020,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                     {"value": "hs", "name": "Secondary/high school"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school"},
                     {"value": "el", "name": "Elementary/primary school"},
-                    {"value": "none", "name": "No Formal Education"},
-                    {"value": "other", "name": "Other Education"},
+                    {"value": "none", "name": "No formal education"},
+                    {"value": "other", "name": "Other education"},
                 ],
             }
         )
@@ -1103,8 +1046,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                     {"value": "hs", "name": "Secondary/high school TRANSLATED"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school TRANSLATED"},
                     {"value": "el", "name": "Elementary/primary school TRANSLATED"},
-                    {"value": "none", "name": "No Formal Education TRANSLATED"},
-                    {"value": "other", "name": "Other Education TRANSLATED"},
+                    {"value": "none", "name": "No formal education TRANSLATED"},
+                    {"value": "other", "name": "Other education TRANSLATED"},
                 ],
             }
         )
@@ -1183,7 +1126,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                 "name": "goals",
                 "type": "textarea",
                 "required": False,
-                "label": "Tell us why you're interested in {platform_name}".format(
+                "label": u"Tell us why you're interested in {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 )
             }
@@ -1197,6 +1140,17 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                 "type": "text",
                 "required": False,
                 "label": "City",
+            }
+        )
+
+    def test_registration_form_state(self):
+        self._assert_reg_field(
+            {"state": "optional"},
+            {
+                "name": "state",
+                "type": "text",
+                "required": False,
+                "label": "State/Province/Region",
             }
         )
 
@@ -1227,22 +1181,22 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
     )
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
-        link_html = '<a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>'
+        link_label = 'Terms of Service and Honor Code'
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the {platform_name} {link_html}.".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_html=link_html
+                    link_label=link_label
                 ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
-                        link_html=link_html
+                        link_label=link_label
                     )
                 }
             }
@@ -1251,22 +1205,22 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
     @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor"})
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
     def test_registration_honor_code_mktg_site_disabled(self):
-        link_html = '<a href=\"/honor\">Terms of Service and Honor Code</a>'
+        link_label = 'Terms of Service and Honor Code'
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the {platform_name} {link_html}.".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_html=link_html
+                    link_label=link_label
                 ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
-                        link_html=link_html
+                        link_label=link_label
                     )
                 }
             }
@@ -1281,44 +1235,48 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
     def test_registration_separate_terms_of_service_mktg_site_enabled(self):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"
-        link_html = '<a href=\"https://www.test.com/honor\">Honor Code</a>'
+        link_label = 'Honor Code'
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} {link_html}.".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_html=link_html
+                    link_label=link_label
                 ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
-                        link_html=link_html
+                        link_label=link_label
                     )
                 }
             }
         )
 
         # Terms of service field should also be present
+<<<<<<< HEAD
         link_html = '<a href=\"https://www.test.com/tos\">Terms of Service</a> and <a href=\"https://www.test.com/tos#privacy\">Privacy Policy</a>'
+=======
+        link_label = 'Terms of Service'
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} {link_html}.".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_html=link_html
+                    link_label=link_label
                 ),
                 "name": "terms_of_service",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
-                        link_html=link_html
+                        link_label=link_label
                     )
                 }
             }
@@ -1332,7 +1290,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} <a href=\"/honor\">Honor Code</a>.".format(
+                "label": u"I agree to the {platform_name} Honor Code".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "name": "honor_code",
@@ -1340,7 +1298,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} <a href=\"/honor\">Honor Code</a>.".format(
+                    "required": u"You must agree to the {platform_name} Honor Code".format(
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -1351,7 +1309,11 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
+<<<<<<< HEAD
                 "label": "I agree to the {platform_name} <a href=\"/tos\">Terms of Service</a> and <a href=\"/tos#privacy\">Privacy Policy</a>.".format(
+=======
+                "label": u"I agree to the {platform_name} Terms of Service".format(
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "name": "terms_of_service",
@@ -1359,7 +1321,11 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
+<<<<<<< HEAD
                     "required": "You must agree to the {platform_name} <a href=\"/tos\">Terms of Service</a> and <a href=\"/tos#privacy\">Privacy Policy</a>.".format(
+=======
+                    "required": u"You must agree to the {platform_name} Terms of Service".format(  # pylint: disable=line-too-long
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -1374,6 +1340,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
             "mailing_address": "optional",
             "goals": "optional",
             "city": "optional",
+            "state": "optional",
             "country": "required",
             "honor_code": "required",
         },
@@ -1394,6 +1361,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
             "favorite_movie",
             "favorite_editor",
             "city",
+            "state",
             "country",
             "gender",
             "year_of_birth",
@@ -1419,7 +1387,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get('/url')
         request.user = user
-        account_settings = get_account_settings(request)
+        account_settings = get_account_settings(request)[0]
 
         self.assertEqual(self.USERNAME, account_settings["username"])
         self.assertEqual(self.EMAIL, account_settings["email"])
@@ -1459,7 +1427,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get('/url')
         request.user = user
-        account_settings = get_account_settings(request)
+        account_settings = get_account_settings(request)[0]
 
         self.assertEqual(account_settings["level_of_education"], self.EDUCATION)
         self.assertEqual(account_settings["mailing_address"], self.ADDRESS)
@@ -1493,7 +1461,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get('/url')
         request.user = user
-        account_settings = get_account_settings(request)
+        account_settings = get_account_settings(request)[0]
 
         self.assertEqual(self.USERNAME, account_settings["username"])
         self.assertEqual(self.EMAIL, account_settings["email"])
@@ -1523,11 +1491,20 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         self.assertEqual(len(mail.outbox), 1)
         sent_email = mail.outbox[0]
         self.assertEqual(sent_email.to, [self.EMAIL])
+<<<<<<< HEAD
         self.assertEqual(sent_email.subject, "Activate Your {platform} Account".format(platform=settings.PLATFORM_NAME))
         self.assertIn(
             u"activating your {platform} account".format(
                 platform=settings.PLATFORM_NAME,
             ),
+=======
+        self.assertEqual(
+            sent_email.subject,
+            u"Activate Your {platform} Account".format(platform=settings.PLATFORM_NAME)
+        )
+        self.assertIn(
+            u"you need to activate your {platform} account".format(platform=settings.PLATFORM_NAME),
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
             sent_email.body
         )
 
@@ -1685,6 +1662,16 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
             }
         )
 
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"honor_code": "hidden", "terms_of_service": "hidden"})
+    def test_register_hidden_honor_code_and_terms_of_service(self):
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        })
+        self.assertHttpOK(response)
+
     def test_missing_fields(self):
         response = self.client.post(
             self.url,
@@ -1761,15 +1748,30 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                 )
             )
 
+    def test_country_overrides(self):
+        """Test that overridden countries are available in country list."""
+        # Retrieve the registration form description
+        with override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"}):
+            response = self.client.get(self.url)
+            self.assertHttpOK(response)
+
+        self.assertContains(response, 'Kosovo')
+
 
 @httpretty.activate
 @ddt.ddt
-class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin):
+class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTestCase):
     """
     Tests for the User API registration endpoint with 3rd party authentication.
     """
+    CREATE_USER = False
+
+    ENABLED_CACHES = ['default']
+
+    __test__ = False
+
     def setUp(self):
-        super(ThirdPartyRegistrationTestMixin, self).setUp(create_user=False)
+        super(ThirdPartyRegistrationTestMixin, self).setUp()
         self.url = reverse('user_api_registration')
 
     def data(self, user=None):
@@ -1884,6 +1886,8 @@ class TestFacebookRegistrationView(
     ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinFacebook, TransactionTestCase
 ):
     """Tests the User API registration endpoint with Facebook authentication."""
+    __test__ = True
+
     def test_social_auth_exception(self):
         """
         According to the do_auth method in social.backends.facebook.py,
@@ -1900,11 +1904,12 @@ class TestGoogleRegistrationView(
     ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, TransactionTestCase
 ):
     """Tests the User API registration endpoint with Google authentication."""
-    pass
+    __test__ = True
 
 
 @ddt.ddt
-class UpdateEmailOptInTestCase(ApiTestCase, SharedModuleStoreTestCase):
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
 
     USERNAME = "steve"
@@ -1989,3 +1994,40 @@ class UpdateEmailOptInTestCase(ApiTestCase, SharedModuleStoreTestCase):
         self.assertHttpBadRequest(response)
         with self.assertRaises(UserOrgTag.DoesNotExist):
             UserOrgTag.objects.get(user=self.user, org=self.course.id.org, key="email-optin")
+
+
+@ddt.ddt
+class CountryTimeZoneListViewTest(UserApiTestCase):
+    """
+    Test cases covering the list viewing behavior for country time zones
+    """
+    ALL_TIME_ZONES_URI = "/user_api/v1/preferences/time_zones/"
+    COUNTRY_TIME_ZONES_URI = "/user_api/v1/preferences/time_zones/?country_code=cA"
+
+    @ddt.data(ALL_TIME_ZONES_URI, COUNTRY_TIME_ZONES_URI)
+    def test_options(self, country_uri):
+        """ Verify that following options are allowed """
+        self.assertAllowedMethods(country_uri, ['OPTIONS', 'GET', 'HEAD'])
+
+    @ddt.data(ALL_TIME_ZONES_URI, COUNTRY_TIME_ZONES_URI)
+    def test_methods_not_allowed(self, country_uri):
+        """ Verify that put, patch, and delete are not allowed """
+        unallowed_methods = ['put', 'patch', 'delete']
+        for unallowed_method in unallowed_methods:
+            self.assertHttpMethodNotAllowed(self.request_with_auth(unallowed_method, country_uri))
+
+    def _assert_time_zone_is_valid(self, time_zone_info):
+        """ Asserts that the time zone is a valid pytz time zone """
+        time_zone_name = time_zone_info['time_zone']
+        self.assertIn(time_zone_name, common_timezones_set)
+        self.assertEqual(time_zone_info['description'], get_display_time_zone(time_zone_name))
+
+    @ddt.data((ALL_TIME_ZONES_URI, 436),
+              (COUNTRY_TIME_ZONES_URI, 28))
+    @ddt.unpack
+    def test_get_basic(self, country_uri, expected_count):
+        """ Verify that correct time zone info is returned """
+        results = self.get_json(country_uri)
+        self.assertEqual(len(results), expected_count)
+        for time_zone_info in results:
+            self._assert_time_zone_is_valid(time_zone_info)

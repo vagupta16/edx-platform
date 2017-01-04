@@ -44,7 +44,7 @@ MOCK_MODULES = [
     'courseware.access',
     'courseware.model_data',
     'courseware.module_render',
-    'courseware.views',
+    'courseware.views.views',
     'util.request',
     'eventtracking',
     'xmodule',
@@ -101,7 +101,7 @@ MOCK_MODULES = [
     'openid',
     'openid.store',
     'openid.store.interface',
-    'external_auth.views',
+    'openedx.core.djangoapps.external_auth.views',
     'mail_utils',
     'ratelimitbackend.backends',
     'social.apps.django_app.default',
@@ -128,7 +128,7 @@ MOCK_MODULES = [
     'celery',
     'celery.task',
     'student.roles',
-    'embargo.models',
+    'openedx.core.djangoapps.embargo.models',
     'xmodule.vertical_block',
     'xmodule.course_module',
     'user_api.accounts.api',
@@ -143,6 +143,25 @@ MOCK_MODULES = [
     'rest_framework_oauth.authentication',
     'certificates.api',
     'courseware.date_summary',
+    'rest_framework_jwt',
+    'rest_framework_jwt.authentication',
+    'microsite_configuration',
+    'xmodule.assetstore',
+    'xmodule.assetstore.assetmgr',
+    'xmodule.assetstore.assetmgr.AssetManager',
+    'xmodule.contentstore.django',
+    'piexif',
+    'provider',
+    'provider.oauth2',
+    'oauth2_provider',
+    'celery.signals',
+    'edx_rest_framework_extensions',
+    'edx_rest_framework_extensions.authentication',
+    'django_extensions',
+    'django_extensions.db',
+    'django_extensions.db.models',
+    'jsonfield',
+    'jsonfield.fields',
 ]
 
 for mod_name in MOCK_MODULES:
@@ -222,7 +241,6 @@ extensions = [
     'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
     'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.napoleon']
 
-project = u'Open edX Platform APIs'
-copyright = u'2015, edX'
+project = 'Open edX Platform APIs'
 
 exclude_patterns = ['build', 'links.rst']

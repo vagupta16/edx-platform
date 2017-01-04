@@ -7,33 +7,29 @@ import re
 import shutil
 import unittest
 from uuid import uuid4
+<<<<<<< HEAD
 from mock import patch
 from pymongo.errors import PyMongoError
+=======
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 from nose.plugins.attrib import attr
 
 from django.conf import settings
-from django.contrib.auth.hashers import check_password
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils.timezone import utc as UTC
-from django.utils.translation import ugettext as _
 import mongoengine
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_XML_MODULESTORE
-
 from dashboard.models import CourseImportLog
-from dashboard.sysadmin import Users
-from dashboard.git_import import GitImportError
+from dashboard.git_import import GitImportErrorNoDir
 from datetime import datetime
-from external_auth.models import ExternalAuthMap
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from instructor_task.tests.factories import InstructorTaskFactory
 
@@ -50,7 +46,7 @@ FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
 
-class SysadminBaseTestCase(ModuleStoreTestCase):
+class SysadminBaseTestCase(SharedModuleStoreTestCase):
     """
     Base class with common methods used in XML and Mongo tests
     """
@@ -61,7 +57,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
 
     def setUp(self):
         """Setup test case by adding primary user."""
-        super(SysadminBaseTestCase, self).setUp(create_user=False)
+        super(SysadminBaseTestCase, self).setUp()
         self.user = UserFactory.create(username='test_user',
                                        email='test_user+sysadmin@edx.org',
                                        password='foo')
@@ -125,6 +121,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
+<<<<<<< HEAD
 @attr('shard_1')
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
@@ -587,6 +584,13 @@ class TestSysadmin(SysadminBaseTestCase):
 
 @attr('shard_1')
 @override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
+=======
+@attr(shard=1)
+@override_settings(
+    MONGODB_LOG=TEST_MONGODB_LOG,
+    GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
+)
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
@@ -626,7 +630,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(GitImportError.NO_DIR,
+        self.assertIn(GitImportErrorNoDir(settings.GIT_REPO_DIR).message,
                       response.content.decode('UTF-8'))
 
     def test_mongo_course_add_delete(self):
@@ -639,7 +643,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(settings.GIT_REPO_DIR)
 
         def_ms = modulestore()
-        self.assertFalse('xml' == def_ms.get_modulestore_type(None))
+        self.assertNotEqual('xml', def_ms.get_modulestore_type(None))
 
         self._add_edx4edx()
         course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))

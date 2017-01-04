@@ -27,7 +27,7 @@ from django.utils.translation import ugettext_noop
 
 from celery import task
 from bulk_email.tasks import perform_delegate_email_batches
-from instructor_task.tasks_helper import (
+from lms.djangoapps.instructor_task.tasks_helper import (
     run_main_task,
     BaseInstructorTask,
     perform_module_state_update,
@@ -48,7 +48,8 @@ from instructor_task.tasks_helper import (
     upload_exec_summary_report,
     upload_course_survey_report,
     generate_students_certificates,
-    upload_proctored_exam_results_report
+    upload_proctored_exam_results_report,
+    upload_ora2_data,
 )
 
 
@@ -333,4 +334,14 @@ def cohort_students(entry_id, xmodule_instance_args):
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = ugettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def export_ora2_data(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV of ora2 responses and push it to S3.
+    """
+    action_name = ugettext_noop('generated')
+    task_fn = partial(upload_ora2_data, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

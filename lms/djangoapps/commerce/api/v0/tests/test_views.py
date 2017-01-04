@@ -1,7 +1,9 @@
 """ Commerce API v0 view tests. """
+from datetime import datetime, timedelta
 import json
 import itertools
 from uuid import uuid4
+import httpretty
 
 import ddt
 from django.conf import settings
@@ -11,6 +13,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 import mock
 from nose.plugins.attrib import attr
+import pytz
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -20,15 +23,17 @@ from commerce.tests.mocks import mock_basket_order, mock_create_basket
 from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
 from edx_rest_api_client import exceptions
-from embargo.test_utils import restrict_course
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from enrollment.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
+from xmodule.modulestore.django import modulestore
+from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
@@ -49,6 +54,8 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         }
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
+
+        self.client.cookies[SAILTHRU_CAMPAIGN_COOKIE] = 'sailthru id'
         return self.client.post(self.url, payload)
 
     def assertResponseMessage(self, response, expected_msg):
@@ -82,11 +89,13 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # TODO Verify this is the best method to create CourseMode objects.
         # TODO Find/create constants for the modes.
         for mode in [CourseMode.HONOR, CourseMode.VERIFIED, CourseMode.AUDIT]:
+            sku_string = uuid4().hex.decode('ascii')
             CourseModeFactory.create(
                 course_id=self.course.id,
                 mode_slug=mode,
                 mode_display_name=mode,
-                sku=uuid4().hex.decode('ascii')
+                sku=sku_string,
+                bulk_sku='BULK-{}'.format(sku_string)
             )
 
         # Ignore events fired from UserFactory creation
@@ -168,6 +177,9 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             self.assertResponseMessage(response, msg)
         else:
             self.assertResponsePaymentData(response)
+
+        # make sure ecommerce API call forwards Sailthru cookie
+        self.assertIn('{}=sailthru id'.format(SAILTHRU_CAMPAIGN_COOKIE), httpretty.last_request().headers['cookie'])
 
     @ddt.data(True, False)
     def test_course_with_honor_seat_sku(self, user_is_active):
@@ -266,8 +278,9 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         CourseMode.objects.filter(course_id=self.course.id).delete()
         mode = CourseMode.NO_ID_PROFESSIONAL_MODE
+        sku_string = uuid4().hex.decode('ascii')
         CourseModeFactory.create(course_id=self.course.id, mode_slug=mode, mode_display_name=mode,
-                                 sku=uuid4().hex.decode('ascii'))
+                                 sku=sku_string, bulk_sku='BULK-{}'.format(sku_string))
 
         with mock_create_basket(expect_called=False):
             response = self._post_to_view()
@@ -346,6 +359,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertEqual(mock_update.called, is_opt_in)
         self.assertEqual(response.status_code, 200)
 
+<<<<<<< HEAD
     def _test_enrollment_email(self):
         self.course.enable_enrollment_email = True
         self.update_course(self.course, self.user.id)
@@ -369,9 +383,20 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         Test that email is sent upon enrollment when E-Commerce service is not configured.
         """
         self._test_enrollment_email()
+=======
+    def test_closed_course(self):
+        """
+        Ensure that the view does not attempt to create a basket for closed
+        courses.
+        """
+        self.course.enrollment_end = datetime.now(pytz.UTC) - timedelta(days=1)
+        modulestore().update_item(self.course, self.user.id)  # pylint:disable=no-member
+        with mock_create_basket(expect_called=False):
+            self.assertEqual(self._post_to_view().status_code, 406)
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """

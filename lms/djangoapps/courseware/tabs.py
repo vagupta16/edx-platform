@@ -10,6 +10,7 @@ from courseware.entrance_exams import user_must_complete_entrance_exam
 from student.models import UserProfile
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
+from student.roles import CourseStaffRole
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
 from xmodule.tabs import StaticTab
 
@@ -313,9 +314,12 @@ def get_course_tab_list(request, course):
         if must_complete_ee:
             # Hide all of the tabs except for 'Courseware'
             # Rename 'Courseware' tab to 'Entrance Exam'
-            if tab.type is not 'courseware':
+            if tab.type != 'courseware':
                 continue
             tab.name = _("Entrance Exam")
+        if tab.type == 'static_tab' and tab.course_staff_only and \
+                not bool(user and has_access(user, 'staff', course, course.id)):
+            continue
         course_tab_list.append(tab)
 
     # Add in any dynamic tabs, i.e. those that are not persisted

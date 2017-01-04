@@ -1,5 +1,6 @@
 """ API v0 views. """
 import logging
+import requests
 
 from edx_rest_api_client import exceptions
 from opaque_keys import InvalidKeyError
@@ -12,21 +13,22 @@ from rest_framework.views import APIView
 from commerce.constants import Messages
 from commerce.exceptions import InvalidResponseError
 from commerce.http import DetailResponse, InternalRequestErrorResponse
-from commerce.utils import audit_log
 from course_modes.models import CourseMode
 from courseware import courses
-from embargo import api as embargo_api
+from openedx.core.djangoapps.embargo import api as embargo_api
 from enrollment.api import add_enrollment
 from enrollment.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.log_utils import audit_log
 from student.models import CourseEnrollment
 from student.views import notify_enrollment_by_email
 from util.json_request import JsonResponse
 
 
 log = logging.getLogger(__name__)
+SAILTHRU_CAMPAIGN_COOKIE = 'sailthru_bid'
 
 
 class BasketsView(APIView):
@@ -101,6 +103,13 @@ class BasketsView(APIView):
             msg = Messages.ENROLLMENT_EXISTS.format(course_id=course_id, username=user.username)
             return DetailResponse(msg, status=HTTP_409_CONFLICT)
 
+        # Check to see if enrollment for this course is closed.
+        course = courses.get_course(course_key)
+        if CourseEnrollment.is_enrollment_closed(user, course):
+            msg = Messages.ENROLLMENT_CLOSED.format(course_id=course_id)
+            log.info(u'Unable to enroll user %s in closed course %s.', user.id, course_id)
+            return DetailResponse(msg, status=HTTP_406_NOT_ACCEPTABLE)
+
         # If there is no audit or honor course mode, this most likely
         # a Prof-Ed course. Return an error so that the JS redirects
         # to track selection.
@@ -130,7 +139,8 @@ class BasketsView(APIView):
         # Setup the API
 
         try:
-            api = ecommerce_api_client(user)
+            api_session = requests.Session()
+            api = ecommerce_api_client(user, session=api_session)
         except ValueError:
             self._enroll(course_key, user)
             notify_enrollment_by_email(courses.get_course(course_key), user, request)
@@ -142,6 +152,15 @@ class BasketsView(APIView):
 
         # Make the API call
         try:
+            # Pass along Sailthru campaign id
+            campaign_cookie = request.COOKIES.get(SAILTHRU_CAMPAIGN_COOKIE)
+            if campaign_cookie:
+                cookie = {SAILTHRU_CAMPAIGN_COOKIE: campaign_cookie}
+                if api_session.cookies:
+                    requests.utils.add_dict_to_cookiejar(api_session.cookies, cookie)
+                else:
+                    api_session.cookies = requests.utils.cookiejar_from_dict(cookie)
+
             response_data = api.baskets.post({
                 'products': [{'sku': default_enrollment_mode.sku}],
                 'checkout': True,

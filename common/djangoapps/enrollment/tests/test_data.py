@@ -2,14 +2,17 @@
 Test the Data Aggregation Layer for Course Enrollments.
 
 """
+import datetime
+import unittest
+
 import ddt
 from mock import patch
 from nose.tools import raises
-import unittest
-
+from pytz import UTC
 from django.conf import settings
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+
+from course_modes.models import CourseMode
+from enrollment import data
 from enrollment.errors import (
     UserNotFoundError, CourseEnrollmentClosedError,
     CourseEnrollmentFullError, CourseEnrollmentExistsError,
@@ -17,9 +20,15 @@ from enrollment.errors import (
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, AlreadyEnrolledError
+<<<<<<< HEAD
 from enrollment import data
 from student.roles import CourseStaffRole
 from student.tests.factories import UserProfileFactory
+=======
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -241,13 +250,13 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
     @raises(CourseEnrollmentFullError)
     @patch.object(CourseEnrollment, "enroll")
-    def test_enrollment_for_closed_course(self, mock_enroll):
+    def test_enrollment_for_full_course(self, mock_enroll):
         mock_enroll.side_effect = CourseFullError("Bad things happened")
         data.create_course_enrollment(self.user.username, unicode(self.course.id), 'honor', True)
 
     @raises(CourseEnrollmentExistsError)
     @patch.object(CourseEnrollment, "enroll")
-    def test_enrollment_for_closed_course(self, mock_enroll):
+    def test_enrollment_for_enrolled_course(self, mock_enroll):
         mock_enroll.side_effect = AlreadyEnrolledError("Bad things happened")
         data.create_course_enrollment(self.user.username, unicode(self.course.id), 'honor', True)
 
@@ -259,6 +268,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         enrollment = data.update_course_enrollment(self.user.username, "some/fake/course", is_active=False)
         self.assertIsNone(enrollment)
 
+<<<<<<< HEAD
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class RosterDataTest(ModuleStoreTestCase):
@@ -313,3 +323,35 @@ class RosterDataTest(ModuleStoreTestCase):
         self.assertEquals(roster[1]['name'], self.STAFF_NAME)
         self.assertEquals(roster[1]['email'], self.STAFF_EMAIL)
         self.assertEquals(roster[1]['is_staff'], 1)
+=======
+    def test_get_course_with_expired_mode_included(self):
+        """Verify that method returns expired modes if include_expired
+        is true."""
+        modes = ['honor', 'verified', 'audit']
+        self._create_course_modes(modes, course=self.course)
+        self._update_verified_mode_as_expired(self.course.id)
+        self.assert_enrollment_modes(modes, True)
+
+    def test_get_course_without_expired_mode_included(self):
+        """Verify that method does not returns expired modes if include_expired
+        is false."""
+        self._create_course_modes(['honor', 'verified', 'audit'], course=self.course)
+        self._update_verified_mode_as_expired(self.course.id)
+        self.assert_enrollment_modes(['audit', 'honor'], False)
+
+    def _update_verified_mode_as_expired(self, course_id):
+        """Dry method to change verified mode expiration."""
+        mode = CourseMode.objects.get(course_id=course_id, mode_slug=CourseMode.VERIFIED)
+        mode.expiration_datetime = datetime.datetime(year=1970, month=1, day=1, tzinfo=UTC)
+        mode.save()
+
+    def assert_enrollment_modes(self, expected_modes, include_expired):
+        """Get enrollment data and assert response with expected modes."""
+        result_course = data.get_course_enrollment_info(unicode(self.course.id), include_expired=include_expired)
+        result_slugs = [mode['slug'] for mode in result_course['course_modes']]
+        for course_mode in expected_modes:
+            self.assertIn(course_mode, result_slugs)
+
+        if not include_expired:
+            self.assertNotIn('verified', result_slugs)
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142

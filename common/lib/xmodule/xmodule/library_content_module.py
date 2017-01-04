@@ -99,12 +99,6 @@ class LibraryContentFields(object):
         values=_get_capa_types(),
         scope=Scope.settings,
     )
-    has_score = Boolean(
-        display_name=_("Scored"),
-        help=_("Set this value to True if this module is either a graded assignment or a practice problem."),
-        default=False,
-        scope=Scope.settings,
-    )
     selected = List(
         # This is a list of (block_type, block_id) tuples used to record
         # which random/first set of matching blocks was selected per user
@@ -367,6 +361,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     """
     Descriptor class for LibraryContentModule XBlock.
     """
+
+    resources_dir = 'assets/library_content'
+
     module_class = LibraryContentModule
     mako_template = 'widgets/metadata-edit.html'
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}

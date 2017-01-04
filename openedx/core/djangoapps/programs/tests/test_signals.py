@@ -3,6 +3,7 @@ This module contains tests for programs-related signals and signal handlers.
 """
 
 from django.test import TestCase
+from nose.plugins.attrib import attr
 import mock
 
 from student.tests.factories import UserFactory
@@ -14,7 +15,8 @@ from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded
 TEST_USERNAME = 'test-user'
 
 
-@mock.patch('openedx.core.djangoapps.programs.tasks.award_program_certificates.delay')
+@attr(shard=2)
+@mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.award_program_certificates.delay')
 @mock.patch(
     'openedx.core.djangoapps.programs.models.ProgramsApiConfig.is_certification_enabled',
     new_callable=mock.PropertyMock,

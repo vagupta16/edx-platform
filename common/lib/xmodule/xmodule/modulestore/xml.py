@@ -730,6 +730,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                             tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
                             if tab:
                                 module.display_name = tab.name
+                                module.course_staff_only = tab.course_staff_only
                         module.data_dir = course_dir
                         module.save()
 
@@ -875,7 +876,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         Args:
             course_key: just for signature compatibility
         """
-        return ModuleStoreEnum.Type.xml
+        # return ModuleStoreEnum.Type.xml
+        return None
 
     def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
@@ -893,7 +895,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         Returns the course count
         """
-        return {ModuleStoreEnum.Type.xml: True}
+        return {'xml': True}
 
     @contextmanager
     def branch_setting(self, branch_setting, course_id=None):  # pylint: disable=unused-argument

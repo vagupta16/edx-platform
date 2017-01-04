@@ -383,9 +383,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     lang,
                 )
             except TranscriptException as ex:
-                # remove key from transcripts because proper srt file does not exist in assets.
-                item.transcripts.pop(lang)
-                reraised_message += ' ' + ex.message
+                pass
         if reraised_message:
             item.save_with_metadata(user)
             raise TranscriptException(reraised_message)
@@ -531,6 +529,9 @@ class Transcript(object):
         """
         Return asset location. `location` is module location.
         """
+        # If user transcript filename is empty, raise `TranscriptException` to avoid `InvalidKeyError`.
+        if not filename:
+            raise TranscriptException("Transcript not uploaded yet")
         return StaticContent.compute_location(location.course_key, filename)
 
     @staticmethod
@@ -569,14 +570,15 @@ class VideoTranscriptsMixin(object):
                 Defaults to False
         """
         translations = []
-        sub, other_lang = transcripts["sub"], transcripts["transcripts"]
+        sub, other_langs = transcripts["sub"], transcripts["transcripts"]
 
         # If we're not verifying the assets, we just trust our field values
         if not verify_assets:
-            translations = list(other_lang)
+            if other_langs:
+                translations = list(other_langs)
             if not translations or sub:
                 translations += ['en']
-            return set(translations)
+            return translations
 
         # If we've gotten this far, we're going to verify that the transcripts
         # being referenced are actually in the contentstore.
@@ -589,16 +591,16 @@ class VideoTranscriptsMixin(object):
                 except NotFoundError:
                     pass
                 else:
-                    translations = ['en']
+                    translations += ['en']
             else:
-                translations = ['en']
+                translations += ['en']
 
-        for lang in other_lang:
+        for lang in other_langs:
             try:
-                Transcript.asset(self.location, None, None, other_lang[lang])
+                Transcript.asset(self.location, None, None, other_langs[lang])
             except NotFoundError:
                 continue
-            translations.append(lang)
+            translations += [lang]
 
         return translations
 
@@ -669,12 +671,17 @@ class VideoTranscriptsMixin(object):
         """
         if is_bumper:
             transcripts = copy.deepcopy(get_bumper_settings(self).get('transcripts', {}))
-            return {
-                "sub": transcripts.pop("en", ""),
-                "transcripts": transcripts,
-            }
+            sub = transcripts.pop("en", "")
         else:
-            return {
-                "sub": self.sub,
-                "transcripts": self.transcripts,
-            }
+            transcripts = self.transcripts if self.transcripts else {}
+            sub = self.sub
+
+        # Only attach transcripts that are not empty.
+        transcripts = {
+            language_code: transcript_file
+            for language_code, transcript_file in transcripts.items() if transcript_file != ''
+        }
+        return {
+            "sub": sub,
+            "transcripts": transcripts,
+        }

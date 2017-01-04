@@ -1,15 +1,14 @@
 <div class="profile <%- ownProfile ? 'profile-self' : 'profile-other' %>">
     <div class="wrapper-profile-field-account-privacy"></div>
-
     <div class="wrapper-profile-sections account-settings-container">
         <div class="wrapper-profile-section-one">
             <div class="profile-image-field">
             </div>
-
             <div class="profile-section-one-fields">
             </div>
         </div>
         <div class="ui-loading-error is-hidden">
+<<<<<<< HEAD
             <i class="fa fa-exclamation-triangle message-error" aria-hidden=true></i>
             <span class="copy"><%- gettext("An error occurred. Please reload the page.") %></span>
         </div>
@@ -23,6 +22,10 @@
                     <% } %>
                 <% } %>
             </div>
+=======
+            <span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span>
+            <span class="copy"><%- gettext("An error occurred. Try loading the page again.") %></span>
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         </div>
     </div>
 </div>

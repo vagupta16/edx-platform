@@ -1,25 +1,27 @@
+# coding=utf-8
 """
 Test the course_info xblock
 """
 import mock
 from nose.plugins.attrib import attr
 from pyquery import PyQuery as pq
-from urllib import urlencode
 
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
 from django.test.utils import override_settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE
+    TEST_DATA_SPLIT_MODULESTORE,
+    TEST_DATA_MIXED_MODULESTORE
 )
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_CLOSED_MODULESTORE
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
@@ -29,16 +31,18 @@ from .helpers import LoginEnrollmentTestCase
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
-@attr('shard_1')
-class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+@attr(shard=1)
+class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the Course Info page
     """
-    def setUp(self):
-        super(CourseInfoTestCase, self).setUp()
-        self.course = CourseFactory.create()
-        self.page = ItemFactory.create(
-            category="course_info", parent_location=self.course.location,
+
+    @classmethod
+    def setUpClass(cls):
+        super(CourseInfoTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.page = ItemFactory.create(
+            category="course_info", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="updates"
         )
 
@@ -86,13 +90,55 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         url = reverse('info', args=[unicode(self.course.id)])
         response = self.client.get(url)
         start_date = strftime_localized(self.course.start, 'SHORT_DATE')
-        self.assertRedirects(response, '{0}?{1}'.format(reverse('dashboard'), urlencode({'notlive': start_date})))
+        expected_params = QueryDict(mutable=True)
+        expected_params['notlive'] = start_date
+        expected_url = '{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode()
+        )
+        self.assertRedirects(response, expected_url)
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    @mock.patch("courseware.views.views.strftime_localized")
+    def test_non_live_course_other_language(self, mock_strftime_localized):
+        """Ensure that a user accessing a non-live course sees a redirect to
+        the student dashboard, not a 404, even if the localized date is unicode
+        """
+        self.setup_user()
+        self.enroll(self.course)
+        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        mock_strftime_localized.return_value = fake_unicode_start_time
+
+        url = reverse('info', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        expected_params = QueryDict(mutable=True)
+        expected_params['notlive'] = fake_unicode_start_time
+        expected_url = u'{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode()
+        )
+        self.assertRedirects(response, expected_url)
 
     def test_nonexistent_course(self):
         self.setup_user()
         url = reverse('info', args=['not/a/course'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+
+@attr(shard=1)
+class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Tests of the CourseInfo last accessed link.
+    """
+
+    def setUp(self):
+        super(CourseInfoLastAccessedTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.page = ItemFactory.create(
+            category="course_info", parent_location=self.course.location,
+            data="OOGIE BLOOGIE", display_name="updates"
+        )
 
     def test_last_accessed_courseware_not_shown(self):
         """
@@ -126,6 +172,60 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         info_page_response = self.client.get(info_url)
         content = pq(info_page_response.content)
         self.assertEqual(content('.page-header-secondary .last-accessed-link').attr('href'), section_url)
+
+
+@attr(shard=1)
+class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Tests of the CourseInfo page title.
+    """
+
+    def setUp(self):
+        super(CourseInfoTitleTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.page = ItemFactory.create(
+            category="course_info", parent_location=self.course.location,
+            data="OOGIE BLOOGIE", display_name="updates"
+        )
+
+    def test_info_title(self):
+        """
+        Test the info page on a course without any display_* settings against
+        one that does.
+        """
+        url = reverse('info', args=(unicode(self.course.id),))
+        response = self.client.get(url)
+        content = pq(response.content)
+        expected_title = "Welcome to {org}'s {course_name}!".format(
+            org=self.course.display_org_with_default,
+            course_name=self.course.display_number_with_default
+        )
+        display_course = CourseFactory.create(
+            org="HogwartZ",
+            number="Potions_3",
+            display_organization="HogwartsX",
+            display_coursenumber="Potions",
+            display_name="Introduction_to_Potions"
+        )
+        display_url = reverse('info', args=(unicode(display_course.id),))
+        display_response = self.client.get(display_url)
+        display_content = pq(display_response.content)
+        expected_display_title = "Welcome to {org}'s {course_name}!".format(
+            org=display_course.display_org_with_default,
+            course_name=display_course.display_number_with_default
+        )
+        self.assertIn(
+            expected_title,
+            content('.page-title').contents()[0]
+        )
+        self.assertIn(
+            expected_display_title,
+            display_content('.page-title').contents()[0]
+        )
+        self.assertIn(
+            display_course.display_name_with_default,
+            display_content('.page-subtitle').contents()
+        )
 
 
 class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -164,21 +264,37 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertRedirects(response, expected, status_code=302, target_status_code=200)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page for an XML course
     """
-    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
-    # The following XML test course (which lives at common/test/data/2014)
-    # is closed; we're testing that a course info page still appears when
-    # the course is already closed
-    xml_course_key = SlashSeparatedCourseKey('edX', 'detached_pages', '2014')
+    def setUp(self):
+        """
+        Set up the tests
+        """
+        super(CourseInfoTestCaseXML, self).setUp()
 
-    # this text appears in that course's course info page
-    # common/test/data/2014/info/updates.html
-    xml_data = "course info 463139"
+        # The following test course (which lives at common/test/data/2014)
+        # is closed; we're testing that a course info page still appears when
+        # the course is already closed
+        self.xml_course_key = self.store.make_course_key('edX', 'detached_pages', '2014')
+        import_course_from_xml(
+            self.store,
+            'test_user',
+            TEST_DATA_DIR,
+            source_dirs=['2014'],
+            static_content_store=None,
+            target_id=self.xml_course_key,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
+
+        # this text appears in that course's course info page
+        # common/test/data/2014/info/updates.html
+        self.xml_data = "course info 463139"
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
@@ -196,18 +312,23 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertNotIn(self.xml_data, resp.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the info page of self-paced courses.
     """
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
+    @classmethod
+    def setUpClass(cls):
+        super(SelfPacedCourseInfoTestCase, cls).setUpClass()
+        cls.instructor_paced_course = CourseFactory.create(self_paced=False)
+        cls.self_paced_course = CourseFactory.create(self_paced=True)
 
     def setUp(self):
         SelfPacedConfiguration(enabled=True).save()
         super(SelfPacedCourseInfoTestCase, self).setUp()
-        self.instructor_paced_course = CourseFactory.create(self_paced=False)
-        self.self_paced_course = CourseFactory.create(self_paced=True)
         self.setup_user()
 
     def fetch_course_info_with_queries(self, course, sql_queries, mongo_queries):
@@ -218,11 +339,19 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         url = reverse('info', args=[unicode(course.id)])
         with self.assertNumQueries(sql_queries):
             with check_mongo_calls(mongo_queries):
-                resp = self.client.get(url)
+                with mock.patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):
+                    resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
+<<<<<<< HEAD
         self.fetch_course_info_with_queries(self.instructor_paced_course, 20, 4)
 
     def test_num_queries_self_paced(self):
         self.fetch_course_info_with_queries(self.self_paced_course, 20, 4)
+=======
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 21, 4)
+
+    def test_num_queries_self_paced(self):
+        self.fetch_course_info_with_queries(self.self_paced_course, 21, 4)
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142

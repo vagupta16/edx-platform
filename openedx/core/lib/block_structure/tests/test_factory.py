@@ -1,6 +1,7 @@
 """
 Tests for block_structure_factory.py
 """
+from nose.plugins.attrib import attr
 from unittest import TestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -11,6 +12,7 @@ from .helpers import (
 )
 
 
+@attr(shard=2)
 class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureFactory
@@ -52,3 +54,15 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
                 block_structure_cache=cache,
             )
         )
+
+    def test_new(self):
+        block_structure = BlockStructureFactory.create_from_modulestore(
+            root_block_usage_key=0, modulestore=self.modulestore
+        )
+        new_structure = BlockStructureFactory.create_new(
+            block_structure.root_block_usage_key,
+            block_structure._block_relations,  # pylint: disable=protected-access
+            block_structure.transformer_data,
+            block_structure._block_data_map,  # pylint: disable=protected-access
+        )
+        self.assert_block_structure(new_structure, self.children_map)

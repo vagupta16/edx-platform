@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from django.views.decorators.http import require_GET, require_http_methods
 import rfc6266
 
-from edxval.api import create_video, get_videos_for_course, SortDirection, VideoSortField
+from edxval.api import create_video, get_videos_for_course, SortDirection, VideoSortField, remove_video_for_course
 from opaque_keys.edx.keys import CourseKey
 
 from contentstore.models import VideoUploadConfig
@@ -44,6 +44,9 @@ class StatusDisplayStrings(object):
     _COMPLETE = ugettext_noop("Ready")
     # Translators: This is the status for a video that the servers have failed to process
     _FAILED = ugettext_noop("Failed")
+    # Translators: This is the status for a video which has failed
+    # due to being flagged as a duplicate by an external or internal CMS
+    _DUPLICATE = ugettext_noop("Failed Duplicate")
     # Translators: This is the status for a video for which an invalid
     # processing token was provided in the course settings
     _INVALID_TOKEN = ugettext_noop("Invalid Token")
@@ -61,6 +64,7 @@ class StatusDisplayStrings(object):
         "file_complete": _COMPLETE,
         "file_corrupt": _FAILED,
         "pipeline_error": _FAILED,
+        "duplicate": _DUPLICATE,
         "invalid_token": _INVALID_TOKEN,
         "imported": _IMPORTED,
     }
@@ -73,8 +77,8 @@ class StatusDisplayStrings(object):
 
 @expect_json
 @login_required
-@require_http_methods(("GET", "POST"))
-def videos_handler(request, course_key_string):
+@require_http_methods(("GET", "POST", "DELETE"))
+def videos_handler(request, course_key_string, edx_video_id=None):
     """
     The restful handler for video uploads.
 
@@ -87,6 +91,8 @@ def videos_handler(request, course_key_string):
         json: create a new video upload; the actual files should not be provided
             to this endpoint but rather PUT to the respective upload_url values
             contained in the response
+    DELETE
+        soft deletes a video for particular course
     """
     course = _get_and_validate_course(course_key_string, request.user)
 
@@ -98,6 +104,9 @@ def videos_handler(request, course_key_string):
             return videos_index_json(course)
         else:
             return videos_index_html(course)
+    elif request.method == "DELETE":
+        remove_video_for_course(course_key_string, edx_video_id)
+        return JsonResponse()
     else:
         return videos_post(course, request)
 
@@ -244,7 +253,7 @@ def videos_index_html(course):
         "videos_index.html",
         {
             "context_course": course,
-            "post_url": reverse_course_url("videos_handler", unicode(course.id)),
+            "video_handler_url": reverse_course_url("videos_handler", unicode(course.id)),
             "encodings_download_url": reverse_course_url("video_encodings_download", unicode(course.id)),
             "previous_uploads": _get_index_videos(course),
             "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
@@ -311,9 +320,9 @@ def videos_post(course, request):
         edx_video_id = unicode(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
         for metadata_name, value in [
-            ("course_video_upload_token", course_video_upload_token),
-            ("client_video_id", file_name),
-            ("course_key", unicode(course.id)),
+                ("course_video_upload_token", course_video_upload_token),
+                ("client_video_id", file_name),
+                ("course_key", unicode(course.id)),
         ]:
             key.set_metadata(metadata_name, value)
         upload_url = key.generate_url(
@@ -332,7 +341,7 @@ def videos_post(course, request):
             "courses": [course.id]
         })
 
-        resp_files.append({"file_name": file_name, "upload_url": upload_url})
+        resp_files.append({"file_name": file_name, "upload_url": upload_url, "edx_video_id": edx_video_id})
 
     return JsonResponse({"files": resp_files}, status=200)
 

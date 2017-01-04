@@ -5,7 +5,6 @@ from django.utils.translation import ugettext as _
 from django_countries import countries
 from student.models import UserProfile
 %>
-<%namespace file='main.html' import="stanford_theme_enabled"/>
 
 <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
 
@@ -25,9 +24,16 @@ from student.models import UserProfile
 
   <div class="form-actions form-third-party-auth">
 
-  % for enabled in provider.Registry.accepting_logins():
+  % for enabled in provider.Registry.displayed_for_login():
     ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
-    <button type="submit" class="button button-primary button-${enabled.provider_id} register-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_urls[enabled.provider_id]}');"><span class="icon fa ${enabled.icon_class}"></span>${_('Sign up with {provider_name}').format(provider_name=enabled.name)}</button>
+    <button type="submit" class="button button-primary button-${enabled.provider_id} register-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_urls[enabled.provider_id]}');">
+      % if enabled.icon_class:
+      <span class="icon fa ${enabled.icon_class}" aria-hidden="true"></span>
+      % else:
+      <span class="icon" aria-hidden="true"><img class="icon-image" src="${enabled.icon_image.url}" alt="${enabled.name} icon" /></span>
+      % endif
+      ${_('Sign up with {provider_name}').format(provider_name=enabled.name)}
+    </button>
   % endfor
 
   </div>
@@ -244,6 +250,7 @@ from student.models import UserProfile
       % endif
 
       % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
+<<<<<<< HEAD
       ## If the stanford theme isn't enabled, check if we have an Honor Code link in our marketing map
       % if stanford_theme_enabled() or (marketing_link('HONOR') and marketing_link('HONOR') != '#'):
       <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
@@ -255,6 +262,14 @@ from student.models import UserProfile
             honor_code_path = self.register_honor_link
           else:
             honor_code_path = marketing_link('HONOR')
+=======
+      ## check if we have an Honor Code link in our marketing map
+      % if marketing_link('HONOR') and marketing_link('HONOR') != '#':
+      <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
+        <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
+        <%
+          honor_code_path = marketing_link('HONOR')
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         %>
         <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
           link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=honor_code_path),

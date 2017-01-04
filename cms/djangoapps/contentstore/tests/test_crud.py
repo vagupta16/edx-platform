@@ -1,5 +1,3 @@
-import unittest
-
 from xmodule import templates
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -37,8 +35,8 @@ class TemplateTests(ModuleStoreTestCase):
         self.assertIsNotNone(dropdown)
         self.assertIn('markdown', dropdown['metadata'])
         self.assertIn('data', dropdown)
-        self.assertRegexpMatches(dropdown['metadata']['markdown'], r'^Dropdown.*')
-        self.assertRegexpMatches(dropdown['data'], r'<problem>\s*<p>Dropdown.*')
+        self.assertRegexpMatches(dropdown['metadata']['markdown'], r'.*dropdown problems.*')
+        self.assertRegexpMatches(dropdown['data'], r'<problem>\s*<optionresponse>\s*<p>.*dropdown problems.*')
 
     def test_get_some_templates(self):
         self.assertEqual(len(SequenceDescriptor.templates()), 0)

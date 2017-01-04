@@ -1,16 +1,15 @@
-
 from mock import patch, Mock
 import unittest
 import ddt
 
+from request_cache.middleware import RequestCache
 from django.conf import settings
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
-import edxmako.middleware
-from edxmako.middleware import get_template_request_context
+from edxmako.request_context import get_template_request_context
 from edxmako import add_lookup, LOOKUP
 from edxmako.shortcuts import (
     marketing_link,
@@ -27,12 +26,12 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     """
     Test the edxmako shortcuts file
     """
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_marketing_link(self):
         # test marketing site on
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            expected_link = 'dummy-root/about-us'
+            expected_link = 'https://dummy-root/about-us'
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
         # test marketing site off
@@ -42,6 +41,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
 
+<<<<<<< HEAD
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch.dict('django.conf.settings.MKTG_URL_LINK_MAP', {'COURSES': 'courses'})
@@ -58,6 +58,9 @@ class ShortcutsTests(UrlResetMixin, TestCase):
         self.assertEqual(link, expected_link)
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
+=======
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_is_marketing_link_set(self):
         # test marketing site on
@@ -69,7 +72,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             self.assertTrue(is_marketing_link_set('ABOUT'))
             self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
 
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_is_any_marketing_link_set(self):
         # test marketing site on
@@ -96,59 +99,76 @@ class AddLookupTests(TestCase):
         self.assertTrue(dirs[0].endswith('management'))
 
 
-class MakoMiddlewareTest(TestCase):
+class MakoRequestContextTest(TestCase):
     """
     Test MakoMiddleware.
     """
 
     def setUp(self):
-        super(MakoMiddlewareTest, self).setUp()
-        self.middleware = edxmako.middleware.MakoMiddleware()
+        super(MakoRequestContextTest, self).setUp()
         self.user = UserFactory.create()
         self.url = "/"
         self.request = RequestFactory().get(self.url)
         self.request.user = self.user
         self.response = Mock(spec=HttpResponse)
 
-    def test_clear_request_context_variable(self):
+        self.addCleanup(RequestCache.clear_request_cache)
+
+    def test_with_current_request(self):
         """
-        Test the global variable requestcontext is cleared correctly
-        when response middleware is called.
+        Test that if get_current_request returns a request, then get_template_request_context
+        returns a RequestContext.
         """
 
-        self.middleware.process_request(self.request)
-        # requestcontext should not be None.
-        self.assertIsNotNone(get_template_request_context())
+        with patch('edxmako.request_context.get_current_request', return_value=self.request):
+            # requestcontext should not be None.
+            self.assertIsNotNone(get_template_request_context())
 
-        self.middleware.process_response(self.request, self.response)
-        # requestcontext should be None.
-        self.assertIsNone(get_template_request_context())
+    def test_without_current_request(self):
+        """
+        Test that if get_current_request returns None, then get_template_request_context
+        returns None.
+        """
+        with patch('edxmako.request_context.get_current_request', return_value=None):
+            # requestcontext should be None.
+            self.assertIsNone(get_template_request_context())
+
+    def test_request_context_caching(self):
+        """
+        Test that the RequestContext is cached in the RequestCache.
+        """
+        with patch('edxmako.request_context.get_current_request', return_value=None):
+            # requestcontext should be None, because the cache isn't filled
+            self.assertIsNone(get_template_request_context())
+
+        with patch('edxmako.request_context.get_current_request', return_value=self.request):
+            # requestcontext should not be None, and should fill the cache
+            self.assertIsNotNone(get_template_request_context())
+
+        mock_get_current_request = Mock()
+        with patch('edxmako.request_context.get_current_request', mock_get_current_request):
+            # requestcontext should not be None, because the cache is filled
+            self.assertIsNotNone(get_template_request_context())
+        mock_get_current_request.assert_not_called()
+
+        RequestCache.clear_request_cache()
+
+        with patch('edxmako.request_context.get_current_request', return_value=None):
+            # requestcontext should be None, because the cache isn't filled
+            self.assertIsNone(get_template_request_context())
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch("edxmako.middleware.REQUEST_CONTEXT")
-    def test_render_to_string_when_no_global_context_lms(self, context_mock):
+    def test_render_to_string_when_no_global_context_lms(self):
         """
         Test render_to_string() when makomiddleware has not initialized
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in LMS.
         """
-        del context_mock.context
         self.assertIn("this module is temporarily unavailable", render_to_string("courseware/error-message.html", None))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
-    @patch("edxmako.middleware.REQUEST_CONTEXT")
-    def test_render_to_string_when_no_global_context_cms(self, context_mock):
+    def test_render_to_string_when_no_global_context_cms(self):
         """
         Test render_to_string() when makomiddleware has not initialized
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in CMS.
         """
-        del context_mock.context
         self.assertIn("We're having trouble rendering your component", render_to_string("html_error.html", None))
-
-
-def mako_middleware_process_request(request):
-    """
-    Initialize the global RequestContext variable
-    edxmako.middleware.requestcontext using the request object.
-    """
-    mako_middleware = edxmako.middleware.MakoMiddleware()
-    mako_middleware.process_request(request)

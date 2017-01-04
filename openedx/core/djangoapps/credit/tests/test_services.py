@@ -5,6 +5,10 @@ import unittest
 
 from django.conf import settings
 
+import ddt
+from nose.plugins.attrib import attr
+from course_modes.models import CourseMode
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -15,6 +19,8 @@ from openedx.core.djangoapps.credit.api.eligibility import set_credit_requiremen
 from student.models import CourseEnrollment, UserProfile
 
 
+@attr(shard=2)
+@ddt.ddt
 class CreditServiceTests(ModuleStoreTestCase):
     """
     Tests for the Credit xBlock service
@@ -28,14 +34,14 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.credit_course = CreditCourse.objects.create(course_key=self.course.id, enabled=True)
         self.profile = UserProfile.objects.create(user_id=self.user.id, name='Foo Bar')
 
-    def enroll(self, course_id=None):
+    def enroll(self, course_id=None, mode=CourseMode.VERIFIED):
         """
-        Enroll the test user in the given course's honor mode, or the test
-        course if not provided.
+        Enroll the test user in the given course's mode. Use course/mode if they are
+        provided.
         """
         if course_id is None:
             course_id = self.course.id
-        return CourseEnrollment.enroll(self.user, course_id, mode='honor')
+        return CourseEnrollment.enroll(self.user, course_id, mode=mode)
 
     def test_user_not_found(self):
         """
@@ -128,7 +134,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         self.assertIsNotNone(credit_state)
         self.assertTrue(credit_state['is_credit_course'])
-        self.assertEqual(credit_state['enrollment_mode'], 'honor')
+        self.assertEqual(credit_state['enrollment_mode'], 'verified')
         self.assertEqual(credit_state['profile_fullname'], 'Foo Bar')
         self.assertEqual(len(credit_state['credit_requirement_status']), 1)
         self.assertEqual(credit_state['credit_requirement_status'][0]['name'], 'grade')
@@ -257,7 +263,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.assertNotIn('course_name', credit_state)
 
         # now make sure it is in there when we pass in the flag
-        credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_name=True)
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_info=True)
         self.assertIn('course_name', credit_state)
         self.assertEqual(credit_state['course_name'], self.course.display_name)
 
@@ -286,6 +292,48 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.assertIsNotNone(credit_state)
         self.assertFalse(credit_state['is_credit_course'])
         self.assertEqual(len(credit_state['credit_requirement_status']), 0)
+
+    @ddt.data(
+        CourseMode.AUDIT,
+        CourseMode.HONOR,
+        CourseMode.CREDIT_MODE
+    )
+    def test_set_status_non_verified_enrollment(self, mode):
+        """
+        Test that we can still try to update a credit status but return quickly if
+        user has non-credit eligible enrollment.
+        """
+        self.enroll(mode=mode)
+
+        # set course requirements
+        set_credit_requirements(
+            self.course.id,
+            [
+                {
+                    "namespace": "grade",
+                    "name": "grade",
+                    "display_name": "Grade",
+                    "criteria": {
+                        "min_grade": 0.8
+                    },
+                },
+            ]
+        )
+
+        # this should be a no-op
+        self.service.set_credit_requirement_status(
+            self.user.id,
+            self.course.id,
+            'grade',
+            'grade'
+        )
+        # Verify credit requirement status for user in the course should be None.
+        credit_state = self.service.get_credit_state(self.user.id, self.course.id)
+        self.assertIsNotNone(credit_state)
+        self.assertEqual(credit_state['enrollment_mode'], mode)
+        self.assertEqual(len(credit_state['credit_requirement_status']), 1)
+        self.assertIsNone(credit_state['credit_requirement_status'][0]['status'])
+        self.assertIsNone(credit_state['credit_requirement_status'][0]['status_date'])
 
     def test_bad_user(self):
         """
@@ -349,7 +397,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         credit_state = self.service.get_credit_state(self.user.id, unicode(self.course.id))
 
         self.assertIsNotNone(credit_state)
-        self.assertEqual(credit_state['enrollment_mode'], 'honor')
+        self.assertEqual(credit_state['enrollment_mode'], 'verified')
         self.assertEqual(credit_state['profile_fullname'], 'Foo Bar')
         self.assertEqual(len(credit_state['credit_requirement_status']), 1)
         self.assertEqual(credit_state['credit_requirement_status'][0]['name'], 'grade')

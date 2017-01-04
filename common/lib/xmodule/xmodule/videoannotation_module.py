@@ -86,11 +86,11 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
     '''Video Annotation Module'''
     js = {
         'coffee': [
-            resource_string(__name__, 'js/src/javascript_loader.coffee'),
             resource_string(__name__, 'js/src/html/display.coffee'),
             resource_string(__name__, 'js/src/annotatable/display.coffee'),
         ],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
         ]
     }
@@ -154,6 +154,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 class VideoAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Video annotation descriptor '''
     module_class = VideoAnnotationModule
+    resources_dir = None
     mako_template = "widgets/raw-edit.html"
 
     @property

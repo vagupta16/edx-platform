@@ -100,9 +100,9 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
             block_type='problem',
             block_id='problem',
         )
-        self.weighted_scores = MagicMock()
-        self.weighted_scores_mock = self.setup_patch(
-            'lti_provider.tasks.get_weighted_scores', self.weighted_scores
+        self.course_grade = MagicMock()
+        self.course_grade_mock = self.setup_patch(
+            'lti_provider.tasks.CourseGradeFactory.create', self.course_grade
         )
         self.module_store = MagicMock()
         self.module_store.get_item = MagicMock(return_value=self.descriptor)
@@ -119,10 +119,14 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     @ddt.unpack
     @unittest.skip('until it always passes on Jenkins')
     def test_outcome_with_score_score(self, earned, possible, expected):
+<<<<<<< HEAD
         """
         TODO: Figure out why this was failing on Jenkins
         """
         self.weighted_scores.score_for_module = MagicMock(return_value=(earned, possible))
+=======
+        self.course_grade.score_for_module = MagicMock(return_value=(earned, possible))
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         tasks.send_composite_outcome(
             self.user.id, unicode(self.course_key), self.assignment.id, 1
         )
@@ -134,4 +138,4 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
         tasks.send_composite_outcome(
             self.user.id, unicode(self.course_key), self.assignment.id, 1
         )
-        self.assertEqual(self.weighted_scores_mock.call_count, 0)
+        self.assertEqual(self.course_grade_mock.call_count, 0)

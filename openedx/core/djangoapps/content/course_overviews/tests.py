@@ -7,6 +7,7 @@ import ddt
 import itertools
 import math
 import mock
+from nose.plugins.attrib import attr
 import pytz
 
 from django.conf import settings
@@ -17,6 +18,7 @@ from PIL import Image
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import course_image_url
+from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
@@ -35,6 +37,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from .models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
 
 
+@attr(shard=3)
 @ddt.ddt
 class CourseOverviewTestCase(ModuleStoreTestCase):
     """
@@ -90,7 +93,6 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             'display_number_with_default',
             'display_org_with_default',
             'advertised_start',
-            'facebook_url',
             'social_sharing_url',
             'certificates_display_behavior',
             'certificates_show_before_end',
@@ -348,7 +350,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         course_overview = CourseOverview._create_from_course(course)  # pylint: disable=protected-access
         self.assertEqual(course_overview.lowest_passing_grade, None)
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 5, 5), (ModuleStoreEnum.Type.split, 3, 4))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 3, 4))
     @ddt.unpack
     def test_versioning(self, modulestore_type, min_mongo_calls, max_mongo_calls):
         """
@@ -396,7 +398,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 # default value present. So mock it to avoid returning the empty str as primary key
                 # value. Due to empty str, model.save will do an update instead of insert which is
                 # incorrect and get exception in
-                # common.djangoapps.xmodule_django.models.OpaqueKeyField.get_prep_value
+                # openedx.core.djangoapps.xmodule_django.models.OpaqueKeyField.get_prep_value
                 with mock.patch('django.db.models.Field.get_pk_value_on_save') as mock_get_pk_value_on_save:
 
                     mock_get_pk_value_on_save.return_value = None
@@ -516,6 +518,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             )
 
 
+@attr(shard=3)
 @ddt.ddt
 class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     """
@@ -642,6 +645,57 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 'large': expected_url
             }
         )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_cdn(self, modulestore_type):
+        """
+        Test that we return CDN prefixed URLs if it is enabled.
+        """
+        with self.store.default_store(modulestore_type):
+            course = CourseFactory.create(default_store=modulestore_type)
+            overview = CourseOverview.get_from_id(course.id)
+
+            # First the behavior when there's no CDN enabled...
+            AssetBaseUrlConfig.objects.all().delete()
+            if modulestore_type == ModuleStoreEnum.Type.mongo:
+                expected_path_start = "/c4x/"
+            elif modulestore_type == ModuleStoreEnum.Type.split:
+                expected_path_start = "/asset-v1:"
+
+            for url in overview.image_urls.values():
+                self.assertTrue(url.startswith(expected_path_start))
+
+            # Now enable the CDN...
+            AssetBaseUrlConfig.objects.create(enabled=True, base_url='fakecdn.edx.org')
+            expected_cdn_url = "//fakecdn.edx.org" + expected_path_start
+
+            for url in overview.image_urls.values():
+                self.assertTrue(url.startswith(expected_cdn_url))
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_cdn_with_external_image(self, modulestore_type):
+        """
+        Test that we return CDN prefixed URLs unless they're absolute.
+        """
+        with self.store.default_store(modulestore_type):
+            course = CourseFactory.create(default_store=modulestore_type)
+            overview = CourseOverview.get_from_id(course.id)
+
+            # Now enable the CDN...
+            AssetBaseUrlConfig.objects.create(enabled=True, base_url='fakecdn.edx.org')
+            expected_cdn_url = "//fakecdn.edx.org"
+
+            start_urls = {
+                'raw': 'http://google.com/image.png',
+                'small': '/static/overview.png',
+                'large': ''
+            }
+
+            modified_urls = overview.apply_cdn_to_urls(start_urls)
+            self.assertEqual(modified_urls['raw'], start_urls['raw'])
+            self.assertNotEqual(modified_urls['small'], start_urls['small'])
+            self.assertTrue(modified_urls['small'].startswith(expected_cdn_url))
+            self.assertEqual(modified_urls['large'], start_urls['large'])
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_error_generating_thumbnails(self, modulestore_type):

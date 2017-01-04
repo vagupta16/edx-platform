@@ -1,47 +1,54 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define([
-            'jquery',
-            'underscore',
-            'js/student_account/views/FormView'
-        ],
+        'jquery',
+        'underscore',
+        'js/student_account/views/FormView'
+    ],
         function($, _, FormView) {
+            return FormView.extend({
+                el: '#register-form',
 
-        return FormView.extend({
-            el: '#register-form',
+                tpl: '#register-tpl',
 
-            tpl: '#register-tpl',
+                events: {
+                    'click .js-register': 'submitForm',
+                    'click .login-provider': 'thirdPartyAuth'
+                },
 
-            events: {
-                'click .js-register': 'submitForm',
-                'click .login-provider': 'thirdPartyAuth'
-            },
+                formType: 'register',
 
-            formType: 'register',
+                submitButton: '.js-register',
 
-            submitButton: '.js-register',
-
-            preRender: function( data ) {
-                this.providers = data.thirdPartyAuth.providers || [];
-                this.hasSecondaryProviders = (
+                preRender: function(data) {
+                    this.providers = data.thirdPartyAuth.providers || [];
+                    this.hasSecondaryProviders = (
                     data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
                 );
+<<<<<<< HEAD
                 this.currentProvider = data.thirdPartyAuth.currentProvider || '';
                 this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                 this.platformName = data.platformName;
                 this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
                 this.isNonMicrositeTheme = data.isNonMicrositeTheme;
+=======
+                    this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+                    this.errorMessage = data.thirdPartyAuth.errorMessage || '';
+                    this.platformName = data.platformName;
+                    this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
-                this.listenTo( this.model, 'sync', this.saveSuccess );
-            },
+                    this.listenTo(this.model, 'sync', this.saveSuccess);
+                },
 
-            render: function( html ) {
-                var fields = html || '';
+                render: function(html) {
+                    var fields = html || '';
 
-                $(this.el).html( _.template( this.tpl, {
+                    $(this.el).html(_.template(this.tpl)({
                     /* We pass the context object to the template so that
                      * we can perform variable interpolation using sprintf
                      */
+<<<<<<< HEAD
                     context: {
                         fields: fields,
                         currentProvider: this.currentProvider,
@@ -52,35 +59,47 @@
                         platformName: this.platformName
                     }
                 }));
+=======
+                        context: {
+                            fields: fields,
+                            currentProvider: this.currentProvider,
+                            errorMessage: this.errorMessage,
+                            providers: this.providers,
+                            hasSecondaryProviders: this.hasSecondaryProviders,
+                            platformName: this.platformName
+                        }
+                    }));
+>>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
-                this.postRender();
+                    this.postRender();
 
-                if (this.autoSubmit) {
-                    $(this.el).hide();
-                    $('#register-honor_code').prop('checked', true);
-                    this.submitForm();
-                }
+                    if (this.autoSubmit) {
+                        $(this.el).hide();
+                        $('#register-honor_code').prop('checked', true);
+                        this.submitForm();
+                    }
 
-                return this;
-            },
+                    return this;
+                },
 
-            thirdPartyAuth: function( event ) {
-                var providerUrl = $(event.currentTarget).data('provider-url') || '';
+                thirdPartyAuth: function(event) {
+                    var providerUrl = $(event.currentTarget).data('provider-url') || '';
 
-                if ( providerUrl ) {
-                    window.location.href = providerUrl;
-                }
-            },
+                    if (providerUrl) {
+                        window.location.href = providerUrl;
+                    }
+                },
 
-            saveSuccess: function() {
-                this.trigger('auth-complete');
-            },
+                saveSuccess: function() {
+                    this.trigger('auth-complete');
+                },
 
-            saveError: function( error ) {
-                $(this.el).show(); // Show in case the form was hidden for auto-submission
-                this.errors = _.flatten(
+                saveError: function(error) {
+                    $(this.el).show(); // Show in case the form was hidden for auto-submission
+                    this.errors = _.flatten(
                     _.map(
-                        JSON.parse(error.responseText),
+                        // Something is passing this 'undefined'. Protect against this.
+                        JSON.parse(error.responseText || '[]'),
                         function(error_list) {
                             return _.map(
                                 error_list,
@@ -89,16 +108,16 @@
                         }
                     )
                 );
-                this.setErrors();
-                this.toggleDisableButton(false);
-            },
+                    this.setErrors();
+                    this.toggleDisableButton(false);
+                },
 
-            postFormSubmission: function() {
-                if (_.compact(this.errors).length) {
+                postFormSubmission: function() {
+                    if (_.compact(this.errors).length) {
                     // The form did not get submitted due to validation errors.
-                    $(this.el).show(); // Show in case the form was hidden for auto-submission
+                        $(this.el).show(); // Show in case the form was hidden for auto-submission
+                    }
                 }
-            }
+            });
         });
-    });
 }).call(this, define || RequireJS.define);

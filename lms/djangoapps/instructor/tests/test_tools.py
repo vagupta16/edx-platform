@@ -25,7 +25,7 @@ from ..views import tools
 DATE_FIELD = Date()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestDashboardError(unittest.TestCase):
     """
     Test DashboardError exceptions.
@@ -36,7 +36,7 @@ class TestDashboardError(unittest.TestCase):
         self.assertEqual(response, {'error': 'Oh noes!'})
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestHandleDashboardError(unittest.TestCase):
     """
     Test handle_dashboard_error decorator.
@@ -65,7 +65,7 @@ class TestHandleDashboardError(unittest.TestCase):
         self.assertEqual(view(None, None), "Oh yes!")
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestRequireStudentIdentifier(unittest.TestCase):
     """
     Test require_student_from_identifier()
@@ -88,7 +88,7 @@ class TestRequireStudentIdentifier(unittest.TestCase):
             tools.require_student_from_identifier("invalid")
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestParseDatetime(unittest.TestCase):
     """
     Test date parsing.
@@ -103,7 +103,7 @@ class TestParseDatetime(unittest.TestCase):
             tools.parse_datetime('foo')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestFindUnit(SharedModuleStoreTestCase):
     """
     Test the find_unit function.
@@ -133,7 +133,7 @@ class TestFindUnit(SharedModuleStoreTestCase):
             tools.find_unit(self.course, url)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGetUnitsWithDueDate(ModuleStoreTestCase):
     """
     Test the get_units_with_due_date function.
@@ -169,7 +169,7 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
             urls((self.week1, self.week2)))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestTitleOrUrl(unittest.TestCase):
     """
     Test the title_or_url funciton.
@@ -184,7 +184,7 @@ class TestTitleOrUrl(unittest.TestCase):
         self.assertEquals(tools.title_or_url(unit), 'test:hello')
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(
     FIELD_OVERRIDE_PROVIDERS=(
         'courseware.student_field_overrides.IndividualStudentOverrideProvider',),
@@ -264,7 +264,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.assertEqual(self.week1.due, self.due)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestDataDumps(ModuleStoreTestCase):
     """
     Test data dumps for reporting.

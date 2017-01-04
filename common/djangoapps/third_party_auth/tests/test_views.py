@@ -6,6 +6,9 @@ import ddt
 from lxml import etree
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 import unittest
+
+from django.conf import settings
+
 from .testutil import AUTH_FEATURE_ENABLED, SAMLTestCase
 
 # Define some XML namespaces:
@@ -39,9 +42,9 @@ class SAMLMetadataTest(SAMLTestCase):
         self.enable_saml()
         self.check_metadata_contacts(
             xml=self._fetch_metadata(),
-            tech_name="edX Support",
+            tech_name=u"{} Support".format(settings.PLATFORM_NAME),
             tech_email="technical@example.com",
-            support_name="edX Support",
+            support_name=u"{} Support".format(settings.PLATFORM_NAME),
             support_email="technical@example.com"
         )
 
@@ -143,3 +146,9 @@ class SAMLAuthTest(SAMLTestCase):
         self.enable_saml()
         response = self.client.get(self.LOGIN_URL)
         self.assertEqual(response.status_code, 302)
+
+    def test_login_disabled(self):
+        """ When SAML is not enabled, the login view should return 404 """
+        self.enable_saml(enabled=False)
+        response = self.client.get(self.LOGIN_URL)
+        self.assertEqual(response.status_code, 404)

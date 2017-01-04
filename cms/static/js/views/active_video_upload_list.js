@@ -1,23 +1,24 @@
 define(
-    ["jquery", "underscore", "backbone", "js/models/active_video_upload", "js/views/baseview", "js/views/active_video_upload", "jquery.fileupload"],
+    ['jquery', 'underscore', 'backbone', 'js/models/active_video_upload', 'js/views/baseview', 'js/views/active_video_upload', 'jquery.fileupload'],
     function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView) {
-        "use strict";
+        'use strict';
 
         var ActiveVideoUploadListView = BaseView.extend({
-            tagName: "div",
+            tagName: 'div',
             events: {
-                "click .file-drop-area": "chooseFile",
-                "dragleave .file-drop-area": "dragleave",
-                "drop .file-drop-area": "dragleave"
+                'click .file-drop-area': 'chooseFile',
+                'dragleave .file-drop-area': 'dragleave',
+                'drop .file-drop-area': 'dragleave'
             },
 
             initialize: function(options) {
-                this.template = this.loadTemplate("active-video-upload-list");
+                this.template = this.loadTemplate('active-video-upload-list');
                 this.collection = new Backbone.Collection();
                 this.itemViews = [];
-                this.listenTo(this.collection, "add", this.addUpload);
+                this.listenTo(this.collection, 'add', this.addUpload);
                 this.concurrentUploadLimit = options.concurrentUploadLimit || 0;
                 this.postUrl = options.postUrl;
+                this.onFileUploadDone = options.onFileUploadDone;
                 if (options.uploadButton) {
                     options.uploadButton.click(this.chooseFile.bind(this));
                 }
@@ -26,10 +27,10 @@ define(
             render: function() {
                 this.$el.html(this.template());
                 _.each(this.itemViews, this.renderUploadView.bind(this));
-                this.$uploadForm = this.$(".file-upload-form");
-                this.$dropZone = this.$uploadForm.find(".file-drop-area");
+                this.$uploadForm = this.$('.file-upload-form');
+                this.$dropZone = this.$uploadForm.find('.file-drop-area');
                 this.$uploadForm.fileupload({
-                    type: "PUT",
+                    type: 'PUT',
                     singleFileUploads: false,
                     limitConcurrentUploads: this.concurrentUploadLimit,
                     dropZone: this.$dropZone,
@@ -46,24 +47,24 @@ define(
                 var preventDefault = function(event) {
                     event.preventDefault();
                 };
-                $(window).on("dragover", preventDefault);
-                $(window).on("drop", preventDefault);
-                $(window).on("beforeunload", this.onBeforeUnload.bind(this));
+                $(window).on('dragover', preventDefault);
+                $(window).on('drop', preventDefault);
+                $(window).on('beforeunload', this.onBeforeUnload.bind(this));
 
                 return this;
             },
 
-            onBeforeUnload: function () {
+            onBeforeUnload: function() {
                 // Are there are uploads queued or in progress?
                 var uploading = this.collection.filter(function(model) {
-                    var stat = model.get("status");
-                    return (model.get("progress") < 1) &&
+                    var stat = model.get('status');
+                    return (model.get('progress') < 1) &&
                           ((stat === ActiveVideoUpload.STATUS_QUEUED ||
                            (stat === ActiveVideoUpload.STATUS_UPLOADING)));
                 });
                 // If so, show a warning message.
                 if (uploading.length) {
-                    return gettext("Your video uploads are not complete.");
+                    return gettext('Your video uploads are not complete.');
                 }
             },
 
@@ -74,22 +75,22 @@ define(
             },
 
             renderUploadView: function(view) {
-                this.$(".active-video-upload-list").append(view.render().$el);
+                this.$('.active-video-upload-list').append(view.render().$el);
             },
 
             chooseFile: function(event) {
                 event.preventDefault();
-                this.$uploadForm.find(".js-file-input").click();
+                this.$uploadForm.find('.js-file-input').click();
             },
 
             dragover: function(event) {
                 event.preventDefault();
-                this.$dropZone.addClass("is-dragged");
+                this.$dropZone.addClass('is-dragged');
             },
 
             dragleave: function(event) {
                 event.preventDefault();
-                this.$dropZone.removeClass("is-dragged");
+                this.$dropZone.removeClass('is-dragged');
             },
 
             // Each file is ultimately sent to a separate URL, but we want to make a
@@ -99,33 +100,35 @@ define(
             // individual file uploads, using the extra `redirected` field to
             // indicate that the correct upload url has already been retrieved
             fileUploadAdd: function(event, uploadData) {
-                var view = this;
+                var view = this,
+                    model;
                 if (uploadData.redirected) {
-                    var model = new ActiveVideoUpload({fileName: uploadData.files[0].name});
+                    model = new ActiveVideoUpload({fileName: uploadData.files[0].name, videoId: uploadData.videoId});
                     this.collection.add(model);
                     uploadData.cid = model.cid;
                     uploadData.submit();
                 } else {
                     $.ajax({
                         url: this.postUrl,
-                        contentType: "application/json",
+                        contentType: 'application/json',
                         data: JSON.stringify({
                             files: _.map(
                                 uploadData.files,
                                 function(file) {
-                                    return {"file_name": file.name, "content_type": file.type};
+                                    return {'file_name': file.name, 'content_type': file.type};
                                 }
                             )
                         }),
-                        dataType: "json",
-                        type: "POST"
+                        dataType: 'json',
+                        type: 'POST'
                     }).done(function(responseData) {
                         _.each(
-                            responseData["files"],
+                            responseData['files'],
                             function(file, index) {
-                                view.$uploadForm.fileupload("add", {
+                                view.$uploadForm.fileupload('add', {
                                     files: [uploadData.files[index]],
-                                    url: file["upload_url"],
+                                    url: file['upload_url'],
+                                    videoId: file.edx_video_id,
                                     multipart: false,
                                     global: false,  // Do not trigger global AJAX error handler
                                     redirected: true
@@ -137,12 +140,12 @@ define(
             },
 
             setStatus: function(cid, status) {
-                this.collection.get(cid).set("status", status);
+                this.collection.get(cid).set('status', status);
             },
 
             // progress should be a number between 0 and 1 (inclusive)
             setProgress: function(cid, progress) {
-                this.collection.get(cid).set("progress", progress);
+                this.collection.get(cid).set('progress', progress);
             },
 
             fileUploadSend: function(event, data) {
@@ -156,10 +159,48 @@ define(
             fileUploadDone: function(event, data) {
                 this.setStatus(data.cid, ActiveVideoUpload.STATUS_COMPLETED);
                 this.setProgress(data.cid, 1);
+                if (this.onFileUploadDone) {
+                    this.onFileUploadDone(this.collection);
+                    this.clearSuccessful();
+                }
             },
 
             fileUploadFail: function(event, data) {
                 this.setStatus(data.cid, ActiveVideoUpload.STATUS_FAILED);
+            },
+
+            removeViewAt: function(index) {
+                this.itemViews.splice(index);
+                this.$('.active-video-upload-list li').eq(index).remove();
+            },
+
+            // Removes the upload progress view for files that have been
+            // uploaded successfully. Also removes the corresponding models
+            // from `collection`, keeping both in sync.
+            clearSuccessful: function() {
+                var idx,
+                    completedIndexes = [],
+                    completedModels = [],
+                    completedMessages = [];
+                this.collection.each(function(model, index) {
+                    if (model.get('status') === ActiveVideoUpload.STATUS_COMPLETED) {
+                        completedModels.push(model);
+                        completedIndexes.push(index - completedIndexes.length);
+                        completedMessages.push(model.get('fileName') +
+                            gettext(': video upload complete.'));
+                    }
+                });
+                for (idx = 0; idx < completedIndexes.length; idx++) {
+                    this.removeViewAt(completedIndexes[idx]);
+                    this.collection.remove(completedModels[idx]);
+                }
+                // Alert screen readers that the uploads were successful
+                if (completedMessages.length) {
+                    completedMessages.push(gettext('Previous Uploads table has been updated.'));
+                    if ($(window).prop('SR') !== undefined) {
+                        $(window).prop('SR').readTexts(completedMessages);
+                    }
+                }
             }
         });
 

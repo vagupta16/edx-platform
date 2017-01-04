@@ -69,6 +69,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "view": "",
                 "order_by": "last_activity_at",
                 "order_direction": "desc",
+                "requested_fields": set(),
             }
         )
 
@@ -146,13 +147,20 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         ("order_by", "last_activity_at"),
         ("order_by", "comment_count"),
         ("order_by", "vote_count"),
-        ("order_direction", "asc"),
         ("order_direction", "desc"),
     )
     @ddt.unpack
     def test_valid_choice_fields(self, field, value):
         self.form_data[field] = value
         self.assert_field_value(field, value)
+
+    def test_requested_fields(self):
+        self.form_data["requested_fields"] = "profile_image"
+        form = self.get_form(expected_valid=True)
+        self.assertEqual(
+            form.cleaned_data["requested_fields"],
+            {"profile_image"},
+        )
 
 
 @ddt.ddt
@@ -177,7 +185,8 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "thread_id": "deadbeef",
                 "endorsed": False,
                 "page": 2,
-                "page_size": 13
+                "page_size": 13,
+                "requested_fields": set(),
             }
         )
 
@@ -202,3 +211,11 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_invalid_endorsed(self):
         self.form_data["endorsed"] = "invalid-boolean"
         self.assert_error("endorsed", "Invalid Boolean Value.")
+
+    def test_requested_fields(self):
+        self.form_data["requested_fields"] = {"profile_image"}
+        form = self.get_form(expected_valid=True)
+        self.assertEqual(
+            form.cleaned_data["requested_fields"],
+            {"profile_image"},
+        )

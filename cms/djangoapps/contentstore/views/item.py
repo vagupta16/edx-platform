@@ -32,6 +32,8 @@ from contentstore.utils import (
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
 from contentstore.views.preview import get_preview_fragment
+from contentstore.utils import is_self_paced
+
 from openedx.core.lib.gating import api as gating_api
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -104,6 +106,9 @@ def xblock_handler(request, usage_key_string):
                 :children: the unicode representation of the UsageKeys of children for this xblock.
                 :metadata: new values for the metadata fields. Any whose values are None will be deleted not set
                        to None! Absent ones will be left alone.
+                :fields: any other xblock fields to be set. Only supported by update.
+                    This is represented as a dictionary:
+                        {'field_name': 'field_value'}
                 :nullout: which metadata fields to set to None
                 :graderType: change how this unit is graded
                 :isPrereq: Set this xblock as a prerequisite which can be used to limit access to other xblocks
@@ -140,7 +145,7 @@ def xblock_handler(request, usage_key_string):
             accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 
             if 'application/json' in accept_header:
-                fields = request.REQUEST.get('fields', '').split(',')
+                fields = request.GET.get('fields', '').split(',')
                 if 'graderType' in fields:
                     # right now can't combine output of this w/ output of _get_module_info, but worthy goal
                     return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
@@ -167,6 +172,7 @@ def xblock_handler(request, usage_key_string):
                 prereq_usage_key=request.json.get('prereqUsageKey'),
                 prereq_min_score=request.json.get('prereqMinScore'),
                 publish=request.json.get('publish'),
+                fields=request.json.get('fields'),
             )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
@@ -300,24 +306,24 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             paging = None
             try:
-                if request.REQUEST.get('enable_paging', 'false') == 'true':
+                if request.GET.get('enable_paging', 'false') == 'true':
                     paging = {
-                        'page_number': int(request.REQUEST.get('page_number', 0)),
-                        'page_size': int(request.REQUEST.get('page_size', 0)),
+                        'page_number': int(request.GET.get('page_number', 0)),
+                        'page_size': int(request.GET.get('page_size', 0)),
                     }
             except ValueError:
                 return HttpResponse(
                     content="Couldn't parse paging parameters: enable_paging: "
                             "{0}, page_number: {1}, page_size: {2}".format(
-                                request.REQUEST.get('enable_paging', 'false'),
-                                request.REQUEST.get('page_number', 0),
-                                request.REQUEST.get('page_size', 0)
+                                request.GET.get('enable_paging', 'false'),
+                                request.GET.get('page_number', 0),
+                                request.GET.get('page_size', 0)
                             ),
                     status=400,
                     content_type="text/plain",
                 )
 
-            force_render = request.REQUEST.get('force_render', None)
+            force_render = request.GET.get('force_render', None)
 
             # Set up the context to be passed to each XBlock's render method.
             context = {
@@ -371,7 +377,7 @@ def xblock_outline_handler(request, usage_key_string):
     if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
-    response_format = request.REQUEST.get('format', 'html')
+    response_format = request.GET.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         store = modulestore()
         with store.bulk_operations(usage_key.course_key):
@@ -400,7 +406,7 @@ def xblock_container_handler(request, usage_key_string):
     if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
-    response_format = request.REQUEST.get('format', 'html')
+    response_format = request.GET.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         with modulestore().bulk_operations(usage_key.course_key):
             response = _get_module_info(
@@ -429,11 +435,13 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
 
 
 def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,
-                 grader_type=None, is_prereq=None, prereq_usage_key=None, prereq_min_score=None, publish=None):
+                 grader_type=None, is_prereq=None, prereq_usage_key=None, prereq_min_score=None,
+                 publish=None, fields=None):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
     nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
     to default).
+
     """
     store = modulestore()
     # Perform all xblock changes within a (single-versioned) transaction
@@ -454,6 +462,10 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             xblock.data = data
         else:
             data = old_content['data'] if 'data' in old_content else None
+
+        if fields:
+            for field_name in fields:
+                setattr(xblock, field_name, fields[field_name])
 
         if children_strings is not None:
             children = []
@@ -534,9 +546,16 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             # find the course's reference to this tab and update the name.
             static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
             # only update if changed
-            if static_tab and static_tab['name'] != xblock.display_name:
-                static_tab['name'] = xblock.display_name
-                store.update_item(course, user.id)
+            if static_tab:
+                update_tab = False
+                if static_tab['name'] != xblock.display_name:
+                    static_tab['name'] = xblock.display_name
+                    update_tab = True
+                if static_tab['course_staff_only'] != xblock.course_staff_only:
+                    static_tab['course_staff_only'] = xblock.course_staff_only
+                    update_tab = True
+                if update_tab:
+                    store.update_item(course, user.id)
 
         result = {
             'id': unicode(xblock.location),
@@ -608,7 +627,7 @@ def _create_item(request):
         user=request.user,
         category=category,
         display_name=request.json.get('display_name'),
-        boilerplate=request.json.get('boilerplate')
+        boilerplate=request.json.get('boilerplate'),
     )
 
     return JsonResponse(
@@ -616,7 +635,7 @@ def _create_item(request):
     )
 
 
-def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
+def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None, is_child=False):
     """
     Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
@@ -634,6 +653,10 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         for field in source_item.fields.values():
             if field.scope == Scope.settings and field.is_set_on(source_item):
                 duplicate_metadata[field.name] = field.read_from(source_item)
+
+        if is_child:
+            display_name = display_name or source_item.display_name or source_item.category
+
         if display_name is not None:
             duplicate_metadata['display_name'] = display_name
         else:
@@ -641,6 +664,18 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
                 duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
             else:
                 duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+
+        asides_to_create = []
+        for aside in source_item.runtime.get_asides(source_item):
+            for field in aside.fields.values():
+                if field.scope in (Scope.settings, Scope.content,) and field.is_set_on(aside):
+                    asides_to_create.append(aside)
+                    break
+
+        for aside in asides_to_create:
+            for field in aside.fields.values():
+                if field.scope not in (Scope.settings, Scope.content,):
+                    field.delete_from(aside)
 
         dest_module = store.create_item(
             user.id,
@@ -650,6 +685,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
             metadata=duplicate_metadata,
             runtime=source_item.runtime,
+            asides=asides_to_create
         )
 
         children_handled = False
@@ -666,7 +702,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         if source_item.has_children and not children_handled:
             dest_module.children = dest_module.children or []
             for child in source_item.children:
-                dupe = _duplicate_item(dest_module.location, child, user=user)
+                dupe = _duplicate_item(dest_module.location, child, user=user, is_child=True)
                 if dupe not in dest_module.children:  # _duplicate_item may add the child for us.
                     dest_module.children.append(dupe)
             store.update_item(dest_module, user.id)
@@ -905,13 +941,16 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     release_date = _get_release_date(xblock, user)
 
     if xblock.category != 'course':
-        visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
+        visibility_state = _compute_visibility_state(
+            xblock, child_info, is_xblock_unit and has_changes, is_self_paced(course)
+        )
     else:
         visibility_state = None
     published = modulestore().has_published_version(xblock) if not is_library_block else None
 
-    # defining the default value 'True' for delete, drag and add new child actions in xblock_actions for each xblock.
-    xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True}
+    # defining the default value 'True' for delete, duplicate, drag and add new child actions
+    # in xblock_actions for each xblock.
+    xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True, 'duplicable': True}
     explanatory_message = None
 
     # is_entrance_exam is inherited metadata.
@@ -932,7 +971,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     xblock_info = {
         "id": unicode(xblock.location),
-        "display_name": xblock.display_name_with_default_escaped,
+        "display_name": xblock.display_name_with_default,
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,
@@ -955,11 +994,17 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "user_partitions": get_user_partition_info(xblock, course=course),
     }
 
+    if xblock.category == 'sequential':
+        xblock_info.update({
+            "hide_after_due": xblock.hide_after_due,
+        })
+
     # update xblock_info with special exam information if the feature flag is enabled
     if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
         if xblock.category == 'course':
             xblock_info.update({
                 "enable_proctored_exams": xblock.enable_proctored_exams,
+                "create_zendesk_tickets": xblock.create_zendesk_tickets,
                 "enable_timed_exams": xblock.enable_timed_exams
             })
         elif xblock.category == 'sequential':
@@ -968,7 +1013,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 "is_practice_exam": xblock.is_practice_exam,
                 "is_time_limited": xblock.is_time_limited,
                 "exam_review_rules": xblock.exam_review_rules,
-                "default_time_limit_minutes": xblock.default_time_limit_minutes
+                "default_time_limit_minutes": xblock.default_time_limit_minutes,
             })
 
     # Update with gating info
@@ -1067,7 +1112,7 @@ class VisibilityState(object):
     gated = 'gated'
 
 
-def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
+def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_course_self_paced=False):
     """
     Returns the current publish state for the specified xblock and its children
     """
@@ -1077,10 +1122,10 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
         # Note that a unit that has never been published will fall into this category,
         # as well as previously published units with draft content.
         return VisibilityState.needs_attention
+
     is_unscheduled = xblock.start == DEFAULT_START_DATE
-    is_live = datetime.now(UTC) > xblock.start
-    children = child_info and child_info.get('children', [])
-    if children and len(children) > 0:
+    is_live = is_course_self_paced or datetime.now(UTC) > xblock.start
+    if child_info and child_info.get('children', []):
         all_staff_only = True
         all_unscheduled = True
         all_live = True
@@ -1204,4 +1249,4 @@ def _xblock_type_and_display_name(xblock):
     """
     return _('{section_or_subsection} "{display_name}"').format(
         section_or_subsection=xblock_type_display_name(xblock),
-        display_name=xblock.display_name_with_default_escaped)
+        display_name=xblock.display_name_with_default)
