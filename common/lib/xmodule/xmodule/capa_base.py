@@ -447,27 +447,21 @@ class CapaMixin(CapaFields):
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
         _ = self.runtime.service(self, "i18n").ugettext
-<<<<<<< HEAD
-        check = _('Submit')
-        final_check = _('Final Submit')
+        submit = _('Submit')
+        final_submit = _('Final Submit')
 
         # Apply customizations if present
         if 'custom_check' in self.text_customization:
-            check = _(self.text_customization.get('custom_check'))                # pylint: disable=translation-of-non-string
+            submit = _(self.text_customization.get('custom_check'))                # pylint: disable=translation-of-non-string
         if 'custom_final_check' in self.text_customization:
-            final_check = _(self.text_customization.get('custom_final_check'))    # pylint: disable=translation-of-non-string
+            final_submit = _(self.text_customization.get('custom_final_check'))    # pylint: disable=translation-of-non-string
         # TODO: need a way to get the customized words into the list of
         # words to be translated
 
         if self.max_attempts is not None and self.attempts >= self.max_attempts - 1:
-            return final_check
+            return final_submit
         else:
-            return check
-=======
-        submit = _('Submit')
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
-
-        return submit
+            return submit
 
     def submit_button_submitting_name(self):
         """
@@ -649,13 +643,11 @@ class CapaMixin(CapaFields):
 
     def get_demand_hint(self, hint_index):
         """
-<<<<<<< HEAD
         Return html for the problem.
         For timed problems, returns an interstitial view if
         the problem has not yet been started.
-=======
-        Return html for the problem, including demand hints.
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+
+        Also returns demand hints.
 
         hint_index (int): (None is the default) if not None, this is the index of the next demand
             hint to show.
@@ -768,7 +760,6 @@ class CapaMixin(CapaFields):
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
-<<<<<<< HEAD
             'problem_is_timed': self.is_timed_problem(),
             'problem_has_finished': self.closed() or self.is_submitted(),
             'exceeded_time_limit': self.exceeded_time_limit() and not self.done,
@@ -777,14 +768,10 @@ class CapaMixin(CapaFields):
             'minutes_allowed': self.minutes_allowed,
             'start_time': self.time_started,
             'end_time_to_display': end_time_to_display,
-            'check_button': check_button,
-            'check_button_checking': check_button_checking,
-=======
             'short_id': self.location.html_id(),
             'submit_button': submit_button,
             'submit_button_submitting': submit_button_submitting,
             'should_enable_submit_button': should_enable_submit_button,
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
             'answer_available': self.answer_available(),
@@ -819,7 +806,6 @@ class CapaMixin(CapaFields):
 
         return html
 
-<<<<<<< HEAD
     def start_problem(self, _data=None):
         """
         Called from the interstitial view, starts a timed problem if
@@ -844,7 +830,7 @@ class CapaMixin(CapaFields):
         now = datetime.datetime.now(UTC())
         time_limit_end = self.time_started + datetime.timedelta(minutes=(self.minutes_allowed))
         return now > time_limit_end
-=======
+
     def _get_answer_notification(self, render_notifications):
         """
         Generate the answer notification type and message from the current problem status.
@@ -903,7 +889,6 @@ class CapaMixin(CapaFields):
                     answer_notification_message = _('Partially Correct')
 
         return answer_notification_type, answer_notification_message
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
     def remove_tags_from_html(self, html):
         """
