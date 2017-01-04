@@ -102,17 +102,6 @@ define(['backbone'], function(Backbone) {
         }
     });
 
-<<<<<<< HEAD
-    Metadata.SELECT_TYPE = "Select";
-    Metadata.INTEGER_TYPE = "Integer";
-    Metadata.FLOAT_TYPE = "Float";
-    Metadata.GENERIC_TYPE = "Generic";
-    Metadata.LIST_TYPE = "List";
-    Metadata.DICT_TYPE = "Dict";
-    Metadata.VIDEO_LIST_TYPE = "VideoList";
-    Metadata.RELATIVE_TIME_TYPE = "RelativeTime";
-    Metadata.INTEGER_WARNING_TYPE = "IntegerWithWarning";
-=======
     Metadata.SELECT_TYPE = 'Select';
     Metadata.INTEGER_TYPE = 'Integer';
     Metadata.FLOAT_TYPE = 'Float';
@@ -121,7 +110,6 @@ define(['backbone'], function(Backbone) {
     Metadata.DICT_TYPE = 'Dict';
     Metadata.VIDEO_LIST_TYPE = 'VideoList';
     Metadata.RELATIVE_TIME_TYPE = 'RelativeTime';
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
     return Metadata;
 });
