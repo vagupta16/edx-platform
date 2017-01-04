@@ -1257,11 +1257,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         )
 
         # Terms of service field should also be present
-<<<<<<< HEAD
-        link_html = '<a href=\"https://www.test.com/tos\">Terms of Service</a> and <a href=\"https://www.test.com/tos#privacy\">Privacy Policy</a>'
-=======
-        link_label = 'Terms of Service'
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+        link_label = '<a href=\"https://www.test.com/tos\">Terms of Service</a> and <a href=\"https://www.test.com/tos#privacy\">Privacy Policy</a>'
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
@@ -1309,11 +1305,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-<<<<<<< HEAD
-                "label": "I agree to the {platform_name} <a href=\"/tos\">Terms of Service</a> and <a href=\"/tos#privacy\">Privacy Policy</a>.".format(
-=======
-                "label": u"I agree to the {platform_name} Terms of Service".format(
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+                "label": u"I agree to the {platform_name} <a href=\"/tos\">Terms of Service</a> and <a href=\"/tos#privacy\">Privacy Policy</a>.".format(  # pylint: disable=line-too-long
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "name": "terms_of_service",
@@ -1321,11 +1313,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-<<<<<<< HEAD
-                    "required": "You must agree to the {platform_name} <a href=\"/tos\">Terms of Service</a> and <a href=\"/tos#privacy\">Privacy Policy</a>.".format(
-=======
-                    "required": u"You must agree to the {platform_name} Terms of Service".format(  # pylint: disable=line-too-long
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+                    "required": u"You must agree to the {platform_name} <a href=\"/tos\">Terms of Service</a> and <a href=\"/tos#privacy\">Privacy Policy</a>.".format(  # pylint: disable=line-too-long
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -1491,20 +1479,12 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertEqual(len(mail.outbox), 1)
         sent_email = mail.outbox[0]
         self.assertEqual(sent_email.to, [self.EMAIL])
-<<<<<<< HEAD
-        self.assertEqual(sent_email.subject, "Activate Your {platform} Account".format(platform=settings.PLATFORM_NAME))
-        self.assertIn(
-            u"activating your {platform} account".format(
-                platform=settings.PLATFORM_NAME,
-            ),
-=======
         self.assertEqual(
             sent_email.subject,
             u"Activate Your {platform} Account".format(platform=settings.PLATFORM_NAME)
         )
         self.assertIn(
             u"you need to activate your {platform} account".format(platform=settings.PLATFORM_NAME),
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
             sent_email.body
         )
 
