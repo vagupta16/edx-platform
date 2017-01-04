@@ -821,30 +821,18 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-<<<<<<< HEAD
         label = _(u"I agree to the {platform_name} {terms_of_service} and {privacy_policy}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             privacy_policy=privacy_link,
             terms_of_service=terms_link
-=======
-        label = _(u"I agree to the {platform_name} {terms_of_service}").format(
-            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-<<<<<<< HEAD
         error_msg = _(u"You must agree to the {platform_name} {terms_of_service} and {privacy_policy}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             privacy_policy=privacy_link,
             terms_of_service=terms_link
-=======
-        error_msg = _(u"You must agree to the {platform_name} {terms_of_service}").format(
-            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         )
 
         form_desc.add_field(
