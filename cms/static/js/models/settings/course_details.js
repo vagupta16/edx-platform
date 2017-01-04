@@ -10,6 +10,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 end_date: null,		// maps to 'end'
                 enrollment_start: null,
                 enrollment_end: null,
+                enable_enrollment_email: false,
                 syllabus: null,
                 title: '',
                 subtitle: '',
@@ -33,35 +34,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 instructor_info: {}
             },
 
-<<<<<<< HEAD
-var CourseDetails = Backbone.Model.extend({
-    defaults: {
-        org : '',
-        course_id: '',
-        run: '',
-        language: '',
-        start_date: null,	// maps to 'start'
-        end_date: null,		// maps to 'end'
-        enrollment_start: null,
-        enrollment_end: null,
-        syllabus: null,
-        short_description: "",
-        overview: "",
-        intro_video: null,
-        effort: null,	// an int or null,
-        license: null,
-        course_image_name: '', // the filename
-        course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
-        enable_enrollment_email: false,
-        pre_requisite_courses: [],
-        entrance_exam_enabled : '',
-        entrance_exam_minimum_score_pct: '50'
-    },
-
-    validate: function(newattrs) {
-=======
             validate: function(newattrs) {
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
                 var errors = {};
