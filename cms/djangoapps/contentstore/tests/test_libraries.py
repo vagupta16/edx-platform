@@ -24,10 +24,7 @@ from openedx.core.djangoapps.content.course_structures.tests import SignalDiscon
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.x_module import STUDIO_VIEW
 from student import auth
-<<<<<<< HEAD
-=======
 from student.tests.factories import UserFactory
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -35,11 +32,7 @@ class LibraryTestCase(ModuleStoreTestCase):
     Common functionality for content libraries tests
     """
     def setUp(self):
-<<<<<<< HEAD
-        self.user_password = super(LibraryTestCase, self).setUp()
-=======
         super(LibraryTestCase, self).setUp()
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
         self.user = UserFactory(password=self.user_password, is_staff=True)
         self.client = AjaxEnabledTestClient()
