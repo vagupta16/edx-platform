@@ -9,17 +9,10 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'common
         'strict mode';
 
         var EditXBlockModal = BaseModal.extend({
-<<<<<<< HEAD
-            events : {
-                "click .action-save": "save",
-                'click .action-modes .action-item a': 'changeMode'
-            },
-=======
             events: _.extend({}, BaseModal.prototype.events, {
                 'click .action-save': 'save',
                 'click .action-modes a': 'changeMode'
             }),
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
             options: $.extend({}, BaseModal.prototype.options, {
                 modalName: 'edit-xblock',
