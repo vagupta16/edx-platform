@@ -16,10 +16,7 @@ from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-<<<<<<< HEAD
-=======
 from xmodule.studio_editable import has_author_view
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.mixin import wrap_with_license
@@ -224,10 +221,7 @@ def _preview_module_system(request, descriptor, field_data):
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
             "field-data": field_data,
-<<<<<<< HEAD
-=======
             "i18n": ModuleI18nService,
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
         },
