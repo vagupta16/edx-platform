@@ -30,12 +30,6 @@ git+https://github.com/open-craft/problem-builder.git@v2.6.5#egg=xblock-problem-
 -e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
 -e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
 
-<<<<<<< HEAD
-=======
-# Peer instruction XBlock
-ubcpi-xblock==0.5.3
-
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 # Vector Drawing and ActiveTable XBlocks (Davidson)
 -e git+https://github.com/open-craft/xblock-vectordraw.git@v0.2#egg=xblock-vectordraw==0.2
 -e git+https://github.com/open-craft/xblock-activetable.git@1786a2c8fc06ca3ecfac1972464048982bd486ff#egg=xblock-activetable
