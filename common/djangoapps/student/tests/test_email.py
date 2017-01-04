@@ -107,25 +107,14 @@ class EnrollmentEmailTests(ModuleStoreTestCase):
 class ActivationEmailTests(TestCase):
     """Test sending of the activation email. """
 
-<<<<<<< HEAD
-    ACTIVATION_SUBJECT = "Activate Your {platform} Account".format(platform=settings.PLATFORM_NAME)
-=======
     ACTIVATION_SUBJECT = u"Activate Your {} Account".format(settings.PLATFORM_NAME)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
         u"Thank you for creating an account with {platform}!".format(platform=settings.PLATFORM_NAME),
         "http://edx.org/activate/",
-<<<<<<< HEAD
         "For more information, check our Help Center here: ",
-=======
-        (
-            "Check the help section of the "
-            u"{platform} website".format(platform=settings.PLATFORM_NAME)
-        )
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     ]
 
     # Text fragments we expect in the body of an email
