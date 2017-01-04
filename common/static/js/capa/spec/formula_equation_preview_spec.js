@@ -106,39 +106,17 @@ describe('Formula Equation Preview', function() {
             ]);
         });
 
-<<<<<<< HEAD
-        it('does not request again if the initial request has already been made', function () {
-            // jshint undef:false
-            expect(Problem.inputAjax.callCount).toEqual(1);
-
-            // Reset the spy in order to check calls again.
-            Problem.inputAjax.reset();
-=======
         it('does not request again if the initial request has already been made', function(done) {
             expect(window.Problem.inputAjax.calls.count()).toEqual(1);
 
             // Reset the spy in order to check calls again.
             window.Problem.inputAjax.calls.reset();
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
             // Enabling the formulaEquationPreview again to see if this will
             // reinitialize input request once again.
             formulaEquationPreview.enable();
 
             // This part may be asynchronous, so wait.
-<<<<<<< HEAD
-            waitsFor(function () {
-                return !Problem.inputAjax.wasCalled;
-            }, "times out in case of AJAX call", 1000);
-
-            // Expect Problem.inputAjax was not called as input request was
-            // initialized before.
-            expect(Problem.inputAjax).not.toHaveBeenCalled();
-        });
-
-        it('makes a request on user input', function () {
-            Problem.inputAjax.reset();
-=======
             jasmine.waitUntil(function() {
                 return window.Problem.inputAjax.calls.count() === 0;
             }).then(function() {
@@ -150,7 +128,6 @@ describe('Formula Equation Preview', function() {
 
         it('makes a request on user input', function(done) {
             window.Problem.inputAjax.calls.reset();
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
             $('#input_THE_ID').val('user_input').trigger('input');
 
             // This part is probably asynchronous
@@ -170,17 +147,9 @@ describe('Formula Equation Preview', function() {
             // Either it makes a request or jumps straight into displaying ''.
             jasmine.waitUntil(function() {
                 // (Short circuit if `inputAjax` is indeed called)
-<<<<<<< HEAD
-                return Problem.inputAjax.wasCalled ||  // jshint ignore:line
-                    MathJax.Hub.Queue.wasCalled;
-            }, "AJAX never called on user input", 1000);
-
-            runs(function () {
-=======
                 return window.Problem.inputAjax.calls.count() > 0 ||
                     window.MathJax.Hub.Queue.calls.count() > 0;
             }).then(function() {
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                 // Expect the request not to have been called.
                 expect(window.Problem.inputAjax).not.toHaveBeenCalled();
             }).always(done);
@@ -300,13 +269,8 @@ describe('Formula Equation Preview', function() {
                 expect(console.log).toHaveBeenCalled();
 
                 // We should look in the preview div for the MathJax.
-<<<<<<< HEAD
-                var previewElement = $("#input_THE_ID_preview")[0];
-                expect(previewElement.firstChild.data).toEqual("\\(THE_FORMULA\\)");
-=======
                 var previewElement = $('#input_THE_ID_preview')[0];
                 expect(previewElement.firstChild.data).toEqual('\\(THE_FORMULA\\)');
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
                 // Refresh the MathJax.
                 expect(window.MathJax.Hub.Queue).toHaveBeenCalledWith(
