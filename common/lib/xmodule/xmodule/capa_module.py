@@ -113,14 +113,10 @@ class CapaModule(CapaMixin, XModule):
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError(not_found_error_message), None, traceback_obj
 
-<<<<<<< HEAD
-        except TimeExpiredError as err:
+        except TimeExpiredError:
             dummy1, dummy2, traceback_obj = sys.exc_info()
-            raise ProcessingError, (time_expired_error_message, err), traceback_obj
+            raise ProcessingError(time_expired_error_message), traceback_obj
 
-        except Exception as err:
-            _, _, traceback_obj = sys.exc_info()
-=======
         except Exception:
             log.exception(
                 "Unknown error when dispatching %s to %s for user %s",
@@ -129,7 +125,6 @@ class CapaModule(CapaMixin, XModule):
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
             raise ProcessingError(generic_error_message), None, traceback_obj
 
         after = self.get_progress()
