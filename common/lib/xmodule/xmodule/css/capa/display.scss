@@ -193,14 +193,11 @@ div.problem {
       margin-top: $baseline;
     }
   }
-<<<<<<< HEAD
 
   .exceeded-time-limit-message {
     color: $gray;
   }
 }
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
   .question-description {
     color: $gray-d1;
@@ -1658,7 +1655,6 @@ div.problem .annotation-input {
     @include status-icon($partially-correct, $asterisk-icon);
   }
 }
-<<<<<<< HEAD
 
 // Loading Spinner Styling
 // ====================
@@ -1666,5 +1662,3 @@ div.problem .annotation-input {
   text-align: center;
   color: $gray-d1;
 }
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
