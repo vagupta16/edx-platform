@@ -69,14 +69,11 @@ class CourseDetails(object):
         self.license = "all-rights-reserved"  # default course license is all rights reserved
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
-<<<<<<< HEAD
         self.enable_enrollment_email = False
-=======
         self.banner_image_name = ""
         self.banner_image_asset_path = ""
         self.video_thumbnail_image_name = ""
         self.video_thumbnail_image_asset_path = ""
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         self.pre_requisite_courses = []  # pre-requisite courses
         self.entrance_exam_enabled = ""  # is entrance exam enabled
         self.entrance_exam_id = ""  # the content location for the entrance exam
@@ -111,18 +108,6 @@ class CourseDetails(object):
         """
         return cls.populate(modulestore().get_course(course_key))
 
-<<<<<<< HEAD
-        course_details.start_date = descriptor.start
-        course_details.end_date = descriptor.end
-        course_details.enrollment_start = descriptor.enrollment_start
-        course_details.enrollment_end = descriptor.enrollment_end
-        course_details.pre_requisite_courses = descriptor.pre_requisite_courses
-        course_details.course_image_name = descriptor.course_image
-        course_details.course_image_asset_path = course_image_url(descriptor)
-        course_details.enable_enrollment_email = descriptor.enable_enrollment_email
-        course_details.language = descriptor.language
-        course_details.self_paced = descriptor.self_paced
-=======
     @classmethod
     def populate(cls, course_descriptor):
         """
@@ -134,6 +119,7 @@ class CourseDetails(object):
         course_details.end_date = course_descriptor.end
         course_details.enrollment_start = course_descriptor.enrollment_start
         course_details.enrollment_end = course_descriptor.enrollment_end
+        course_details.enable_enrollment_email = descriptor.enable_enrollment_email
         course_details.pre_requisite_courses = course_descriptor.pre_requisite_courses
         course_details.course_image_name = course_descriptor.course_image
         course_details.course_image_asset_path = course_image_url(course_descriptor, 'course_image')
@@ -145,7 +131,6 @@ class CourseDetails(object):
         course_details.self_paced = course_descriptor.self_paced
         course_details.learning_info = course_descriptor.learning_info
         course_details.instructor_info = course_descriptor.instructor_info
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(course_descriptor, "license", "all-rights-reserved")
