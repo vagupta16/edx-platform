@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-define(["js/views/baseview", "codemirror", "js/models/course_update",
-        "common/js/components/views/feedback_prompt", "common/js/components/views/feedback_notification",
-        "js/views/course_info_helper", "js/utils/modal", "common/js/components/utils/view_utils"],
-    function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils, ViewUtils) {
-
-    var CourseInfoUpdateView = BaseView.extend({
-=======
 define(['codemirror',
         'js/utils/modal',
         'js/utils/date_utils',
@@ -19,7 +11,6 @@ define(['codemirror',
              PromptView, NotificationView) {
         'use strict';
         var CourseInfoUpdateView = ValidatingView.extend({
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
         // collection is CourseUpdateCollection
             events: {
@@ -162,29 +153,6 @@ define(['codemirror',
                 // Variable stored for unit test.
                 this.$modalCover = ModalUtils.showModalCover(false, function() {
                 // Binding empty function to prevent default hideModal.
-<<<<<<< HEAD
-            });
-
-            $('.date').datepicker('destroy');
-            $('.date').datepicker({ 'dateFormat': 'MM d, yy' });
-        },
-
-        onSave: function(event) {
-            event.preventDefault();
-            var validation = ViewUtils.keywordValidator.validateString(this.$codeMirror.getValue());
-            if (!validation.isValid) {
-                message = gettext('There are invalid keywords in your message. Please check the following keywords and try again:');
-                message += "\n" + validation.keywordsInvalid.join('\n');
-                window.alert(message);
-                return;
-            }
-            var targetModel = this.eventModel(event);
-            targetModel.set({
-                date : this.dateEntry(event).val(),
-                content : this.$codeMirror.getValue(),
-                push_notification_selected : this.push_notification_selected(event)
-            });
-=======
                 });
 
                 DateUtils.setupDatePicker('date', this, 0);
@@ -192,6 +160,13 @@ define(['codemirror',
 
             onSave: function(event) {
                 event.preventDefault();
+                var validation = ViewUtils.keywordValidator.validateString(this.$codeMirror.getValue());
+                if (!validation.isValid) {
+                    message = gettext('There are invalid keywords in your message. Please check the following keywords and try again:');
+                    message += "\n" + validation.keywordsInvalid.join('\n');
+                    window.alert(message);
+                    return;
+                }
                 var targetModel = this.eventModel(event);
                 targetModel.set({
                 // translate short-form date (for input) into long form date (for display)
@@ -199,7 +174,6 @@ define(['codemirror',
                     content: this.$codeMirror.getValue(),
                     push_notification_selected: this.push_notification_selected(event)
                 });
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
             // push change to display, hide the editor, submit the change
                 var saving = new NotificationView.Mini({
                     title: gettext('Saving')
