@@ -166,7 +166,6 @@ describe 'Problem', ->
       it 're-bind the content', ->
         expect(@problem.bind).toHaveBeenCalled()
 
-<<<<<<< HEAD
     describe 'with timed exam', ->
       beforeEach ->
         @problem.el.append('''
@@ -180,10 +179,7 @@ describe 'Problem', ->
       it 'should set up a timer', ->
         expect(@problem.maybeSetupTimer).toHaveBeenCalled()
 
-  describe 'check_fd', ->
-=======
   describe 'submit_fd', ->
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     beforeEach ->
       # Insert an input of type file outside of the problem.
       $('.xblock-student_view').after('<input type="file" />')
