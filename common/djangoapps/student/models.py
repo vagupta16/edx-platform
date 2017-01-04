@@ -24,12 +24,6 @@ import analytics
 import dogstats_wrapper as dog_stats_api
 from config_models.models import ConfigurationModel
 from django.conf import settings
-<<<<<<< HEAD
-from django.utils import timezone
-from django.contrib.auth.models import User
-from django.utils.crypto import get_random_string
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
@@ -40,6 +34,7 @@ from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
