@@ -308,7 +308,7 @@ def get_feedback_form_context(request):
 
     context["additional_info"] = {}
 
-    if request.user.is_authenticated():
+    if UserProfile.has_registered(request.user):
         context["realname"] = request.user.profile.name
         context["email"] = request.user.email
         context["additional_info"]["username"] = request.user.username
@@ -351,12 +351,8 @@ def submit_feedback(request):
         return HttpResponse(json.dumps({"field": field, "error": err_msg}), status=status_code)
 
     required_fields = ["subject", "details"]
-<<<<<<< HEAD
-    if not UserProfile.has_registered(request.user):
-=======
 
-    if not request.user.is_authenticated():
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+    if not UserProfile.has_registered(request.user):
         required_fields += ["name", "email"]
 
     required_field_errs = {
@@ -369,23 +365,7 @@ def submit_feedback(request):
         if field not in request.POST or not request.POST[field]:
             return build_error_response(400, field, required_field_errs[field])
 
-<<<<<<< HEAD
-    subject = request.POST["subject"]
-    details = request.POST["details"]
-    tags = dict(
-        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
-    )
-
-    if UserProfile.has_registered(request.user):
-        realname = request.user.profile.name
-        email = request.user.email
-        additional_info["username"] = request.user.username
-    else:
-        realname = request.POST["name"]
-        email = request.POST["email"]
-=======
-    if not request.user.is_authenticated():
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+    if not UserProfile.has_registered(request.user):
         try:
             validate_email(request.POST["email"])
         except ValidationError:
