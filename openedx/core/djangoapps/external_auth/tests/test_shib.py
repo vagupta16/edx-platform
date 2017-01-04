@@ -15,15 +15,9 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser, User
 from importlib import import_module
-<<<<<<< HEAD:common/djangoapps/external_auth/tests/test_shib.py
-from edxmako.tests import mako_middleware_process_request
-from external_auth.models import ExternalAuthMap
-from external_auth.views import _safe_postlogin_redirect
-from external_auth.views import (
-=======
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.external_auth.views import (
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142:openedx/core/djangoapps/external_auth/tests/test_shib.py
+    _safe_postlogin_redirect,
     shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 )
 from mock import patch
