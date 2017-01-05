@@ -8,48 +8,6 @@ from django.core.urlresolvers import reverse
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
-<<<<<<< HEAD
-<section class="home">
-  <header>
-    <div class="outer-wrapper">
-      <div class="title">
-        <hgroup>
-          % if homepage_overlay_html:
-            ${homepage_overlay_html}
-          % elif self.homepage_overlay_file:
-            <%include file="${self.homepage_overlay_file}" />
-          % else:
-            <h1>${_("The Future of Online Education")}</h1>
-            <h2>${_("For anyone, anywhere, anytime")}</h2>
-          % endif
-        </hgroup>
-        % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-          <div class="course-search">
-            <form method="get" action="/courses">
-              <label><span class="sr">${_("Search for a course")}</span>
-                <input class="search-input" name="search_query" type="text" placeholder="${_("Search for a course")}"></input>
-              </label>
-              <button class="search-button" type="submit">
-                <i class="icon fa fa-search" aria-hidden="true"></i><span class="sr">${_("Search")}</span>
-              </button>
-            </form>
-          </div>
-        % endif
-
-      </div>
-
-        % if self.homepage_promo_video_file:
-            <%include file="${self.homepage_promo_video_file}" />
-        % elif show_homepage_promo_video:
-            <a href="#video-modal" class="media" rel="leanModal">
-              <div class="hero">
-                <div class="play-intro"></div>
-              </div>
-            </a>
-        % endif
-
-    </div>
-=======
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="home">
       <header>
@@ -58,6 +16,8 @@ from openedx.core.djangolib.markup import HTML, Text
             <div class="heading-group">
               % if homepage_overlay_html:
                 ${homepage_overlay_html | n, decode.utf8}
+              % elif self.homepage_overlay_file:
+                <%include file="${self.homepage_overlay_file}" />
               % else:
                   ## Translators: 'Open edX' is a registered trademark, please keep this untranslated. See http://open.edx.org for more information.
                   <h1>${Text(_(u"Welcome to the Open edX{registered_trademark} platform!")).format(registered_trademark=HTML("<sup style='font-size: 65%'>&reg;</sup>"))}</h1>
@@ -79,9 +39,10 @@ from openedx.core.djangolib.markup import HTML, Text
             % endif
 
           </div>
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
-          % if show_homepage_promo_video:
+          % if self.homepage_promo_video_file:
+            <%include file="${self.homepage_promo_video_file}" />
+          % elif show_homepage_promo_video:
             <a href="#video-modal" class="media" rel="leanModal">
               <div class="hero">
                 <div class="play-intro"></div>
