@@ -9,173 +9,6 @@
         'js/student_account/views/RegisterView'
     ],
         function($, _, TemplateHelpers, AjaxHelpers, RegisterModel, RegisterView) {
-<<<<<<< HEAD
-
-        describe('edx.student.account.RegisterView', function() {
-            var model = null,
-                view = null,
-                requests = null,
-                authComplete = false,
-                PLATFORM_NAME = 'edX',
-                COURSE_ID = 'edX/DemoX/Fall',
-                USER_DATA = {
-                    email: 'xsy@edx.org',
-                    name: 'Xsy M. Education',
-                    username: 'Xsy',
-                    password: 'xsyisawesome',
-                    level_of_education: 'p',
-                    gender: 'm',
-                    year_of_birth: 2014,
-                    mailing_address: '141 Portland',
-                    goals: 'To boldly learn what no letter of the alphabet has learned before',
-                    honor_code: true
-                },
-                THIRD_PARTY_AUTH = {
-                    currentProvider: null,
-                    providers: [
-                        {
-                            id: 'oa2-google-oauth2',
-                            name: 'Google',
-                            iconClass: 'fa-google-plus',
-                            loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
-                            registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
-                        },
-                        {
-                            id: 'oa2-facebook',
-                            name: 'Facebook',
-                            iconClass: 'fa-facebook',
-                            loginUrl: '/auth/login/facebook/?auth_entry=account_login',
-                            registerUrl: '/auth/login/facebook/?auth_entry=account_register'
-                        }
-                    ]
-                },
-                FORM_DESCRIPTION = {
-                    method: 'post',
-                    submit_url: '/user_api/v1/account/registration/',
-                    fields: [
-                        {
-                            placeholder: 'username@domain.com',
-                            name: 'email',
-                            label: 'Email',
-                            defaultValue: '',
-                            type: 'email',
-                            required: true,
-                            instructions: 'Enter your email.',
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: 'Jane Doe',
-                            name: 'name',
-                            label: 'Full Name',
-                            defaultValue: '',
-                            type: 'text',
-                            required: true,
-                            instructions: 'Enter your username.',
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: 'JaneDoe',
-                            name: 'username',
-                            label: 'Username',
-                            defaultValue: '',
-                            type: 'text',
-                            required: true,
-                            instructions: 'Enter your username.',
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: '',
-                            name: 'password',
-                            label: 'Password',
-                            defaultValue: '',
-                            type: 'password',
-                            required: true,
-                            instructions: 'Enter your password.',
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: '',
-                            name: 'level_of_education',
-                            label: 'Highest Level of Education Completed',
-                            defaultValue: '',
-                            type: 'select',
-                            options: [
-                                {value: "", name: "--"},
-                                {value: "p", name: "Doctorate"},
-                                {value: "m", name: "Master's or professional degree"},
-                                {value: "b", name: "Bachelor's degree"}
-                            ],
-                            required: false,
-                            instructions: 'Select your education level.',
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: '',
-                            name: 'gender',
-                            label: 'Gender',
-                            defaultValue: '',
-                            type: 'select',
-                            options: [
-                                {value: "", name: "--"},
-                                {value: "m", name: "Male"},
-                                {value: "f", name: "Female"},
-                                {value: "o", name: "Other"}
-                            ],
-                            required: false,
-                            instructions: 'Select your gender.',
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: '',
-                            name: 'year_of_birth',
-                            label: 'Year of Birth',
-                            defaultValue: '',
-                            type: 'select',
-                            options: [
-                                {value: "", name: "--"},
-                                {value: 1900, name: "1900"},
-                                {value: 1950, name: "1950"},
-                                {value: 2014, name: "2014"}
-                            ],
-                            required: false,
-                            instructions: 'Select your year of birth.',
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: '',
-                            name: 'mailing_address',
-                            label: 'Mailing Address',
-                            defaultValue: '',
-                            type: 'textarea',
-                            required: false,
-                            instructions: 'Enter your mailing address.',
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: '',
-                            name: 'goals',
-                            label: 'Goals',
-                            defaultValue: '',
-                            type: 'textarea',
-                            required: false,
-                            instructions: "If you'd like, tell us why you're interested in taking online courses.",
-                            restrictions: {}
-                        },
-                        {
-                            placeholder: '',
-                            name: 'honor_code',
-                            label: 'I agree to the <a href="/honor">Terms of Service and Honor Code</a>',
-                            defaultValue: '',
-                            type: 'checkbox',
-                            required: true,
-                            instructions: '',
-                            restrictions: {}
-                        }
-                    ]
-                };
-
-            var createRegisterView = function(that) {
-=======
             describe('edx.student.account.RegisterView', function() {
                 var model = null,
                     view = null,
@@ -323,13 +156,13 @@
                                 defaultValue: '',
                                 type: 'textarea',
                                 required: false,
-                                instructions: "If you'd like, tell us why you're interested in edX.",
+                                instructions: "If you'd like, tell us why you're interested in taking online courses.",
                                 restrictions: {}
                             },
                             {
                                 placeholder: '',
                                 name: 'honor_code',
-                                label: 'I agree to the Terms of Service and Honor Code',
+                                label: 'I agree to the <a href="/honor">Terms of Service and Honor Code</a>',
                                 defaultValue: '',
                                 type: 'checkbox',
                                 required: true,
@@ -340,7 +173,6 @@
                     };
 
                 var createRegisterView = function(that) {
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                 // Initialize the register model
                     model = new RegisterModel({}, {
                         url: FORM_DESCRIPTION.submit_url,
