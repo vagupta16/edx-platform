@@ -106,17 +106,6 @@ def get_certificates_for_user(username):
     ]
 
 
-<<<<<<< HEAD
-def generate_user_certificates(
-        student,
-        course_key,
-        course=None,
-        designation=None,
-        insecure=False,
-        generation_mode='batch',
-        forced_grade=None,
-):
-=======
 def get_certificate_for_user(username, course_key):
     """
     Retrieve certificate information for a particular user for a specific course.
@@ -137,8 +126,8 @@ def get_certificate_for_user(username, course_key):
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
+                               designation=None,
                                forced_grade=None):
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     """
     It will add the add-cert request into the xqueue.
 
