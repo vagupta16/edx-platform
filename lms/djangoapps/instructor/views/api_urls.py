@@ -12,17 +12,17 @@ urlpatterns = patterns(
     url(r'^register_and_enroll_students$',
         'lms.djangoapps.instructor.views.api.register_and_enroll_students', name="register_and_enroll_students"),
     url(r'^list_course_role_members$',
-<<<<<<< HEAD
-        'instructor.views.api.list_course_role_members', name="list_course_role_members"),
-    url(r'^list_course_sections$',
-        'instructor.views.api.list_course_sections', name="list_course_sections"),
-    url(r'^list_course_problems$',
-        'instructor.views.api.list_course_problems', name="list_course_problems"),
-    url(r'^list_course_tree$',
-        'instructor.views.api.list_course_tree', name="list_course_tree"),
-=======
         'lms.djangoapps.instructor.views.api.list_course_role_members', name="list_course_role_members"),
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+
+    # Stanford Fork
+    url(r'^list_course_sections$',
+        'lms.djangoapps.instructor.views.api.list_course_sections', name="list_course_sections"),
+    url(r'^list_course_problems$',
+        'lms.djangoapps.instructor.views.api.list_course_problems', name="list_course_problems"),
+    url(r'^list_course_tree$',
+        'lms.djangoapps.instructor.views.api.list_course_tree', name="list_course_tree"),
+    # / Stanford Fork
+
     url(r'^modify_access$',
         'lms.djangoapps.instructor.views.api.modify_access', name="modify_access"),
     url(r'^bulk_beta_modify_access$',
@@ -30,32 +30,32 @@ urlpatterns = patterns(
     url(r'^get_problem_responses$',
         'lms.djangoapps.instructor.views.api.get_problem_responses', name="get_problem_responses"),
     url(r'^get_grading_config$',
-<<<<<<< HEAD
-        'instructor.views.api.get_grading_config', name="get_grading_config"),
+        'lms.djangoapps.instructor.views.api.get_grading_config', name="get_grading_config"),
+
+    # Stanford Fork
     url(r'^get_all_students(?P<make_csv>/csv)?$',
-        'instructor.views.api.get_all_students', name="get_all_students"),
+        'lms.djangoapps.instructor.views.api.get_all_students', name="get_all_students"),
     url(r'^save_query$',
-        'instructor.views.api.save_query', name="save_query"),
+        'lms.djangoapps.instructor.views.api.save_query', name="save_query"),
     url(r'^get_saved_queries$',
-        'instructor.views.api.get_saved_queries', name="get_saved_queries"),
+        'lms.djangoapps.instructor.views.api.get_saved_queries', name="get_saved_queries"),
     url(r'^get_temp_queries$',
-        'instructor.views.api.get_temp_queries', name="get_temp_queries"),
+        'lms.djangoapps.instructor.views.api.get_temp_queries', name="get_temp_queries"),
     url(r'^get_single_query/(?P<inclusion>\S{2,3})/(?P<query_type>(Section|Problem))/(?P<state_type>\S+)/(?P<state_id>\S+)$',
-        'instructor.views.api.get_single_query', name="get_single_query"),
+        'lms.djangoapps.instructor.views.api.get_single_query', name="get_single_query"),
     # the parameter-less url is here as a convenience because we don't know the params at the time of calling 'reverse
     url(r'^get_single_query',
-        'instructor.views.api.get_single_query', name="get_single_query"),
+        'lms.djangoapps.instructor.views.api.get_single_query', name="get_single_query"),
     url(r'^delete_saved_query',
-        'instructor.views.api.delete_saved_query', name="delete_saved_query"),
+        'lms.djangoapps.instructor.views.api.delete_saved_query', name="delete_saved_query"),
     url(r'^delete_temp_query_batch',
-        'instructor.views.api.delete_temp_query_batch', name="delete_temp_query_batch"),
+        'lms.djangoapps.instructor.views.api.delete_temp_query_batch', name="delete_temp_query_batch"),
     url(r'^delete_temp_query',
-        'instructor.views.api.delete_temp_query', name="delete_temp_query"),
+        'lms.djangoapps.instructor.views.api.delete_temp_query', name="delete_temp_query"),
     url(r'^save_group_name',
-        'instructor.views.api.save_group_name', name="save_group_name"),
-=======
-        'lms.djangoapps.instructor.views.api.get_grading_config', name="get_grading_config"),
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+        'lms.djangoapps.instructor.views.api.save_group_name', name="save_group_name"),
+    # / Stanford Fork
+
     url(r'^get_students_features(?P<csv>/csv)?$',
         'lms.djangoapps.instructor.views.api.get_students_features', name="get_students_features"),
     url(r'^get_issued_certificates/$',
