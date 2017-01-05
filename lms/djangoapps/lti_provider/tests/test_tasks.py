@@ -119,14 +119,10 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     @ddt.unpack
     @unittest.skip('until it always passes on Jenkins')
     def test_outcome_with_score_score(self, earned, possible, expected):
-<<<<<<< HEAD
         """
         TODO: Figure out why this was failing on Jenkins
         """
-        self.weighted_scores.score_for_module = MagicMock(return_value=(earned, possible))
-=======
         self.course_grade.score_for_module = MagicMock(return_value=(earned, possible))
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         tasks.send_composite_outcome(
             self.user.id, unicode(self.course_key), self.assignment.id, 1
         )
