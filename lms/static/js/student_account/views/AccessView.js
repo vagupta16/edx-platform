@@ -67,13 +67,10 @@
                         hinted_login: null
                     };
 
-<<<<<<< HEAD
-                this.platformName = options.platform_name;
-                this.isNonMicrositeTheme = options.stanford_theme_enabled
-=======
+                    this.isNonMicrositeTheme = options.stanford_theme_enabled // <- Stanford Fork
+
                     this.platformName = options.platform_name;
                     this.supportURL = options.support_link;
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
@@ -160,6 +157,7 @@
                             fields: data.fields,
                             model: model,
                             thirdPartyAuth: this.thirdPartyAuth,
+                            isNonMicrositeTheme: this.isNonMicrositeTheme, // <- Stanford Fork
                             platformName: this.platformName
                         });
 
@@ -195,18 +193,9 @@
                     this.element.scrollTop($loginAnchorElement);
                 },
 
-<<<<<<< HEAD
-                    this.subview.register =  new RegisterView({
-                        fields: data.fields,
-                        model: model,
-                        thirdPartyAuth: this.thirdPartyAuth,
-                        isNonMicrositeTheme: this.isNonMicrositeTheme,
-                        platformName: this.platformName
-=======
                 resetPassword: function() {
                     window.analytics.track('edx.bi.password_reset_form.viewed', {
                         category: 'user-engagement'
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                     });
 
                     this.element.hide($(this.el).find('#login-anchor'));
