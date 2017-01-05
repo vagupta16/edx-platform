@@ -683,19 +683,19 @@ section.self-assessment {
   font-weight: bold;
 }
 
-<<<<<<< HEAD
+// Stanford Fork
 h4.problem-feedback-label{
   margin-top: 1em;
-=======
+// / Stanford Fork
+
 /*
  * CodeMirror color contrast overrides
  * (so we don't change the vendor file)
  */
 
 .CodeMirror {
-    
+
     .CodeMirror-linenumber.CodeMirror-gutter-elt {
         color: $gray-d3 !important;
     }
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 }
