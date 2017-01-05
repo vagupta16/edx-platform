@@ -45,29 +45,6 @@ PAGES_NEARBY_DELTA = 2
 log = logging.getLogger("edx.discussions")
 
 
-<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
-class DiscussionTab(EnrolledTab):
-    """
-    A tab for the cs_comments_service forums.
-    """
-
-    type = 'discussion'
-    title = ugettext_noop('Discussion')
-    priority = None
-    view_name = 'django_comment_client.forum.views.forum_form_discussion'
-    is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
-    is_default = False
-    is_visible_to_sneak_peek = False
-
-    @classmethod
-    def is_enabled(cls, course, user=None):
-        if not super(DiscussionTab, cls).is_enabled(course, user):
-            return False
-        return utils.is_discussion_enabled(course.id)
-
-
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142:lms/djangoapps/discussion/views.py
 @newrelic.agent.function_trace()
 def make_course_settings(course, user):
     """
@@ -432,12 +409,8 @@ def user_profile(request, course_key, user_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     #TODO: Allow sorting?
-<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
     course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
-=======
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
 
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142:lms/djangoapps/discussion/views.py
     try:
         # If user is not enrolled in the course, do not proceed.
         django_user = User.objects.get(id=user_id)
