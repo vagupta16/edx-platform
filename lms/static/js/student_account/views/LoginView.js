@@ -114,52 +114,6 @@
                 thirdPartyAuth: function(event) {
                     var providerUrl = $(event.currentTarget).data('provider-url') || '';
 
-<<<<<<< HEAD
-                if (providerUrl) {
-                    window.location.href = providerUrl;
-                }
-            },
-
-            saveSuccess: function() {
-                this.trigger('auth-complete');
-                this.element.hide( this.$resetSuccess );
-            },
-
-            saveError: function( error ) {
-                var url;
-                var queryParameters = (function getUrlVars() {
-                    // http://stackoverflow.com/a/4656873
-                    var vars = [], hash;
-                    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-                    for(var i = 0; i < hashes.length; i++)
-                    {
-                        hash = hashes[i].split('=');
-                        vars.push(hash[0]);
-                        vars[hash[0]] = hash[1];
-                    }
-                    return vars;
-                }());
-                if(error.status === 418) {
-                    // Hijack the response for Shibboleth redirects
-                    url = error.responseText;
-                    if(url) {
-                        if(queryParameters['next']) {
-                            url = url + '?next=' + queryParameters['next'];
-                        }
-                        window.location = url;
-                        return;
-                    }
-                }
-                var msg = error.responseText;
-                if (error.status === 0) {
-                    msg = gettext('An error has occurred. Check your Internet connection and try again.');
-                } else if(error.status === 500){
-                    msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.');
-                }
-                this.errors = ['<li>' + msg + '</li>'];
-                this.setErrors();
-                this.element.hide( this.$resetSuccess );
-=======
                     if (providerUrl) {
                         window.location.href = providerUrl;
                     }
@@ -171,6 +125,33 @@
                 },
 
                 saveError: function(error) {
+                    // Stanford Fork
+                    var url;
+                    var queryParameters = (function getUrlVars() {
+                        // http://stackoverflow.com/a/4656873
+                        var vars = [], hash;
+                        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+                        for(var i = 0; i < hashes.length; i++)
+                        {
+                            hash = hashes[i].split('=');
+                            vars.push(hash[0]);
+                            vars[hash[0]] = hash[1];
+                        }
+                        return vars;
+                    }());
+                    if(error.status === 418) {
+                        // Hijack the response for Shibboleth redirects
+                        url = error.responseText;
+                        if(url) {
+                            if(queryParameters['next']) {
+                                url = url + '?next=' + queryParameters['next'];
+                            }
+                            window.location = url;
+                            return;
+                        }
+                    }
+                    // / Stanford Fork
+                    
                     var msg = error.responseText;
                     if (error.status === 0) {
                         msg = gettext('An error has occurred. Check your Internet connection and try again.');
@@ -180,7 +161,6 @@
                     this.errors = ['<li>' + msg + '</li>'];
                     this.setErrors();
                     this.element.hide(this.$resetSuccess);
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
                 /* If we've gotten a 403 error, it means that we've successfully
                  * authenticated with a third-party provider, but we haven't
