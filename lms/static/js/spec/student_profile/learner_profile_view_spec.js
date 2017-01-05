@@ -39,13 +39,8 @@ define(['backbone',
                     required: true,
                     editable: 'always',
                     showMessages: false,
-<<<<<<< HEAD
                     title: 'learners can see my:',
-                    valueAttribute: "account_privacy",
-=======
-                    title: 'edX learners can see my:',
                     valueAttribute: 'account_privacy',
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                     options: [
                         ['all_users', 'Full Profile'],
                         ['private', 'Limited Profile']
@@ -107,15 +102,9 @@ define(['backbone',
                         editable: editable,
                         showMessages: false,
                         title: 'About me',
-<<<<<<< HEAD
                         placeholderValue: "Tell other learners a little about yourself: where you live, " +
                             "what your interests are, why you're taking courses, or what you hope to learn.",
-                        valueAttribute: "bio",
-=======
-                        placeholderValue: 'Tell other edX learners a little about yourself: where you live, ' +
-                            "what your interests are, why you're taking courses on edX, or what you hope to learn.",
                         valueAttribute: 'bio',
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                         helpMessage: '',
                         messagePosition: 'header'
                     })
