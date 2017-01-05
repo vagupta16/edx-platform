@@ -622,24 +622,15 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
-<<<<<<< HEAD
+        # Stanford Sneak Peek permissions
         if user.is_authenticated():
             if not UserProfile.has_registered(user):
                 if not _can_load_descriptor_nonregistered(descriptor):
                     return ACCESS_DENIED
-        response = (
-            _visible_to_nonstaff_users(descriptor)
-            and _has_group_access(descriptor, user, course_key)
-            and
-            (
-                _has_detached_class_tag(descriptor)
-                or _can_access_descriptor_with_start_date(user, descriptor, course_key)
-            )
-        )
-=======
+        # / Stanford Sneak Peek permissions
+
         if _has_staff_access_to_descriptor(user, descriptor, course_key):
             return ACCESS_GRANTED
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
         # if the user has staff access, they can load the module so this code doesn't need to run
         return (
