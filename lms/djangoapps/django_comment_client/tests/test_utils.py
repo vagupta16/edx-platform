@@ -116,12 +116,8 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
 
 
 @ddt.ddt
-<<<<<<< HEAD
-@attr('shard_1')
-@mock.patch('student.models.UserProfile.has_registered', mock.Mock(return_value=True))
-=======
 @attr(shard=1)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+@mock.patch('student.models.UserProfile.has_registered', mock.Mock(return_value=True))
 class CoursewareContextTestCase(ModuleStoreTestCase):
     """
     Base testcase class for courseware context for the
@@ -210,11 +206,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), expected_discussion_xblocks)
 
 
-<<<<<<< HEAD
-@mock.patch('student.models.UserProfile.has_registered', mock.Mock(return_value=True))
-=======
 @attr(shard=3)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+@mock.patch('student.models.UserProfile.has_registered', mock.Mock(return_value=True))
 class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
     """
     Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
@@ -347,12 +340,8 @@ class CategoryMapTestMixin(object):
         )
 
 
-<<<<<<< HEAD
-@attr('shard_1')
-@mock.patch('student.models.UserProfile.has_registered', mock.Mock(return_value=True))
-=======
 @attr(shard=1)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+@mock.patch('student.models.UserProfile.has_registered', mock.Mock(return_value=True))
 class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     """
     Base testcase class for discussion categories for the
