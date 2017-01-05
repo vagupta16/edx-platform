@@ -245,13 +245,8 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                     title: 'About me',
                     valueAttribute: 'bio',
                     helpMessage: 'Wicked is good',
-<<<<<<< HEAD
                     placeholderValue: "Tell other learners a little about yourself: where you live, " +
                         "what your interests are, why you’re taking courses, or what you hope to learn.",
-=======
-                    placeholderValue: 'Tell other edX learners a little about yourself: where you live, ' +
-                        'what your interests are, why you’re taking courses on edX, or what you hope to learn.',
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                     editable: 'never',
                     persistChanges: true,
                     messagePosition: 'header'
@@ -282,13 +277,10 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                     title: 'About me',
                     valueAttribute: 'bio',
                     helpMessage: 'Wicked is good',
-<<<<<<< HEAD
                     placeholderValue: "Tell other learners a little about yourself: where you live, " +
                         "what your interests are, why you’re taking courses, or what you hope to learn.",
-=======
                     placeholderValue: 'Tell other edX learners a little about yourself: where you live, ' +
                         'what your interests are, why you’re taking courses on edX, or what you hope to learn.',
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
                     editable: 'toggle',
                     persistChanges: true,
                     messagePosition: 'header'
