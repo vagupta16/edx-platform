@@ -25,18 +25,12 @@
                     this.hasSecondaryProviders = (
                     data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
                 );
-<<<<<<< HEAD
-                this.currentProvider = data.thirdPartyAuth.currentProvider || '';
-                this.errorMessage = data.thirdPartyAuth.errorMessage || '';
-                this.platformName = data.platformName;
-                this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
-                this.isNonMicrositeTheme = data.isNonMicrositeTheme;
-=======
                     this.currentProvider = data.thirdPartyAuth.currentProvider || '';
                     this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                     this.platformName = data.platformName;
                     this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+
+                    this.isNonMicrositeTheme = data.isNonMicrositeTheme; // <- Stanford Fork
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                 },
@@ -48,28 +42,16 @@
                     /* We pass the context object to the template so that
                      * we can perform variable interpolation using sprintf
                      */
-<<<<<<< HEAD
-                    context: {
-                        fields: fields,
-                        currentProvider: this.currentProvider,
-                        errorMessage: this.errorMessage,
-                        providers: this.providers,
-                        hasSecondaryProviders: this.hasSecondaryProviders,
-                        isNonMicrositeTheme: this.isNonMicrositeTheme,
-                        platformName: this.platformName
-                    }
-                }));
-=======
                         context: {
                             fields: fields,
                             currentProvider: this.currentProvider,
                             errorMessage: this.errorMessage,
                             providers: this.providers,
                             hasSecondaryProviders: this.hasSecondaryProviders,
+                            isNonMicrositeTheme: this.isNonMicrositeTheme, // <- Stanford Fork
                             platformName: this.platformName
                         }
                     }));
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
                     this.postRender();
 
