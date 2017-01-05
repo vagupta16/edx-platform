@@ -254,68 +254,8 @@ class DjangoStorageReportStore(ReportStore):
     def store(self, course_id, filename, buff):
         """
         Store the contents of `buff` in a directory determined by hashing
-<<<<<<< HEAD
-        `course_id`, and name the file `filename`. `buff` is typically a
-        `StringIO`, but can be anything that implements `.getvalue()`.
-
-        This method assumes that the contents of `buff` are gzip-encoded (it
-        will add the appropriate headers to S3 to make the decompression
-        transparent via the browser). Filenames should end in whatever
-        suffix makes sense for the original file, so `.txt` instead of `.gz`
-        """
-        key = self.key_for(course_id, filename)
-
-        _config = config if config else {}
-
-        content_type = _config.get('content_type', 'text/csv')
-        content_encoding = _config.get('content_encoding', 'gzip')
-
-        data = buff.getvalue()
-        key.size = len(data)
-        key.content_encoding = content_encoding
-        key.content_type = content_type
-
-        # Just setting the content encoding and type above should work
-        # according to the docs, but when experimenting, this was necessary for
-        # it to actually take.
-        key.set_contents_from_string(
-            data,
-            headers={
-                "Content-Encoding": content_encoding,
-                "Content-Length": len(data),
-                "Content-Type": content_type,
-            }
-        )
-
-    def store_rows(self, course_id, filename, rows):
-        """
-        Given a `course_id`, `filename`, and `rows` (each row is an iterable of
-        strings), create a buffer that is a gzip'd csv file, and then `store()`
-        that buffer.
-
-        Even though we store it in gzip format, browsers will transparently
-        download and decompress it. Filenames should end in `.csv`, not `.gz`.
-        """
-        output_buffer = StringIO()
-        gzip_file = GzipFile(fileobj=output_buffer, mode="wb")
-        csvwriter = csv.writer(gzip_file)
-        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
-        gzip_file.close()
-
-        self.store(course_id, filename, output_buffer)
-
-    def delete_file(self, course_id, filename):
-        """
-        Given the `course_id` and `filename` for the report, this method deletes the report
-        """
-        key = self.key_for(course_id, filename)
-        self.bucket.delete_key(key)
-
-    def links_for(self, course_id):
-=======
         `course_id`, and name the file `filename`. `buff` can be any file-like
         object, ready to be read from the beginning.
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         """
         path = self.path_to(course_id, filename)
         self.storage.save(path, buff)
