@@ -1,20 +1,14 @@
-<<<<<<< HEAD
-<%! from django.utils.translation import ugettext as _ %>
-<%page args="section_data"/>
-
 <script>
   ${d3_graph_data_download.body()}
 </script>
 
 <%namespace name="d3_graph_data_download" file="/class_dashboard/d3_graph_data_download.js"/>
 
-=======
 <%page args="section_data" expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 <div class="data-download-container action-type-container">
   <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>
@@ -88,21 +82,17 @@ from openedx.core.djangolib.markup import HTML, Text
 
   %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
     <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
-<<<<<<< HEAD
-
-    <p>
-      <input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
-      <input type="button" name="get-student-responses" value="${_("Get Student Responses Report")}" data-endpoint="${ section_data['get_student_responses_url'] }"/>
-      <input type="button" name="ora2-response-btn" value="${_("Download Ora2 Responses (no email addresses)")}" data-endpoint="${ section_data['get_ora2_responses_url'] }"/>
-      <input type="button" name="ora2-response-btn-email" value="${_("Download Ora2 Responses (including email addresses)")}" data-endpoint="${ section_data['get_ora2_email_responses_url'] }"/>
-      <input type="button" name="course-forums-btn"  value="${_("Generate Course Forums Usage Report")}" data-endpoint="${ section_data['get_course_forums_usage_url'] }"/>
-      <input type="button" name="student-forums-btn" value="${_("Generate Student Forums Usage Report")}" data-endpoint="${ section_data['get_student_forums_usage_url']}"/>
-=======
     <p>
       <input type="button" name="calculate-grades-csv" class="async-report-btn" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
       <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/>
       <input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate ORA Data Report")}" data-endpoint="${ section_data['export_ora2_data_url'] }"/>
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+      <br />
+      <p><strong>Custom Stanford Reports</strong></p>
+      <input type="button" name="get-student-responses" class="async-report-btn" value="${_("Get Student Responses Report")}" data-endpoint="${ section_data['get_student_responses_url'] }"/>
+      <input type="button" name="ora2-response-btn" class="async-report-btn" value="${_("Download Ora2 Responses (no email addresses)")}" data-endpoint="${ section_data['get_ora2_responses_url'] }"/>
+      <input type="button" name="ora2-response-btn-email" class="async-report-btn" value="${_("Download Ora2 Responses (including email addresses)")}" data-endpoint="${ section_data['get_ora2_email_responses_url'] }"/>
+      <input type="button" name="course-forums-btn" class="async-report-btn" value="${_("Generate Course Forums Usage Report")}" data-endpoint="${ section_data['get_course_forums_usage_url'] }"/>
+      <input type="button" name="student-forums-btn" class="async-report-btn" value="${_("Generate Student Forums Usage Report")}" data-endpoint="${ section_data['get_student_forums_usage_url']}"/>
     </p>
   %endif
 
