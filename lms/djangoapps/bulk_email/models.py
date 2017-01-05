@@ -12,16 +12,12 @@ from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
 
-<<<<<<< HEAD
 from instructor_email_widget.models import GroupedQuery
-from xmodule_django.models import CourseKeyField
-=======
 from config_models.models import ConfigurationModel
 from student.roles import CourseStaffRole, CourseInstructorRole
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from util.keyword_substitution import substitute_keywords_with_data
 from util.query import use_read_replica_if_available
 
@@ -171,23 +167,6 @@ class CourseEmail(Email):
     class Meta(object):
         app_label = "bulk_email"
 
-<<<<<<< HEAD
-    # Three options for sending that we provide from the instructor dashboard:
-    # * Myself: This sends an email to the staff member that is composing the email.
-    #
-    # * Staff and instructors: This sends an email to anyone in the staff group and
-    #   anyone in the instructor group
-    #
-    # * All: This sends an email to anyone enrolled in the course, with any role
-    #   (student, staff, or instructor)
-    #
-    TO_OPTION_CHOICES = (
-        (SEND_TO_MYSELF, 'Myself'),
-        (SEND_TO_STAFF, 'Staff and instructors'),
-        (SEND_TO_ALL, 'All (students, staff and instructors)'),
-    )
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     course_id = CourseKeyField(max_length=255, db_index=True)
     # to_option is deprecated and unused, but dropping db columns is hard so it's still here for legacy reasons
     to_option = models.CharField(max_length=64, choices=[("deprecated", "deprecated")])
@@ -209,27 +188,20 @@ class CourseEmail(Email):
         if text_message is None:
             text_message = html_to_text(html_message)
 
-<<<<<<< HEAD
-        # perform some validation here:
-        if to_option.isdigit():
-            if not GroupedQuery.objects.filter(id=int(to_option)).exists():
-                message = "Course email for '{course}' being sent to query id that does not exist: {query_id}, subject '{subject}'".format(
-                    course=course_id,
-                    query_id=to_option,
-                    subject=subject,
-                )
-                raise ValueError(message)
-        elif to_option not in TO_OPTIONS:
-            fmt = 'Course email being sent to unrecognized to_option: "{to_option}" for "{course}", subject "{subject}"'
-            msg = fmt.format(to_option=to_option, course=course_id, subject=subject)
-            raise ValueError(msg)
-=======
         new_targets = []
         for target in targets:
             # split target, to handle cohort:cohort_name
             target_split = target.split(':', 1)
             # Ensure our desired target exists
-            if target_split[0] not in EMAIL_TARGETS:
+            if target.isdigit():
+                if not GroupedQuery.objects.filter(id=int(target)).exists():
+                    message = "Course email for '{course}' being sent to query id that does not exist: {query_id}, subject '{subject}'".format(
+                        course=course_id,
+                        query_id=target,
+                        subject=subject,
+                    )
+                    raise ValueError(message)
+            elif target_split[0] not in EMAIL_TARGETS:
                 fmt = 'Course email being sent to unrecognized target: "{target}" for "{course}", subject "{subject}"'
                 msg = fmt.format(target=target, course=course_id, subject=subject)
                 raise ValueError(msg)
@@ -240,7 +212,6 @@ class CourseEmail(Email):
             else:
                 new_target, _ = Target.objects.get_or_create(target_type=target_split[0])
             new_targets.append(new_target)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
         # create the task, then save it immediately:
         course_email = cls(
