@@ -15,13 +15,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from edxmako.shortcuts import render_to_response
 import student.views
 from student.models import CourseEnrollment
-<<<<<<< HEAD
-import courseware.views
 from student.models import UserProfile
-from microsite_configuration import microsite
-=======
 import courseware.views.views
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
@@ -56,13 +51,8 @@ def index(request):
     Redirects to main page -- info page if user authenticated, or marketing if not
     '''
 
-<<<<<<< HEAD
     if UserProfile.has_registered(request.user):
-        # For microsites, only redirect to dashboard if user has
-=======
-    if request.user.is_authenticated():
         # Only redirect to dashboard if user has
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         # courses in his/her dashboard. Otherwise UX is a bit cryptic.
         # In this case, we want to have the user stay on a course catalog
         # page to make it easier to browse for courses (and register)
