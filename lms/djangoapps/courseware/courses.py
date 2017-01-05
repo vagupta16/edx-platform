@@ -17,12 +17,11 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
 from xmodule.x_module import STUDENT_VIEW
-<<<<<<< HEAD
-from microsite_configuration import microsite
+
+# Stanford Fork
 from util.date_utils import get_default_time_display
 from util.keyword_substitution import substitute_keywords_with_data
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+# / Stanford Fork
 
 from courseware.access import has_access
 from courseware.date_summary import (
