@@ -90,12 +90,8 @@ Feature: LMS.LTI component
   Then I see text "Problem Scores: 8/10"
   And I see graph with total progress "8%"
   Then I click on the "Instructor" tab
-<<<<<<< HEAD
-  And I click on the "Gradebook" tab
-=======
   And I click the "Student Admin" button
   And I click on the "View Gradebook" link
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
   And I see in the gradebook table that "HW" is "80"
   And I see in the gradebook table that "Total" is "8"
   And I visit the LTI component
@@ -120,12 +116,8 @@ Feature: LMS.LTI component
   Then I see text "Problem Scores: 0/10"
   And I see graph with total progress "0%"
   Then I click on the "Instructor" tab
-<<<<<<< HEAD
-  And I click on the "Gradebook" tab
-=======
   And I click the "Student Admin" button
   And I click on the "View Gradebook" link
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
   And I see in the gradebook table that "HW" is "0"
   And I see in the gradebook table that "Total" is "0"
 
