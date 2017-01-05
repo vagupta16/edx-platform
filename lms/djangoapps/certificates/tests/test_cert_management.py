@@ -17,12 +17,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.management.commands import resubmit_error_certificates, regenerate_user, ungenerated_certs
-<<<<<<< HEAD
 from certificates.management.commands import update_cert_status
-from certificates.models import GeneratedCertificate, CertificateStatuses, BadgeAssertion
-=======
 from certificates.models import GeneratedCertificate, CertificateStatuses
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 
 class CertificateManagementTest(ModuleStoreTestCase):
@@ -266,15 +262,6 @@ class UngenerateCertificatesTest(CertificateManagementTest):
             course_id=key
         )
         self.assertEqual(certificate.status, CertificateStatuses.generating)
-<<<<<<< HEAD
-
-    @contextmanager
-    def _mock_passing_grade(self):
-        """Mock the grading function to always return a passing grade. """
-        symbol = 'courseware.grades.grade'
-        with patch(symbol) as mock_grade:
-            mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
-            yield
 
 
 @attr('shard_1')
@@ -352,5 +339,3 @@ class UpdateCertificateStatusTest(CertificateManagementTest):
                 username_or_email=self.no_certs_user.username,
                 status=target_status,
             )
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
