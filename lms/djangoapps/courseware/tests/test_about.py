@@ -432,9 +432,9 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.assertNotIn('<span class="important-dates-item-text">$10</span>', resp.content)
 
 
-<<<<<<< HEAD
-@attr('shard_1')
-class AboutSidebarHTMLTestCase(ModuleStoreTestCase):
+# Stanford About Sidebar tests
+@attr(shard=1)
+class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
     """
     This test case will check the About page for the content in the HTML sidebar.
     """
@@ -457,18 +457,13 @@ class AboutSidebarHTMLTestCase(ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("About Sidebar HTML Heading", resp.content)
+# / Stanford About Sidebar tests
 
 
-@attr('shard_1')
-@patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
-@patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
-class AboutPurchaseCourseTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
-=======
 @attr(shard=1)
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     """
     This test class runs through a suite of verifications regarding
     purchaseable courses
