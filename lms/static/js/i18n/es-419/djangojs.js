@@ -1416,12 +1416,8 @@
     "The minimum grade for course credit is not set.": "La calificaci\u00f3n m\u00ednima para obtener cr\u00e9ditos por el curso no est\u00e1 definida.", 
     "The minimum score percentage must be a whole number between 0 and 100.": "La nota m\u00ednima para aprobar debe ser un n\u00famero entero entre 0 y 100.", 
     "The name of this signatory as it should appear on certificates.": "El nombre de este signatario como debe aparecer en los certificados.", 
-<<<<<<< HEAD
     "The name that appears on your Statements of Accomplishment. Other learners never see your full name.": "El nombre que aparecer\u00e1 en sus declaraciones de logro. Otros usuarios nunca ver\u00e1n su nombre completo.", 
-    "The name that identifies you throughout {platform_name}. You cannot change your username.": "En nombre que lo identifica en el sitio de {platform_name}. No podr\u00e1 ser cambiado.", 
-=======
     "The name that identifies you throughout {platform_name}. You cannot change your username.": "El nombre que lo identifica en el sitio de {platform_name}. No podr\u00e1 ser cambiado.", 
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     "The name that is used for ID verification and appears on your certificates. Other learners never see your full name. Make sure to enter your name exactly as it appears on your government-issued photo ID, including any non-Roman characters.": "Nombre que se usar\u00e1 para la verificaci\u00f3n de identidad y que aparece en sus certificados. Otros estudiantes nunca ver\u00e1n su nombre completo. Aseg\u00farese de que ingresa el nombre exactamente como aparece en su identificaci\u00f3n oficial con foto, incluyendo cualquier caracter no romano.", 
     "The number of assignments of this type that will be dropped. The lowest scoring assignments are dropped first.": "El n\u00famero de asignaciones de este tipo que ser\u00e1n descartados. Las asignaciones con calificaciones m\u00e1s bajas ser\u00e1n las primeras en ser descartadas.", 
     "The number of subsections in the course that contain problems of this assignment type.": "El n\u00famero de subdivisiones del curso que contiene problemas de este tipo de asignaci\u00f3n.", 
