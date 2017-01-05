@@ -1914,11 +1914,7 @@ class CertificateItem(OrderItem):
                                                                                                        user_email=course_enrollment.user.email,
                                                                                                        order_number=order_number)
         to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-<<<<<<< HEAD
-        from_email = microsite.get_value('payment_support_email', settings.PAYMENT_CONFIRM_EMAIL)
-=======
         from_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         try:
             send_mail(subject, message, from_email, to_email, fail_silently=False)
         except Exception as exception:  # pylint: disable=broad-except
