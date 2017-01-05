@@ -639,12 +639,7 @@ def get_students_opened_subsection(request, csv=False):
 
         # Subsection name is everything after 3rd space in tooltip
         filename = sanitize_filename(' '.join(tooltip.split(' ')[3:]))
-<<<<<<< HEAD
         header = [_("Name").encode('utf-8'), _("Username").encode('utf-8')]
-=======
-
-        header = [_("Name"), _("Username")]
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         for student in students:
             results.append([student['student__profile__name'], student['student__username']])
 
