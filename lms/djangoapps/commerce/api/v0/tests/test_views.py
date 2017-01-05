@@ -359,7 +359,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertEqual(mock_update.called, is_opt_in)
         self.assertEqual(response.status_code, 200)
 
-<<<<<<< HEAD
+    # Stanford Enrollment Email tests
     def _test_enrollment_email(self):
         self.course.enable_enrollment_email = True
         self.update_course(self.course, self.user.id)
@@ -383,7 +383,8 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         Test that email is sent upon enrollment when E-Commerce service is not configured.
         """
         self._test_enrollment_email()
-=======
+    # / Stanford Enrollment Email tests
+
     def test_closed_course(self):
         """
         Ensure that the view does not attempt to create a basket for closed
@@ -393,7 +394,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         modulestore().update_item(self.course, self.user.id)  # pylint:disable=no-member
         with mock_create_basket(expect_called=False):
             self.assertEqual(self._post_to_view().status_code, 406)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 
 @attr(shard=1)
