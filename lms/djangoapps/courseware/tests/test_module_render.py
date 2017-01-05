@@ -2277,13 +2277,40 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     def test_get_item(self, default_ms):
         with self.store.default_store(default_ms):
             course = CourseFactory()
-<<<<<<< HEAD
-            for block_type in ('video',):
-                item = ItemFactory(category=block_type, parent=course)
-                item = self.store.get_item(item.scope_ids.usage_id)
-                self.assertEqual(item.__class__.__name__, 'RawDescriptorWithMixins')
+            self._verify_descriptor('video', course, 'RawDescriptorWithMixins')
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_dynamic_updates(self, default_ms):
+        """Tests that the list of disabled xblocks can dynamically update."""
+        with self.store.default_store(default_ms):
+            course = CourseFactory()
+            item_usage_id = self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins')
+            XBlockConfiguration(name='problem', enabled=False).save()
+
+            # First verify that the cached value is used until there is a new request cache.
+            self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins', item_usage_id)
+
+            # Now simulate a new request cache.
+            self.store.request_cache.data = {}
+            self._verify_descriptor('problem', course, 'RawDescriptorWithMixins', item_usage_id)
+
+    def _verify_descriptor(self, category, course, descriptor, item_id=None):
+        """
+        Helper method that gets an item with the specified category from the
+        modulestore and verifies that it has the expected descriptor name.
+
+        Returns the item's usage_id.
+        """
+        if not item_id:
+            item = ItemFactory(category=category, parent=course)
+            item_id = item.scope_ids.usage_id
+
+        item = self.store.get_item(item_id)
+        self.assertEqual(item.__class__.__name__, descriptor)
+        return item_id
 
 
+# Stanford Inline Analytics tests
 @override_settings(ANALYTICS_DATA_URL='dummy_url')
 class TestInlineAnalytics(ModuleStoreTestCase):
     """Tests to verify that Inline Analytics fragment is generated correctly"""
@@ -2447,36 +2474,4 @@ class TestInlineAnalytics(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertNotIn('Staff Analytics Info', result_fragment.content)
-=======
-            self._verify_descriptor('video', course, 'RawDescriptorWithMixins')
-
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_dynamic_updates(self, default_ms):
-        """Tests that the list of disabled xblocks can dynamically update."""
-        with self.store.default_store(default_ms):
-            course = CourseFactory()
-            item_usage_id = self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins')
-            XBlockConfiguration(name='problem', enabled=False).save()
-
-            # First verify that the cached value is used until there is a new request cache.
-            self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins', item_usage_id)
-
-            # Now simulate a new request cache.
-            self.store.request_cache.data = {}
-            self._verify_descriptor('problem', course, 'RawDescriptorWithMixins', item_usage_id)
-
-    def _verify_descriptor(self, category, course, descriptor, item_id=None):
-        """
-        Helper method that gets an item with the specified category from the
-        modulestore and verifies that it has the expected descriptor name.
-
-        Returns the item's usage_id.
-        """
-        if not item_id:
-            item = ItemFactory(category=category, parent=course)
-            item_id = item.scope_ids.usage_id
-
-        item = self.store.get_item(item_id)
-        self.assertEqual(item.__class__.__name__, descriptor)
-        return item_id
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+    # Stanford Inline Analytics tests
