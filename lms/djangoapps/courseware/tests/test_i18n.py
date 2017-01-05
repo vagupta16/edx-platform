@@ -54,10 +54,6 @@ class BaseI18nTestCase(TestCase):
             enabled=True
         ).save()
 
-<<<<<<< HEAD
-    def tearDown(self):
-        response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='en')
-=======
     def create_user(self):
         """
         Creates the user log in
@@ -73,7 +69,9 @@ class BaseI18nTestCase(TestCase):
         """
         # Get the login url & log in our user
         self.client.login(username=self.user.username, password=self.pwd)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+
+    def tearDown(self):
+        response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='en')
 
 
 @attr(shard=1)
