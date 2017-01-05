@@ -10,12 +10,8 @@ from collections import OrderedDict
 from datetime import datetime
 from itertools import chain
 from time import time
-<<<<<<< HEAD
-import unicodecsv
-import logging
-import urllib
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+
+import urllib # <- Stanford Fork
 
 import dogstats_wrapper as dog_stats_api
 import re
@@ -50,11 +46,10 @@ from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor_internal
-<<<<<<< HEAD
-from instructor_analytics.basic import student_response_rows
-=======
+
+from instructor_analytics.basic import student_response_rows # <- Stanford Fork
+
 from edxmako.shortcuts import render_to_string
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from instructor_analytics.basic import (
     enrolled_students_features,
     get_proctored_exam_results,
@@ -185,6 +180,7 @@ class BaseInstructorTask(Task):
             entry.save_now()
 
 
+# Stanford Email Widget Fork
 class EmailWidgetTask(Task):     # pylint: disable=abstract-method
     """
     Base task class for use with EmailWidgetTask models.
@@ -198,6 +194,7 @@ class EmailWidgetTask(Task):     # pylint: disable=abstract-method
         """
         TASK_LOG.debug(u'Task %s: failure returned', task_id)
         TASK_LOG.warning(u"Task (%s) failed", task_id, exc_info=True)
+# / Stanford Email Widget Fork
 
 
 class UpdateProblemModuleStateError(Exception):
@@ -895,7 +892,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-<<<<<<< HEAD
+# Stanford Student Submission Report Fork
 def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a responses CSV file for students that
@@ -1019,14 +1016,12 @@ def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _tas
     else:
         filename = u'ORA2_responses_anonymous'
         return _push_csv_responses_to_s3(collect_anonymous_ora2_data, filename, course_id, action_name)
+# / Stanford Student Submission Report Fork
 
 
-def _order_problems(blocks):
-=======
 def _graded_assignments(course_key):
     """
     Returns an OrderedDict that maps an assignment type to a dict of subsection-headers and average-header.
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     """
     grading_context = grading_context_for_course(course_key)
     graded_assignments_map = OrderedDict()
