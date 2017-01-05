@@ -52,12 +52,7 @@ from student.models import (
 )
 from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
-<<<<<<< HEAD
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-=======
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
 
@@ -280,8 +275,8 @@ class TestCommonExceptions400(TestCase):
         self.assertIn("Task is already running", result["error"])
 
 
-<<<<<<< HEAD
-@attr('shard_1')
+# Stanford email queries tests
+@attr(shard=1)
 class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensures the backend logic is sound for instructor email widget
@@ -805,10 +800,9 @@ class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 check_subsections.add(subsecs[name_key])
         self.assertSetEqual(section_names, check_sections)
         self.assertSetEqual(subsection_names, check_subsections)
+# / Stanford email queries tests
 
 
-@attr('shard_1')
-=======
 @attr(shard=1)
 @ddt.ddt
 class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -865,7 +859,6 @@ class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase
 
 
 @attr(shard=1)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -948,18 +941,13 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         status_code: expected HTTP status code response
         msg: message to display if assertion fails.
         """
-<<<<<<< HEAD
+        # Stanford Fork
         if endpoint in ['get_ora2_responses']:
             url = reverse(endpoint, kwargs={'course_id': self.course.id.to_deprecated_string(), 'include_email': False})
         else:
             url = reverse(endpoint, kwargs={'course_id': self.course.id.to_deprecated_string()})
-        if endpoint in ['send_email', 'students_update_enrollment', 'bulk_beta_modify_access']:
-            response = self.client.post(url, args)
-        else:
-=======
-        url = reverse(endpoint, kwargs={'course_id': self.course.id.to_deprecated_string()})
+        # / Stanford Fork
         if endpoint in INSTRUCTOR_GET_ENDPOINTS:
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
             response = self.client.get(url, args)
         else:
             response = self.client.post(url, args)
@@ -3626,24 +3614,24 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.assertIn(already_running_status, response.content)
 
     def test_get_ora2_responses_success(self):
-<<<<<<< HEAD
-        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string(), 'include_email': False})
+        url = reverse('export_ora2_data', kwargs={'course_id': unicode(self.course.id)})
 
-        with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
+        with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
             mock_submit_ora2_task.return_value = True
-            response = self.client.get(url, {})
-        success_status = "The ORA2 responses report is being generated."
+            response = self.client.post(url, {})
+        success_status = "The ORA data report is being generated."
         self.assertIn(success_status, response.content)
 
     def test_get_ora2_responses_already_running(self):
-        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string(), 'include_email': False})
+        url = reverse('export_ora2_data', kwargs={'course_id': unicode(self.course.id)})
 
-        with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
+        with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
             mock_submit_ora2_task.side_effect = AlreadyRunningError()
-            response = self.client.get(url, {})
-        already_running_status = "An ORA2 responses report generation task is already in progress."
+            response = self.client.post(url, {})
+        already_running_status = "An ORA data report generation task is already in progress."
         self.assertIn(already_running_status, response.content)
 
+    # Stanford Fork
     def test_collect_course_forums_data_success(self):
         url = reverse('get_course_forums_usage', kwargs={'course_id': unicode(self.course.id)})
 
@@ -3676,24 +3664,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             mock_submit_student_forums_task.side_effect = AlreadyRunningError()
             response = self.client.get(url, {})
         already_running_status = "A student forums usage report task is already in progress."
-=======
-        url = reverse('export_ora2_data', kwargs={'course_id': unicode(self.course.id)})
-
-        with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
-            mock_submit_ora2_task.return_value = True
-            response = self.client.post(url, {})
-        success_status = "The ORA data report is being generated."
-        self.assertIn(success_status, response.content)
-
-    def test_get_ora2_responses_already_running(self):
-        url = reverse('export_ora2_data', kwargs={'course_id': unicode(self.course.id)})
-
-        with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
-            mock_submit_ora2_task.side_effect = AlreadyRunningError()
-            response = self.client.post(url, {})
-        already_running_status = "An ORA data report generation task is already in progress."
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
-        self.assertIn(already_running_status, response.content)
+    # / Stanford Fork
 
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
