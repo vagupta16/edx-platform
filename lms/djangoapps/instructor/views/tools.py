@@ -18,11 +18,8 @@ from courseware.student_field_overrides import (
 )
 from xmodule.fields import Date
 from opaque_keys.edx.keys import UsageKey
-<<<<<<< HEAD
-from bulk_email.models import CourseAuthorization
-import csv
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+
+import csv # <- Stanford Fork
 
 DATE_FIELD = Date()
 
@@ -253,6 +250,7 @@ def add_block_ids(payload):
                 ele['block_id'] = UsageKey.from_string(ele['module_id']).block_id
 
 
+# Stanford CSV parser
 def generate_course_forums_d3(url_handle):
     """
     Grab the csv file at url_handle and parse it. Return a new-line joined csv string to be graphed
@@ -285,3 +283,4 @@ def generate_course_forums_d3(url_handle):
         # make the string to process in d3
         csv_string = '\n'.join([','.join(row) for row in rows])
         return csv_string
+# / Stanford CSV parser
