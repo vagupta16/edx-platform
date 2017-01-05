@@ -43,12 +43,9 @@ from openedx.core.lib.courses import course_image_url
 from student.roles import CourseStaffRole, CourseInstructorRole
 from instructor.views.data_access import get_group_query_students, delete_group_temp_queries_and_students
 from instructor_email_widget.models import GroupedQuery
-from instructor_task.models import InstructorTask
-from instructor_task.subtasks import (
 =======
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     SubtaskStatus,
     queue_subtasks_for_query,
     check_subtask_is_valid,
@@ -101,81 +98,17 @@ BULK_EMAIL_FAILURE_ERRORS = (
 )
 
 
-<<<<<<< HEAD
-def _get_recipient_querysets(user_id, to_option, course_id):
-    """
-    Returns a list of query sets of email recipients corresponding to the
-    requested `to_option` category.
-
-    `to_option` is either SEND_TO_MYSELF, SEND_TO_STAFF, or SEND_TO_ALL.
-
-    Recipients who are in more than one category (e.g. enrolled in the course
-    and are staff or self) will be properly deduped.
-    """
-    if to_option.isdigit():
-        if not GroupedQuery.objects.filter(id=int(to_option)).exists():
-            message = "Bulk email TO_OPTION query id {query_id} does not exist".format(query_id=to_option)
-            log.error(message)
-            raise Exception(message)
-    elif to_option not in TO_OPTIONS:
-        log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
-        raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
-
-    if to_option.isdigit():
-        recipient_queryset = get_group_query_students(course_id, int(to_option))
-        return [recipient_queryset]
-    elif to_option == SEND_TO_MYSELF:
-        user = User.objects.filter(id=user_id)
-        return [use_read_replica_if_available(user)]
-    else:
-        staff_qset = CourseStaffRole(course_id).users_with_role()
-        instructor_qset = CourseInstructorRole(course_id).users_with_role()
-        staff_instructor_qset = (staff_qset | instructor_qset).distinct()
-        if to_option == SEND_TO_STAFF:
-            return [use_read_replica_if_available(staff_instructor_qset)]
-
-        if to_option == SEND_TO_ALL:
-            # We also require students to have activated their accounts to
-            # provide verification that the provided email address is valid.
-            enrollment_qset = User.objects.filter(
-                is_active=True,
-                courseenrollment__course_id=course_id,
-                courseenrollment__is_active=True
-            )
-
-            # to avoid duplicates, we only want to email unenrolled course staff
-            # members here
-            unenrolled_staff_qset = staff_instructor_qset.exclude(
-                courseenrollment__course_id=course_id, courseenrollment__is_active=True
-            )
-
-            # use read_replica if available
-            recipient_qsets = [
-                use_read_replica_if_available(unenrolled_staff_qset),
-                use_read_replica_if_available(enrollment_qset),
-            ]
-            return recipient_qsets
-
-
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 def _get_course_email_context(course):
     """
     Returns context arguments to apply to all emails, independent of recipient.
     """
     course_id = course.id.to_deprecated_string()
     course_title = course.display_name
-<<<<<<< HEAD
-    course_url = 'https://{}{}'.format(
-        settings.SITE_NAME,
-        reverse('course_root', kwargs={'course_id': course_id})
-=======
     course_end_date = get_default_time_display(course.end)
     course_root = reverse('course_root', kwargs={'course_id': course_id})
     course_url = '{}{}'.format(
         settings.LMS_ROOT_URL,
         course_root
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     )
     image_url = u'{}{}'.format(settings.LMS_ROOT_URL, course_image_url(course))
     email_context = {
@@ -183,18 +116,10 @@ def _get_course_email_context(course):
         'course_root': course_root,
         'course_url': course_url,
         'course_image_url': image_url,
-<<<<<<< HEAD
-        'course_start_date': get_default_time_display(course.start),
-        'course_end_date': get_default_time_display(course.end),
-        'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('account_settings')),
-        'email_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
-        'platform_name': settings.PLATFORM_NAME,
-=======
         'course_end_date': course_end_date,
         'account_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('account_settings')),
         'email_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('dashboard')),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     }
     return email_context
 
