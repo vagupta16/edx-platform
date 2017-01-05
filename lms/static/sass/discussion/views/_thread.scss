@@ -51,30 +51,17 @@
     min-height: ($baseline*5);
 
     .response-header-content {
-<<<<<<< HEAD
       display: inline-block;
       vertical-align: top;
-      width: flex-grid(10,12);
+      width: flex-grid(10,12); // <- Stanford Fork
     }
 
     .response-header-actions {
-      width: flex-grid(2,12);
+      width: flex-grid(2,12); // <- Stanford Fork
       @include float(right);
       @include right($baseline);
       position: absolute;
       top: ($baseline);
-=======
-        display: inline-block;
-        vertical-align: top;
-        width: flex-grid(11,12);
-    }
-
-    .response-header-actions {
-        @include float(right);
-        @include right($baseline);
-        position: absolute;
-        top: $baseline;
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     }
 }
 
@@ -305,8 +292,6 @@ body.discussion {
         padding: $baseline/2;
     }
 }
-<<<<<<< HEAD
-=======
 
 .thread-wrapper,
 .forum-new-post-form {
@@ -314,4 +299,3 @@ body.discussion {
     max-width: 100%;
   }
 }
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
