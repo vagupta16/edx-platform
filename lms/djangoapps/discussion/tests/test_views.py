@@ -20,11 +20,8 @@ from django_comment_client.tests.group_id import (
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
 from django_comment_client.utils import strip_none
-<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/tests.py
-from student.models import UserProfile
-=======
+from student.models import UserProfile # <- Stanford Fork
 from lms.djangoapps.discussion import views
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142:lms/djangoapps/discussion/tests/test_views.py
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
@@ -735,8 +732,10 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         self.team.add_user(self.user)  # pylint: disable=no-member
 
+        # Stanford Sneak Peek fork
         # Create the user a UserProfile so it doesn't act as a direct access user
         UserProfile(user=self.user).save()
+        # / Stanford Sneak Peek fork
 
     def test_context_can_be_standalone(self, mock_request):
         mock_request.side_effect = make_mock_request_impl(
