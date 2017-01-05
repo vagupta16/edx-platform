@@ -16,16 +16,12 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-<<<<<<< HEAD
 from instructor_email_widget.models import StudentsForQuery, TemporaryQuery
-from bulk_email.models import Optout
 from courseware.models import StudentModule
-=======
 from bulk_email.models import Optout, BulkEmailFlag
 from bulk_email.tasks import _get_source_address, _get_course_email_context
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from courseware.tests.factories import StaffFactory, InstructorFactory
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
