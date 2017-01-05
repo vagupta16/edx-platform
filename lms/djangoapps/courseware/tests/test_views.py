@@ -707,14 +707,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertIn("Score: 3.0 / 3.0", response_content)
         self.assertIn('#4', response_content)
 
-<<<<<<< HEAD
-    @ddt.data('America/New_York',  # UTC - 5
-              'Asia/Pyongyang',      # UTC + 9
-              'Europe/London',       # UTC
-              'Canada/Yukon',        # UTC - 8
-              'Europe/Moscow',)      # UTC + 3
-    def test_submission_history_timezone(self, timezone):
-=======
     @ddt.data(('America/New_York', -5),  # UTC - 5
               ('Asia/Pyongyang', 9),  # UTC + 9
               ('Europe/London', 0),  # UTC
@@ -723,17 +715,12 @@ class ViewsTestCase(ModuleStoreTestCase):
     @ddt.unpack
     @freeze_time('2012-01-01')
     def test_submission_history_timezone(self, timezone, hour_diff):
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         with (override_settings(TIME_ZONE=timezone)):
             course = CourseFactory.create()
             course_key = course.id
             client = Client()
             admin = AdminFactory.create()
-<<<<<<< HEAD
-            client.login(username=admin.username, password='test')
-=======
             self.assertTrue(client.login(username=admin.username, password='test'))
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
             state_client = DjangoXBlockUserStateClient(admin)
             usage_key = course_key.make_usage_key('problem', 'test-history')
             state_client.set(
@@ -748,14 +735,10 @@ class ViewsTestCase(ModuleStoreTestCase):
             })
             response = client.get(url)
             response_content = HTMLParser().unescape(response.content)
-<<<<<<< HEAD
-            self.assertIn(settings.TIME_ZONE, response_content)
-=======
             expected_time = datetime.now() + timedelta(hours=hour_diff)
             expected_tz = expected_time.strftime('%Z')
             self.assertIn(expected_tz, response_content)
             self.assertIn(str(expected_time), response_content)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
     def _email_opt_in_checkbox(self, response, org_name_string=None):
         """Check if the email opt-in checkbox appears in the response content."""
@@ -1048,8 +1031,8 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
 
-<<<<<<< HEAD
-@attr('shard_1')
+# Stanford Sneak Peek tests
+@attr(shard=1)
 class TestNonRegisteredUser(TestCase):
     """
     Tests nonregistered (auto-created) users
@@ -1067,12 +1050,10 @@ class TestNonRegisteredUser(TestCase):
             req = self.request_factory.get(reverse('progress', args=[self.course_id]))
             req.user = self.user
             views.progress(req, self.course_id)
+# / Stanford Sneak Peek tests
 
 
-@attr('shard_1')
-=======
 @attr(shard=1)
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
@@ -1362,11 +1343,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-<<<<<<< HEAD
-        *itertools.product(((40, 4, True), (40, 4, False)), (True, False))
-=======
         *itertools.product((True, False), (True, False))
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, self_paced_enabled):
