@@ -1,17 +1,10 @@
 """
 Test for LMS instructor background task queue management
 """
-<<<<<<< HEAD
-
-from mock import MagicMock
-from mock import patch, Mock
-from bulk_email.models import CourseEmail, SEND_TO_ALL
-=======
 import ddt
 from mock import patch, Mock, MagicMock
 from nose.plugins.attrib import attr
 from bulk_email.models import CourseEmail, SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from courseware.tests.factories import UserFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -42,16 +35,14 @@ from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
 )
 
-<<<<<<< HEAD
-from instructor_task.api_helper import AlreadyRunningError
-from instructor_task.models import InstructorTask, PROGRESS
-from instructor_task.tasks import get_ora2_responses, get_course_forums_usage, get_student_forums_usage
-from instructor_task.tests.test_base import (InstructorTaskTestCase,
-                                             InstructorTaskCourseTestCase,
-                                             InstructorTaskModuleTestCase,
-                                             TestReportMixin,
-                                             TEST_COURSE_KEY)
-=======
+# Stanford Fork
+from instructor_task.tasks import (
+    get_ora2_responses,
+    get_course_forums_usage,
+    get_student_forums_usage,
+)
+# / Stanford Fork
+
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
 from lms.djangoapps.instructor_task.models import InstructorTask, PROGRESS
 from lms.djangoapps.instructor_task.tasks import export_ora2_data
@@ -62,7 +53,6 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     TestReportMixin,
     TEST_COURSE_KEY,
 )
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from certificates.models import CertificateStatuses, CertificateGenerationHistory
 
 
@@ -268,6 +258,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         )
         self._test_resubmission(api_call)
 
+# Stanford Fork
     def test_submit_ora2_request_task(self):
         request = self.create_task_request(self.instructor)
 
@@ -285,22 +276,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             submit_ora2_request_task(request, self.course.id, "False")
 
             mock_submit_task.assert_called_once_with(request, 'ora2_responses', get_ora2_responses, self.course.id, {'include_email': 'False'}, '')
-
-    def test_submit_course_forums_usage_task(self):
-        request = self.create_task_request(self.instructor)
-
-        with patch('instructor_task.api.submit_task') as mock_submit_task:
-            mock_submit_task.return_value = MagicMock()
-            submit_course_forums_usage_task(request, self.course.id)
-
-            mock_submit_task.assert_called_once_with(
-                request,
-                'course_forums_usage',
-                get_course_forums_usage,
-                self.course.id,
-                {},
-                '',
-            )
+# / Stanford Fork
 
     def test_submit_student_forums_usage_task(self):
         request = self.create_task_request(self.instructor)
