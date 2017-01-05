@@ -134,27 +134,10 @@ from openedx.core.djangolib.markup import HTML, Text
         % endif
     </div>
 
-<<<<<<< HEAD
-        <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
-
-      </ul>
-    </section>
     % if self.dashboard_extra_file:
         <%include file='${self.dashboard_extra_file}' />
     % endif
-  </section>
-  % if xseries_credentials:
-    <div class="wrapper-xseries-certificates">
-      <p class="title">${_("XSeries Program Certificates")}</p>
-      <p class="copy">${_("You have received a certificate for the following XSeries programs:")}</p>
-      <ul>
-      % for xseries_credential in xseries_credentials:
-        <li>
-          <a class="copy" href="${xseries_credential['credential_url']}">${xseries_credential['display_name']}</a>
-        </li>
-      % endfor
-      </ul>
-=======
+
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
         <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
           <form>
@@ -197,7 +180,6 @@ from openedx.core.djangolib.markup import HTML, Text
           </ul>
             </div>
         </div>
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     </div>
 </main>
 
