@@ -50,11 +50,8 @@ from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from lms.djangoapps.verify_student.services import VerificationService, ReverificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.credit.services import CreditService
-<<<<<<< HEAD
-from openedx.core.lib.inline_analytics_utils import add_inline_analytics
-=======
+from openedx.core.lib.inline_analytics_utils import add_inline_analytics # <- Stanford Fork
 from openedx.core.djangoapps.util.user_utils import SystemUser
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
