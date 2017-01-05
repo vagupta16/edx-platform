@@ -7,13 +7,11 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
-<<<<<<< HEAD
-from student.models import UserProfile
-from pipeline_mako import render_require_js_path_overrides
-=======
+
+from student.models import UserProfile # Stanford Fork
+
 from openedx.core.djangolib.markup import HTML
 from openedx.core.djangolib.js_utils import js_escaped_string
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 %>
 <%
   include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
@@ -69,14 +67,8 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
 <script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}"></script>
 
-<<<<<<< HEAD
-<%include file="../discussion/_js_head_dependencies.html" />
-  ${fragment.head_html()}
-
-=======
 <link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
   ${HTML(fragment.head_html())}
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 </%block>
 
 <%block name="js_extra">
