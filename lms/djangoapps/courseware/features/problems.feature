@@ -103,11 +103,7 @@ Feature: LMS.Answer problems
         Then I should see "You have used 1 of 3 attempts" somewhere in the page
         When I answer a "multiple choice" problem "incorrectly"
         And I reset the problem
-<<<<<<< HEAD
-        Then I should see "You have used 2 of 3 submissions" somewhere in the page
-=======
         Then I should see "You have used 2 of 3 attempts" somewhere in the page
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         And The "Submit" button does appear
         When I answer a "multiple choice" problem "correctly"
         Then The "Reset" button does not appear
