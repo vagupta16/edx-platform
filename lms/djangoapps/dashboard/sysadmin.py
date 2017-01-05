@@ -39,22 +39,13 @@ import dashboard.git_import as git_import
 from django_comment_client.management_utils import rename_user as rename_user_util
 from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
-<<<<<<< HEAD
-from external_auth.models import ExternalAuthMap
-from external_auth.views import generate_password
 from instructor_task.models import InstructorTask
-=======
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.external_auth.views import generate_password
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from student.models import CourseEnrollment, UserProfile, Registration
 from student.roles import CourseStaffRole, CourseInstructorRole
 import track.views
-<<<<<<< HEAD
-from util.json_request import JsonResponse
-from xmodule.modulestore import ModuleStoreEnum
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+from util.json_request import JsonResponse # <- Stanford Fork
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
