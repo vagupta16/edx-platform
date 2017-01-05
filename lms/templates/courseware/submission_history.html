@@ -1,22 +1,13 @@
-<<<<<<< HEAD
-<% import json, pytz %>
-<h3>${username | h} > ${course_id | h} > ${location | h}</h3>
-=======
 <%page expression_filter="h"/>
 <% import json, pytz  %>
 <h3>${username} > ${course_id} > ${location}</h3>
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 % for i, (entry, score) in enumerate(zip(history_entries, scores)):
 <hr/>
 <div>
-<<<<<<< HEAD
-<b>#${len(history_entries) - i}</b>: ${entry.updated.astimezone(pytz.timezone(settings.TIME_ZONE))} (${settings.TIME_ZONE} time)</br>
-=======
     <% timedate = entry.updated.astimezone(pytz.timezone(settings.TIME_ZONE))%>
     <% timedate_str = timedate.strftime('%Y-%m-%d %H:%M:%S %Z') %>
 <b>#${len(history_entries) - i}</b>: ${timedate_str}</br>
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 Score: ${score.grade} / ${score.max_grade}
 <pre>
 ${json.dumps(entry.state, indent=2, sort_keys=True)}
