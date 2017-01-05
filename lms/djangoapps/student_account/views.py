@@ -26,9 +26,9 @@ from openedx.core.djangoapps.external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
-<<<<<<< HEAD
-from external_auth.models import ExternalAuthMap
-=======
+
+from external_auth.models import ExternalAuthMap # <- Stanford Fork
+
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.lang_pref.api import released_languages, all_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -38,7 +38,6 @@ from openedx.core.djangoapps.user_api.accounts.api import request_password_chang
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.core.lib.edx_api_utils import get_edx_api_data
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 from student.models import UserProfile
 from student.views import (
     signin_user as old_login_view,
@@ -119,13 +118,9 @@ def login_and_registration_form(request, initial_mode="login"):
             'initial_mode': initial_mode,
             'third_party_auth': _third_party_auth_context(request, redirect_to),
             'third_party_auth_hint': third_party_auth_hint or '',
-<<<<<<< HEAD
-            'platform_name': settings.PLATFORM_NAME,
-            'stanford_theme_enabled': stanford_theme_enabled,
-=======
+            'stanford_theme_enabled': stanford_theme_enabled, # <- Stanford Fork
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'support_link': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,
