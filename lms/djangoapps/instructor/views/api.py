@@ -37,16 +37,15 @@ from util.file import (
     FileValidationException, UniversalNewlineIterator
 )
 from util.json_request import JsonResponse, JsonResponseBadRequest
-<<<<<<< HEAD
-from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
+
+# Stanford Fork
 from instructor_analytics.csvs import create_csv_response
 import gzip
+from instructor.lti_grader import LTIGrader
+# / Stanford Fork
 
-from microsite_configuration import microsite
-=======
 from util.views import require_global_staff
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
@@ -93,13 +92,8 @@ import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
-<<<<<<< HEAD
-from instructor.views import INVOICE_KEY
-from instructor.lti_grader import LTIGrader
-=======
 from openedx.core.djangolib.markup import HTML, Text
 from lms.djangoapps.instructor.views import INVOICE_KEY
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
@@ -119,11 +113,7 @@ from .tools import (
     parse_datetime,
     set_due_date_extension,
     strip_if_string,
-<<<<<<< HEAD
-    bulk_email_is_enabled_for_course,
-    generate_course_forums_d3,
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+    generate_course_forums_d3, # <- Stanford Fork
 )
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
