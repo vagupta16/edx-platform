@@ -39,15 +39,14 @@ from lms.djangoapps.instructor_task.tasks_helper import (
     UpdateProblemModuleStateError,
     upload_ora2_data,
 )
-<<<<<<< HEAD
-from instructor_task.tasks_helper import UpdateProblemModuleStateError
-from instructor_task.tasks_helper import (
+
+# Stanford Fork
+from lms.djangoapps.instructor_task.tasks_helper import (
     push_ora2_responses_to_s3,
     push_course_forums_data_to_s3,
     push_student_forums_data_to_s3,
 )
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+# / Stanford Fork
 
 PROBLEM_URL_NAME = "test_urlname"
 
@@ -64,11 +63,8 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.instructor = self.create_instructor('instructor')
         self.location = self.problem_location(PROBLEM_URL_NAME)
 
-<<<<<<< HEAD
-    def _create_input_entry(self, student_ident=None, use_problem_url=True, course_id=None, include_email=True):
-=======
-    def _create_input_entry(self, student_ident=None, use_problem_url=True, course_id=None, only_if_higher=False):
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+    def _create_input_entry(self, student_ident=None, use_problem_url=True, course_id=None, only_if_higher=False,
+                            include_email=True): # <- Stanford Fork
         """Creates a InstructorTask entry for testing."""
         task_id = str(uuid4())
         task_input = {'only_if_higher': only_if_higher}
