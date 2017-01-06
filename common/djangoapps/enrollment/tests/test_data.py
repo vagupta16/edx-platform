@@ -20,15 +20,9 @@ from enrollment.errors import (
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, AlreadyEnrolledError
-<<<<<<< HEAD
-from enrollment import data
-from student.roles import CourseStaffRole
-from student.tests.factories import UserProfileFactory
-=======
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
