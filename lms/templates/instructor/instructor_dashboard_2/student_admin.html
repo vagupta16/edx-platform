@@ -1,23 +1,5 @@
 <%page args="section_data" expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
-<<<<<<< HEAD
-<%namespace name='static' file='/static_content.html'/>
-<%page args="section_data"/>
-
-<div>
-  %if section_data['is_small_course']:
-  ## Show the gradebook for small courses
-    <h2>${_("Student Gradebook")}</h2>
-      <p>
-	${_("Click here to view the gradebook for enrolled students. This feature is only visible to courses with a small number of total enrolled students.")}
-      </p>
-      <br>
-      <p>
-	<a href="${ section_data['spoc_gradebook_url'] }" class="gradebook-link"> ${_("View Gradebook")} </a>
-      </p>
-    <hr>
-  %endif
-=======
 %if section_data['access']['staff'] or section_data['access']['instructor']:
 <div class="action-type-container">
     %if section_data['is_small_course']:
@@ -30,7 +12,6 @@
         <br><br>
         <hr>
     %endif
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 </div>
 
 <div class="student-specific-container action-type-container">
