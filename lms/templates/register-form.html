@@ -250,9 +250,8 @@ from student.models import UserProfile
       % endif
 
       % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
-<<<<<<< HEAD
       ## If the stanford theme isn't enabled, check if we have an Honor Code link in our marketing map
-      % if stanford_theme_enabled() or (marketing_link('HONOR') and marketing_link('HONOR') != '#'):
+      % if stanford_theme_enabled() or marketing_link('HONOR') and marketing_link('HONOR') != '#':
       <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
         <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
         <%
@@ -262,14 +261,6 @@ from student.models import UserProfile
             honor_code_path = self.register_honor_link
           else:
             honor_code_path = marketing_link('HONOR')
-=======
-      ## check if we have an Honor Code link in our marketing map
-      % if marketing_link('HONOR') and marketing_link('HONOR') != '#':
-      <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
-        <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
-        <%
-          honor_code_path = marketing_link('HONOR')
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         %>
         <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
           link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=honor_code_path),
