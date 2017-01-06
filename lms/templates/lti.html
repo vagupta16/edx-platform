@@ -60,13 +60,9 @@ from django.utils.translation import ugettext as _
 % endif
 
 % if has_score and comment:
-<<<<<<< HEAD
     % if grader_feedback_label:
-        <h4 class="problem-feedback-label">${grader_feedback_label}</h4>
+        <h4 class="hd hd-4 problem-feedback-label">${grader_feedback_label}</h4>
     % endif
-=======
-    <h4 class="hd hd-4 problem-feedback-label">${_("Feedback on your work from the grader:")}</h4>
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     <div class="problem-feedback">
         ## sanitized with bleach in view
         ${comment}
