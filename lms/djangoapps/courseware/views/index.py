@@ -382,6 +382,7 @@ class CoursewareIndex(View):
             'fragment': Fragment(),
             'staff_access': self.is_staff,
             'studio_url': get_studio_url(self.course, 'course'),
+            'analytics_url': getattr(settings, 'ANALYTICS_DATA_URL'),
             'masquerade': self.masquerade,
             'real_user': self.real_user,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
