@@ -7,10 +7,7 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 - Tests all of the existing reports.
 
 """
-<<<<<<< HEAD
-=======
 
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 import os
 import shutil
 from datetime import datetime
@@ -2032,32 +2029,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         for student in students[2:7]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
-<<<<<<< HEAD
-        current_task = Mock()
-        current_task.update_state = Mock()
-        instructor_task = Mock()
-        instructor_task.task_input = json.dumps({'students': None})
-        with self.assertNumQueries(224):
-            with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
-                mock_current_task.return_value = current_task
-                with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
-                    mock_queue.return_value = (0, "Successfully queued")
-                    with patch('instructor_task.models.InstructorTask.objects.get') as instructor_task_object:
-                        instructor_task_object.return_value = instructor_task
-                        result = generate_students_certificates(
-                            None, None, self.course.id, {}, 'certificates generated'
-                        )
-        self.assertDictContainsSubset(
-            {
-                'action_name': 'certificates generated',
-                'total': 10,
-                'attempted': 8,
-                'succeeded': 5,
-                'failed': 3,
-                'skipped': 2
-            },
-            result
-=======
         task_input = {'student_set': None}
         expected_results = {
             'action_name': 'certificates generated',
@@ -2067,7 +2038,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
-        with self.assertNumQueries(166):
+        with self.assertNumQueries(254):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {
@@ -2178,7 +2149,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         self.assertCertificatesGenerated(
             task_input,
             expected_results
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
         )
 
         # the first 4 students have passing certificate statuses since
