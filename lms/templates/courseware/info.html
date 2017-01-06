@@ -83,6 +83,9 @@ from openedx.core.djangolib.markup import HTML, Text
 
           <h4>${_("Course Updates and News")}</h4>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
+          % if self.course_info_extra_file:
+            <%include file="${self.course_info_extra_file}" />
+          % endif
 
           ## CourseTalk widget
           % if show_coursetalk_widget:
@@ -137,36 +140,6 @@ from openedx.core.djangolib.markup import HTML, Text
         </section>
       % endif <!-- if course authenticated -->
       </div>
-<<<<<<< HEAD
-      % endif
-
-      <h1>${_("Course Updates and News")}</h1>
-      ${get_course_info_section(request, masquerade_user, course, 'updates')}
-      % if self.course_info_extra_file:
-        <%include file="${self.course_info_extra_file}" />
-      % endif
-    </section>
-    <section aria-label="${_('Handout Navigation')}" class="handouts">
-      % if SelfPacedConfiguration.current().enable_course_home_improvements:
-        <h1>${_("Important Course Dates")}</h1>
-        ${get_course_date_summary(course, user)}
-      % endif
-
-      <h1>${_(course.info_sidebar_name)}</h1>
-      ${get_course_info_section(request, masquerade_user, course, 'handouts')}
-    </section>
-    % else:
-    <section class="updates">
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, masquerade_user, course, 'guest_updates')}
-    </section>
-    <section aria-label="${_('Handout Navigation')}" class="handouts">
-      <h1>${_("Course Handouts")}</h1>
-      ${get_course_info_section(request, masquerade_user, course, 'guest_handouts')}
-    </section>
-    % endif
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
   </div>
 </main>
 
