@@ -18,11 +18,10 @@ from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language_bidi
 from branding import api as branding_api
-<<<<<<< HEAD
+
 from microsite_configuration import microsite
-=======
+
 from pipeline_mako import render_require_js_path_overrides
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 %>
 <!DOCTYPE html>
 <!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
@@ -36,12 +35,10 @@ from pipeline_mako import render_require_js_path_overrides
 ## embedding theme conditionals into templates. All inheriting
 ## templates have access to these functions, and we can import these
 ## into non-inheriting templates via the %namespace tag.
-<<<<<<< HEAD
+
 <%def name="theme_enabled()"><% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %></%def>
 <%def name="is_microsite()"><% return microsite.is_request_in_microsite() %></%def>
 <%def name="stanford_theme_enabled()"><% return theme_enabled() and not is_microsite() %></%def>
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
 <%def name="pagetitle()" />
@@ -97,7 +94,6 @@ from pipeline_mako import render_require_js_path_overrides
     }).call(this, require || RequireJS.require);
   </script>
   <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
-<<<<<<< HEAD
 
   <%
     header_extra_file = None
@@ -123,8 +119,7 @@ from pipeline_mako import render_require_js_path_overrides
       self.register_honor_link = marketing_link('TOS') + '#honor'
       self.register_sidebar_extra_file = 'theme-register_sidebar.html' # TODO: This is hardcoded in register_sidebar.html because it doesn't inherit this file right now.
   %>
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
+  
   <%block name="js_overrides">
     ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
   </%block>
