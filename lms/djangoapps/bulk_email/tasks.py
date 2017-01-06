@@ -39,11 +39,9 @@ from django.core.urlresolvers import reverse
 from bulk_email.models import CourseEmail, Optout
 from courseware.courses import get_course
 from openedx.core.lib.courses import course_image_url
-<<<<<<< HEAD
-from student.roles import CourseStaffRole, CourseInstructorRole
-from instructor.views.data_access import get_group_query_students, delete_group_temp_queries_and_students
-from instructor_email_widget.models import GroupedQuery
-=======
+
+from instructor.views.data_access import delete_group_temp_queries_and_students # <- Stanford Fork
+
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
     SubtaskStatus,
