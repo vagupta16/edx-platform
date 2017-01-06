@@ -1,63 +1,10 @@
-<<<<<<< HEAD
-<%! from django.utils.translation import ugettext as _ %>
-<%page args="section_data"/>
-<%include file='keyword_sub_modal.html' args="keywords_supported=section_data['keywords_supported']" />
-
-<div class="vert-left send-email" id="section-send-email">
-  <h2> ${_("Send Email")} </h2>
-  <div class="request-response msg msg-confirm copy" id="request-response"></div>
-  <ul class="list-fields">
-    <li class="field">
-      <label for="id_to">${_("Send to:")}</label><br/>
-      <select id="id_to" name="send_to">
-        <option value="myself">${_("Myself")}</option>
-        <option value="staff">${_("Staff and admins")}</option>
-      <option value="all">${_("All (students, staff, and admins)")}</option>
-        % for to_option in section_data['to_options']:
-          <option value="${to_option[0]}">${_(to_option[1])}</option>
-        % endfor
-      </select>
-    </li>
-  <br/>
-  <li class="field">
-    <label for="id_subject">${_("Subject: ")}</label><br/>
-     %if subject:
-      <input type="text" id="id_subject" name="subject" maxlength="128" size="75" value="${subject}">
-     %else:
-      <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
-     %endif
-     <span class="tip">${_("(Max 128 characters)")}</span>
-  </li>
-  <li class="field">
-    <label>${_("Message:")}</label>
-    <span class="tip"><a href="#keyword-sub-modal" class="keyword-sub-link" rel="leanModal">${_("Supports keyword substitutions")}</a></span>
-      <div class="email-editor">
-      ${ section_data['editor'] }
-      </div>
-    <input type="hidden" name="message" value="">
-  </li>
-  </ul>
- <div class="submit-email-action">
-  <p class="copy">${_("Please try not to email students more than once per week. Before sending your email, consider:")}</p>
-  <ul class="list-advice">
-   <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
-   <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed, and that embedded links and images work properly?")}</li>
-  </ul>
- </div>
- <div class="submit-email-warning">
-   <p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
-     ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
-   <b>${_("A queued email CANNOT be cancelled.")}</b></p>
-</div>
- <br />
-  <input type="button" name="send" value="${_("Send Email")}" data-endpoint="${ section_data['send_email'] }" >
-  <div class="request-response-error"></div>
-=======
 <%page args="section_data" expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML
 %>
+
+<%include file='keyword_sub_modal.html' args="keywords_supported=section_data['keywords_supported']" />
 
 <div class="vert-left send-email" id="section-send-email">
     <div class="request-response msg msg-confirm copy" id="request-response"></div>
@@ -135,7 +82,6 @@ from openedx.core.djangolib.markup import HTML
     <br />
     <input type="button" name="send" value="${_("Send Email")}" data-endpoint="${ section_data['send_email'] }" >
     <div class="request-response-error"></div>
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
     %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <div class="running-tasks-container action-type-container">
