@@ -1,13 +1,9 @@
-<<<<<<< HEAD
 <%! from django.conf import settings %>
-<%! from django.utils.translation import ugettext as _ %>
-=======
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ungettext, ugettext as _
 from openedx.core.djangolib.markup import HTML
 %>
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 
 <%! from xmodule.util.date_utils import get_time_display %>
 
@@ -93,19 +89,13 @@ from openedx.core.djangolib.markup import HTML
         <button type="button" class="show problem-action-btn btn-default btn-small" aria-describedby="${ short_id }-problem-title"><span class="icon fa fa-info-circle" aria-hidden="true"></span><span class="show-label">${_('Show Answer')}</span></button>
     </span>
     % endif
-<<<<<<< HEAD
-    % if attempts_allowed and not problem_is_timed:
-    <div class="submission_feedback" aria-live="polite">
-      ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}
-=======
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
     </div>
     <div class="submit-attempt-container">
       <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
           <span class="submit-label" aria-hidden="true">${ submit_button }</span><span class="sr">${_("Submit your answer")}</span>
       </button>
       <div class="submission-feedback" id="submission_feedback_${short_id}">
-      % if attempts_allowed:
+      % if attempts_allowed and not problem_is_timed:
           ${ungettext("You have used {num_used} of {num_total} attempt", "You have used {num_used} of {num_total} attempts", attempts_allowed).format(num_used=attempts_used, num_total=attempts_allowed)}
       % endif
       </div>
