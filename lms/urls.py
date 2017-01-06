@@ -104,21 +104,20 @@ urlpatterns = (
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
 )
 
-<<<<<<< HEAD
+# Stanford SHIB_ONLY urls
 if settings.SHIB_ONLY_SITE:
     urlpatterns += (
         url(r'^backup_login$', 'student.views.signin_user', name="backup_signin_user"),
         url(r'^backup_register$', 'student.views.register_user', name="backup_register_user"),
     )
+# / Stanford SHIB_ONLY urls
 
-=======
 urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
 )
 
 # TODO: This needs to move to a separate urls.py once the student_account and
 # student views below find a home together
->>>>>>> 90707afa503dfba74c592f88ce43c01d12c76142
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += (
