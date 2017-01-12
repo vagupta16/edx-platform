@@ -590,6 +590,17 @@ COURSE_SETTINGS = {
     }
 }
 
+COURSE_MODE_DEFAULTS = {
+    'currency': 'usd',
+    'description': None,
+    'expiration_datetime': None,
+    'min_price': 0,
+    'name': 'Audit',
+    'sku': None,
+    'slug': 'audit',
+    'suggested_prices': '',
+}
+
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
