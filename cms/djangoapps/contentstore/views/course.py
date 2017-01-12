@@ -1028,16 +1028,13 @@ def settings_handler(request, course_key_string):
 
             about_page_editable = not marketing_site_enabled
             enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
-
             short_description_editable = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'EDITABLE_SHORT_DESCRIPTION',
                 settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
             )
-            
             default_enroll_email_template_pre = render_to_string('emails/default_pre_enrollment_message.txt', {})
             default_enroll_email_template_post = render_to_string('emails/default_post_enrollment_message.txt', {})
-
             self_paced_enabled = SelfPacedConfiguration.current().enabled
 
             settings_context = {

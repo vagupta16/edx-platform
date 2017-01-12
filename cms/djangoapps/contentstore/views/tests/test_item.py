@@ -1705,6 +1705,7 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(display_name, templates[0]['display_name'])
         self.assertEqual(support_level, templates[0]['support_level'])
 
+
 @ddt.ddt
 class TestXBlockInfo(ItemTest):
     """
