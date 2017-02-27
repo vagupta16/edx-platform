@@ -380,6 +380,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
 
+
 @ddt.ddt
 class CourseGradingTest(CourseTestCase):
     """
