@@ -21,6 +21,7 @@ from enrollment import data
 from student.roles import CourseStaffRole
 from student.tests.factories import UserProfileFactory
 
+
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentDataTest(ModuleStoreTestCase):

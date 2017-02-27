@@ -54,7 +54,7 @@ class TestOLIBackend(TestCase):
         Assert that problem_check events are sent
         """
         mock_get_problem_text.return_value = None
-        
+
         # pylint: disable=line-too-long
         event = {
             'username': 'verified',
